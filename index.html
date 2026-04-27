@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lyn spillerbørs</title>
+</head>
+
+<body>
+  <h1>Lyn spillerbørs</h1>
+
+  <h2>Velg kamp</h2>
+  <select id="match">
+    <option>Moss borte</option>
+    <option>Sandnes Ulf hjemme</option>
+    <option>Sogndal borte</option>
+  </select>
+
+  <h2>Pedersen</h2>
+  <input type="number" id="Pedersen" min="1" max="10">
+
+  <h2>SAH</h2>
+  <input type="number" id="SAH" min="1" max="10">
+
+  <h2>Sell</h2>
+  <input type="number" id="Sell" min="1" max="10">
+
+  <h2>ABO</h2>
+  <input type="number" id="ABO" min="1" max="10">
+
+  <br><br>
+
+  <button onclick="sendVote()">Send inn</button>
+
+  <script>
+    async function sendVote() {
+      const match = document.getElementById("match").value;
+
+      const players = ["Pedersen","SAH","Sell","ABO"];
+
+      for (let player of players) {
+        const rating = document.getElementById(player).value;
+
+        if (!rating) continue;
+
+        await fetch("https://oqwlbdnthdbomnobxqot.supabase.co/rest/v1/votes", {
+          method: "POST",
+          headers: {
+            "apikey": "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            match: match,
+            player: player,
+            rating: Number(rating)
+          })
+        });
+      }
+
+      alert("Stemmen er sendt!");
+    }
+  </script>
+</body>
+</html>
