@@ -3,111 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Lyn spillerbørs</title>
 
   <style>
+    :root {
+      --lyn-red: #d71920;
+      --lyn-dark: #101828;
+      --lyn-blue: #13294b;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #e4e7ec;
+      --muted: #667085;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #101828;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--lyn-dark);
     }
 
     header {
-      background: #d71920;
+      background: linear-gradient(135deg, var(--lyn-red), #9f1016);
       color: white;
-      padding: 28px 18px;
+      padding: 34px 18px 30px;
       text-align: center;
+    }
+
+    .logo-wrap {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: white;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--lyn-red);
+      font-weight: 900;
+      font-size: 28px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
     }
 
     header h1 {
       margin: 0;
-      font-size: 34px;
+      font-size: 36px;
+      letter-spacing: -0.5px;
     }
 
     header p {
-      margin: 8px 0 0;
+      margin: 9px auto 0;
+      max-width: 650px;
       font-size: 16px;
+      line-height: 1.45;
+      opacity: 0.95;
     }
 
     main {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 24px auto;
-      padding: 0 14px 40px;
+      padding: 0 14px 50px;
     }
 
     .box {
-      background: white;
-      border-radius: 18px;
+      background: var(--card);
+      border-radius: 20px;
       padding: 18px;
       margin-bottom: 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      box-shadow: 0 5px 18px rgba(16, 24, 40, 0.08);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 760px) {
+      .row {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
     }
 
     label {
-      font-weight: bold;
+      font-weight: 800;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
     }
 
-    select, input, textarea {
+    select,
+    input,
+    textarea {
       width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      border-radius: 12px;
+      padding: 13px 14px;
+      border-radius: 14px;
       border: 1px solid #d0d5dd;
       font-size: 16px;
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #fff1f2;
+      color: #b51218;
+      border: 1px solid #fecdd3;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
       gap: 14px;
     }
 
     .player {
       background: #ffffff;
-      border: 1px solid #eaecf0;
-      border-radius: 18px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
       padding: 14px;
       text-align: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .player:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(16,24,40,0.09);
     }
 
     .avatar {
-      width: 72px;
-      height: 72px;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
-      background: #101828;
+      background: radial-gradient(circle at 30% 30%, #243b6b, var(--lyn-dark));
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 10px;
       font-size: 22px;
-      font-weight: bold;
+      font-weight: 900;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
     }
 
     .player-name {
-      font-weight: bold;
-      margin-bottom: 10px;
+      font-weight: 900;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.15;
+    }
+
+    .role {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 3px 0 10px;
+      min-height: 16px;
     }
 
     .rating {
-      width: 80px;
+      width: 78px;
       text-align: center;
       margin: auto;
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 19px;
+      font-weight: 900;
     }
 
     button {
-      background: #d71920;
+      background: var(--lyn-red);
       color: white;
       border: none;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 15px 22px;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 900;
       cursor: pointer;
       width: 100%;
       margin-top: 16px;
@@ -115,12 +237,6 @@
 
     button:hover {
       background: #b51218;
-    }
-
-    .small {
-      color: #667085;
-      font-size: 14px;
-      margin-top: 6px;
     }
 
     .success {
@@ -132,46 +248,102 @@
       padding: 12px;
       margin-top: 12px;
       text-align: center;
-      font-weight: bold;
+      font-weight: 900;
+    }
+
+    .error {
+      display: none;
+      background: #fff1f3;
+      color: #b42318;
+      border: 1px solid #fecdca;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .preview {
+      background: #f9fafb;
+      border: 1px dashed #d0d5dd;
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 72px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 20px;
     }
   </style>
 </head>
 
 <body>
   <header>
+    <div class="logo-wrap">
+      <img src="lyn-logo.png" alt="Lyn logo" onload="this.style.display='block'; this.parentElement.childNodes[0].textContent='';" />
+      LYN
+    </div>
     <h1>Lyn spillerbørs</h1>
     <p>Stem på spillerne etter kamp. 1 til 10. Helt subjektivt. Heldigvis.</p>
   </header>
 
   <main>
-    <div class="box">
-      <label for="match">Velg kamp</label>
-      <select id="match">
-        <option>Moss borte</option>
-        <option>Sandnes Ulf hjemme</option>
-        <option>Sogndal borte</option>
-        <option>Haugesund hjemme</option>
-      </select>
+    <div class="box row">
+      <div>
+        <label for="match">Velg kamp</label>
+        <select id="match"></select>
+        <div class="small">Alle kamper i terminlisten er lagt inn. Tidspunkt kan endres utover sesongen.</div>
+      </div>
+
+      <div>
+        <label for="voter">Forumbruker / navn</label>
+        <input id="voter" placeholder="Valgfritt" />
+        <div class="small">Du kan være anonym, men navn gjør snittet morsommere.</div>
+      </div>
     </div>
 
     <div class="box">
-      <label for="voter">Forumbruker / navn</label>
-      <input id="voter" placeholder="Valgfritt" />
-      <div class="small">Du kan være anonym, men navn gjør snittet litt morsommere.</div>
-    </div>
+      <div class="section-title">
+        <div>
+          <h2>Gi karakter</h2>
+          <div class="small">La felt stå tomt hvis spilleren ikke skal vurderes.</div>
+        </div>
+        <span class="pill">1 til 10</span>
+      </div>
 
-    <div class="box">
-      <h2>Gi karakter</h2>
-      <div class="small">La felt stå tomt hvis spilleren ikke skal vurderes.</div>
-      <br />
       <div class="grid" id="players"></div>
     </div>
 
     <div class="box">
       <label for="comment">Kommentar</label>
       <textarea id="comment" rows="4" placeholder="F.eks: Skaug BB, Aadland spørsmålstegn, bortefeltet 10."></textarea>
+
       <button onclick="sendVote()">Send inn børs</button>
+
       <div id="success" class="success">Stemmen er sendt!</div>
+      <div id="error" class="error">Noe gikk feil. Sjekk Supabase-tabellen eller prøv igjen.</div>
+    </div>
+
+    <div class="box">
+      <div class="section-title">
+        <div>
+          <h2>Resultater</h2>
+          <div class="small">Neste steg blir å vise snitt per kamp direkte her.</div>
+        </div>
+        <span class="pill">Kommer snart</span>
+      </div>
+      <div class="preview">
+        Snitt, BB og antall stemmer kommer her i neste versjon.
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Uoffisiell supporterbørs.
     </div>
   </main>
 
@@ -179,89 +351,151 @@
     const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
     const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
-    const players = [
-      "Pedersen",
-      "SAH",
-      "Sell",
-      "Midtskogen",
-      "HSN",
-      "Fredriksen",
-      "Isufi",
-      "Skaug",
-      "ABO",
-      "Sawaneh",
-      "Hellum",
-      "Kurtovic",
-      "Sock",
-      "Vik",
-      "Monglo",
-      "Wæhler",
-      "Aadland",
-      "Hartmann",
-      "Bortefeltet"
+    const matches = [
+      "Haugesund hjemme",
+      "Sogndal borte",
+      "Sandnes Ulf hjemme",
+      "Moss borte",
+      "Strømmen hjemme",
+      "Odd borte",
+      "Bryne hjemme",
+      "Ranheim borte",
+      "Hødd hjemme",
+      "Åsane hjemme",
+      "Strømsgodset borte",
+      "Sogndal hjemme",
+      "Stabæk borte",
+      "Odd hjemme",
+      "Åsane borte",
+      "Kongsvinger borte",
+      "Egersund hjemme",
+      "Hødd borte",
+      "Ranheim hjemme",
+      "Bryne borte",
+      "Strømsgodset hjemme",
+      "Haugesund borte",
+      "Moss hjemme",
+      "Sandnes Ulf borte",
+      "Raufoss hjemme",
+      "Strømmen borte"
     ];
+
+    const players = [
+      { name: "Alexander Pedersen", short: "Pedersen", role: "Keeper" },
+      { name: "Marcus Andersen", short: "Andersen", role: "Keeper" },
+      { name: "Mats Trige", short: "Trige", role: "Keeper" },
+
+      { name: "William Sell", short: "Sell", role: "Forsvar" },
+      { name: "Isak Vik", short: "Vik", role: "Forsvar" },
+      { name: "Ådne Midtskogen", short: "Midtskogen", role: "Forsvar" },
+      { name: "Herman Solberg Nilsen", short: "HSN", role: "Forsvar" },
+      { name: "Isaac Barnett", short: "Barnett", role: "Forsvar" },
+      { name: "Sander Amble Haugen", short: "SAH", role: "Forsvar" },
+
+      { name: "Isaac Monglo", short: "Monglo", role: "Midtbane" },
+      { name: "Eron Isufi", short: "Isufi", role: "Midtbane" },
+      { name: "William Wæhler", short: "Wæhler", role: "Midtbane" },
+      { name: "Julius Skaug", short: "Skaug", role: "Midtbane" },
+      { name: "William Kurtovic", short: "Kurtovic", role: "Midtbane" },
+      { name: "Didrik Fredriksen", short: "Fredriksen", role: "Midtbane" },
+
+      { name: "Anders Bjørntvedt Olsen", short: "ABO", role: "Angrep" },
+      { name: "Mathias Johansen", short: "MJ", role: "Angrep" },
+      { name: "Andreas Hellum", short: "Hellum", role: "Angrep" },
+      { name: "Ibrahim Sawaneh", short: "Sawaneh", role: "Angrep" },
+      { name: "Fallou Sock", short: "Sock", role: "Angrep" },
+
+      { name: "Magnus Aadland", short: "Aadland", role: "Trener" },
+      { name: "Sportsdirektør", short: "Hartmann", role: "Bonus" },
+      { name: "Bortefeltet", short: "Bortefeltet", role: "Support" }
+    ];
+
+    const matchSelect = document.getElementById("match");
+    matches.forEach(match => {
+      matchSelect.innerHTML += `<option>${match}</option>`;
+    });
 
     const playersDiv = document.getElementById("players");
 
-    players.forEach(player => {
-      const initials = player
+    function initialsFrom(shortName) {
+      if (shortName === "Bortefeltet") return "10";
+      if (shortName === "Hartmann") return "SD";
+      return shortName
         .split(" ")
         .map(x => x[0])
         .join("")
         .substring(0, 2)
         .toUpperCase();
+    }
+
+    players.forEach(player => {
+      const initials = initialsFrom(player.short);
 
       playersDiv.innerHTML += `
         <div class="player">
-          <div class="avatar">${initials}</div>
-          <div class="player-name">${player}</div>
-          <input class="rating" type="number" id="${player}" min="1" max="10" placeholder="-" />
+          <div class="avatar">
+            <img src="bilder/${player.short}.jpg" alt="${player.short}" onload="this.style.display='block'; this.parentElement.childNodes[0].textContent='';" />
+            ${initials}
+          </div>
+          <div class="player-name">${player.short}</div>
+          <div class="role">${player.role}</div>
+          <input class="rating" type="number" id="${player.short}" min="1" max="10" placeholder="-" />
         </div>
       `;
     });
 
     async function sendVote() {
+      const successBox = document.getElementById("success");
+      const errorBox = document.getElementById("error");
+      successBox.style.display = "none";
+      errorBox.style.display = "none";
+
       const match = document.getElementById("match").value;
       const voter = document.getElementById("voter").value || "Anonym";
       const comment = document.getElementById("comment").value || "";
 
-      let sentSomething = false;
+      let rows = [];
 
-      for (let player of players) {
-        const ratingInput = document.getElementById(player);
-        const rating = ratingInput.value;
+      players.forEach(player => {
+        const input = document.getElementById(player.short);
+        const rating = input.value;
 
-        if (!rating) continue;
+        if (!rating) return;
 
-        sentSomething = true;
-
-        await fetch(`${SUPABASE_URL}/rest/v1/votes`, {
-          method: "POST",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({
-            match: match,
-            voter_name: voter,
-            player: player,
-            rating: Number(rating),
-            comment: comment
-          })
+        rows.push({
+          match: match,
+          voter_name: voter,
+          player: player.short,
+          rating: Number(rating),
+          comment: comment
         });
-      }
+      });
 
-      if (!sentSomething) {
+      if (rows.length === 0) {
         alert("Du må gi minst én karakter først.");
         return;
       }
 
-      document.getElementById("success").style.display = "block";
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/votes`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(rows)
+      });
+
+      if (!response.ok) {
+        errorBox.style.display = "block";
+        return;
+      }
+
+      successBox.style.display = "block";
 
       players.forEach(player => {
-        document.getElementById(player).value = "";
+        document.getElementById(player.short).value = "";
       });
 
       document.getElementById("comment").value = "";
