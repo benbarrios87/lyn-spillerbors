@@ -103,16 +103,8 @@ select, input {
   object-fit:cover;
 }
 
-.player-short {
-  font-weight:bold;
-  margin-top:8px;
-}
-
-.player-name {
-  font-size:12px;
-  color:gray;
-  min-height:30px;
-}
+.player-short { font-weight:bold; margin-top:8px; }
+.player-name { font-size:12px; color:gray; min-height:30px; }
 
 button {
   background:var(--red);
@@ -135,7 +127,7 @@ button:hover { background:#b51218; }
 }
 
 @media (min-width:700px) {
-  .button-row { grid-template-columns:1fr 1fr; }
+  .button-row { grid-template-columns:1fr 1fr 1fr; }
 }
 
 .bb {
@@ -243,13 +235,13 @@ button:hover { background:#b51218; }
 
 <div class="box">
   <label>Navn / forumbruker</label>
-  <input id="voter" placeholder="Viktig: skriv forumnavnet ditt nøyaktig likt hver gang (case sensitivt)">
-
+  <input id="voter" placeholder="Skriv forumnavnet ditt">
+  <div class="small">Viktig: skriv forumnavnet nøyaktig likt hver gang. Store og små bokstaver behandles likt.</div>
 </div>
 
 <div class="box">
   <h2>Gi karakter</h2>
-  <p>La felt stå tomt hvis spilleren ikke skal vurderes.</p>
+  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
   <div class="grid" id="players"></div>
 </div>
 
@@ -260,7 +252,8 @@ button:hover { background:#b51218; }
 <div class="box">
   <h2>Resultater</h2>
   <div class="button-row">
-    <button onclick="loadResults()">Vis snitt</button>
+    <button onclick="loadResults()">Vis kampsnitt</button>
+    <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
     <button onclick="loadSuperbenVsRest()">superben vs resten</button>
   </div>
   <div id="results" style="margin-top:16px;"></div>
@@ -283,11 +276,11 @@ const players = [
   { name:"Didrik Fredriksen", short:"Fredriksen" },
   { name:"Eron Isufi", short:"Isufi" },
   { name:"Julius Skaug", short:"Skaug" },
-  { name:"William Kurtovic", short:"Kurtovic" },
   { name:"Anders Bjørntvedt Olsen", short:"ABO" },
   { name:"Ibrahim Sawaneh", short:"Sawaneh" },
   { name:"Andreas Hellum", short:"Hellum" },
   { name:"Matias Johansen", short:"MJ" },
+  { name:"William Kurtovic", short:"Kurtovic" },
   { name:"Fallou Sock", short:"Sock" },
   { name:"Isak Vik", short:"Vik" },
   { name:"Isaac Monglo", short:"Monglo" },
@@ -306,61 +299,74 @@ players.forEach(p => {
       </div>
       <div class="player-short">${p.short}</div>
       <div class="player-name">${p.name}</div>
-      <input type="number" id="${p.short}" min="1" max="10" placeholder="-">
+      <input type="number" id="${p.short}" min="1" max="10" step="1" placeholder="-">
     </div>
   `;
 });
 
+function cleanVoterName(name) {
+  return (name || "Anonym").trim().toLowerCase();
+}
+
 async function sendVote() {
   const match = document.getElementById("match").value;
-  const voter = document.getElementById("voter").value.trim() || "Anonym";
+  const voter = cleanVoterName(document.getElementById("voter").value);
 
   let rows = [];
 
-  players.forEach(p => {
-    const val = document.getElementById(p.short).value;
-    if (val) {
-      rows.push({
-        match_id: match,
-        voter: voter,
-        player: p.short,
-        rating: Number(val)
-      });
+  for (const p of players) {
+    const raw = document.getElementById(p.short).value;
+
+    if (!raw) continue;
+
+    const rating = Number(raw);
+
+    if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+      alert(`${p.short}: karakter må være et helt tall fra 1 til 10.`);
+      return;
     }
-  });
+
+    rows.push({
+      match_id: match,
+      voter: voter,
+      player: p.short,
+      rating: rating
+    });
+  }
 
   if (rows.length === 0) {
     alert("Du må gi minst én karakter først.");
     return;
   }
 
-  const response = await fetch(SUPABASE_URL + "/rest/v1/votes", {
-    method:"POST",
-    headers:{
-      "apikey":SUPABASE_KEY,
-      "Authorization":"Bearer " + SUPABASE_KEY,
-      "Content-Type":"application/json",
-      "Prefer":"return=minimal"
-    },
-    body:JSON.stringify(rows)
-  });
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
+    {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"resolution=merge-duplicates,return=minimal"
+      },
+      body:JSON.stringify(rows)
+    }
+  );
 
   if (!response.ok) {
     alert("Noe gikk feil. Stemmen ble ikke sendt.");
     return;
   }
 
-  alert("Stemmen er sendt!");
+  alert("Stemmen er sendt! Hvis du hadde stemt før på samme kamp, ble den gamle stemmen oppdatert.");
 
   players.forEach(p => document.getElementById(p.short).value = "");
   loadResults();
 }
 
-async function getVotesForSelectedMatch() {
-  const match = document.getElementById("match").value;
-
+async function fetchVotes(query = "") {
   const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes?match_id=eq." + encodeURIComponent(match),
+    SUPABASE_URL + "/rest/v1/votes" + query,
     {
       headers:{
         "apikey":SUPABASE_KEY,
@@ -370,6 +376,11 @@ async function getVotesForSelectedMatch() {
   );
 
   return await response.json();
+}
+
+async function getVotesForSelectedMatch() {
+  const match = document.getElementById("match").value;
+  return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
 }
 
 function buildStats(data) {
@@ -388,21 +399,18 @@ function buildStats(data) {
   })).sort((a,b) => b.avg - a.avg);
 }
 
-async function loadResults() {
-  const data = await getVotesForSelectedMatch();
-
-  if (!data || data.length === 0) {
-    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
+function renderRanking(title, resultList) {
+  if (!resultList || resultList.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen stemmer funnet.</p>";
     return;
   }
 
-  const resultList = buildStats(data);
   const best = resultList[0];
   const topThree = resultList.slice(0,3);
   const medals = ["🥇","🥈","🥉"];
 
   let html = `
-    <div class="bb">🔥 Banens beste: ${best.player} med ${best.avg.toFixed(2)}</div>
+    <div class="bb">🔥 ${title}: ${best.player} med ${best.avg.toFixed(2)}</div>
     <div class="top-three">
   `;
 
@@ -431,6 +439,30 @@ async function loadResults() {
   document.getElementById("results").innerHTML = html;
 }
 
+async function loadResults() {
+  const data = await getVotesForSelectedMatch();
+
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
+    return;
+  }
+
+  renderRanking("Banens beste", buildStats(data));
+}
+
+async function loadSeasonResults() {
+  const data = await fetchVotes("?match_id=neq.TEST");
+
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen sesongstemmer enda.</p>";
+    return;
+  }
+
+  const resultList = buildStats(data).filter(r => r.count >= 2);
+
+  renderRanking("Sesongtoppen", resultList);
+}
+
 async function loadSuperbenVsRest() {
   const data = await getVotesForSelectedMatch();
 
@@ -443,7 +475,7 @@ async function loadSuperbenVsRest() {
   let rest = {};
 
   data.forEach(v => {
-    const name = (v.voter || "").toLowerCase().trim();
+    const name = cleanVoterName(v.voter);
     const target = name === MY_NAME ? mine : rest;
 
     if (!target[v.player]) target[v.player] = { total:0, count:0 };
