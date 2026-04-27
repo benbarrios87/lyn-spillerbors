@@ -1,61 +1,270 @@
 <!DOCTYPE html>
-<html>
+<html lang="no">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lyn spillerbørs</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #101828;
+    }
+
+    header {
+      background: #d71920;
+      color: white;
+      padding: 28px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 14px 40px;
+    }
+
+    .box {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d0d5dd;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+    }
+
+    .player {
+      background: #ffffff;
+      border: 1px solid #eaecf0;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #101828;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .player-name {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .rating {
+      width: 80px;
+      text-align: center;
+      margin: auto;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    button {
+      background: #d71920;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 15px 22px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    button:hover {
+      background: #b51218;
+    }
+
+    .small {
+      color: #667085;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .success {
+      display: none;
+      background: #ecfdf3;
+      color: #027a48;
+      border: 1px solid #abefc6;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Lyn spillerbørs</h1>
+  <header>
+    <h1>Lyn spillerbørs</h1>
+    <p>Stem på spillerne etter kamp. 1 til 10. Helt subjektivt. Heldigvis.</p>
+  </header>
 
-  <h2>Velg kamp</h2>
-  <select id="match">
-    <option>Moss borte</option>
-    <option>Sandnes Ulf hjemme</option>
-    <option>Sogndal borte</option>
-  </select>
+  <main>
+    <div class="box">
+      <label for="match">Velg kamp</label>
+      <select id="match">
+        <option>Moss borte</option>
+        <option>Sandnes Ulf hjemme</option>
+        <option>Sogndal borte</option>
+        <option>Haugesund hjemme</option>
+      </select>
+    </div>
 
-  <h2>Pedersen</h2>
-  <input type="number" id="Pedersen" min="1" max="10">
+    <div class="box">
+      <label for="voter">Forumbruker / navn</label>
+      <input id="voter" placeholder="Valgfritt" />
+      <div class="small">Du kan være anonym, men navn gjør snittet litt morsommere.</div>
+    </div>
 
-  <h2>SAH</h2>
-  <input type="number" id="SAH" min="1" max="10">
+    <div class="box">
+      <h2>Gi karakter</h2>
+      <div class="small">La felt stå tomt hvis spilleren ikke skal vurderes.</div>
+      <br />
+      <div class="grid" id="players"></div>
+    </div>
 
-  <h2>Sell</h2>
-  <input type="number" id="Sell" min="1" max="10">
-
-  <h2>ABO</h2>
-  <input type="number" id="ABO" min="1" max="10">
-
-  <br><br>
-
-  <button onclick="sendVote()">Send inn</button>
+    <div class="box">
+      <label for="comment">Kommentar</label>
+      <textarea id="comment" rows="4" placeholder="F.eks: Skaug BB, Aadland spørsmålstegn, bortefeltet 10."></textarea>
+      <button onclick="sendVote()">Send inn børs</button>
+      <div id="success" class="success">Stemmen er sendt!</div>
+    </div>
+  </main>
 
   <script>
+    const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+    const players = [
+      "Pedersen",
+      "SAH",
+      "Sell",
+      "Midtskogen",
+      "HSN",
+      "Fredriksen",
+      "Isufi",
+      "Skaug",
+      "ABO",
+      "Sawaneh",
+      "Hellum",
+      "Kurtovic",
+      "Sock",
+      "Vik",
+      "Monglo",
+      "Wæhler",
+      "Aadland",
+      "Hartmann",
+      "Bortefeltet"
+    ];
+
+    const playersDiv = document.getElementById("players");
+
+    players.forEach(player => {
+      const initials = player
+        .split(" ")
+        .map(x => x[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+
+      playersDiv.innerHTML += `
+        <div class="player">
+          <div class="avatar">${initials}</div>
+          <div class="player-name">${player}</div>
+          <input class="rating" type="number" id="${player}" min="1" max="10" placeholder="-" />
+        </div>
+      `;
+    });
+
     async function sendVote() {
       const match = document.getElementById("match").value;
+      const voter = document.getElementById("voter").value || "Anonym";
+      const comment = document.getElementById("comment").value || "";
 
-      const players = ["Pedersen","SAH","Sell","ABO"];
+      let sentSomething = false;
 
       for (let player of players) {
-        const rating = document.getElementById(player).value;
+        const ratingInput = document.getElementById(player);
+        const rating = ratingInput.value;
 
         if (!rating) continue;
 
-        await fetch("https://oqwlbdnthdbomnobxqot.supabase.co/rest/v1/votes", {
+        sentSomething = true;
+
+        await fetch(`${SUPABASE_URL}/rest/v1/votes`, {
           method: "POST",
           headers: {
-            "apikey": "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z",
-            "Content-Type": "application/json"
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
           },
           body: JSON.stringify({
             match: match,
+            voter_name: voter,
             player: player,
-            rating: Number(rating)
+            rating: Number(rating),
+            comment: comment
           })
         });
       }
 
-      alert("Stemmen er sendt!");
+      if (!sentSomething) {
+        alert("Du må gi minst én karakter først.");
+        return;
+      }
+
+      document.getElementById("success").style.display = "block";
+
+      players.forEach(player => {
+        document.getElementById(player).value = "";
+      });
+
+      document.getElementById("comment").value = "";
     }
   </script>
 </body>
