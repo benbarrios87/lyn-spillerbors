@@ -9,6 +9,8 @@
 :root {
   --red: #d71920;
   --blue: #13294b;
+  --white: #ffffff;
+  --light: #f8fafc;
 }
 
 body {
@@ -21,7 +23,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.62);
   z-index: -1;
 }
 
@@ -48,15 +50,20 @@ header {
   object-fit: contain;
 }
 
+h1 {
+  margin: 10px 0 5px;
+  font-size: 38px;
+}
+
 main {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: auto;
   padding: 15px;
 }
 
 .box {
   background: rgba(255,255,255,0.95);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 18px;
   margin-bottom: 18px;
   border-left: 6px solid var(--red);
@@ -65,27 +72,30 @@ main {
 select, input, textarea {
   width: 100%;
   padding: 11px;
-  border-radius: 8px;
+  border-radius: 9px;
   border: 1px solid #ccc;
   margin-top: 6px;
+  box-sizing: border-box;
+  font-size: 15px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
   gap: 12px;
 }
 
 .player {
   background: white;
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 14px;
+  padding: 12px;
   text-align: center;
+  border: 1px solid #eee;
 }
 
 .avatar {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   background: var(--blue);
   color: white;
   border-radius: 50%;
@@ -105,12 +115,13 @@ select, input, textarea {
 
 .player-short {
   font-weight: bold;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .player-name {
   font-size: 12px;
   color: gray;
+  min-height: 30px;
 }
 
 button {
@@ -122,6 +133,7 @@ button {
   width: 100%;
   font-weight: bold;
   cursor: pointer;
+  font-size: 16px;
 }
 
 button:hover {
@@ -129,19 +141,94 @@ button:hover {
 }
 
 .result-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 11px 0;
   border-bottom: 1px solid #eee;
+}
+
+.result-score {
+  font-weight: bold;
+  color: var(--blue);
+  font-size: 18px;
 }
 
 .bb {
   background: #fff1f2;
   border: 1px solid #fecdd3;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  color: #b51218;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
   font-weight: bold;
+}
+
+.top-three {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.podium {
+  background: var(--light);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.podium .medal {
+  font-size: 24px;
+}
+
+.podium .name {
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.podium .score {
+  color: var(--blue);
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.diff-plus {
+  color: #027a48;
+  font-weight: bold;
+}
+
+.diff-minus {
+  color: #b42318;
+  font-weight: bold;
+}
+
+.small {
+  color: gray;
+  font-size: 13px;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 700px) {
+  .button-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 </style>
 </head>
@@ -153,71 +240,77 @@ button:hover {
     <img src="lyn-logo.png">
   </div>
   <h1>Lyn spillerbørs</h1>
+  <p>Stem på spillerne etter kamp. 1–10. Helt subjektivt.</p>
 </header>
 
 <main>
 
 <div class="box">
-<label>Velg kamp</label>
+  <label>Velg kamp</label>
+  <select id="match">
+    <option>TEST</option>
 
-<select id="match">
+    <option>13.04 Haugesund hjemme</option>
+    <option>21.04 Sogndal borte</option>
+    <option>27.04 Sandnes Ulf hjemme</option>
+    <option>30.04 Moss borte</option>
 
-<option>TEST</option>
-
-<option>13.04 Haugesund hjemme</option>
-<option>21.04 Sogndal borte</option>
-<option>27.04 Sandnes Ulf hjemme</option>
-<option>30.04 Moss borte</option>
-
-<option>01.05 Lyn - Stabæk</option>
-<option>10.05 Raufoss - Lyn</option>
-<option>16.05 Lyn - Kongsvinger</option>
-<option>20.05 Egersund - Lyn</option>
-<option>25.05 Lyn - Strømmen</option>
-<option>31.05 Odd - Lyn</option>
-<option>14.06 Lyn - Bryne</option>
-<option>19.06 Ranheim - Lyn</option>
-<option>27.06 Lyn - Hødd</option>
-<option>02.07 Lyn - Åsane</option>
-<option>26.07 Strømsgodset - Lyn</option>
-<option>02.08 Lyn - Sogndal</option>
-<option>09.08 Stabæk - Lyn</option>
-<option>16.08 Lyn - Odd</option>
-<option>26.08 Åsane - Lyn</option>
-<option>30.08 Kongsvinger - Lyn</option>
-<option>06.09 Lyn - Egersund</option>
-<option>13.09 Hødd - Lyn</option>
-<option>20.09 Lyn - Ranheim</option>
-<option>04.10 Bryne - Lyn</option>
-<option>11.10 Lyn - Strømsgodset</option>
-<option>14.10 Haugesund - Lyn</option>
-<option>18.10 Lyn - Moss</option>
-<option>25.10 Sandnes Ulf - Lyn</option>
-<option>01.11 Lyn - Raufoss</option>
-<option>08.11 Strømmen - Lyn</option>
-
-</select>
+    <option>01.05 Lyn - Stabæk</option>
+    <option>10.05 Raufoss - Lyn</option>
+    <option>16.05 Lyn - Kongsvinger</option>
+    <option>20.05 Egersund - Lyn</option>
+    <option>25.05 Lyn - Strømmen</option>
+    <option>31.05 Odd - Lyn</option>
+    <option>14.06 Lyn - Bryne</option>
+    <option>19.06 Ranheim - Lyn</option>
+    <option>27.06 Lyn - Hødd</option>
+    <option>02.07 Lyn - Åsane</option>
+    <option>26.07 Strømsgodset - Lyn</option>
+    <option>02.08 Lyn - Sogndal</option>
+    <option>09.08 Stabæk - Lyn</option>
+    <option>16.08 Lyn - Odd</option>
+    <option>26.08 Åsane - Lyn</option>
+    <option>30.08 Kongsvinger - Lyn</option>
+    <option>06.09 Lyn - Egersund</option>
+    <option>13.09 Hødd - Lyn</option>
+    <option>20.09 Lyn - Ranheim</option>
+    <option>04.10 Bryne - Lyn</option>
+    <option>11.10 Lyn - Strømsgodset</option>
+    <option>14.10 Haugesund - Lyn</option>
+    <option>18.10 Lyn - Moss</option>
+    <option>25.10 Sandnes Ulf - Lyn</option>
+    <option>01.11 Lyn - Raufoss</option>
+    <option>08.11 Strømmen - Lyn</option>
+  </select>
 </div>
 
 <div class="box">
-<label>Navn</label>
-<input id="voter">
+  <label>Navn / forumbruker</label>
+  <input id="voter" placeholder="Skriv superben for dine egne børser">
+  <div class="small">Skriv <b>superben</b> for dine egne stemmer. Da fungerer “superben vs resten”.</div>
 </div>
 
 <div class="box">
-<h2>Spillere</h2>
-<div class="grid" id="players"></div>
+  <h2>Gi karakter</h2>
+  <p>La felt stå tomt hvis spilleren ikke skal vurderes.</p>
+  <div class="grid" id="players"></div>
 </div>
 
 <div class="box">
-<textarea id="comment" placeholder="Kommentar"></textarea>
-<button onclick="sendVote()">Send inn</button>
+  <label>Kommentar</label>
+  <textarea id="comment" rows="4" placeholder="Valgfritt"></textarea>
+  <br><br>
+  <button onclick="sendVote()">Send inn børs</button>
 </div>
 
 <div class="box">
-<h2>Resultater</h2>
-<button onclick="loadResults()">Vis snitt</button>
-<div id="results"></div>
+  <h2>Resultater</h2>
+  <p>Velg kamp over og trykk for å se snitt.</p>
+  <div class="button-row">
+    <button onclick="loadResults()">Vis snitt for valgt kamp</button>
+    <button onclick="loadSuperbenVsRest()">Vis superben vs resten</button>
+  </div>
+  <div id="results" style="margin-top:16px;"></div>
 </div>
 
 </main>
@@ -225,6 +318,7 @@ button:hover {
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+const MY_NAME = "superben";
 
 const players = [
   { name: "Alexander Pedersen", short: "Pedersen" },
@@ -232,6 +326,7 @@ const players = [
   { name: "William Sell", short: "Sell" },
   { name: "Ådne Midtskogen", short: "Midtskogen" },
   { name: "Herman Solberg Nilsen", short: "HSN" },
+  { name: "Isaac Barnett", short: "Barnett" },
   { name: "Didrik Fredriksen", short: "Fredriksen" },
   { name: "Eron Isufi", short: "Isufi" },
   { name: "Julius Skaug", short: "Skaug" },
@@ -241,7 +336,6 @@ const players = [
   { name: "Matias Johansen", short: "MJ" },
   { name: "William Kurtovic", short: "Kurtovic" },
   { name: "Fallou Sock", short: "Sock" },
-  { name: "Isaac Barnett", short: "Barnett" },
   { name: "Isak Vik", short: "Vik" },
   { name: "Isaac Monglo", short: "Monglo" },
   { name: "William Wæhler", short: "Wæhler" },
@@ -259,48 +353,68 @@ players.forEach(p => {
       </div>
       <div class="player-short">${p.short}</div>
       <div class="player-name">${p.name}</div>
-      <input type="number" id="${p.short}" min="1" max="10">
+      <input type="number" id="${p.short}" min="1" max="10" placeholder="-">
     </div>
   `;
 });
 
 async function sendVote() {
   const match = document.getElementById("match").value;
-  const voter = document.getElementById("voter").value || "Anonym";
+  const voter = document.getElementById("voter").value.trim() || "Anonym";
   const comment = document.getElementById("comment").value;
 
   let rows = [];
 
   players.forEach(p => {
-    let val = document.getElementById(p.short).value;
-    if(val) {
+    const val = document.getElementById(p.short).value;
+
+    if (val) {
       rows.push({
-        match,
+        match: match,
         voter_name: voter,
         player: p.short,
         rating: Number(val),
-        comment
+        comment: comment
       });
     }
   });
 
-  await fetch(SUPABASE_URL + "/rest/v1/votes", {
+  if (rows.length === 0) {
+    alert("Du må gi minst én karakter først.");
+    return;
+  }
+
+  const response = await fetch(SUPABASE_URL + "/rest/v1/votes", {
     method: "POST",
     headers: {
       "apikey": SUPABASE_KEY,
       "Authorization": "Bearer " + SUPABASE_KEY,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
     },
     body: JSON.stringify(rows)
   });
 
-  alert("Sendt!");
+  if (!response.ok) {
+    alert("Noe gikk feil. Stemmen ble ikke sendt.");
+    return;
+  }
+
+  alert("Stemmen er sendt!");
+
+  players.forEach(p => {
+    document.getElementById(p.short).value = "";
+  });
+
+  document.getElementById("comment").value = "";
+
+  loadResults();
 }
 
-async function loadResults() {
+async function getVotesForSelectedMatch() {
   const match = document.getElementById("match").value;
 
-  const res = await fetch(
+  const response = await fetch(
     SUPABASE_URL + "/rest/v1/votes?match=eq." + encodeURIComponent(match),
     {
       headers: {
@@ -310,31 +424,144 @@ async function loadResults() {
     }
   );
 
-  const data = await res.json();
+  return await response.json();
+}
 
+function buildStats(data) {
   let stats = {};
 
   data.forEach(v => {
-    if (!stats[v.player]) stats[v.player] = { total: 0, count: 0 };
-    stats[v.player].total += v.rating;
-    stats[v.player].count++;
+    if (!stats[v.player]) {
+      stats[v.player] = { total: 0, count: 0 };
+    }
+
+    stats[v.player].total += Number(v.rating);
+    stats[v.player].count += 1;
   });
 
-  let list = Object.keys(stats).map(p => ({
-    player: p,
-    avg: stats[p].total / stats[p].count,
-    count: stats[p].count
-  }));
+  return Object.keys(stats).map(player => {
+    const avg = stats[player].total / stats[player].count;
+    return {
+      player,
+      avg,
+      count: stats[player].count
+    };
+  }).sort((a, b) => b.avg - a.avg);
+}
 
-  list.sort((a,b)=>b.avg-a.avg);
+async function loadResults() {
+  const data = await getVotesForSelectedMatch();
 
-  let html = `<div class="bb">🔥 BB: ${list[0].player} (${list[0].avg.toFixed(2)})</div>`;
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
+    return;
+  }
 
-  list.forEach(r=>{
-    html += `<div class="result-row">
-      <div>${r.player} (${r.count})</div>
-      <div>${r.avg.toFixed(2)}</div>
-    </div>`;
+  const resultList = buildStats(data);
+  const best = resultList[0];
+  const topThree = resultList.slice(0, 3);
+  const medals = ["🥇", "🥈", "🥉"];
+
+  let html = `
+    <div class="bb">
+      🔥 Banens beste: ${best.player} med ${best.avg.toFixed(2)}
+    </div>
+
+    <div class="top-three">
+  `;
+
+  topThree.forEach((r, index) => {
+    html += `
+      <div class="podium">
+        <div class="medal">${medals[index]}</div>
+        <div class="name">${r.player}</div>
+        <div class="score">${r.avg.toFixed(2)}</div>
+        <div class="small">${r.count} stemmer</div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  resultList.forEach(r => {
+    html += `
+      <div class="result-row">
+        <div>
+          <strong>${r.player}</strong><br>
+          <span class="small">${r.count} stemmer</span>
+        </div>
+        <div class="result-score">${r.avg.toFixed(2)}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("results").innerHTML = html;
+}
+
+async function loadSuperbenVsRest() {
+  const data = await getVotesForSelectedMatch();
+
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
+    return;
+  }
+
+  let mine = {};
+  let rest = {};
+
+  data.forEach(v => {
+    const voter = (v.voter_name || "").toLowerCase().trim();
+    const target = voter === MY_NAME ? mine : rest;
+
+    if (!target[v.player]) {
+      target[v.player] = { total: 0, count: 0 };
+    }
+
+    target[v.player].total += Number(v.rating);
+    target[v.player].count += 1;
+  });
+
+  let rows = players.map(p => {
+    const myData = mine[p.short];
+    const restData = rest[p.short];
+
+    const myAvg = myData ? myData.total / myData.count : null;
+    const restAvg = restData ? restData.total / restData.count : null;
+    const diff = myAvg !== null && restAvg !== null ? myAvg - restAvg : null;
+
+    return {
+      player: p.short,
+      myAvg,
+      restAvg,
+      diff
+    };
+  }).filter(r => r.myAvg !== null || r.restAvg !== null);
+
+  rows.sort((a, b) => {
+    if (a.diff === null) return 1;
+    if (b.diff === null) return -1;
+    return Math.abs(b.diff) - Math.abs(a.diff);
+  });
+
+  let html = `
+    <div class="bb">
+      🧠 superben vs resten
+    </div>
+    <p class="small">Positive tall betyr at superben er snillere enn resten. Negative tall betyr strengere.</p>
+  `;
+
+  rows.forEach(r => {
+    const diffText = r.diff === null ? "–" : (r.diff > 0 ? "+" : "") + r.diff.toFixed(2);
+    const diffClass = r.diff === null ? "" : (r.diff >= 0 ? "diff-plus" : "diff-minus");
+
+    html += `
+      <div class="compare-row">
+        <div><strong>${r.player}</strong></div>
+        <div>superben: ${r.myAvg === null ? "–" : r.myAvg.toFixed(2)}</div>
+        <div>resten: ${r.restAvg === null ? "–" : r.restAvg.toFixed(2)}</div>
+        <div class="${diffClass}">${diffText}</div>
+      </div>
+    `;
   });
 
   document.getElementById("results").innerHTML = html;
