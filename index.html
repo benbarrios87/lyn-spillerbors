@@ -6,7 +6,7 @@
 <title>Lyn spillerbørs</title>
 
 <style>
-:root { --red:#d71920; --blue:#13294b; }
+:root { --red:#d71920; --blue:#13294b; --gold:#f59e0b; }
 
 body {
   margin:0;
@@ -57,6 +57,11 @@ main {
   padding:18px;
   margin-bottom:18px;
   border-left:6px solid var(--red);
+}
+
+.stats-center {
+  border-left:6px solid var(--blue);
+  background:rgba(255,255,255,0.97);
 }
 
 select, input {
@@ -140,31 +145,34 @@ button:hover { background:#b51218; }
   font-weight:bold;
 }
 
-.top-three {
+.stats-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
-  gap:12px;
-  margin-bottom:16px;
+  grid-template-columns:1fr;
+  gap:14px;
 }
 
-.podium {
+@media (min-width:850px) {
+  .stats-grid { grid-template-columns:1fr 1fr; }
+}
+
+.stat-card {
   background:#f8fafc;
-  border-radius:14px;
-  padding:14px;
-  text-align:center;
   border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:15px;
 }
 
-.medal { font-size:24px; }
-.name { font-weight:bold; margin-top:6px; }
-.score { color:var(--blue); font-size:22px; font-weight:bold; }
+.stat-card h3 {
+  margin:0 0 10px;
+  color:var(--blue);
+}
 
 .result-row, .compare-row {
   display:grid;
   grid-template-columns:1fr auto;
   gap:10px;
-  padding:11px 0;
-  border-bottom:1px solid #eee;
+  padding:9px 0;
+  border-bottom:1px solid #e5e7eb;
 }
 
 .compare-row {
@@ -175,12 +183,48 @@ button:hover { background:#b51218; }
 .result-score {
   font-weight:bold;
   color:var(--blue);
+  font-size:17px;
+}
+
+.medal {
   font-size:18px;
+  margin-right:5px;
+}
+
+.small {
+  color:gray;
+  font-size:13px;
 }
 
 .diff-plus { color:#027a48; font-weight:bold; }
 .diff-minus { color:#b42318; font-weight:bold; }
-.small { color:gray; font-size:13px; }
+
+.hero-stat {
+  background:linear-gradient(135deg, #13294b, #1f3f73);
+  color:white;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.hero-stat h3 {
+  margin:0 0 5px;
+  color:white;
+}
+
+.hero-stat .big {
+  font-size:28px;
+  font-weight:bold;
+}
+
+.warning {
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
 </style>
 </head>
 
@@ -250,13 +294,21 @@ button:hover { background:#b51218; }
 </div>
 
 <div class="box">
-  <h2>Resultater</h2>
+  <h2>Valgt kamp</h2>
   <div class="button-row">
     <button onclick="loadResults()">Vis kampsnitt</button>
     <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
     <button onclick="loadSuperbenVsRest()">superben vs resten</button>
   </div>
   <div id="results" style="margin-top:16px;"></div>
+</div>
+
+<div class="box stats-center">
+  <h2>📊 Statscenter</h2>
+  <p class="small">Oppdateres fra alle lagrede stemmer. TEST-kampen holdes utenfor.</p>
+  <div id="statsCenter">
+    <div class="small">Laster stats...</div>
+  </div>
 </div>
 
 </main>
@@ -306,6 +358,10 @@ players.forEach(p => {
 
 function cleanVoterName(name) {
   return (name || "Anonym").trim().toLowerCase();
+}
+
+function isRealMatch(v) {
+  return v.match_id && v.match_id !== "TEST";
 }
 
 async function sendVote() {
@@ -362,6 +418,7 @@ async function sendVote() {
 
   players.forEach(p => document.getElementById(p.short).value = "");
   loadResults();
+  loadStatsCenter();
 }
 
 async function fetchVotes(query = "") {
@@ -387,16 +444,44 @@ function buildStats(data) {
   let stats = {};
 
   data.forEach(v => {
-    if (!stats[v.player]) stats[v.player] = { total:0, count:0 };
+    if (!stats[v.player]) stats[v.player] = { total:0, count:0, ratings:[] };
     stats[v.player].total += Number(v.rating);
     stats[v.player].count += 1;
+    stats[v.player].ratings.push(Number(v.rating));
   });
 
   return Object.keys(stats).map(player => ({
     player,
     avg: stats[player].total / stats[player].count,
-    count: stats[player].count
+    count: stats[player].count,
+    ratings: stats[player].ratings
   })).sort((a,b) => b.avg - a.avg);
+}
+
+function stdDev(values) {
+  if (!values || values.length < 2) return 0;
+  const avg = values.reduce((a,b)=>a+b,0) / values.length;
+  const variance = values.reduce((sum,v)=>sum + Math.pow(v - avg, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function renderMiniRanking(items, limit = 5, showMedals = true) {
+  if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇","🥈","🥉"];
+  let html = "";
+
+  items.slice(0, limit).forEach((r, i) => {
+    const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
+    html += `
+      <div class="result-row">
+        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
+        <div class="result-score">${r.score}</div>
+      </div>
+    `;
+  });
+
+  return html;
 }
 
 function renderRanking(title, resultList) {
@@ -406,35 +491,16 @@ function renderRanking(title, resultList) {
   }
 
   const best = resultList[0];
-  const topThree = resultList.slice(0,3);
-  const medals = ["🥇","🥈","🥉"];
 
   let html = `
     <div class="bb">🔥 ${title}: ${best.player} med ${best.avg.toFixed(2)}</div>
-    <div class="top-three">
   `;
 
-  topThree.forEach((r, i) => {
-    html += `
-      <div class="podium">
-        <div class="medal">${medals[i]}</div>
-        <div class="name">${r.player}</div>
-        <div class="score">${r.avg.toFixed(2)}</div>
-        <div class="small">${r.count} stemmer</div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-
-  resultList.forEach(r => {
-    html += `
-      <div class="result-row">
-        <div><strong>${r.player}</strong><br><span class="small">${r.count} stemmer</span></div>
-        <div class="result-score">${r.avg.toFixed(2)}</div>
-      </div>
-    `;
-  });
+  html += renderMiniRanking(resultList.map(r => ({
+    player:r.player,
+    score:r.avg.toFixed(2),
+    sub:`${r.count} stemmer`
+  })), 99);
 
   document.getElementById("results").innerHTML = html;
 }
@@ -451,7 +517,7 @@ async function loadResults() {
 }
 
 async function loadSeasonResults() {
-  const data = await fetchVotes("?match_id=neq.TEST");
+  const data = (await fetchVotes()).filter(isRealMatch);
 
   if (!data || data.length === 0) {
     document.getElementById("results").innerHTML = "<p>Ingen sesongstemmer enda.</p>";
@@ -522,6 +588,147 @@ async function loadSuperbenVsRest() {
 
   document.getElementById("results").innerHTML = html;
 }
+
+function buildBBCounts(allVotes) {
+  const matches = [...new Set(allVotes.filter(isRealMatch).map(v => v.match_id))];
+  let counts = {};
+
+  matches.forEach(match => {
+    const matchVotes = allVotes.filter(v => v.match_id === match);
+    const ranking = buildStats(matchVotes);
+    if (ranking.length > 0) {
+      const winner = ranking[0].player;
+      counts[winner] = (counts[winner] || 0) + 1;
+    }
+  });
+
+  return Object.keys(counts).map(player => ({
+    player,
+    score: counts[player],
+    sub: "BB"
+  })).sort((a,b) => b.score - a.score);
+}
+
+function buildSuperbenSeason(allVotes) {
+  let mine = {};
+  let rest = {};
+
+  allVotes.filter(isRealMatch).forEach(v => {
+    const name = cleanVoterName(v.voter);
+    const target = name === MY_NAME ? mine : rest;
+
+    if (!target[v.player]) target[v.player] = { total:0, count:0 };
+    target[v.player].total += Number(v.rating);
+    target[v.player].count += 1;
+  });
+
+  return players.map(p => {
+    const myData = mine[p.short];
+    const restData = rest[p.short];
+    const myAvg = myData ? myData.total / myData.count : null;
+    const restAvg = restData ? restData.total / restData.count : null;
+    const diff = myAvg !== null && restAvg !== null ? myAvg - restAvg : null;
+    return { player:p.short, myAvg, restAvg, diff };
+  }).filter(r => r.diff !== null)
+    .sort((a,b) => Math.abs(b.diff) - Math.abs(a.diff));
+}
+
+function buildControversial(allVotes) {
+  return buildStats(allVotes.filter(isRealMatch))
+    .filter(r => r.count >= 3)
+    .map(r => ({
+      player:r.player,
+      score: stdDev(r.ratings).toFixed(2),
+      raw: stdDev(r.ratings),
+      sub: `${r.count} stemmer`
+    }))
+    .sort((a,b) => b.raw - a.raw);
+}
+
+function buildMostRated(allVotes) {
+  return buildStats(allVotes.filter(isRealMatch))
+    .map(r => ({
+      player:r.player,
+      score:r.count,
+      sub:"stemmer"
+    }))
+    .sort((a,b)=>b.score-a.score);
+}
+
+async function loadStatsCenter() {
+  const allVotes = await fetchVotes();
+  const realVotes = allVotes.filter(isRealMatch);
+
+  const box = document.getElementById("statsCenter");
+
+  if (!realVotes || realVotes.length === 0) {
+    box.innerHTML = `<div class="warning">Ingen ekte stemmer enda. TEST-kampen vises ikke her.</div>`;
+    return;
+  }
+
+  const season = buildStats(realVotes).filter(r => r.count >= 2);
+  const seasonItems = season.map(r => ({
+    player:r.player,
+    score:r.avg.toFixed(2),
+    sub:`${r.count} stemmer`
+  }));
+
+  const totalVotes = realVotes.length;
+  const uniqueMatches = new Set(realVotes.map(v => v.match_id)).size;
+  const uniqueVoters = new Set(realVotes.map(v => cleanVoterName(v.voter))).size;
+
+  const bbCounts = buildBBCounts(realVotes);
+  const controversial = buildControversial(realVotes);
+  const mostRated = buildMostRated(realVotes);
+  const superbenSeason = buildSuperbenSeason(realVotes);
+
+  const superbenMostDifferent = superbenSeason.slice(0,5).map(r => ({
+    player:r.player,
+    score:(r.diff > 0 ? "+" : "") + r.diff.toFixed(2),
+    sub:`superben ${r.myAvg.toFixed(2)} / resten ${r.restAvg.toFixed(2)}`
+  }));
+
+  let html = `
+    <div class="hero-stat">
+      <h3>Sesongstatus</h3>
+      <div class="big">${totalVotes} stemmer</div>
+      <div>${uniqueMatches} kamper · ${uniqueVoters} brukere</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>🏆 Sesongtoppen</h3>
+        ${renderMiniRanking(seasonItems, 8)}
+      </div>
+
+      <div class="stat-card">
+        <h3>👑 Flest BB</h3>
+        ${renderMiniRanking(bbCounts, 8)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🤯 Mest uenighet</h3>
+        <div class="small">Basert på variasjon i karakterene.</div>
+        ${renderMiniRanking(controversial, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>📢 Mest vurdert</h3>
+        ${renderMiniRanking(mostRated, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🧠 superben vs resten</h3>
+        <div class="small">Største avvik totalt.</div>
+        ${renderMiniRanking(superbenMostDifferent, 8, false)}
+      </div>
+    </div>
+  `;
+
+  box.innerHTML = html;
+}
+
+loadStatsCenter();
 </script>
 
 </body>
