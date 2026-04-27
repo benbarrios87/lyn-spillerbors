@@ -10,7 +10,6 @@
 :root {
   --red: #d71920;
   --blue: #13294b;
-  --white: #ffffff;
 }
 
 /* bakgrunn */
@@ -32,14 +31,12 @@ body::before {
   z-index: -1;
 }
 
-/* header */
 header {
   text-align: center;
   padding: 40px 20px;
   color: white;
 }
 
-/* logo */
 .logo-wrap {
   width: 120px;
   height: 120px;
@@ -57,24 +54,12 @@ header {
   object-fit: contain;
 }
 
-/* tittel */
-h1 {
-  margin: 10px 0;
-  font-size: 38px;
-}
-
-header p {
-  opacity: 0.9;
-}
-
-/* layout */
 main {
   max-width: 1100px;
   margin: auto;
   padding: 15px;
 }
 
-/* kort */
 .box {
   background: rgba(255,255,255,0.95);
   border-radius: 16px;
@@ -83,35 +68,30 @@ main {
   border-left: 6px solid var(--red);
 }
 
-/* inputs */
 select, input, textarea {
   width: 100%;
-  padding: 11px;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   margin-top: 6px;
 }
 
-/* grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
 
-/* spillerkort */
 .player {
   background: white;
   border-radius: 12px;
   padding: 10px;
   text-align: center;
-  border: 1px solid #eee;
 }
 
-/* avatar */
 .avatar {
-  width: 55px;
-  height: 55px;
+  width: 60px;
+  height: 60px;
   background: var(--blue);
   color: white;
   border-radius: 50%;
@@ -120,9 +100,15 @@ select, input, textarea {
   justify-content: center;
   margin: auto;
   font-weight: bold;
+  overflow: hidden;
 }
 
-/* knapp */
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 button {
   background: var(--red);
   color: white;
@@ -130,18 +116,12 @@ button {
   padding: 14px;
   border-radius: 12px;
   width: 100%;
-  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
   background: #b51218;
-}
-
-/* seksjon tittel */
-h2 {
-  margin-top: 0;
 }
 </style>
 </head>
@@ -153,7 +133,7 @@ h2 {
     <img src="lyn-logo.png">
   </div>
   <h1>Lyn spillerbørs</h1>
-  <p>Stem på spillerne etter kamp. 1–10. Helt subjektivt.</p>
+  <p>Stem på spillerne etter kamp. 1–10.</p>
 </header>
 
 <main>
@@ -191,10 +171,29 @@ const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
 const players = [
-"Pedersen","SAH","Sell","Midtskogen","HSN",
-"Fredriksen","Isufi","Skaug","ABO",
-"Sawaneh","Hellum","Kurtovic","Sock",
-"Vik","Monglo","Wæhler","Aadland","Hartmann"
+  { name: "Alexander Pedersen", short: "Pedersen" },
+
+  { name: "Sander Amble Haugen", short: "SAH" },
+  { name: "William Sell", short: "Sell" },
+  { name: "Ådne Midtskogen", short: "Midtskogen" },
+  { name: "Herman Solberg Nilsen", short: "HSN" },
+
+  { name: "Didrik Fredriksen", short: "Fredriksen" },
+  { name: "Eron Isufi", short: "Isufi" },
+  { name: "Julius Skaug", short: "Skaug" },
+
+  { name: "Anders Bjørntvedt Olsen", short: "ABO" },
+  { name: "Ibrahim Sawaneh", short: "Sawaneh" },
+  { name: "Andreas Hellum", short: "Hellum" },
+  { name: "Matias Johansen", short: "MJ" },
+
+  { name: "William Kurtovic", short: "Kurtovic" },
+  { name: "Fallou Sock", short: "Sock" },
+  { name: "Isak Vik", short: "Vik" },
+  { name: "Isaac Monglo", short: "Monglo" },
+  { name: "William Wæhler", short: "Wæhler" },
+
+  { name: "Magnus Aadland", short: "Aadland" }
 ];
 
 const playersDiv = document.getElementById("players");
@@ -202,9 +201,16 @@ const playersDiv = document.getElementById("players");
 players.forEach(p => {
   playersDiv.innerHTML += `
   <div class="player">
-    <div class="avatar">${p.substring(0,2)}</div>
-    <div>${p}</div>
-    <input type="number" id="${p}" min="1" max="10">
+    <div class="avatar">
+      <img src="bilder/${p.short}.jpg"
+           onerror="this.style.display='none'">
+      ${p.short.substring(0,2)}
+    </div>
+
+    <div style="font-weight:bold">${p.short}</div>
+    <div style="font-size:12px;color:gray">${p.name}</div>
+
+    <input type="number" id="${p.short}" min="1" max="10">
   </div>
   `;
 });
@@ -217,12 +223,12 @@ async function sendVote() {
   let rows = [];
 
   players.forEach(p => {
-    let val = document.getElementById(p).value;
+    let val = document.getElementById(p.short).value;
     if(val) {
       rows.push({
         match,
         voter_name: voter,
-        player: p,
+        player: p.short,
         rating: Number(val),
         comment
       });
