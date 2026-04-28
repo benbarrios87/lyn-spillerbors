@@ -932,12 +932,6 @@ async function loadStatsCenter() {
       </div>
 
       <div class="stat-card">
-        <h3>❤️ Fan-favoritt</h3>
-        <div class="small">Kombinasjon av høyt snitt og mange stemmer.</div>
-        ${renderMiniRanking(fanFav, 8)}
-      </div>
-
-      <div class="stat-card">
         <h3>👑 Flest BB</h3>
         ${renderMiniRanking(bb.counts, 8)}
       </div>
@@ -1006,23 +1000,10 @@ async function loadStatsCenter() {
       </div>
 
       <div class="stat-card">
-        <h3>🔥 Hot take-maskin</h3>
-        <div class="small">Brukere som avviker mest fra snittet.</div>
-        ${renderMiniRanking(hotTakes, 8, false)}
-      </div>
-
-      <div class="stat-card">
         <h3>🧠 superben vs resten</h3>
         <div class="small">Største avvik totalt.</div>
         ${renderMiniRanking(superbenMostDifferent, 8, false)}
       </div>
-
-      <div class="stat-card">
-        <h3>🪓 Dagens syndebukk</h3>
-        <div class="small">Lavest snitt i siste registrerte kamp.</div>
-        ${renderMiniRanking(lastLowest, 8, false)}
-      </div>
-    </div>
   `;
 
   box.innerHTML = html;
