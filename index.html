@@ -312,25 +312,30 @@ const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 const MY_NAME = "superben";
 
 const players = [
-  { name:"Alexander Pedersen", short:"Pedersen" },
-  { name:"Sander Amble Haugen", short:"SAH" },
-  { name:"William Sell", short:"Sell" },
-  { name:"Ådne Midtskogen", short:"Midtskogen" },
-  { name:"Herman Solberg Nilsen", short:"HSN" },
-  { name:"Isaac Barnett", short:"Barnett" },
-  { name:"Didrik Fredriksen", short:"Fredriksen" },
-  { name:"Eron Isufi", short:"Isufi" },
-  { name:"Julius Skaug", short:"Skaug" },
-  { name:"Anders Bjørntvedt Olsen", short:"ABO" },
-  { name:"Ibrahim Sawaneh", short:"Sawaneh" },
-  { name:"Andreas Hellum", short:"Hellum" },
-  { name:"Matias Johansen", short:"MJ" },
-  { name:"William Kurtovic", short:"Kurtovic" },
-  { name:"Fallou Sock", short:"Sock" },
-  { name:"Isak Vik", short:"Vik" },
-  { name:"Isaac Monglo", short:"Monglo" },
-  { name:"William Wæhler", short:"Wæhler" },
-  { name:"Magnus Aadland", short:"Aadland" }
+  { name:"Alexander Pedersen", short:"Pedersen", img:"pedersen.png" },
+  { name:"Marcus Andersen", short:"Andersen", img:"andersen.png" },
+  { name:"Mats Trige", short:"Trige", img:"trige.png" },
+
+  { name:"Sander Amble Haugen", short:"SAH", img:"sah.png" },
+  { name:"William Sell", short:"Sell", img:"sell.png" },
+  { name:"Ådne Midtskogen", short:"Midtskogen", img:"midtskogen.png" },
+  { name:"Herman Solberg Nilsen", short:"HSN", img:"hsn.png" },
+  { name:"Isaac Barnett", short:"Barnett", img:"barnett.png" },
+
+  { name:"Didrik Fredriksen", short:"Fredriksen", img:"fredriksen.png" },
+  { name:"Eron Isufi", short:"Isufi", img:"isufi.png" },
+  { name:"Julius Skaug", short:"Skaug", img:"skaug.png" },
+  { name:"William Kurtovic", short:"Kurtovic", img:"kurtovic.png" },
+  { name:"Isaac Monglo", short:"Monglo", img:"monglo.png" },
+  { name:"William Wæhler", short:"Wæhler", img:"wæhler.png" },
+
+  { name:"Anders Bjørntvedt Olsen", short:"ABO", img:"abo.png" },
+  { name:"Matias Johansen", short:"MJ", img:"mj.png" },
+  { name:"Andreas Hellum", short:"Hellum", img:"hellum.png" },
+  { name:"Ibrahim Sawaneh", short:"Sawaneh", img:"sawaneh.png" },
+  { name:"Fallou Sock", short:"Sock", img:"sock.png" },
+
+  { name:"Magnus Aadland", short:"Aadland", img:null }
 ];
 
 const playersDiv = document.getElementById("players");
@@ -339,7 +344,7 @@ players.forEach(p => {
   playersDiv.innerHTML += `
     <div class="player">
       <div class="avatar">
-        <img src="bilder/${p.short}.jpg" onerror="this.style.display='none'">
+       ${p.img ? `<img src="bilder/${p.img}" onerror="this.style.display='none'">` : ""}
         ${p.short.substring(0,2)}
       </div>
       <div class="player-short">${p.short}</div>
