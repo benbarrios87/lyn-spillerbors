@@ -740,9 +740,6 @@ function buildUserAverages(allVotes) {
   }));
 }
 
-function buildHotTakeUsers(allVotes) {
-  const realVotes = allVotes.filter(isRealMatch);
-  let byMatchPlayer = {};
 
   realVotes.forEach(v => {
     const key = `${v.match_id}|||${v.player}`;
@@ -849,19 +846,6 @@ function buildFanFavourite(allVotes) {
   })).sort((a,b)=>b.raw-a.raw);
 }
 
-function buildMedianGap(allVotes) {
-  return buildStats(allVotes.filter(isRealMatch))
-    .filter(r => r.count >= 3)
-    .map(r => {
-      const med = median(r.ratings);
-      return {
-        player:r.player,
-        score:(r.avg - med > 0 ? "+" : "") + (r.avg - med).toFixed(2),
-        raw:Math.abs(r.avg - med),
-        sub:`snitt ${r.avg.toFixed(2)} · median ${med.toFixed(2)}`
-      };
-    })
-    .sort((a,b)=>b.raw-a.raw);
 }
 
 function buildLastMatchLowest(allVotes) {
@@ -905,17 +889,14 @@ async function loadStatsCenter() {
   const bb = buildBBCounts(realVotes);
   const controversial = buildControversial(realVotes);
   const stable = buildStable(realVotes);
-  const mostRated = buildMostRated(realVotes);
   const worstPlayers = buildWorstPlayers(realVotes);
   const topVoters = buildTopVoters(realVotes);
   const userAvgs = buildUserAverages(realVotes).filter(u=>u.count >= 5);
   const strictest = [...userAvgs].sort((a,b)=>a.avg-b.avg);
   const kindest = [...userAvgs].sort((a,b)=>b.avg-a.avg);
-  const hotTakes = buildHotTakeUsers(realVotes);
   const form = buildFormStats(realVotes);
   const jojo = buildJojo(realVotes);
   const fanFav = buildFanFavourite(realVotes);
-  const medianGap = buildMedianGap(realVotes);
   const lastLowest = buildLastMatchLowest(realVotes);
   const superbenSeason = buildSuperbenSeason(realVotes);
 
@@ -989,11 +970,6 @@ async function loadStatsCenter() {
         <h3>⚖️ Snitt vs median</h3>
         <div class="small">Fanger rare/extreme stemmer.</div>
         ${renderMiniRanking(medianGap, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>📢 Mest vurdert</h3>
-        ${renderMiniRanking(mostRated, 8, false)}
       </div>
 
       <div class="stat-card">
