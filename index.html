@@ -115,11 +115,7 @@ select, input {
   width:110%;
   height:110%;
   object-fit:cover;
-  transform: translateX(8%);
-}
-}
-}
-}
+  transform:translateX(8%);
 }
 
 .player-short { font-weight:bold; margin-top:8px; }
@@ -215,6 +211,7 @@ button:hover { background:#b51218; }
 .small { color:gray; font-size:13px; }
 .diff-plus { color:var(--green); font-weight:bold; }
 .diff-minus { color:var(--darkred); font-weight:bold; }
+
 .warning {
   background:#fff7ed;
   border:1px solid #fed7aa;
@@ -223,6 +220,25 @@ button:hover { background:#b51218; }
   border-radius:12px;
   margin-bottom:12px;
 }
+
+.vipps-box {
+  text-align:center;
+  margin:25px auto 40px;
+  color:white;
+}
+
+.vipps-box img {
+  width:120px;
+  max-width:80%;
+  border-radius:16px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+
+.vipps-box div {
+  font-size:16px;
+  color:white;
+  margin-top:6px;
+}
 </style>
 </head>
 
@@ -230,16 +246,16 @@ button:hover { background:#b51218; }
 
 <header>
   <div class="logo-wrap">
-    <img src="lyn-logo.png">
+    <img src="lyn-logo.png" alt="Lyn-logo">
   </div>
   <h1>Lyn spillerbørs</h1>
-  </p> 100% subjektivt. Heldigvis. Sett børsen.</p>
+  <p>100% subjektivt. Heldigvis. Sett børsen.</p>
 </header>
 
 <main>
 
 <div class="box">
-  <label>OBS:Velg kamp</label>
+  <label>OBS: Velg kamp</label>
   <select id="match">
     <option>TEST</option>
     <option>13.04 Haugesund hjemme</option>
@@ -309,6 +325,11 @@ button:hover { background:#b51218; }
   </div>
 </div>
 
+<div class="vipps-box">
+  <img src="bilder/vipps.png.png" alt="Vipps">
+  <div>Scan for å spandere en kaffekapsel 🙏</div>
+</div>
+
 </main>
 
 <script>
@@ -318,31 +339,25 @@ const MY_NAME = "superben";
 
 const players = [
   { name:"Alexander Pedersen", short:"Pedersen", img:"pedersen.png" },
-  
   { name:"Sander Amble Haugen", short:"SAH", img:"sah.png" },
   { name:"William Sell", short:"Sell", img:"sell.png" },
   { name:"Ådne Midtskogen", short:"Midtskogen", img:"midtskogen.png" },
   { name:"Herman Solberg Nilsen", short:"HSN", img:"hsn.png" },
-
   { name:"Didrik Fredriksen", short:"Fredriksen", img:"fredriksen.png" },
   { name:"Eron Isufi", short:"Isufi", img:"isufi.png" },
   { name:"Julius Skaug", short:"Skaug", img:"skaug.png" },
   { name:"William Kurtovic", short:"Kurtovic", img:"kurtovic.png" },
   { name:"Isaac Monglo", short:"Monglo", img:"monglo.png" },
-
-
   { name:"Anders Bjørntvedt Olsen", short:"ABO", img:"abo.png" },
   { name:"Matias Johansen", short:"MJ", img:"mj.png" },
   { name:"Andreas Hellum", short:"Hellum", img:"hellum.png" },
   { name:"Ibrahim Sawaneh", short:"Sawaneh", img:"sawaneh.png" },
- 
   { name:"Fallou Sock", short:"Sock", img:"sock.png" },
   { name:"Isak Vik", short:"Vik", img:"vik.png" },
- { name:"Isaac Barnett", short:"Barnett", img:"barnett.png" },
-   { name:"Marcus Andersen", short:"Andersen", img:"andersen.png" },
+  { name:"Isaac Barnett", short:"Barnett", img:"barnett.png" },
+  { name:"Marcus Andersen", short:"Andersen", img:"andersen.png" },
   { name:"Mats Trige", short:"Trige", img:"trige.png" },
-    { name:"William Wæhler", short:"Wæhler", img:"wæhler.png" },
-
+  { name:"William Wæhler", short:"Wæhler", img:"wæhler.png" },
   { name:"Magnus Aadland", short:"Aadland", img:"aadland.png" }
 ];
 
@@ -352,7 +367,7 @@ players.forEach(p => {
   playersDiv.innerHTML += `
     <div class="player">
       <div class="avatar">
-       ${p.img ? `<img src="bilder/${p.img}" onerror="this.style.display='none'">` : ""}
+        ${p.img ? `<img src="bilder/${p.img}" onerror="this.style.display='none'">` : ""}
         ${p.short.substring(0,2)}
       </div>
       <div class="player-short">${p.short}</div>
@@ -441,6 +456,8 @@ async function fetchVotes(query = "") {
       }
     }
   );
+
+  if (!response.ok) return [];
   return await response.json();
 }
 
@@ -687,16 +704,6 @@ function buildStable(allVotes) {
     .sort((a,b) => a.raw - b.raw);
 }
 
-function buildMostRated(allVotes) {
-  return buildStats(allVotes.filter(isRealMatch))
-    .map(r => ({
-      player:r.player,
-      score:r.count,
-      sub:"stemmer"
-    }))
-    .sort((a,b)=>b.score-a.score);
-}
-
 function buildWorstPlayers(allVotes) {
   return buildStats(allVotes.filter(isRealMatch))
     .filter(r => r.count >= 2)
@@ -726,7 +733,7 @@ function buildUserAverages(allVotes) {
   let users = {};
   allVotes.filter(isRealMatch).forEach(v => {
     const name = cleanVoterName(v.voter);
-    if (!users[name]) users[name] = { total:0, count:0, diffs:[] };
+    if (!users[name]) users[name] = { total:0, count:0 };
     users[name].total += Number(v.rating);
     users[name].count += 1;
   });
@@ -740,31 +747,6 @@ function buildUserAverages(allVotes) {
   }));
 }
 
-
-  realVotes.forEach(v => {
-    const key = `${v.match_id}|||${v.player}`;
-    if (!byMatchPlayer[key]) byMatchPlayer[key] = [];
-    byMatchPlayer[key].push(Number(v.rating));
-  });
-
-  let users = {};
-
-  realVotes.forEach(v => {
-    const key = `${v.match_id}|||${v.player}`;
-    const avg = byMatchPlayer[key].reduce((a,b)=>a+b,0) / byMatchPlayer[key].length;
-    const voter = cleanVoterName(v.voter);
-    if (!users[voter]) users[voter] = { totalDiff:0, count:0 };
-    users[voter].totalDiff += Math.abs(Number(v.rating) - avg);
-    users[voter].count += 1;
-  });
-
-  return Object.keys(users).map(user => ({
-    player:user,
-    score:(users[user].totalDiff / users[user].count).toFixed(2),
-    raw:users[user].totalDiff / users[user].count,
-    sub:`${users[user].count} stemmer`
-  })).sort((a,b)=>b.raw-a.raw);
-}
 
 function perPlayerMatchAverages(allVotes) {
   let map = {};
@@ -793,7 +775,6 @@ function perPlayerMatchAverages(allVotes) {
 
 function buildFormStats(allVotes) {
   const byPlayer = perPlayerMatchAverages(allVotes);
-
   let rows = [];
 
   Object.keys(byPlayer).forEach(player => {
@@ -844,8 +825,6 @@ function buildFanFavourite(allVotes) {
     raw:r.avg * Math.log10(r.count + 1),
     sub:`${r.avg.toFixed(2)} snitt · ${r.count} stemmer`
   })).sort((a,b)=>b.raw-a.raw);
-}
-
 }
 
 function buildLastMatchLowest(allVotes) {
@@ -899,7 +878,7 @@ async function loadStatsCenter() {
   const fanFav = buildFanFavourite(realVotes);
   const lastLowest = buildLastMatchLowest(realVotes);
   const superbenSeason = buildSuperbenSeason(realVotes);
-
+  
   const superbenMostDifferent = superbenSeason.slice(0,8).map(r => ({
     player:r.player,
     score:(r.diff > 0 ? "+" : "") + r.diff.toFixed(2),
@@ -965,10 +944,6 @@ async function loadStatsCenter() {
         <div class="small">Basert på variasjon i karakterene.</div>
         ${renderMiniRanking(controversial, 8, false)}
       </div>
-
-      <div class="stat-card">
-        <h3>⚖️ Snitt vs median</h3>
-        <div class="small">Fanger rare/extreme stemmer.</div>
         ${renderMiniRanking(medianGap, 8, false)}
       </div>
 
@@ -993,6 +968,19 @@ async function loadStatsCenter() {
         <div class="small">Største avvik totalt.</div>
         ${renderMiniRanking(superbenMostDifferent, 8, false)}
       </div>
+
+      <div class="stat-card">
+        <h3>⭐ Folkets favoritt</h3>
+        <div class="small">Kombinerer høyt snitt og mange stemmer.</div>
+        ${renderMiniRanking(fanFav, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🧯 Svakest sist kamp</h3>
+        <div class="small">Lavest snitt i nyeste kamp.</div>
+        ${renderMiniRanking(lastLowest, 8, false)}
+      </div>
+    </div>
   `;
 
   box.innerHTML = html;
@@ -1003,14 +991,3 @@ loadStatsCenter();
 
 </body>
 </html>
-<div style="text-align:center; margin-top:20px;">
-<img src="bilder/vipps.png.png" style="
-  width:120px;
-  max-width:80%;
-  border-radius:16px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.25);
-">
-  <div style="font-size:16px; color:gray; margin-top:6px;">
-    Scan for å spandere en kaffekapsel 🙏
-  </div>
-</div>
