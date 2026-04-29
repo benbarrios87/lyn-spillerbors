@@ -361,7 +361,7 @@ button:hover { background:#b51218; }
     <option>13.04 Haugesund hjemme</option>
     <option>21.04 Sogndal borte</option>
     <option>27.04 Sandnes Ulf hjemme</option>
-    <option>30.04 Moss borte</option>
+    <option>26.04 Moss borte</option>
     <option>01.05 Lyn - Stabæk</option>
     <option>10.05 Raufoss - Lyn</option>
     <option>16.05 Lyn - Kongsvinger</option>
@@ -398,6 +398,23 @@ button:hover { background:#b51218; }
 </div>
 
 <div class="box">
+  <h2>Gi karakter</h2>
+  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
+  <div class="grid" id="players"></div>
+</div>
+
+<div class="box">
+  <h2>🏟️ motstanderens tribuneliv</h2>
+  <p>Hvordan var motstandernes tribuneliv? Helt frivillig. Kun hele tall fra 1 til 10.</p>
+  <input type="number" id="awayFans" min="1" max="10" step="1" placeholder="1–10">
+  <div class="small">for moro skyld.</div>
+</div>
+
+<div class="box">
+  <button onclick="sendVote()">Send inn børs / tips</button>
+</div>
+
+<div class="box">
   <h2>🎯 Tippekonkurranse</h2>
   <p>Tipset kan endres helt frem til kampfristen. Etter fristen låses kampen.</p>
   <div id="nextMatches" class="next-grid"></div>
@@ -416,23 +433,6 @@ button:hover { background:#b51218; }
     </div>
   </div>
   <div class="small">3 poeng for helt riktig resultat. 1 poeng for riktig utfall. Samme bruker + samme kamp overskriver gammelt tips før fristen.</div>
-</div>
-
-<div class="box">
-  <h2>Gi karakter</h2>
-  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
-  <div class="grid" id="players"></div>
-</div>
-
-<div class="box">
-  <h2>🏟️ motstanderens tribuneliv</h2>
-  <p>Hvordan var motstandernes tribuneliv? Helt frivillig. Kun hele tall fra 1 til 10.</p>
-  <input type="number" id="awayFans" min="1" max="10" step="1" placeholder="1–10">
-  <div class="small">for moro skyld.</div>
-</div>
-
-<div class="box">
-  <button onclick="sendVote()">Send inn børs / tips</button>
 </div>
 
 <div class="box">
@@ -474,7 +474,7 @@ const matchesData = [
   { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
   { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
   { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
-  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
+  { id:"26.04 Moss borte", date:"2026-04-26", home:"Moss", away:"Lyn", deadline:"2026-04-26T18:00:00", actual:null },
   { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:null },
   { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
   { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
