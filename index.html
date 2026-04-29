@@ -411,7 +411,7 @@ button:hover { background:#b51218; }
 </div>
 
 <div class="box">
-  <button onclick="sendVote()">Send inn børs / tips</button>
+  <button onclick="sendVote()">Send inn børs</button>
 </div>
 
 <div class="box">
@@ -433,6 +433,9 @@ button:hover { background:#b51218; }
     </div>
   </div>
   <div class="small">3 poeng for helt riktig resultat. 1 poeng for riktig utfall. Samme bruker + samme kamp overskriver gammelt tips før fristen.</div>
+  <div style="margin-top:14px;">
+    <button onclick="sendTip()">Send tips</button>
+  </div>
 </div>
 
 <div class="box">
@@ -672,9 +675,6 @@ async function sendVote() {
   const match = document.getElementById("match").value;
   const voter = cleanVoterName(document.getElementById("voter").value);
   const awayFansRaw = document.getElementById("awayFans").value;
-  const tipMatch = document.getElementById("tipMatch").value;
-  const tipHomeRaw = document.getElementById("tipHome").value;
-  const tipAwayRaw = document.getElementById("tipAway").value;
 
   let rows = [];
 
@@ -705,44 +705,8 @@ async function sendVote() {
     });
   }
 
-  if (tipHomeRaw || tipAwayRaw) {
-    if (!tipHomeRaw || !tipAwayRaw) {
-      alert("Du må fylle inn både hjemme- og bortemål hvis du skal tippe resultat.");
-      return;
-    }
-
-    const matchData = getMatchData(tipMatch);
-    if (!matchData) {
-      alert("Velg en gyldig kamp å tippe på.");
-      return;
-    }
-
-    if (isTipLocked(matchData)) {
-      alert("Fristen for å tippe denne kampen er passert.");
-      return;
-    }
-
-    const tipHome = Number(tipHomeRaw);
-    const tipAway = Number(tipAwayRaw);
-    if (!validateTip("Hjemmemål", tipHome) || !validateTip("Bortemål", tipAway)) return;
-
-    rows.push({
-      match_id: tipMatch,
-      voter: voter,
-      player: TIP_HOME_PLAYER,
-      rating: encodeGoals(tipHome)
-    });
-
-    rows.push({
-      match_id: tipMatch,
-      voter: voter,
-      player: TIP_AWAY_PLAYER,
-      rating: encodeGoals(tipAway)
-    });
-  }
-
   if (rows.length === 0) {
-    alert("Du må gi minst én karakter eller ett tips først.");
+    alert("Du må gi minst én spillerkarakter eller Bortefeltet-karakter først.");
     return;
   }
 
@@ -765,13 +729,78 @@ async function sendVote() {
     return;
   }
 
-  alert("Sendt! Hvis du hadde sendt før på samme kamp, ble det gamle oppdatert.");
+  alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
 
   players.forEach(p => document.getElementById(p.short).value = "");
   document.getElementById("awayFans").value = "";
+  loadResults();
+  loadStatsCenter();
+}
+
+async function sendTip() {
+  const tipMatch = document.getElementById("tipMatch").value;
+  const voter = cleanVoterName(document.getElementById("voter").value);
+  const tipHomeRaw = document.getElementById("tipHome").value;
+  const tipAwayRaw = document.getElementById("tipAway").value;
+
+  if (!tipHomeRaw || !tipAwayRaw) {
+    alert("Du må fylle inn både hjemme- og bortemål.");
+    return;
+  }
+
+  const matchData = getMatchData(tipMatch);
+  if (!matchData) {
+    alert("Velg en gyldig kamp å tippe på.");
+    return;
+  }
+
+  if (isTipLocked(matchData)) {
+    alert("Fristen for å tippe denne kampen er passert.");
+    return;
+  }
+
+  const tipHome = Number(tipHomeRaw);
+  const tipAway = Number(tipAwayRaw);
+  if (!validateTip("Hjemmemål", tipHome) || !validateTip("Bortemål", tipAway)) return;
+
+  const rows = [
+    {
+      match_id: tipMatch,
+      voter: voter,
+      player: TIP_HOME_PLAYER,
+      rating: encodeGoals(tipHome)
+    },
+    {
+      match_id: tipMatch,
+      voter: voter,
+      player: TIP_AWAY_PLAYER,
+      rating: encodeGoals(tipAway)
+    }
+  ];
+
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
+    {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"resolution=merge-duplicates,return=minimal"
+      },
+      body:JSON.stringify(rows)
+    }
+  );
+
+  if (!response.ok) {
+    alert("Noe gikk feil. Tipset ble ikke sendt.");
+    return;
+  }
+
+  alert("Tipset er lagret! Hvis du hadde tippet før på samme kamp, ble det gamle tipset oppdatert.");
   document.getElementById("tipHome").value = "";
   document.getElementById("tipAway").value = "";
-  loadResults();
+  loadMatchPredictions();
   loadStatsCenter();
 }
 
