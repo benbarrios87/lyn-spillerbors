@@ -1339,8 +1339,21 @@ async function loadStatsCenter() {
   const allVotes = await fetchVotes();
   const realVotes = allVotes.filter(isPlayerVote);
   const awayFansStats = buildAwayFansStats(allVotes);
-  const predictionLeaders = buildPredictionLeaderboardRows(allVotes);
-  const box = document.getElementById("statsCenter");
+ const predictionLeaders = buildPredictionLeaderboardRows(allVotes);
+const accuratePredictors = predictionLeaders
+  .filter(r => r.sub && r.sub.includes("helt riktige"))
+  .map(r => {
+    const match = r.sub.match(/(\d+) helt riktige/);
+    return {
+      player: r.player,
+      score: match ? Number(match[1]) : 0,
+      sub: `${r.score} poeng`
+    };
+  })
+  .filter(r => r.score > 0)
+  .sort((a,b) => b.score - a.score);
+
+const box = document.getElementById("statsCenter");
 
   if (!realVotes || realVotes.length === 0) {
     box.innerHTML = `<div class="warning">Ingen ekte spillerstemmer enda. TEST-kampen, Bortefeltet og tipping vises ikke i spillerstats.</div>`;
