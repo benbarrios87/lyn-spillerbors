@@ -1466,9 +1466,14 @@ async function loadStatsCenter() {
       </div>
 
       <div class="stat-card">
-        <h3>🎯 Tippetabellen</h3>
-        <div class="small">Alle forumbrukere rangert etter tippepoeng.</div>
-        ${renderMiniRanking(predictionLeaders, 99)}
+       <h3>🎯 Tippetabellen</h3>
+<div class="small">Alle forumbrukere rangert etter tippepoeng.</div>
+${renderMiniRanking(predictionLeaders, 99)}
+
+<div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.12);">
+  <strong>🎯 Treffsikre typer</strong>
+  ${renderMiniRanking(accuratePredictors, 5, false)}
+</div>
       </div>
     </div>
   `;
