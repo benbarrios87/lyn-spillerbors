@@ -339,16 +339,6 @@ button:hover { background:#b51218; }
   color:gray;
   margin-top:8px;
 }
-  .rating-guide {
-  margin-top:12px;
-  padding:14px;
-  border-radius:14px;
-  background:#fff7ed;
-  border:1px solid #fed7aa;
-  font-size:13px;
-  color:#9a3412;
-  line-height:1.6;
-}
 </style>
 </head>
 
@@ -402,28 +392,14 @@ button:hover { background:#b51218; }
 </div>
 
 <div class="box">
-  <label>OBS: Navn / forumbruker</label>
-  <input id="voter" placeholder="Skriv forumnavnet ditt">
+  <label>Navn / forumbruker</label>
+  <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Viktig: skriv forumnavnet nøyaktig likt hver gang. Store og små bokstaver behandles likt.</div>
 </div>
 
 <div class="box">
   <h2>Gi karakter</h2>
   <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
-  <div class="rating-guide">
-  <strong>Lynbørs-skala (helt objektiv, selvfølgelig):</strong><br><br>
-
-  <b>10</b> – Bygger statue på Bislett. Snakkes om i årevis.<br>
-  <b>9</b> – Banens klart beste. Bærer laget alene.<br>
-  <b>8</b> – Meget sterk kamp. Alt sitter.<br>
-  <b>7</b> – Solid +. Gjør jobben og litt til.<br>
-  <b>6</b> – Helt OK. Godkjent dag på kontoret.<br>
-  <b>5</b> – Ok.. men meh.<br>
-  <b>4</b> – Svak. Her forventer vi mer.<br>
-  <b>3</b> – Veldig svak. Lite som stemmer.<br>
-  <b>2</b> – Katastrofal kamp. Burde vært byttet tidlig.<br>
-  <b>1</b> – Send han til Vålerenga. Der blir han stjernespillern.
-</div>
   <div class="grid" id="players"></div>
 </div>
 
@@ -440,7 +416,7 @@ button:hover { background:#b51218; }
 
 <div class="box">
   <h2>🎯 Tippekonkurranse</h2>
-  <p>Tipset kan endres helt frem til kampfristen. Etter fristen låses kampen.OBS!: Husk å legge in brukernavnet ditt øverst om du ikke allerede har gjort det</p>
+  <p>Tipset kan endres helt frem til kampfristen. Etter fristen låses kampen.</p>
   <div id="nextMatches" class="next-grid"></div>
 
   <label>Velg kamp å tippe på</label>
@@ -502,8 +478,7 @@ const matchesData = [
   { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
   { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
   { id:"26.04 Moss borte", date:"2026-04-26", home:"Moss", away:"Lyn", deadline:"2026-04-26T18:00:00", actual:null },
-  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 }
-  },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:null },
   { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
   { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
   { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
@@ -570,8 +545,14 @@ players.forEach(p => {
 });
 
 function cleanVoterName(name) {
-  return (name || "Anonym").trim().toLowerCase();
+  return (name || "").trim().toLowerCase();
 }
+
+const voterInput = document.getElementById("voter");
+voterInput.value = localStorage.getItem("lynbors_voter") || "";
+voterInput.addEventListener("input", () => {
+  localStorage.setItem("lynbors_voter", voterInput.value.trim());
+});
 
 function isRealMatch(v) {
   return v.match_id && v.match_id !== "TEST";
@@ -701,6 +682,20 @@ async function sendVote() {
   const voter = cleanVoterName(document.getElementById("voter").value);
   const awayFansRaw = document.getElementById("awayFans").value;
 
+  if (match === "TEST") {
+    alert("TEST-kampen er bare for testing. Velg en ekte kamp før du sender inn børs.");
+    document.getElementById("match").focus();
+    return;
+  }
+
+  if (!voter) {
+    alert("Skriv inn forumbrukernavnet ditt først.");
+    document.getElementById("voter").focus();
+    return;
+  }
+
+  localStorage.setItem("lynbors_voter", document.getElementById("voter").value.trim());
+
   let rows = [];
 
   for (const p of players) {
@@ -767,6 +762,19 @@ async function sendTip() {
   const voter = cleanVoterName(document.getElementById("voter").value);
   const tipHomeRaw = document.getElementById("tipHome").value;
   const tipAwayRaw = document.getElementById("tipAway").value;
+
+  if (!voter) {
+    alert("Skriv inn forumbrukernavnet ditt først.");
+    document.getElementById("voter").focus();
+    return;
+  }
+
+  if (!tipMatch || tipMatch === "TEST") {
+    alert("Velg en ekte kamp å tippe på.");
+    return;
+  }
+
+  localStorage.setItem("lynbors_voter", document.getElementById("voter").value.trim());
 
   if (!tipHomeRaw || !tipAwayRaw) {
     alert("Du må fylle inn både hjemme- og bortemål.");
@@ -1007,19 +1015,46 @@ function buildPredictionLeaderboardRows(allVotes) {
     if (!actual) return;
 
     const points = scorePrediction(p.home, p.away, actual.home, actual.away);
-    if (!users[p.voter]) users[p.voter] = { points:0, correct:0, outcomes:0, tips:0 };
+    if (!users[p.voter]) users[p.voter] = { points:0, correct:0, outcomes:0, zeroes:0, tips:0 };
+
     users[p.voter].points += points;
     users[p.voter].tips += 1;
+
     if (points === 3) users[p.voter].correct += 1;
     if (points === 1) users[p.voter].outcomes += 1;
+    if (points === 0) users[p.voter].zeroes += 1;
   });
 
   return Object.keys(users).map(user => ({
     player:user,
-    score:users[user].points,
+    score:users[user].points + " p",
     raw:users[user].points,
-    sub:`${users[user].tips} tips · ${users[user].correct} helt riktige · ${users[user].outcomes} riktig utfall`
-  })).sort((a,b) => b.raw - a.raw || a.player.localeCompare(b.player));
+    correct:users[user].correct,
+    outcomes:users[user].outcomes,
+    zeroes:users[user].zeroes,
+    tips:users[user].tips,
+    sub:`🎯 ${users[user].correct} helt riktige · 🔮 ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
+  })).sort((a,b) =>
+    b.raw - a.raw ||
+    b.correct - a.correct ||
+    b.outcomes - a.outcomes ||
+    a.player.localeCompare(b.player)
+  );
+}
+
+function buildMostAccuratePredictors(allVotes) {
+  return buildPredictionLeaderboardRows(allVotes)
+    .filter(r => r.correct > 0)
+    .sort((a,b) =>
+      b.correct - a.correct ||
+      b.raw - a.raw ||
+      a.player.localeCompare(b.player)
+    )
+    .map(r => ({
+      player:r.player,
+      score:r.correct,
+      sub:`${r.raw} poeng · ${r.tips} tips`
+    }));
 }
 
 async function loadPredictionLeaderboard() {
@@ -1340,21 +1375,9 @@ async function loadStatsCenter() {
   const allVotes = await fetchVotes();
   const realVotes = allVotes.filter(isPlayerVote);
   const awayFansStats = buildAwayFansStats(allVotes);
- const predictionLeaders = buildPredictionLeaderboardRows(allVotes);
-const accuratePredictors = predictionLeaders
-  .filter(r => r.sub && r.sub.includes("helt riktige"))
-  .map(r => {
-    const match = r.sub.match(/(\d+) helt riktige/);
-    return {
-      player: r.player,
-      score: match ? Number(match[1]) : 0,
-      sub: `${r.score} poeng`
-    };
-  })
-  .filter(r => r.score > 0)
-  .sort((a,b) => b.score - a.score);
-
-const box = document.getElementById("statsCenter");
+  const predictionLeaders = buildPredictionLeaderboardRows(allVotes);
+  const accuratePredictors = buildMostAccuratePredictors(allVotes);
+  const box = document.getElementById("statsCenter");
 
   if (!realVotes || realVotes.length === 0) {
     box.innerHTML = `<div class="warning">Ingen ekte spillerstemmer enda. TEST-kampen, Bortefeltet og tipping vises ikke i spillerstats.</div>`;
@@ -1401,70 +1424,76 @@ const box = document.getElementById("statsCenter");
     <div class="stats-grid">
       <div class="stat-card">
         <h3>🏆 Sesongtoppen</h3>
-        ${renderMiniRanking(seasonItems, 6)}
+        ${renderMiniRanking(seasonItems, 8)}
       </div>
 
       <div class="stat-card">
         <h3>😬 Skjerpings</h3>
         <div class="small">Lavest snitt denne sesongen.</div>
-        ${renderMiniRanking(worstPlayers, 6, false)}
+        ${renderMiniRanking(worstPlayers, 8, false)}
       </div>
 
       <div class="stat-card">
         <h3>👑 Flest BB</h3>
-        ${renderMiniRanking(bb.counts, 6)}
+        ${renderMiniRanking(bb.counts, 8)}
       </div>
 
       <div class="stat-card">
         <h3>💪 Størst BB-margin</h3>
         <div class="small">Hvor klart BB vant en kamp.</div>
-        ${renderMiniRanking(bb.margins, 6, false)}
+        ${renderMiniRanking(bb.margins, 8, false)}
       </div>
 
       <div class="stat-card">
         <h3>📈 Formkonge</h3>
         <div class="small">Størst positiv utvikling.</div>
-        ${renderMiniRanking(form.up, 6, false)}
+        ${renderMiniRanking(form.up, 8, false)}
       </div>
 
       <div class="stat-card">
         <h3>📉 Formsvikt</h3>
         <div class="small">Størst negativ utvikling.</div>
-        ${renderMiniRanking(form.down, 6, false)}
-      </div>
-
-       <div class="stat-card">
-        <h3>🤯 Mest uenighet</h3>
-        <div class="small">Basert på variasjon i karakterene.</div>
-        ${renderMiniRanking(controversial, 6, false)}
+        ${renderMiniRanking(form.down, 8, false)}
       </div>
 
       <div class="stat-card">
-        <h3>🧱 Mest stabil</h3>
-        <div class="small">Lavest variasjon.</div>
-        ${renderMiniRanking(stable, 6, false)}
-      </div>
-
-     <div class="stat-card">
         <h3>🎢 Jojo-spiller</h3>
         <div class="small">Størst svingninger fra kamp til kamp.</div>
         ${renderMiniRanking(jojo, 8, false)}
       </div>
 
       <div class="stat-card">
+        <h3>🧱 Mest stabil</h3>
+        <div class="small">Lavest variasjon.</div>
+        ${renderMiniRanking(stable, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🤯 Mest uenighet</h3>
+        <div class="small">Basert på variasjon i karakterene.</div>
+        ${renderMiniRanking(controversial, 8, false)}
+      </div>
+
+      <div class="stat-card">
         <h3>🏅 Topp bidragsytere</h3>
         <div class="small">Hvem stemmer mest.</div>
-        ${renderMiniRanking(topVoters, 10, false)}
+        ${renderMiniRanking(topVoters, 8, false)}
       </div>
 
       <div class="stat-card">
         <h3>😇 Snilleste brukere</h3>
-        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 6, false)}
+        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
       </div>
 
       <div class="stat-card">
         <h3>😈 Strengeste brukere</h3>
-        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 6, false)}
+        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🧠 superben vs resten</h3>
+        <div class="small">Største avvik totalt.</div>
+        ${renderMiniRanking(superbenMostDifferent, 8, false)}
       </div>
 
       <div class="stat-card">
@@ -1474,14 +1503,13 @@ const box = document.getElementById("statsCenter");
       </div>
 
       <div class="stat-card">
-       <h3>🎯 Tippetabellen</h3>
-<div class="small">Alle forumbrukere rangert etter tippepoeng.</div>
-${renderMiniRanking(predictionLeaders, 99)}
-
-<div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.12);">
-  <strong>🎯 Treffsikre typer</strong>
-  ${renderMiniRanking(accuratePredictors, 5, false)}
-</div>
+        <h3>🎯 Tippetabellen</h3>
+        <div class="small">Rangert etter poeng. Ved lik poengsum teller flest helt riktige først.</div>
+        ${renderMiniRanking(predictionLeaders, 99)}
+        <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.12);">
+          <strong>🎯 Treffsikre typer</strong>
+          ${renderMiniRanking(accuratePredictors, 5, false)}
+        </div>
       </div>
     </div>
   `;
