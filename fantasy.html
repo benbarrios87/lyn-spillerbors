@@ -117,7 +117,7 @@ label {
 <div class="container">
 
   <h1>Lyn Fantasy</h1>
-  <p class="small">Velg 3 Lyn-spillere og én kaptein før kamp.</p>
+  <p class="small">Velg 2 Lyn-spillere og én kaptein før kamp.</p>
 
   <div class="card match-box">
     <div>Neste fantasy-kamp</div>
@@ -125,40 +125,47 @@ label {
     <div class="match-date" id="matchDate"></div>
   </div>
 
-<div class="card rules">
-  <h2>Regler</h2>
+  <div class="card rules">
+    <h2>Regler</h2>
 
-  <ul>
-    <li>Du velger <strong>3 Lyn-spillere</strong> før kampstart.</li>
-    <li>Du må velge <strong>én av dem som kaptein ⭐</strong>.</li>
-    <li>Du kan ikke velge samme spiller flere ganger.</li>
-    <li>Laget låses når kampen starter.</li>
-  </ul>
+    <ul>
+      <li>Velg <strong>2 Lyn-spillere</strong> + <strong>1 kaptein ⭐</strong> før kampstart.</li>
+      <li>Kapteinen er ditt hovedvalg og gir ekstra poeng.</li>
+      <li>Du kan ikke velge samme spiller flere ganger.</li>
+      <li>Laget låses når kampen starter.</li>
+    </ul>
 
-  <h3>Poengsystem</h3>
+    <h3>Poengsystem</h3>
 
-  <ul>
-    <li><strong>Alle spillere:</strong> Spilt kamp +1 poeng</li>
-    <li><strong>Angrep:</strong> Mål +5, assist +3</li>
-    <li><strong>Midtbane:</strong> Mål +6, assist +3</li>
-    <li><strong>Forsvar:</strong> Mål +6, assist +3, clean sheet +4</li>
-    <li><strong>Keeper:</strong> Clean sheet +4</li>
-  </ul>
+    <ul>
+      <li><strong>Angrep:</strong> Mål +4, assist +3</li>
+      <li><strong>Midtbane:</strong> Mål +5, assist +3, clean sheet +1</li>
+      <li><strong>Forsvar:</strong> Mål +6, assist +3, clean sheet +4</li>
+      <li><strong>Keeper:</strong> Clean sheet +5, strafferedning +5</li>
+      <li><strong>Alle posisjoner:</strong> Rødt kort −3</li>
+    </ul>
 
-  <h3>Kaptein</h3>
+    <h3>Kaptein</h3>
 
-  <ul>
-    <li>Kapteinen får <strong>+2 ekstra poeng</strong>.</li>
-    <li>Kaptein gir ikke dobbel score, bare bonus.</li>
-  </ul>
+    <ul>
+      <li>Kapteinen får <strong>+2 ekstra poeng</strong>.</li>
+      <li>Kaptein gir ikke dobbel score.</li>
+    </ul>
 
-  <h3>Resultater</h3>
+    <h3>Børsbonus</h3>
 
-  <ul>
-    <li>Poeng og sammenlagtstilling vises etter hvert i <strong>Statscentral</strong>.</li>
-    <li>Dette er en testversjon. Innsending og leaderboard kobles på senere.</li>
-  </ul>
-</div>
+    <ul>
+      <li>Snittscore på <strong>7.5 eller høyere</strong>: +1 poeng</li>
+      <li>Snittscore på <strong>4.5 eller lavere</strong>: −1 poeng</li>
+      <li>Gjelder kun hvis spilleren har minst <strong>10 stemmer</strong>.</li>
+    </ul>
+
+    <h3>Resultater</h3>
+
+    <ul>
+      <li>Poeng og sammenlagtstilling vises i <strong>Statscentral</strong>.</li>
+    </ul>
+  </div>
 
   <div class="card">
     <h2>Ditt lag</h2>
@@ -172,10 +179,7 @@ label {
     <label for="player2">Spiller 2</label>
     <select id="player2"></select>
 
-    <label for="player3">Spiller 3</label>
-    <select id="player3"></select>
-
-    <label for="captain">Kaptein</label>
+    <label for="captain">Kaptein ⭐</label>
     <select id="captain"></select>
 
     <button onclick="saveTeam()">Lagre fantasy-lag</button>
@@ -237,7 +241,7 @@ function saveUsernameEverywhere(username) {
 }
 
 function fillSelects() {
-  const selects = ["player1", "player2", "player3", "captain"];
+  const selects = ["player1", "player2", "captain"];
 
   selects.forEach(id => {
     const select = document.getElementById(id);
@@ -253,23 +257,17 @@ function saveTeam() {
   const username = document.getElementById("username").value.trim();
   const player1 = document.getElementById("player1").value;
   const player2 = document.getElementById("player2").value;
-  const player3 = document.getElementById("player3").value;
   const captain = document.getElementById("captain").value;
 
-  if (!username || !player1 || !player2 || !player3 || !captain) {
-    alert("Fyll inn brukernavn, tre spillere og kaptein.");
+  if (!username || !player1 || !player2 || !captain) {
+    alert("Fyll inn brukernavn, to spillere og kaptein.");
     return;
   }
 
-  const chosenPlayers = [player1, player2, player3];
+  const chosenPlayers = [player1, player2, captain];
 
   if (new Set(chosenPlayers).size !== 3) {
     alert("Du kan ikke velge samme spiller flere ganger.");
-    return;
-  }
-
-  if (!chosenPlayers.includes(captain)) {
-    alert("Kapteinen må være en av de tre spillerne dine.");
     return;
   }
 
@@ -278,7 +276,8 @@ function saveTeam() {
   const team = {
     match_id: nextMatch.id,
     username,
-    players: chosenPlayers,
+    player1,
+    player2,
     captain
   };
 
@@ -295,12 +294,11 @@ function showTeam(team) {
     <strong>${team.username}</strong><br>
     Kamp: ${nextMatch.home} - ${nextMatch.away}<br><br>
 
-    1. ${team.players[0]} ${team.captain === team.players[0] ? "⭐ KAPTEIN" : ""}<br>
-    2. ${team.players[1]} ${team.captain === team.players[1] ? "⭐ KAPTEIN" : ""}<br>
-    3. ${team.players[2]} ${team.captain === team.players[2] ? "⭐ KAPTEIN" : ""}
+    Spiller 1: ${team.player1}<br>
+    Spiller 2: ${team.player2}<br>
 
     <div class="captain-line">
-      Kapteinvalg: ⭐ ${team.captain}
+      ⭐ Kaptein: ${team.captain}
     </div>
   `;
 }
@@ -319,9 +317,8 @@ function loadSavedTeam() {
   if (team.match_id !== nextMatch.id) return;
 
   document.getElementById("username").value = team.username;
-  document.getElementById("player1").value = team.players[0];
-  document.getElementById("player2").value = team.players[1];
-  document.getElementById("player3").value = team.players[2];
+  document.getElementById("player1").value = team.player1;
+  document.getElementById("player2").value = team.player2;
   document.getElementById("captain").value = team.captain;
 
   showTeam(team);
