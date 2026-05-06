@@ -98,6 +98,26 @@ button:hover {
   font-weight:bold;
 }
 
+.points-box {
+  margin-top:18px;
+  background:rgba(255,255,255,0.12);
+  border-radius:12px;
+  padding:15px;
+}
+
+.total-points {
+  font-size:26px;
+  font-weight:bold;
+  text-align:center;
+  color:#ffffff;
+  margin-top:10px;
+}
+
+.breakdown {
+  margin-top:12px;
+  font-size:15px;
+}
+
 .small {
   opacity:0.8;
   font-size:14px;
@@ -162,7 +182,7 @@ label {
     <h3>Resultater</h3>
 
     <ul>
-      <li>Poeng og sammenlagtstilling vises i <strong>Statscentral</strong>.</li>
+      <li>Poeng og sammenlagtstilling vises etter hvert i <strong>Statscentral</strong>.</li>
     </ul>
   </div>
 
@@ -198,26 +218,52 @@ const nextMatch = {
 };
 
 const players = [
-  "Pedersen",
-  "Sah",
-  "Sell",
-  "Midtskogen",
-  "HSN",
-  "Barnett",
-  "Fredriksen",
-  "Isufi",
-  "Skaug",
-  "Kurtovic",
-  "Monglo",
-  "Wæhler",
-  "Abo",
-  "MJ",
-  "Hellum",
-  "Sawaneh",
-  "Sock",
-  "Vik",
-  "Trige"
+  { name: "Pedersen", position: "ANG" },
+  { name: "Sah", position: "MID" },
+  { name: "Sell", position: "FORS" },
+  { name: "Midtskogen", position: "ANG" },
+  { name: "HSN", position: "MID" },
+  { name: "Barnett", position: "FORS" },
+  { name: "Fredriksen", position: "MID" },
+  { name: "Isufi", position: "MID" },
+  { name: "Skaug", position: "FORS" },
+  { name: "Kurtovic", position: "MID" },
+  { name: "Monglo", position: "FORS" },
+  { name: "Wæhler", position: "FORS" },
+  { name: "Abo", position: "MID" },
+  { name: "MJ", position: "MID" },
+  { name: "Hellum", position: "ANG" },
+  { name: "Sawaneh", position: "ANG" },
+  { name: "Sock", position: "MID" },
+  { name: "Vik", position: "KEEPER" },
+  { name: "Trige", position: "KEEPER" }
 ];
+
+/*
+  Fake testdata for første runde.
+  Endre gjerne tallene her for å teste poeng.
+*/
+const matchStats = {
+  "Pedersen": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.8 },
+  "Sah": { goals: 0, assists: 1, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.2 },
+  "Sell": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 6.9 },
+  "Midtskogen": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 5.8 },
+  "HSN": { goals: 0, assists: 1, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.6 },
+  "Barnett": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.1 },
+  "Fredriksen": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.2 },
+  "Isufi": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 8.0 },
+  "Skaug": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 6.8 },
+  "Kurtovic": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: true, rating: 4.2 },
+  "Monglo": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.7 },
+  "Wæhler": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.6 },
+  "Abo": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.4 },
+  "MJ": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 5.9 },
+  "Hellum": { goals: 0, assists: 1, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.4 },
+  "Sawaneh": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.9 },
+  "Sock": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 4.4 },
+  "Vik": { goals: 0, assists: 0, cleanSheet: true, penaltySave: true, redCard: false, rating: 8.2 },
+  "Trige": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.1 }
+};
 
 function fillMatchInfo() {
   document.getElementById("matchTitle").textContent = `${nextMatch.home} - ${nextMatch.away}`;
@@ -247,9 +293,86 @@ function fillSelects() {
     select.innerHTML = `<option value="">Velg spiller</option>`;
 
     players.forEach(player => {
-      select.innerHTML += `<option value="${player}">${player}</option>`;
+      select.innerHTML += `<option value="${player.name}">${player.name} (${player.position})</option>`;
     });
   });
+}
+
+function getPlayerPosition(playerName) {
+  const player = players.find(p => p.name === playerName);
+  return player ? player.position : "";
+}
+
+function calculatePoints(playerName, isCaptain) {
+  const stat = matchStats[playerName];
+  const position = getPlayerPosition(playerName);
+
+  if (!stat) return { total: 0, lines: ["Ingen kampdata funnet"] };
+
+  let points = 0;
+  const lines = [];
+
+  if (stat.goals > 0) {
+    let goalPoints = 0;
+
+    if (position === "ANG") goalPoints = stat.goals * 4;
+    if (position === "MID") goalPoints = stat.goals * 5;
+    if (position === "FORS") goalPoints = stat.goals * 6;
+    if (position === "KEEPER") goalPoints = stat.goals * 10;
+
+    points += goalPoints;
+    lines.push(`Mål: +${goalPoints}`);
+  }
+
+  if (stat.assists > 0) {
+    const assistPoints = stat.assists * 3;
+    points += assistPoints;
+    lines.push(`Assist: +${assistPoints}`);
+  }
+
+  if (stat.cleanSheet) {
+    let csPoints = 0;
+
+    if (position === "MID") csPoints = 1;
+    if (position === "FORS") csPoints = 4;
+    if (position === "KEEPER") csPoints = 5;
+
+    if (csPoints > 0) {
+      points += csPoints;
+      lines.push(`Clean sheet: +${csPoints}`);
+    }
+  }
+
+  if (stat.penaltySave && position === "KEEPER") {
+    points += 5;
+    lines.push("Strafferedning: +5");
+  }
+
+  if (stat.redCard) {
+    points -= 3;
+    lines.push("Rødt kort: −3");
+  }
+
+  if (stat.rating >= 7.5) {
+    points += 1;
+    lines.push("Børsbonus: +1");
+  }
+
+  if (stat.rating <= 4.5) {
+    points -= 1;
+    lines.push("Børsbonus: −1");
+  }
+
+  if (isCaptain) {
+    points += 2;
+    lines.push("Kaptein: +2");
+  }
+
+  if (lines.length === 0) {
+    lines.push("Ingen poenggivende hendelser");
+  }
+
+  return { total: points, lines };
 }
 
 function saveTeam() {
@@ -289,15 +412,36 @@ function showTeam(team) {
   const output = document.getElementById("output");
   output.style.display = "block";
 
+  const p1 = calculatePoints(team.player1, false);
+  const p2 = calculatePoints(team.player2, false);
+  const cap = calculatePoints(team.captain, true);
+
+  const total = p1.total + p2.total + cap.total;
+
   output.innerHTML = `
     <strong>${team.username}</strong><br>
     Kamp: ${nextMatch.home} - ${nextMatch.away}<br><br>
 
-    Spiller 1: ${team.player1}<br>
-    Spiller 2: ${team.player2}<br>
+    Spiller 1: ${team.player1} (${getPlayerPosition(team.player1)})<br>
+    Spiller 2: ${team.player2} (${getPlayerPosition(team.player2)})<br>
 
     <div class="captain-line">
-      ⭐ Kaptein: ${team.captain}
+      ⭐ Kaptein: ${team.captain} (${getPlayerPosition(team.captain)})
+    </div>
+
+    <div class="points-box">
+      <div class="total-points">${total} poeng</div>
+
+      <div class="breakdown">
+        <strong>${team.player1}:</strong> ${p1.total} poeng<br>
+        ${p1.lines.join("<br>")}<br><br>
+
+        <strong>${team.player2}:</strong> ${p2.total} poeng<br>
+        ${p2.lines.join("<br>")}<br><br>
+
+        <strong>⭐ ${team.captain}:</strong> ${cap.total} poeng<br>
+        ${cap.lines.join("<br>")}
+      </div>
     </div>
   `;
 }
