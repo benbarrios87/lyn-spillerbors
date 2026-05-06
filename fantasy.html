@@ -22,7 +22,7 @@ body::before {
 }
 
 .container {
-  max-width:700px;
+  max-width:750px;
   margin:0 auto;
   padding:30px 20px;
 }
@@ -39,6 +39,27 @@ h1, h2 {
   text-align:center;
 }
 
+.match-box {
+  background:#13294b;
+  border:2px solid #d71920;
+  text-align:center;
+}
+
+.match-title {
+  font-size:22px;
+  font-weight:bold;
+}
+
+.match-date {
+  margin-top:8px;
+  opacity:0.85;
+}
+
+.rules ul {
+  padding-left:20px;
+  line-height:1.6;
+}
+
 select, input, button {
   width:100%;
   padding:14px;
@@ -46,6 +67,7 @@ select, input, button {
   border-radius:12px;
   border:none;
   font-size:16px;
+  box-sizing:border-box;
 }
 
 button {
@@ -62,14 +84,30 @@ button:hover {
 .result {
   margin-top:20px;
   background:rgba(255,255,255,0.1);
-  padding:15px;
+  padding:18px;
   border-radius:12px;
+  line-height:1.7;
+}
+
+.captain-line {
+  background:rgba(215,25,32,0.25);
+  border:1px solid rgba(215,25,32,0.8);
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
+  font-weight:bold;
 }
 
 .small {
   opacity:0.8;
   font-size:14px;
   text-align:center;
+}
+
+label {
+  display:block;
+  margin-top:15px;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -81,15 +119,39 @@ button:hover {
   <h1>Lyn Fantasy</h1>
   <p class="small">Velg 3 Lyn-spillere og én kaptein før kamp.</p>
 
+  <div class="card match-box">
+    <div>Neste fantasy-kamp</div>
+    <div class="match-title" id="matchTitle"></div>
+    <div class="match-date" id="matchDate"></div>
+  </div>
+
+  <div class="card rules">
+    <h2>Regler</h2>
+    <ul>
+      <li>Velg 3 Lyn-spillere før kampstart.</li>
+      <li>Velg én av de tre som kaptein.</li>
+      <li>Du kan ikke velge samme spiller flere ganger.</li>
+      <li>Foreløpig lagres laget bare på denne enheten.</li>
+      <li>Poengsystem kommer etter hvert: mål, assist, spilletid og kapteinsbonus.</li>
+    </ul>
+  </div>
+
   <div class="card">
     <h2>Ditt lag</h2>
 
+    <label for="username">Forumbrukernavn</label>
     <input id="username" placeholder="Forumbrukernavn">
 
+    <label for="player1">Spiller 1</label>
     <select id="player1"></select>
+
+    <label for="player2">Spiller 2</label>
     <select id="player2"></select>
+
+    <label for="player3">Spiller 3</label>
     <select id="player3"></select>
 
+    <label for="captain">Kaptein</label>
     <select id="captain"></select>
 
     <button onclick="saveTeam()">Lagre fantasy-lag</button>
@@ -100,6 +162,14 @@ button:hover {
 </div>
 
 <script>
+const nextMatch = {
+  id: "09.05 Lyn - Aalesund",
+  home: "Lyn",
+  away: "Aalesund",
+  dateText: "Lørdag 9. mai",
+  deadline: "2026-05-09T16:00:00"
+};
+
 const players = [
   "Pedersen",
   "Sah",
@@ -121,6 +191,26 @@ const players = [
   "Vik",
   "Trige"
 ];
+
+function fillMatchInfo() {
+  document.getElementById("matchTitle").textContent = `${nextMatch.home} - ${nextMatch.away}`;
+  document.getElementById("matchDate").textContent = `${nextMatch.dateText} | Frist ved kampstart`;
+}
+
+function getSavedUsername() {
+  return (
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    ""
+  );
+}
+
+function saveUsernameEverywhere(username) {
+  localStorage.setItem("lynBorsUsername", username);
+  localStorage.setItem("username", username);
+  localStorage.setItem("voter", username);
+}
 
 function fillSelects() {
   const selects = ["player1", "player2", "player3", "captain"];
@@ -159,7 +249,10 @@ function saveTeam() {
     return;
   }
 
+  saveUsernameEverywhere(username);
+
   const team = {
+    match_id: nextMatch.id,
     username,
     players: chosenPlayers,
     captain
@@ -175,18 +268,31 @@ function showTeam(team) {
   output.style.display = "block";
 
   output.innerHTML = `
-    <strong>${team.username}</strong><br><br>
-    1. ${team.players[0]} ${team.captain === team.players[0] ? "⭐ Kaptein" : ""}<br>
-    2. ${team.players[1]} ${team.captain === team.players[1] ? "⭐ Kaptein" : ""}<br>
-    3. ${team.players[2]} ${team.captain === team.players[2] ? "⭐ Kaptein" : ""}
+    <strong>${team.username}</strong><br>
+    Kamp: ${nextMatch.home} - ${nextMatch.away}<br><br>
+
+    1. ${team.players[0]} ${team.captain === team.players[0] ? "⭐ KAPTEIN" : ""}<br>
+    2. ${team.players[1]} ${team.captain === team.players[1] ? "⭐ KAPTEIN" : ""}<br>
+    3. ${team.players[2]} ${team.captain === team.players[2] ? "⭐ KAPTEIN" : ""}
+
+    <div class="captain-line">
+      Kapteinvalg: ⭐ ${team.captain}
+    </div>
   `;
 }
 
 function loadSavedTeam() {
+  const savedUsername = getSavedUsername();
+  if (savedUsername) {
+    document.getElementById("username").value = savedUsername;
+  }
+
   const saved = localStorage.getItem("lynFantasyTeam");
   if (!saved) return;
 
   const team = JSON.parse(saved);
+
+  if (team.match_id !== nextMatch.id) return;
 
   document.getElementById("username").value = team.username;
   document.getElementById("player1").value = team.players[0];
@@ -197,6 +303,7 @@ function loadSavedTeam() {
   showTeam(team);
 }
 
+fillMatchInfo();
 fillSelects();
 loadSavedTeam();
 </script>
