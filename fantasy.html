@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyn Fantasy</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  color:white;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  z-index:-1;
+}
+
+.container {
+  max-width:700px;
+  margin:0 auto;
+  padding:30px 20px;
+}
+
+.card {
+  background:rgba(0,0,0,0.72);
+  border-radius:20px;
+  padding:25px;
+  margin-top:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+}
+
+h1, h2 {
+  text-align:center;
+}
+
+select, input, button {
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+}
+
+button {
+  background:#d71920;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#b9151b;
+}
+
+.result {
+  margin-top:20px;
+  background:rgba(255,255,255,0.1);
+  padding:15px;
+  border-radius:12px;
+}
+
+.small {
+  opacity:0.8;
+  font-size:14px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Lyn Fantasy</h1>
+  <p class="small">Velg 3 Lyn-spillere og én kaptein før kamp.</p>
+
+  <div class="card">
+    <h2>Ditt lag</h2>
+
+    <input id="username" placeholder="Forumbrukernavn">
+
+    <select id="player1"></select>
+    <select id="player2"></select>
+    <select id="player3"></select>
+
+    <select id="captain"></select>
+
+    <button onclick="saveTeam()">Lagre fantasy-lag</button>
+
+    <div id="output" class="result" style="display:none;"></div>
+  </div>
+
+</div>
+
+<script>
+const players = [
+  "Pedersen",
+  "Sah",
+  "Sell",
+  "Midtskogen",
+  "HSN",
+  "Barnett",
+  "Fredriksen",
+  "Isufi",
+  "Skaug",
+  "Kurtovic",
+  "Monglo",
+  "Wæhler",
+  "Abo",
+  "MJ",
+  "Hellum",
+  "Sawaneh",
+  "Sock",
+  "Vik",
+  "Trige"
+];
+
+function fillSelects() {
+  const selects = ["player1", "player2", "player3", "captain"];
+
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    select.innerHTML = `<option value="">Velg spiller</option>`;
+
+    players.forEach(player => {
+      select.innerHTML += `<option value="${player}">${player}</option>`;
+    });
+  });
+}
+
+function saveTeam() {
+  const username = document.getElementById("username").value.trim();
+  const player1 = document.getElementById("player1").value;
+  const player2 = document.getElementById("player2").value;
+  const player3 = document.getElementById("player3").value;
+  const captain = document.getElementById("captain").value;
+
+  if (!username || !player1 || !player2 || !player3 || !captain) {
+    alert("Fyll inn brukernavn, tre spillere og kaptein.");
+    return;
+  }
+
+  const chosenPlayers = [player1, player2, player3];
+
+  if (new Set(chosenPlayers).size !== 3) {
+    alert("Du kan ikke velge samme spiller flere ganger.");
+    return;
+  }
+
+  if (!chosenPlayers.includes(captain)) {
+    alert("Kapteinen må være en av de tre spillerne dine.");
+    return;
+  }
+
+  const team = {
+    username,
+    players: chosenPlayers,
+    captain
+  };
+
+  localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
+
+  showTeam(team);
+}
+
+function showTeam(team) {
+  const output = document.getElementById("output");
+  output.style.display = "block";
+
+  output.innerHTML = `
+    <strong>${team.username}</strong><br><br>
+    1. ${team.players[0]} ${team.captain === team.players[0] ? "⭐ Kaptein" : ""}<br>
+    2. ${team.players[1]} ${team.captain === team.players[1] ? "⭐ Kaptein" : ""}<br>
+    3. ${team.players[2]} ${team.captain === team.players[2] ? "⭐ Kaptein" : ""}
+  `;
+}
+
+function loadSavedTeam() {
+  const saved = localStorage.getItem("lynFantasyTeam");
+  if (!saved) return;
+
+  const team = JSON.parse(saved);
+
+  document.getElementById("username").value = team.username;
+  document.getElementById("player1").value = team.players[0];
+  document.getElementById("player2").value = team.players[1];
+  document.getElementById("player3").value = team.players[2];
+  document.getElementById("captain").value = team.captain;
+
+  showTeam(team);
+}
+
+fillSelects();
+loadSavedTeam();
+</script>
+
+</body>
+</html>
