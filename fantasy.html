@@ -86,6 +86,44 @@ button:disabled {
   cursor:not-allowed;
 }
 
+.preview-cards {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:20px;
+}
+
+.player-card {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:rgba(255,255,255,0.12);
+  border-radius:14px;
+  padding:12px;
+}
+
+.player-card img {
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+}
+
+.player-card .info {
+  flex:1;
+}
+
+.player-card .role {
+  font-size:13px;
+  opacity:0.75;
+}
+
+.player-card.captain {
+  border:2px solid #d71920;
+  background:rgba(215,25,32,0.25);
+}
+
 .result {
   margin-top:20px;
   background:rgba(255,255,255,0.1);
@@ -216,6 +254,7 @@ label {
 
     <label for="captain">Kaptein ⭐</label>
     <select id="captain"></select>
+
     <div id="previewCards" class="preview-cards"></div>
 
     <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
@@ -270,25 +309,25 @@ function getNextMatch() {
 const nextMatch = getNextMatch();
 
 const players = [
- { name: "Pedersen", position: "KEEPER", image: "bilder/pedersen.png" },
-{ name: "Sah", position: "FORS", image: "bilder/sah.png" },
-{ name: "Sell", position: "FORS", image: "bilder/sell.png" },
-{ name: "Midtskogen", position: "FORS", image: "bilder/midtskogen.png" },
-{ name: "HSN", position: "FORS", image: "bilder/hsn.png" },
-{ name: "Barnett", position: "FORS", image: "bilder/barnett.png" },
-{ name: "Fredriksen", position: "MID", image: "bilder/fredriksen.png" },
-{ name: "Isufi", position: "MID", image: "bilder/isufi.png" },
-{ name: "Skaug", position: "MID", image: "bilder/skaug.png" },
-{ name: "Kurtovic", position: "MID", image: "bilder/kurtovic.png" },
-{ name: "Monglo", position: "MID", image: "bilder/monglo.png" },
-{ name: "Wæhler", position: "MID", image: "bilder/wæhler.png" },
-{ name: "Abo", position: "ANG", image: "bilder/abo.png" },
-{ name: "MJ", position: "ANG", image: "bilder/mj.png" },
-{ name: "Hellum", position: "ANG", image: "bilder/hellum.png" },
-{ name: "Sawaneh", position: "ANG", image: "bilder/sawaneh.png" },
-{ name: "Sock", position: "ANG", image: "bilder/sock.png" },
-{ name: "Vik", position: "KEEPER", image: "bilder/vik.png" },
-{ name: "Trige", position: "KEEPER", image: "bilder/trige.png" }
+  { name: "Pedersen", position: "KEEPER", image: "bilder/pedersen.png" },
+  { name: "Sah", position: "FORS", image: "bilder/sah.png" },
+  { name: "Sell", position: "FORS", image: "bilder/sell.png" },
+  { name: "Midtskogen", position: "FORS", image: "bilder/midtskogen.png" },
+  { name: "HSN", position: "FORS", image: "bilder/hsn.png" },
+  { name: "Barnett", position: "FORS", image: "bilder/barnett.png" },
+  { name: "Fredriksen", position: "MID", image: "bilder/fredriksen.png" },
+  { name: "Isufi", position: "MID", image: "bilder/isufi.png" },
+  { name: "Skaug", position: "MID", image: "bilder/skaug.png" },
+  { name: "Kurtovic", position: "MID", image: "bilder/kurtovic.png" },
+  { name: "Monglo", position: "MID", image: "bilder/monglo.png" },
+  { name: "Wæhler", position: "MID", image: "bilder/wæhler.png" },
+  { name: "Abo", position: "ANG", image: "bilder/abo.png" },
+  { name: "MJ", position: "ANG", image: "bilder/mj.png" },
+  { name: "Hellum", position: "ANG", image: "bilder/hellum.png" },
+  { name: "Sawaneh", position: "ANG", image: "bilder/sawaneh.png" },
+  { name: "Sock", position: "ANG", image: "bilder/sock.png" },
+  { name: "Vik", position: "KEEPER", image: "bilder/vik.png" },
+  { name: "Trige", position: "KEEPER", image: "bilder/trige.png" }
 ];
 
 const matchStats = {
@@ -378,9 +417,45 @@ function fillSelects() {
   });
 }
 
+function getPlayer(playerName) {
+  return players.find(p => p.name === playerName);
+}
+
 function getPlayerPosition(playerName) {
-  const player = players.find(p => p.name === playerName);
+  const player = getPlayer(playerName);
   return player ? player.position : "";
+}
+
+function updatePreviewCards() {
+  const preview = document.getElementById("previewCards");
+
+  const picks = [
+    { role: "Spiller 1", name: document.getElementById("player1").value },
+    { role: "Spiller 2", name: document.getElementById("player2").value },
+    { role: "⭐ Kaptein", name: document.getElementById("captain").value, captain: true }
+  ];
+
+  const selected = picks.filter(pick => pick.name);
+
+  if (selected.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+
+  preview.innerHTML = selected.map(pick => {
+    const player = getPlayer(pick.name);
+    if (!player) return "";
+
+    return `
+      <div class="player-card ${pick.captain ? "captain" : ""}">
+        <img src="${player.image}" alt="${player.name}">
+        <div class="info">
+          <strong>${player.name}</strong><br>
+          <span class="role">${pick.role} · ${player.position}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function calculatePoints(playerName, isCaptain) {
@@ -561,6 +636,7 @@ fillSelects();
 loadSavedTeam();
 updatePreviewCards();
 applyDeadlineLock();
+</script>
 
 </body>
 </html>
