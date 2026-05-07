@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lyn Fantasy</title>
@@ -502,7 +515,7 @@ function calculatePoints(playerName, isCaptain) {
   return { total: points, lines };
 }
 
-function saveTeam() {
+async function saveTeam() {
   if (isDeadlinePassed()) {
     alert("Fristen har gått ut. Laget er låst.");
     return;
@@ -535,8 +548,31 @@ function saveTeam() {
     captain
   };
 
-  localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
-  showTeam(team);
+localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
+
+const { error } = await supabase
+  .from("fantasy_picks")
+  .upsert(
+    {
+      match_id: team.match_id,
+      voter: team.username,
+      player1: team.player1,
+      player2: team.player2,
+      captain: team.captain
+    },
+    {
+      onConflict: "match_id,voter"
+    }
+  );
+
+if (error) {
+  console.error(error);
+  alert("Noe gikk galt ved lagring.");
+  return;
+}
+
+alert("Fantasy-laget er lagret!");
+showTeam(team);
 }
 
 function showTeam(team) {
