@@ -552,7 +552,8 @@ async function saveTeam() {
 
 localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
 
-const { error } = await supabaseclient
+
+const { error } = await supabaseClient
   .from("fantasy_picks")
   .upsert(
     {
@@ -566,6 +567,11 @@ const { error } = await supabaseclient
       onConflict: "match_id,voter"
     }
   );
+
+console.log(error);
+alert(JSON.stringify(error));
+
+if (error) {
 
 if (error) {
   console.error(error);
