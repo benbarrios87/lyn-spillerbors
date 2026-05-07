@@ -608,29 +608,91 @@ async function loadFantasyLeaderboard() {
     };
   }).sort((a, b) => b.total - a.total);
 
-  document.getElementById("fantasyLeaderboard").innerHTML = `
-    <p><strong>${fantasyMatchId}</strong></p>
-    <table class="fantasy-table">
-      <thead>
+ const pickCounts = {};
+const captainCounts = {};
+
+leaderboard.forEach(row => {
+  [row.player1, row.player2, row.captain].forEach(p => {
+    pickCounts[p] = (pickCounts[p] || 0) + 1;
+  });
+
+  captainCounts[row.captain] = (captainCounts[row.captain] || 0) + 1;
+});
+
+const mostPicked = Object.entries(pickCounts)
+  .sort((a,b) => b[1] - a[1])[0];
+
+const mostCaptained = Object.entries(captainCounts)
+  .sort((a,b) => b[1] - a[1])[0];
+
+const fantasyMVP = Object.entries(statsMap)
+  .map(([player, stat]) => ({
+    player,
+    points: calculateFantasyPoints(player, false, statsMap)
+  }))
+  .sort((a,b) => b.points - a.points)[0];
+
+document.getElementById("fantasyLeaderboard").innerHTML = `
+  <p><strong>${fantasyMatchId}</strong></p>
+
+  <div class="stats-grid" style="margin-bottom:18px;">
+    
+    <div class="stat-card">
+      <h3>👑 Fantasy MVP</h3>
+      <div class="result-row">
+        <div>
+          <strong>${fantasyMVP.player}</strong><br>
+          <span class="small">Flest fantasy-poeng</span>
+        </div>
+        <div class="result-score">${fantasyMVP.points}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>🔥 Mest valgt</h3>
+      <div class="result-row">
+        <div>
+          <strong>${mostPicked[0]}</strong><br>
+          <span class="small">Valgt av flest brukere</span>
+        </div>
+        <div class="result-score">${mostPicked[1]}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>⭐ Mest valgt kaptein</h3>
+      <div class="result-row">
+        <div>
+          <strong>${mostCaptained[0]}</strong><br>
+          <span class="small">Kaptein hos flest</span>
+        </div>
+        <div class="result-score">${mostCaptained[1]}</div>
+      </div>
+    </div>
+
+  </div>
+
+  <table class="fantasy-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Bruker</th>
+        <th>Lag</th>
+        <th>Poeng</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${leaderboard.map((row, index) => `
         <tr>
-          <th>#</th>
-          <th>Bruker</th>
-          <th>Lag</th>
-          <th>Poeng</th>
+          <td>${index + 1}</td>
+          <td><strong>${row.voter}</strong></td>
+          <td>${row.player1}, ${row.player2}, ⭐ ${row.captain}</td>
+          <td>${row.total}</td>
         </tr>
-      </thead>
-      <tbody>
-        ${leaderboard.map((row, index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td><strong>${row.voter}</strong></td>
-            <td>${row.player1}, ${row.player2}, ⭐ ${row.captain}</td>
-            <td>${row.total}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
+      `).join("")}
+    </tbody>
+  </table>
+`;
 }
 
 async function loadStatsCenter() {
