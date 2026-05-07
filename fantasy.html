@@ -514,10 +514,8 @@ function calculatePoints(playerName, isCaptain) {
 
   return { total: points, lines };
 }
+
 async function saveTeam() {
-
-  alert("Knappen funker");
-
   if (isDeadlinePassed()) {
     alert("Fristen har gått ut. Laget er låst.");
     return;
@@ -550,37 +548,31 @@ async function saveTeam() {
     captain
   };
 
-localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
+  localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
 
+  const { error } = await supabaseClient
+    .from("fantasy_picks")
+    .upsert(
+      {
+        match_id: team.match_id,
+        voter: team.username,
+        player1: team.player1,
+        player2: team.player2,
+        captain: team.captain
+      },
+      {
+        onConflict: "match_id,voter"
+      }
+    );
 
-const { error } = await supabaseClient
-  .from("fantasy_picks")
-  .upsert(
-    {
-      match_id: team.match_id,
-      voter: team.username,
-      player1: team.player1,
-      player2: team.player2,
-      captain: team.captain
-    },
-    {
-      onConflict: "match_id,voter"
-    }
-  );
+  if (error) {
+    console.error(error);
+    alert("Noe gikk galt ved lagring.");
+    return;
+  }
 
-console.log(error);
-alert(JSON.stringify(error));
-
-if (error) {
-
-if (error) {
-  console.error(error);
-  alert("Noe gikk galt ved lagring.");
-  return;
-}
-
-alert("Fantasy-laget er lagret!");
-showTeam(team);
+  alert("Fantasy-laget er lagret!");
+  showTeam(team);
 }
 
 function showTeam(team) {
