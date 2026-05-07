@@ -94,11 +94,6 @@ button:hover {
   background:#b9151b;
 }
 
-button:disabled {
-  background:#777;
-  cursor:not-allowed;
-}
-
 .select-row {
   display:flex;
   align-items:center;
@@ -113,11 +108,6 @@ button:disabled {
   border-radius:50%;
   background:white;
   flex-shrink:0;
-  border:2px solid rgba(255,255,255,0.3);
-}
-
-.select-row select {
-  margin-top:0;
 }
 
 .result {
@@ -184,466 +174,357 @@ label {
 
 <div class="container">
 
-  <h1>Lyn Fantasy</h1>
-  <p class="small">Velg 2 Lyn-spillere og én kaptein før kamp.</p>
+<h1>Lyn Fantasy</h1>
 
-  <div class="card match-box">
-    <div>Neste fantasy-kamp</div>
-    <div class="match-title" id="matchTitle"></div>
-    <div class="match-date" id="matchDate"></div>
-  </div>
+<div class="card match-box">
+<div>Neste fantasy-kamp</div>
+<div class="match-title" id="matchTitle"></div>
+<div class="match-date" id="matchDate"></div>
+</div>
 
-  <div class="card rules">
-    <h2>Regler</h2>
+<div class="card">
+<h2>Ditt lag</h2>
 
-    <ul>
-      <li>Velg <strong>2 Lyn-spillere</strong> + <strong>1 kaptein ⭐</strong> før kampstart.</li>
-      <li>Kapteinen er ditt hovedvalg og gir ekstra poeng.</li>
-      <li>Du kan ikke velge samme spiller flere ganger.</li>
-      <li>Laget låses når kampen starter.</li>
-    </ul>
+<div id="lockMessage"></div>
 
-    <h3>Poengsystem</h3>
+<label for="username">Forumbrukernavn</label>
+<input id="username" placeholder="Forumbrukernavn">
 
-    <ul>
-      <li><strong>Angrep:</strong> Mål +4, assist +3</li>
-      <li><strong>Midtbane:</strong> Mål +5, assist +3, clean sheet +1</li>
-      <li><strong>Forsvar:</strong> Mål +6, assist +3, clean sheet +4</li>
-      <li><strong>Keeper:</strong> Clean sheet +5, strafferedning +5</li>
-      <li><strong>Alle posisjoner:</strong> Rødt kort −3</li>
-    </ul>
+<label for="player1">Spiller 1</label>
+<div class="select-row">
+<img id="img-player1" src="bilder/lyn-logo.png">
+<select id="player1"></select>
+</div>
 
-    <h3>Kaptein</h3>
+<label for="player2">Spiller 2</label>
+<div class="select-row">
+<img id="img-player2" src="bilder/lyn-logo.png">
+<select id="player2"></select>
+</div>
 
-    <ul>
-      <li>Kapteinen får <strong>+2 ekstra poeng</strong>.</li>
-      <li>Kaptein gir ikke dobbel score.</li>
-    </ul>
+<label for="captain">Kaptein ⭐</label>
+<div class="select-row">
+<img id="img-captain" src="bilder/lyn-logo.png">
+<select id="captain"></select>
+</div>
 
-    <h3>Børsbonus</h3>
+<button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
 
-    <ul>
-      <li>Snittscore på <strong>7.5 eller høyere</strong>: +1 poeng</li>
-      <li>Snittscore på <strong>4.5 eller lavere</strong>: −1 poeng</li>
-    </ul>
+<div id="output" class="result" style="display:none;"></div>
 
-    <h3>Resultater</h3>
-
-    <ul>
-      <li>Poeng og sammenlagtstilling vises etter hvert i <strong>Statscentral</strong>.</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>Ditt lag</h2>
-
-    <div id="lockMessage"></div>
-
-    <label for="username">Forumbrukernavn</label>
-    <input id="username" placeholder="Forumbrukernavn">
-
-    <label for="player1">Spiller 1</label>
-    <div class="select-row">
-      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
-      <select id="player1"></select>
-    </div>
-
-    <label for="player2">Spiller 2</label>
-    <div class="select-row">
-      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
-      <select id="player2"></select>
-    </div>
-
-    <label for="captain">Kaptein ⭐</label>
-    <div class="select-row">
-      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
-      <select id="captain"></select>
-    </div>
-
-    <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
-
-    <div id="output" class="result" style="display:none;"></div>
-  </div>
-
+</div>
 </div>
 
 <script>
+
 const matchesData = [
-  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
-  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
-  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
-  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
-  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
-  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
-  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
-  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
-  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00", actual:null },
-  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00", actual:null },
-  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00", actual:null },
-  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00", actual:null },
-  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00", actual:null },
-  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00", actual:null },
-  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00", actual:null },
-  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00", actual:null },
-  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00", actual:null },
-  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00", actual:null },
-  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00", actual:null },
-  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00", actual:null },
-  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00", actual:null },
-  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00", actual:null },
-  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00", actual:null },
-  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00", actual:null },
-  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00", actual:null },
-  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00", actual:null },
-  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00", actual:null },
-  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00", actual:null },
-  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00", actual:null },
-  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00", actual:null }
+{ id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null }
 ];
 
-function getNextMatch() {
-  const now = new Date();
+const players = [
+{ name: "Pedersen", position: "KEEPER", image: "bilder/pedersen.png" },
+{ name: "Sah", position: "FORS", image: "bilder/sah.png" },
+{ name: "Sell", position: "FORS", image: "bilder/sell.png" },
+{ name: "Midtskogen", position: "FORS", image: "bilder/midtskogen.png" },
+{ name: "HSN", position: "FORS", image: "bilder/hsn.png" },
+{ name: "Barnett", position: "FORS", image: "bilder/barnett.png" },
+{ name: "Fredriksen", position: "MID", image: "bilder/fredriksen.png" },
+{ name: "Isufi", position: "MID", image: "bilder/isufi.png" },
+{ name: "Skaug", position: "MID", image: "bilder/skaug.png" },
+{ name: "Kurtovic", position: "MID", image: "bilder/kurtovic.png" },
+{ name: "Monglo", position: "MID", image: "bilder/monglo.png" },
+{ name: "Wæhler", position: "MID", image: "bilder/wæhler.png" },
+{ name: "Abo", position: "ANG", image: "bilder/abo.png" },
+{ name: "MJ", position: "ANG", image: "bilder/mj.png" },
+{ name: "Hellum", position: "ANG", image: "bilder/hellum.png" },
+{ name: "Sawaneh", position: "ANG", image: "bilder/sawaneh.png" },
+{ name: "Sock", position: "ANG", image: "bilder/sock.png" },
+{ name: "Vik", position: "KEEPER", image: "bilder/vik.png" },
+{ name: "Trige", position: "KEEPER", image: "bilder/trige.png" }
+];
 
-  return matchesData
-    .filter(match => new Date(match.deadline) > now)
-    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+let matchStats = {};
+
+function getNextMatch() {
+const now = new Date();
+
+return matchesData
+.filter(match => new Date(match.deadline) > now)
+.sort((a,b) => new Date(a.deadline) - new Date(b.deadline))[0];
 }
 
 const nextMatch = getNextMatch();
 
-const players = [
-  { name: "Pedersen", position: "KEEPER", image: "bilder/pedersen.png" },
-  { name: "Sah", position: "FORS", image: "bilder/sah.png" },
-  { name: "Sell", position: "FORS", image: "bilder/sell.png" },
-  { name: "Midtskogen", position: "FORS", image: "bilder/midtskogen.png" },
-  { name: "HSN", position: "FORS", image: "bilder/hsn.png" },
-  { name: "Barnett", position: "FORS", image: "bilder/barnett.png" },
-  { name: "Fredriksen", position: "MID", image: "bilder/fredriksen.png" },
-  { name: "Isufi", position: "MID", image: "bilder/isufi.png" },
-  { name: "Skaug", position: "MID", image: "bilder/skaug.png" },
-  { name: "Kurtovic", position: "MID", image: "bilder/kurtovic.png" },
-  { name: "Monglo", position: "MID", image: "bilder/monglo.png" },
-  { name: "Wæhler", position: "MID", image: "bilder/wæhler.png" },
-  { name: "Abo", position: "ANG", image: "bilder/abo.png" },
-  { name: "MJ", position: "ANG", image: "bilder/mj.png" },
-  { name: "Hellum", position: "ANG", image: "bilder/hellum.png" },
-  { name: "Sawaneh", position: "ANG", image: "bilder/sawaneh.png" },
-  { name: "Sock", position: "ANG", image: "bilder/sock.png" },
-  { name: "Vik", position: "KEEPER", image: "bilder/vik.png" },
-  { name: "Trige", position: "KEEPER", image: "bilder/trige.png" }
-];
+async function loadMatchStats() {
 
-const matchStats = {
-  "Pedersen": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.8 },
-  "Sah": { goals: 0, assists: 1, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.2 },
-  "Sell": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 6.9 },
-  "Midtskogen": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 5.8 },
-  "HSN": { goals: 0, assists: 1, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.6 },
-  "Barnett": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.1 },
-  "Fredriksen": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.2 },
-  "Isufi": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 8.0 },
-  "Skaug": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 6.8 },
-  "Kurtovic": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: true, rating: 4.2 },
-  "Monglo": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.7 },
-  "Wæhler": { goals: 0, assists: 0, cleanSheet: true, penaltySave: false, redCard: false, rating: 7.6 },
-  "Abo": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.4 },
-  "MJ": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 5.9 },
-  "Hellum": { goals: 0, assists: 1, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.4 },
-  "Sawaneh": { goals: 1, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 7.9 },
-  "Sock": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 4.4 },
-  "Vik": { goals: 0, assists: 0, cleanSheet: true, penaltySave: true, redCard: false, rating: 8.2 },
-  "Trige": { goals: 0, assists: 0, cleanSheet: false, penaltySave: false, redCard: false, rating: 6.1 }
+if (!nextMatch) return;
+
+const { data, error } = await supabaseClient
+.from("fantasy_stats")
+.select("*")
+.eq("match_id", nextMatch.id);
+
+if (error) {
+console.error(error);
+return;
+}
+
+matchStats = {};
+
+data.forEach(row => {
+matchStats[row.player] = {
+goals: row.goals || 0,
+assists: row.assists || 0,
+cleanSheet: row.clean_sheet || false,
+penaltySave: row.penalty_save || false,
+redCard: row.red_card || false,
+rating: row.rating || 0
 };
-
-function isDeadlinePassed() {
-  if (!nextMatch) return true;
-  return new Date() > new Date(nextMatch.deadline);
+});
 }
 
 function fillMatchInfo() {
-  if (!nextMatch) {
-    document.getElementById("matchTitle").textContent = "Ingen kommende kamp";
-    document.getElementById("matchDate").textContent = "";
-    return;
-  }
 
-  document.getElementById("matchTitle").textContent = `${nextMatch.home} - ${nextMatch.away}`;
-  document.getElementById("matchDate").textContent =
-    `${nextMatch.date} | Frist: ${nextMatch.deadline.replace("T", " kl. ")}`;
-}
+if (!nextMatch) return;
 
-function applyDeadlineLock() {
-  const lockMessage = document.getElementById("lockMessage");
+document.getElementById("matchTitle").textContent =
+`${nextMatch.home} - ${nextMatch.away}`;
 
-  if (!nextMatch) {
-    document.getElementById("saveBtn").disabled = true;
-    lockMessage.innerHTML = `<div class="locked">Ingen kommende kamp å velge lag til.</div>`;
-    return;
-  }
-
-  if (isDeadlinePassed()) {
-    document.getElementById("saveBtn").disabled = true;
-    document.getElementById("player1").disabled = true;
-    document.getElementById("player2").disabled = true;
-    document.getElementById("captain").disabled = true;
-    document.getElementById("username").disabled = true;
-
-    lockMessage.innerHTML = `<div class="locked">Fristen har gått ut. Laget er låst.</div>`;
-  }
-}
-
-function getSavedUsername() {
-  return (
-    localStorage.getItem("lynBorsUsername") ||
-    localStorage.getItem("username") ||
-    localStorage.getItem("voter") ||
-    ""
-  );
-}
-
-function saveUsernameEverywhere(username) {
-  localStorage.setItem("lynBorsUsername", username);
-  localStorage.setItem("username", username);
-  localStorage.setItem("voter", username);
+document.getElementById("matchDate").textContent =
+`${nextMatch.date}`;
 }
 
 function fillSelects() {
-  const selects = ["player1", "player2", "captain"];
 
-  selects.forEach(id => {
-    const select = document.getElementById(id);
-    select.innerHTML = `<option value="">Velg spiller</option>`;
+["player1","player2","captain"].forEach(id => {
 
-    players.forEach(player => {
-      select.innerHTML += `<option value="${player.name}">${player.name} (${player.position})</option>`;
-    });
-  });
+const select = document.getElementById(id);
+
+select.innerHTML = `<option value="">Velg spiller</option>`;
+
+players.forEach(player => {
+
+select.innerHTML += `
+<option value="${player.name}">
+${player.name} (${player.position})
+</option>
+`;
+});
+});
 }
 
 function getPlayer(playerName) {
-  return players.find(p => p.name === playerName);
+return players.find(p => p.name === playerName);
 }
 
 function getPlayerPosition(playerName) {
-  const player = getPlayer(playerName);
-  return player ? player.position : "";
+const player = getPlayer(playerName);
+return player ? player.position : "";
 }
 
 function updatePlayerImages() {
-  ["player1", "player2", "captain"].forEach(id => {
-    const select = document.getElementById(id);
-    const image = document.getElementById(`img-${id}`);
-    const player = getPlayer(select.value);
 
-    if (player) {
-      image.src = player.image;
-    } else {
-      image.src = "bilder/lyn-logo.png";
-    }
-  });
+["player1","player2","captain"].forEach(id => {
+
+const select = document.getElementById(id);
+
+const image = document.getElementById(`img-${id}`);
+
+const player = getPlayer(select.value);
+
+image.src = player
+? player.image
+: "bilder/lyn-logo.png";
+});
 }
 
 function calculatePoints(playerName, isCaptain) {
-  const stat = matchStats[playerName];
-  const position = getPlayerPosition(playerName);
 
-  if (!stat) return { total: 0, lines: ["Ingen kampdata funnet"] };
+const stat = matchStats[playerName];
 
-  let points = 0;
-  const lines = [];
+const position = getPlayerPosition(playerName);
 
-  if (stat.goals > 0) {
-    let goalPoints = 0;
+if (!stat) {
+return { total:0, lines:["Ingen kampdata"] };
+}
 
-    if (position === "ANG") goalPoints = stat.goals * 4;
-    if (position === "MID") goalPoints = stat.goals * 5;
-    if (position === "FORS") goalPoints = stat.goals * 6;
-    if (position === "KEEPER") goalPoints = stat.goals * 10;
+let points = 0;
+const lines = [];
 
-    points += goalPoints;
-    lines.push(`Mål: +${goalPoints}`);
-  }
+if (stat.goals > 0) {
 
-  if (stat.assists > 0) {
-    const assistPoints = stat.assists * 3;
-    points += assistPoints;
-    lines.push(`Assist: +${assistPoints}`);
-  }
+let goalPoints = 0;
 
-  if (stat.cleanSheet) {
-    let csPoints = 0;
+if (position === "ANG") goalPoints = stat.goals * 4;
+if (position === "MID") goalPoints = stat.goals * 5;
+if (position === "FORS") goalPoints = stat.goals * 6;
+if (position === "KEEPER") goalPoints = stat.goals * 10;
 
-    if (position === "MID") csPoints = 1;
-    if (position === "FORS") csPoints = 4;
-    if (position === "KEEPER") csPoints = 5;
+points += goalPoints;
 
-    if (csPoints > 0) {
-      points += csPoints;
-      lines.push(`Clean sheet: +${csPoints}`);
-    }
-  }
+lines.push(`Mål: +${goalPoints}`);
+}
 
-  if (stat.penaltySave && position === "KEEPER") {
-    points += 5;
-    lines.push("Strafferedning: +5");
-  }
+if (stat.assists > 0) {
 
-  if (stat.redCard) {
-    points -= 3;
-    lines.push("Rødt kort: −3");
-  }
+const assistPoints = stat.assists * 3;
 
-  if (stat.rating >= 7.5) {
-    points += 1;
-    lines.push("Børsbonus: +1");
-  }
+points += assistPoints;
 
-  if (stat.rating <= 4.5) {
-    points -= 1;
-    lines.push("Børsbonus: −1");
-  }
+lines.push(`Assist: +${assistPoints}`);
+}
 
-  if (isCaptain) {
-    points += 2;
-    lines.push("Kaptein: +2");
-  }
+if (stat.cleanSheet) {
 
-  if (lines.length === 0) {
-    lines.push("Ingen poenggivende hendelser");
-  }
+let csPoints = 0;
 
-  return { total: points, lines };
+if (position === "MID") csPoints = 1;
+if (position === "FORS") csPoints = 4;
+if (position === "KEEPER") csPoints = 5;
+
+if (csPoints > 0) {
+points += csPoints;
+lines.push(`Clean sheet: +${csPoints}`);
+}
+}
+
+if (stat.penaltySave && position === "KEEPER") {
+points += 5;
+lines.push("Strafferedning: +5");
+}
+
+if (stat.redCard) {
+points -= 3;
+lines.push("Rødt kort: −3");
+}
+
+if (stat.rating >= 7.5) {
+points += 1;
+lines.push("Børsbonus: +1");
+}
+
+if (stat.rating <= 4.5) {
+points -= 1;
+lines.push("Børsbonus: −1");
+}
+
+if (isCaptain) {
+points += 2;
+lines.push("Kaptein: +2");
+}
+
+return {
+total: points,
+lines
+};
 }
 
 async function saveTeam() {
-  if (isDeadlinePassed()) {
-    alert("Fristen har gått ut. Laget er låst.");
-    return;
-  }
 
-  const username = document.getElementById("username").value.trim();
-  const player1 = document.getElementById("player1").value;
-  const player2 = document.getElementById("player2").value;
-  const captain = document.getElementById("captain").value;
+const username =
+document.getElementById("username").value.trim();
 
-  if (!username || !player1 || !player2 || !captain) {
-    alert("Fyll inn brukernavn, to spillere og kaptein.");
-    return;
-  }
+const player1 =
+document.getElementById("player1").value;
 
-  const chosenPlayers = [player1, player2, captain];
+const player2 =
+document.getElementById("player2").value;
 
-  if (new Set(chosenPlayers).size !== 3) {
-    alert("Du kan ikke velge samme spiller flere ganger.");
-    return;
-  }
+const captain =
+document.getElementById("captain").value;
 
-  saveUsernameEverywhere(username);
+if (!username || !player1 || !player2 || !captain) {
+alert("Fyll inn alt");
+return;
+}
 
-  const team = {
-    match_id: nextMatch.id,
-    username,
-    player1,
-    player2,
-    captain
-  };
+if (
+new Set([player1, player2, captain]).size !== 3
+) {
+alert("Tre ulike spillere");
+return;
+}
 
-  localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
+const team = {
+match_id: nextMatch.id,
+username,
+player1,
+player2,
+captain
+};
 
-  const { error } = await supabaseClient
-    .from("fantasy_picks")
-    .upsert(
-      {
-        match_id: team.match_id,
-        voter: team.username,
-        player1: team.player1,
-        player2: team.player2,
-        captain: team.captain
-      },
-      {
-        onConflict: "match_id,voter"
-      }
-    );
+localStorage.setItem(
+"lynFantasyTeam",
+JSON.stringify(team)
+);
 
-  if (error) {
-    console.error(error);
-    alert("Noe gikk galt ved lagring.");
-    return;
-  }
+const { error } = await supabaseClient
+.from("fantasy_picks")
+.upsert(
+{
+match_id: team.match_id,
+voter: team.username,
+player1: team.player1,
+player2: team.player2,
+captain: team.captain
+},
+{
+onConflict: "match_id,voter"
+}
+);
 
-  alert("Fantasy-laget er lagret!");
-  showTeam(team);
+if (error) {
+console.error(error);
+alert("Noe gikk galt");
+return;
+}
+
+alert("Fantasy-laget er lagret!");
+
+showTeam(team);
 }
 
 function showTeam(team) {
-  const output = document.getElementById("output");
-  output.style.display = "block";
 
-  const p1 = calculatePoints(team.player1, false);
-  const p2 = calculatePoints(team.player2, false);
-  const cap = calculatePoints(team.captain, true);
+const output = document.getElementById("output");
 
-  const total = p1.total + p2.total + cap.total;
+output.style.display = "block";
 
-  output.innerHTML = `
-    <strong>${team.username}</strong><br>
-    Kamp: ${nextMatch.home} - ${nextMatch.away}<br><br>
+const p1 = calculatePoints(team.player1,false);
+const p2 = calculatePoints(team.player2,false);
+const cap = calculatePoints(team.captain,true);
 
-    Spiller 1: ${team.player1} (${getPlayerPosition(team.player1)})<br>
-    Spiller 2: ${team.player2} (${getPlayerPosition(team.player2)})<br>
+const total =
+p1.total +
+p2.total +
+cap.total;
 
-    <div class="captain-line">
-      ⭐ Kaptein: ${team.captain} (${getPlayerPosition(team.captain)})
-    </div>
+output.innerHTML = `
+<strong>${team.username}</strong><br><br>
 
-    <div class="points-box">
-      <div class="total-points">${total} poeng</div>
+${team.player1}: ${p1.total} poeng<br>
+${team.player2}: ${p2.total} poeng<br>
+⭐ ${team.captain}: ${cap.total} poeng<br><br>
 
-      <div class="breakdown">
-        <strong>${team.player1}:</strong> ${p1.total} poeng<br>
-        ${p1.lines.join("<br>")}<br><br>
-
-        <strong>${team.player2}:</strong> ${p2.total} poeng<br>
-        ${p2.lines.join("<br>")}<br><br>
-
-        <strong>⭐ ${team.captain}:</strong> ${cap.total} poeng<br>
-        ${cap.lines.join("<br>")}
-      </div>
-    </div>
-  `;
-}
-
-function loadSavedTeam() {
-  const savedUsername = getSavedUsername();
-  if (savedUsername) {
-    document.getElementById("username").value = savedUsername;
-  }
-
-  const saved = localStorage.getItem("lynFantasyTeam");
-  if (!saved) return;
-
-  const team = JSON.parse(saved);
-
-  if (!nextMatch || team.match_id !== nextMatch.id) return;
-
-  document.getElementById("username").value = team.username;
-  document.getElementById("player1").value = team.player1;
-  document.getElementById("player2").value = team.player2;
-  document.getElementById("captain").value = team.captain;
-
-  showTeam(team);
+<div class="total-points">
+${total} poeng
+</div>
+`;
 }
 
 fillMatchInfo();
 fillSelects();
 
-["player1", "player2", "captain"].forEach(id => {
-  document.getElementById(id).addEventListener("change", updatePlayerImages);
+["player1","player2","captain"].forEach(id => {
+document
+.getElementById(id)
+.addEventListener("change", updatePlayerImages);
 });
 
-loadSavedTeam();
+loadMatchStats();
+
 updatePlayerImages();
-applyDeadlineLock();
+
 </script>
 
 </body>
