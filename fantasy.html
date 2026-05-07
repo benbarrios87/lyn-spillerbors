@@ -8,7 +8,7 @@
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -550,7 +550,7 @@ async function saveTeam() {
 
 localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
 
-const { error } = await supabase
+const { error } = await supabaseclient
   .from("fantasy_picks")
   .upsert(
     {
