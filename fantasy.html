@@ -216,6 +216,7 @@ label {
 
     <label for="captain">Kaptein ⭐</label>
     <select id="captain"></select>
+    <div id="previewCards" class="preview-cards"></div>
 
     <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
 
@@ -269,25 +270,25 @@ function getNextMatch() {
 const nextMatch = getNextMatch();
 
 const players = [
-  { name: "Pedersen", position: "ANG" },
-  { name: "Sah", position: "MID" },
-  { name: "Sell", position: "FORS" },
-  { name: "Midtskogen", position: "ANG" },
-  { name: "HSN", position: "MID" },
-  { name: "Barnett", position: "FORS" },
-  { name: "Fredriksen", position: "MID" },
-  { name: "Isufi", position: "MID" },
-  { name: "Skaug", position: "FORS" },
-  { name: "Kurtovic", position: "MID" },
-  { name: "Monglo", position: "FORS" },
-  { name: "Wæhler", position: "FORS" },
-  { name: "Abo", position: "MID" },
-  { name: "MJ", position: "MID" },
-  { name: "Hellum", position: "ANG" },
-  { name: "Sawaneh", position: "ANG" },
-  { name: "Sock", position: "MID" },
-  { name: "Vik", position: "KEEPER" },
-  { name: "Trige", position: "KEEPER" }
+ { name: "Pedersen", position: "KEEPER", image: "bilder/pedersen.png" },
+{ name: "Sah", position: "FORS", image: "bilder/sah.png" },
+{ name: "Sell", position: "FORS", image: "bilder/sell.png" },
+{ name: "Midtskogen", position: "FORS", image: "bilder/midtskogen.png" },
+{ name: "HSN", position: "FORS", image: "bilder/hsn.png" },
+{ name: "Barnett", position: "FORS", image: "bilder/barnett.png" },
+{ name: "Fredriksen", position: "MID", image: "bilder/fredriksen.png" },
+{ name: "Isufi", position: "MID", image: "bilder/isufi.png" },
+{ name: "Skaug", position: "MID", image: "bilder/skaug.png" },
+{ name: "Kurtovic", position: "MID", image: "bilder/kurtovic.png" },
+{ name: "Monglo", position: "MID", image: "bilder/monglo.png" },
+{ name: "Wæhler", position: "MID", image: "bilder/wæhler.png" },
+{ name: "Abo", position: "ANG", image: "bilder/abo.png" },
+{ name: "MJ", position: "ANG", image: "bilder/mj.png" },
+{ name: "Hellum", position: "ANG", image: "bilder/hellum.png" },
+{ name: "Sawaneh", position: "ANG", image: "bilder/sawaneh.png" },
+{ name: "Sock", position: "ANG", image: "bilder/sock.png" },
+{ name: "Vik", position: "KEEPER", image: "bilder/vik.png" },
+{ name: "Trige", position: "KEEPER", image: "bilder/trige.png" }
 ];
 
 const matchStats = {
