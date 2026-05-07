@@ -553,9 +553,14 @@ function loadSavedTeam() {
 
 fillMatchInfo();
 fillSelects();
+
+["player1", "player2", "captain"].forEach(id => {
+  document.getElementById(id).addEventListener("change", updatePreviewCards);
+});
+
 loadSavedTeam();
+updatePreviewCards();
 applyDeadlineLock();
-</script>
 
 </body>
 </html>
