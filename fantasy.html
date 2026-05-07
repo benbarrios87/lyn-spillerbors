@@ -514,8 +514,10 @@ function calculatePoints(playerName, isCaptain) {
 
   return { total: points, lines };
 }
-
 async function saveTeam() {
+
+  alert("Knappen funker");
+
   if (isDeadlinePassed()) {
     alert("Fristen har gått ut. Laget er låst.");
     return;
