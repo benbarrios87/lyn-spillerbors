@@ -86,13 +86,6 @@ button:disabled {
   cursor:not-allowed;
 }
 
-.preview-cards {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-  margin-top:20px;
-}
-
 .select-row {
   display:flex;
   align-items:center;
@@ -107,35 +100,11 @@ button:disabled {
   border-radius:50%;
   background:white;
   flex-shrink:0;
+  border:2px solid rgba(255,255,255,0.3);
 }
 
 .select-row select {
   margin-top:0;
-}
-}
-}
-}
-
-.player-card img {
-  width:64px;
-  height:64px;
-  object-fit:cover;
-  border-radius:50%;
-  background:white;
-}
-
-.player-card .info {
-  flex:1;
-}
-
-.player-card .role {
-  font-size:13px;
-  opacity:0.75;
-}
-
-.player-card.captain {
-  border:2px solid #d71920;
-  background:rgba(215,25,32,0.25);
 }
 
 .result {
@@ -260,23 +229,23 @@ label {
     <label for="username">Forumbrukernavn</label>
     <input id="username" placeholder="Forumbrukernavn">
 
-  <label for="player1">Spiller 1</label>
-<div class="select-row">
-  <img id="img-player1" src="bilder/lyn-logo.png">
-  <select id="player1"></select>
-</div>
+    <label for="player1">Spiller 1</label>
+    <div class="select-row">
+      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
+      <select id="player1"></select>
+    </div>
 
-<label for="player2">Spiller 2</label>
-<div class="select-row">
-  <img id="img-player2" src="bilder/lyn-logo.png">
-  <select id="player2"></select>
-</div>
+    <label for="player2">Spiller 2</label>
+    <div class="select-row">
+      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
+      <select id="player2"></select>
+    </div>
 
-<label for="captain">Kaptein ⭐</label>
-<div class="select-row">
-  <img id="img-captain" src="bilder/lyn-logo.png">
-  <select id="captain"></select>
-</div>
+    <label for="captain">Kaptein ⭐</label>
+    <div class="select-row">
+      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
+      <select id="captain"></select>
+    </div>
 
     <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
 
@@ -447,36 +416,18 @@ function getPlayerPosition(playerName) {
   return player ? player.position : "";
 }
 
-function updatePreviewCards() {
-  const preview = document.getElementById("previewCards");
+function updatePlayerImages() {
+  ["player1", "player2", "captain"].forEach(id => {
+    const select = document.getElementById(id);
+    const image = document.getElementById(`img-${id}`);
+    const player = getPlayer(select.value);
 
-  const picks = [
-    { role: "Spiller 1", name: document.getElementById("player1").value },
-    { role: "Spiller 2", name: document.getElementById("player2").value },
-    { role: "⭐ Kaptein", name: document.getElementById("captain").value, captain: true }
-  ];
-
-  const selected = picks.filter(pick => pick.name);
-
-  if (selected.length === 0) {
-    preview.innerHTML = "";
-    return;
-  }
-
-  preview.innerHTML = selected.map(pick => {
-    const player = getPlayer(pick.name);
-    if (!player) return "";
-
-    return `
-      <div class="player-card ${pick.captain ? "captain" : ""}">
-        <img src="${player.image}" alt="${player.name}">
-        <div class="info">
-          <strong>${player.name}</strong><br>
-          <span class="role">${pick.role} · ${player.position}</span>
-        </div>
-      </div>
-    `;
-  }).join("");
+    if (player) {
+      image.src = player.image;
+    } else {
+      image.src = "bilder/lyn-logo.png";
+    }
+  });
 }
 
 function calculatePoints(playerName, isCaptain) {
@@ -651,11 +602,11 @@ fillMatchInfo();
 fillSelects();
 
 ["player1", "player2", "captain"].forEach(id => {
-  document.getElementById(id).addEventListener("change", updatePreviewCards);
+  document.getElementById(id).addEventListener("change", updatePlayerImages);
 });
 
 loadSavedTeam();
-updatePreviewCards();
+updatePlayerImages();
 applyDeadlineLock();
 </script>
 
