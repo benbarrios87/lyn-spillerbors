@@ -10,113 +10,195 @@
 :root {
   --red:#d71920;
   --blue:#13294b;
+  --paper:#f4ead8;
+  --paper2:#fff8e8;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --line:#d8c8aa;
   --green:#027a48;
   --darkred:#b42318;
+  --stamp:#b51218;
 }
 
 body {
   margin:0;
-  font-family:Arial, sans-serif;
-  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  font-family:"Courier New", Courier, monospace;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.09), transparent 28%),
+    linear-gradient(180deg, #f7eedc, #efe2ca);
 }
 
 body::before {
   content:"";
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.62);
+  background-image:
+    linear-gradient(rgba(19,41,75,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19,41,75,0.035) 1px, transparent 1px);
+  background-size:22px 22px;
+  pointer-events:none;
   z-index:-1;
 }
 
 .menu-btn {
   position:fixed;
-  top:20px;
-  left:20px;
+  top:18px;
+  left:18px;
   z-index:9999;
   width:auto;
   padding:10px 15px;
   border:none;
-  border-radius:10px;
+  border-radius:999px;
   background:var(--red);
   color:white;
   font-weight:bold;
   cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  box-shadow:0 4px 12px rgba(0,0,0,0.22);
 }
 
 header {
   text-align:center;
-  padding:45px 20px 25px;
-  color:white;
+  padding:55px 20px 30px;
+}
+
+.coupon-hero {
+  max-width:900px;
+  margin:0 auto;
+  background:var(--paper2);
+  border:2px dashed var(--blue);
+  border-radius:18px;
+  padding:26px 20px;
+  position:relative;
+  box-shadow:0 14px 35px rgba(19,41,75,0.16);
+}
+
+.coupon-hero::before,
+.coupon-hero::after {
+  content:"";
+  position:absolute;
+  top:50%;
+  width:28px;
+  height:28px;
+  background:#f7eedc;
+  border-radius:50%;
+  transform:translateY(-50%);
+  border:2px solid var(--blue);
+}
+
+.coupon-hero::before {
+  left:-16px;
+}
+
+.coupon-hero::after {
+  right:-16px;
 }
 
 .logo-wrap {
-  width:220px;
-  margin:0 auto 15px;
+  width:120px;
+  margin:0 auto 12px;
 }
 
 .logo-wrap img {
   width:100%;
   height:auto;
-  filter:drop-shadow(0 10px 25px rgba(0,0,0,0.5));
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,0.22));
+}
+
+.ticket-label {
+  display:inline-block;
+  border:2px solid var(--stamp);
+  color:var(--stamp);
+  padding:6px 12px;
+  transform:rotate(-2deg);
+  font-weight:bold;
+  letter-spacing:1px;
+  margin-bottom:10px;
+  background:rgba(255,255,255,0.45);
 }
 
 h1 {
-  margin:10px 0 5px;
-  font-size:38px;
+  margin:8px 0 5px;
+  font-size:42px;
+  color:var(--blue);
+  letter-spacing:1px;
 }
 
-h2 {
-  margin-top:0;
+header p {
+  margin:0 auto;
+  max-width:620px;
+  color:#374151;
+  font-family:Arial, sans-serif;
 }
 
 main {
   max-width:1000px;
   margin:auto;
-  padding:15px;
+  padding:15px 15px 60px;
 }
 
 .section-title {
-  color:white;
-  margin:30px 0 12px;
-  font-size:26px;
-  text-shadow:0 3px 10px rgba(0,0,0,0.5);
+  color:var(--blue);
+  margin:34px 0 12px;
+  font-size:25px;
+  letter-spacing:0.5px;
+}
+
+.section-title::after {
+  content:"";
+  display:block;
+  width:90px;
+  height:4px;
+  background:var(--red);
+  border-radius:999px;
+  margin-top:8px;
 }
 
 .box {
-  background:rgba(255,255,255,0.96);
+  background:rgba(255,248,232,0.96);
   border-radius:18px;
   padding:18px;
   margin-bottom:18px;
-  border-left:6px solid var(--red);
+  border:2px solid var(--line);
+  box-shadow:0 8px 20px rgba(19,41,75,0.08);
+  position:relative;
 }
 
 .box.blue {
-  border-left-color:var(--blue);
+  border-color:var(--blue);
+  background:linear-gradient(180deg, #fff8e8, #eef5ff);
 }
 
 .notice {
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
-  color:var(--blue);
+  background:#fff4cc;
+  border:2px dashed #d6a200;
+  color:#7a4b00;
   border-radius:14px;
   padding:14px;
   margin-bottom:14px;
   font-weight:bold;
 }
 
+label {
+  display:block;
+  color:var(--blue);
+  font-weight:bold;
+}
+
 select, input {
   width:100%;
-  padding:11px;
-  border-radius:9px;
-  border:1px solid #ccc;
-  margin-top:6px;
+  padding:12px;
+  border-radius:10px;
+  border:2px solid #d8c8aa;
+  margin-top:7px;
   box-sizing:border-box;
-  font-size:15px;
+  font-size:16px;
+  background:#fffdf7;
+  font-family:"Courier New", Courier, monospace;
 }
 
 button {
-  background:var(--red);
+  background:var(--blue);
   color:white;
   border:none;
   padding:14px;
@@ -125,10 +207,12 @@ button {
   font-weight:bold;
   cursor:pointer;
   font-size:16px;
+  font-family:"Courier New", Courier, monospace;
+  box-shadow:0 4px 12px rgba(19,41,75,0.2);
 }
 
 button:hover {
-  background:#b51218;
+  background:#0d1d36;
 }
 
 .next-grid {
@@ -145,28 +229,74 @@ button:hover {
 }
 
 .next-card {
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
+  background:#fffdf7;
+  border:2px dashed var(--blue);
   border-radius:16px;
   padding:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+  box-shadow:0 4px 12px rgba(19,41,75,0.08);
+  position:relative;
 }
 
 .next-card strong {
-  color:var(--blue);
+  color:var(--red);
   font-size:17px;
 }
 
-.tip-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:10px;
+.next-card::after {
+  content:"KUPONG";
+  position:absolute;
+  right:10px;
+  top:10px;
+  color:rgba(215,25,32,0.16);
+  font-weight:bold;
+  transform:rotate(8deg);
 }
 
-.tip-input label {
+.tip-board {
+  margin-top:18px;
+  background:#13294b;
+  color:white;
+  border-radius:18px;
+  padding:18px;
+  text-align:center;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,0.12);
+}
+
+.tip-board-title {
+  font-size:14px;
+  opacity:0.8;
+  margin-bottom:12px;
+}
+
+.score-entry {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:12px;
+  align-items:end;
+}
+
+.score-entry input {
+  font-size:42px;
+  text-align:center;
   font-weight:bold;
+  padding:14px 8px;
+  border-radius:16px;
+  border:3px solid rgba(255,255,255,0.3);
+  background:#fffdf7;
   color:var(--blue);
+}
+
+.score-entry label {
+  color:white;
+  font-size:13px;
+  min-height:32px;
+}
+
+.score-dash {
+  font-size:46px;
+  font-weight:bold;
+  padding-bottom:10px;
+  color:#fff;
 }
 
 .button-row {
@@ -185,8 +315,8 @@ button:hover {
   display:grid;
   grid-template-columns:1fr auto;
   gap:10px;
-  padding:9px 0;
-  border-bottom:1px solid #e5e7eb;
+  padding:10px 0;
+  border-bottom:1px dashed #c9b894;
   align-items:center;
 }
 
@@ -197,15 +327,16 @@ button:hover {
 .prediction-score, .result-score {
   font-weight:bold;
   color:var(--blue);
-  font-size:17px;
+  font-size:18px;
 }
 
 .hero-stat {
-  background:linear-gradient(135deg, #13294b, #1f3f73);
+  background:linear-gradient(135deg, #13294b, #d71920);
   color:white;
-  border-radius:16px;
-  padding:16px;
+  border-radius:18px;
+  padding:18px;
   margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(19,41,75,0.16);
 }
 
 .hero-stat h3 {
@@ -213,7 +344,7 @@ button:hover {
 }
 
 .hero-stat .big {
-  font-size:28px;
+  font-size:30px;
   font-weight:bold;
 }
 
@@ -232,8 +363,9 @@ button:hover {
 .stat-card {
   border-radius:16px;
   padding:15px;
-  border:1px solid #e5e7eb;
-  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+  border:2px solid #e5d4b5;
+  box-shadow:0 4px 12px rgba(19,41,75,0.06);
+  background:#fffdf7;
 }
 
 .stat-card:nth-child(1) { background:#eff6ff; border-color:#bfdbfe; }
@@ -243,12 +375,41 @@ button:hover {
 
 .bb {
   background:#fff1f2;
-  border:1px solid #fecdd3;
+  border:2px dashed #fecdd3;
   color:#b51218;
-  border-radius:14px;
+  border-radius:16px;
   padding:14px;
   margin-bottom:14px;
   font-weight:bold;
+}
+
+.people-box {
+  background:#fffdf7;
+  border:2px dashed var(--blue);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.bar-row {
+  display:grid;
+  grid-template-columns:95px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin:10px 0;
+}
+
+.bar {
+  height:16px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.bar-fill {
+  height:100%;
+  background:var(--red);
+  border-radius:999px;
 }
 
 .medal {
@@ -257,8 +418,9 @@ button:hover {
 }
 
 .small {
-  color:gray;
+  color:var(--muted);
   font-size:13px;
+  font-family:Arial, sans-serif;
 }
 
 .warning {
@@ -269,6 +431,43 @@ button:hover {
   border-radius:12px;
   margin-bottom:12px;
 }
+
+@media (max-width:620px) {
+  .menu-btn {
+    position:static;
+    margin:14px 0 0 14px;
+  }
+
+  header {
+    padding-top:24px;
+  }
+
+  h1 {
+    font-size:34px;
+  }
+
+  .score-entry {
+    grid-template-columns:1fr auto 1fr;
+    gap:8px;
+  }
+
+  .score-entry input {
+    font-size:34px;
+  }
+
+  .score-dash {
+    font-size:34px;
+  }
+
+  .prediction-row {
+    grid-template-columns:1fr auto;
+  }
+
+  .prediction-row div:last-child {
+    grid-column:1 / -1;
+    text-align:right;
+  }
+}
 </style>
 </head>
 
@@ -277,11 +476,14 @@ button:hover {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <header>
-  <div class="logo-wrap">
-    <img src="lblogoen.png" alt="Lynbørs-logo">
+  <div class="coupon-hero">
+    <div class="logo-wrap">
+      <img src="lblogoen.png" alt="Lynbørs-logo">
+    </div>
+    <div class="ticket-label">KAMPKUPONG</div>
+    <h1>Tippetips</h1>
+    <p>Tippekonkurransen for folk som egentlig vet bedre etter kampen.</p>
   </div>
-  <h1>Tippetips</h1>
-  <p>Tippekonkurransen for folk som egentlig vet bedre etter kampen.</p>
 </header>
 
 <main>
@@ -304,23 +506,30 @@ button:hover {
   <label>Velg kamp å tippe på</label>
   <select id="tipMatch"></select>
 
-  <div class="tip-grid">
-    <div class="tip-input">
-      <label id="tipHomeLabel">Hjemmelag</label>
-      <input type="number" id="tipHome" min="0" max="9" step="1" placeholder="0–9">
-    </div>
-    <div class="tip-input">
-      <label id="tipAwayLabel">Bortelag</label>
-      <input type="number" id="tipAway" min="0" max="9" step="1" placeholder="0–9">
-    </div>
-  </div>
+  <div class="tip-board">
+    <div class="tip-board-title">Fyll ut kupongen</div>
 
-  <div class="small" style="margin-top:10px;">
-    3 poeng for helt riktig resultat. 1 poeng for riktig utfall.
+    <div class="score-entry">
+      <div>
+        <label id="tipHomeLabel">Hjemmelag</label>
+        <input type="number" id="tipHome" min="0" max="9" step="1" placeholder="0">
+      </div>
+
+      <div class="score-dash">–</div>
+
+      <div>
+        <label id="tipAwayLabel">Bortelag</label>
+        <input type="number" id="tipAway" min="0" max="9" step="1" placeholder="0">
+      </div>
+    </div>
+
+    <div class="small" style="margin-top:12px; color:rgba(255,255,255,0.75);">
+      3 poeng for helt riktig resultat. 1 poeng for riktig utfall.
+    </div>
   </div>
 
   <div style="margin-top:14px;">
-    <button onclick="sendTip()">Send tips</button>
+    <button onclick="sendTip()">Lever kupong</button>
   </div>
 </div>
 
@@ -443,7 +652,7 @@ function renderNextMatches() {
 
   box.innerHTML = nextMatches.map((m, i) => `
     <div class="next-card">
-      <strong>${i === 0 ? "Neste kamp" : "Kamp " + (i + 1)}</strong><br>
+      <strong>${i === 0 ? "Neste kupong" : "Kupong " + (i + 1)}</strong><br>
       ${formatDate(m.date)} · ${m.home} - ${m.away}<br>
       <span class="small">Frist: ${formatDeadline(m.deadline)}</span>
     </div>
@@ -564,7 +773,7 @@ async function sendTip() {
     return;
   }
 
-  alert("Tipset er lagret! Hvis du hadde tippet før på samme kamp, ble det gamle tipset oppdatert.");
+  alert("Kupongen er levert! Hvis du hadde tippet før på samme kamp, ble det gamle tipset oppdatert.");
 
   document.getElementById("tipHome").value = "";
   document.getElementById("tipAway").value = "";
@@ -617,6 +826,60 @@ function buildPredictions(votes) {
   return Object.values(map).filter(p => p.home !== null && p.away !== null);
 }
 
+function renderPeoplePrediction(predictions) {
+  if (!predictions || predictions.length === 0) return "";
+
+  const resultCounts = {};
+  let homeTotal = 0;
+  let awayTotal = 0;
+  let homeWins = 0;
+  let draws = 0;
+  let awayWins = 0;
+
+  predictions.forEach(p => {
+    const result = `${p.home}-${p.away}`;
+    resultCounts[result] = (resultCounts[result] || 0) + 1;
+
+    homeTotal += p.home;
+    awayTotal += p.away;
+
+    const outcome = getOutcome(p.home, p.away);
+    if (outcome === "H") homeWins += 1;
+    if (outcome === "U") draws += 1;
+    if (outcome === "B") awayWins += 1;
+  });
+
+  const total = predictions.length;
+  const mostCommon = Object.entries(resultCounts).sort((a,b) => b[1] - a[1])[0];
+
+  const bars = [
+    { label:"Hjemme", value:homeWins },
+    { label:"Uavgjort", value:draws },
+    { label:"Borte", value:awayWins }
+  ];
+
+  return `
+    <div class="people-box">
+      <strong>Folkets kupong</strong><br>
+      <span class="small">
+        Mest tippet resultat: ${mostCommon[0]} · Snittips: ${(homeTotal / total).toFixed(1)}-${(awayTotal / total).toFixed(1)}
+      </span>
+
+      ${bars.map(row => {
+        const percent = total ? Math.round((row.value / total) * 100) : 0;
+
+        return `
+          <div class="bar-row">
+            <div>${row.label}</div>
+            <div class="bar"><div class="bar-fill" style="width:${percent}%"></div></div>
+            <div>${percent}%</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 async function loadMatchPredictions() {
   const match = document.getElementById("tipMatch").value;
 
@@ -636,11 +899,13 @@ async function loadMatchPredictions() {
   }
 
   let html = `
-    <div class="bb">Tips for ${match}</div>
+    <div class="bb">Kuponger for ${match}</div>
     <p class="small">
       ${matchData ? `${matchData.home} - ${matchData.away}` : ""}
       ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
     </p>
+
+    ${renderPeoplePrediction(predictions)}
   `;
 
   predictions.forEach(p => {
@@ -650,7 +915,7 @@ async function loadMatchPredictions() {
       <div class="prediction-row">
         <div><strong>${p.voter}</strong></div>
         <div class="prediction-score">${p.home}-${p.away}</div>
-        <div>${points === null ? "–" : points + " p"}</div>
+        <div>${points === null ? "venter" : points + " p"}</div>
       </div>
     `;
   });
@@ -775,12 +1040,12 @@ async function loadTipStats() {
   const mostActiveRows = Object.keys(mostActive).map(user => ({
     player:user,
     score:mostActive[user],
-    sub:"tips sendt inn"
+    sub:"kuponger levert"
   })).sort((a,b) => b.score - a.score);
 
   document.getElementById("tipStats").innerHTML = `
     <div class="hero-stat">
-      <h3>Tippestatus</h3>
+      <h3>Kupongstatus</h3>
       <div class="big">${totalTips} tips</div>
       <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat</div>
     </div>
