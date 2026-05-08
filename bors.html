@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lynbørs</title>
+<link rel="icon" href="lblogoen.png">
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+  --lightblue:#eef5ff;
+  --cream:#fffaf0;
+  --paper:#fffdf8;
+  --green:#027a48;
+  --darkred:#b42318;
+  --ink:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  color:var(--ink);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.92), rgba(238,245,255,0.96)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+}
+
+.menu-btn {
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:9999;
+  width:auto;
+  padding:10px 15px;
+  border:none;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.22);
+}
+
+header {
+  position:relative;
+  text-align:center;
+  padding:58px 20px 36px;
+  color:white;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 26%),
+    linear-gradient(135deg, #13294b 0%, #193b70 48%, #d71920 100%);
+  overflow:hidden;
+}
+
+header::after {
+  content:"LYNBØRS";
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  font-size:96px;
+  font-weight:900;
+  letter-spacing:8px;
+  color:rgba(255,255,255,0.055);
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.logo-wrap {
+  width:190px;
+  margin:0 auto 12px;
+  position:relative;
+  z-index:1;
+}
+
+.logo-wrap img {
+  width:100%;
+  height:auto;
+  filter:drop-shadow(0 10px 25px rgba(0,0,0,0.45));
+}
+
+h1 {
+  position:relative;
+  z-index:1;
+  margin:8px 0 5px;
+  font-size:44px;
+  letter-spacing:0.5px;
+}
+
+header p {
+  position:relative;
+  z-index:1;
+  margin:0 auto;
+  max-width:620px;
+  opacity:0.92;
+  font-size:17px;
+}
+
+main {
+  max-width:1120px;
+  margin:auto;
+  padding:22px 15px 60px;
+}
+
+.section-title {
+  color:var(--blue);
+  margin:34px 0 12px;
+  font-size:26px;
+}
+
+.section-title::after {
+  content:"";
+  display:block;
+  width:74px;
+  height:4px;
+  background:var(--red);
+  border-radius:999px;
+  margin-top:8px;
+}
+
+.box {
+  background:rgba(255,255,255,0.96);
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:18px;
+  border:1px solid rgba(19,41,75,0.12);
+  box-shadow:0 10px 25px rgba(19,41,75,0.08);
+}
+
+.box.blue {
+  background:linear-gradient(180deg, #ffffff, #eef5ff);
+  border-top:5px solid var(--blue);
+}
+
+.notice {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:var(--blue);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  font-weight:bold;
+}
+
+label {
+  display:block;
+  font-weight:bold;
+  color:var(--blue);
+}
+
+select, input {
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #cfd7e3;
+  margin-top:7px;
+  box-sizing:border-box;
+  font-size:15px;
+  background:white;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(145px, 1fr));
+  gap:14px;
+}
+
+.player {
+  background:linear-gradient(180deg, #ffffff, #f8fafc);
+  border-radius:18px;
+  padding:13px;
+  text-align:center;
+  border:1px solid #e5e7eb;
+  box-shadow:0 4px 12px rgba(19,41,75,0.06);
+  transition:transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.player:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(19,41,75,0.12);
+}
+
+.avatar {
+  width:68px;
+  height:68px;
+  background:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  overflow:hidden;
+  border:3px solid #eef2ff;
+  box-shadow:0 3px 8px rgba(0,0,0,0.14);
+}
+
+.avatar img {
+  width:110%;
+  height:110%;
+  object-fit:cover;
+  transform:translateX(8%);
+}
+
+.player-short {
+  font-weight:bold;
+  margin-top:9px;
+  color:var(--blue);
+  font-size:16px;
+}
+
+.player-name {
+  font-size:12px;
+  color:var(--muted);
+  min-height:30px;
+}
+
+button {
+  background:var(--red);
+  color:white;
+  border:none;
+  padding:14px;
+  border-radius:14px;
+  width:100%;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:16px;
+  box-shadow:0 4px 12px rgba(215,25,32,0.18);
+}
+
+button:hover {
+  background:#b51218;
+}
+
+.button-row {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+@media (min-width:750px) {
+  .button-row {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.result-row, .compare-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.compare-row {
+  grid-template-columns:1fr auto auto auto;
+  font-size:14px;
+}
+
+.result-score {
+  font-weight:bold;
+  color:var(--blue);
+  font-size:18px;
+}
+
+.bb {
+  background:linear-gradient(135deg, #fff1f2, #ffffff);
+  border:1px solid #fecdd3;
+  color:#b51218;
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:14px;
+  font-weight:bold;
+}
+
+.away-box {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:#13294b;
+  border-radius:16px;
+  padding:15px;
+  margin:14px 0;
+  font-weight:bold;
+}
+
+.hero-stat {
+  background:linear-gradient(135deg, #13294b, #d71920);
+  color:white;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 8px 20px rgba(19,41,75,0.18);
+}
+
+.hero-stat h3 {
+  margin:0 0 5px;
+}
+
+.hero-stat .big {
+  font-size:30px;
+  font-weight:bold;
+}
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:850px) {
+  .stats-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.stat-card {
+  border-radius:18px;
+  padding:16px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 5px 14px rgba(19,41,75,0.07);
+}
+
+.stat-card:nth-child(1) { background:#eff6ff; border-color:#bfdbfe; }
+.stat-card:nth-child(2) { background:#fff1f2; border-color:#fecdd3; }
+.stat-card:nth-child(3) { background:#fffbeb; border-color:#fde68a; }
+.stat-card:nth-child(4) { background:#f0fdf4; border-color:#bbf7d0; }
+.stat-card:nth-child(5) { background:#f5f3ff; border-color:#ddd6fe; }
+.stat-card:nth-child(6) { background:#ecfeff; border-color:#a5f3fc; }
+.stat-card:nth-child(7) { background:#fff7ed; border-color:#fed7aa; }
+.stat-card:nth-child(8) { background:#f8fafc; border-color:#cbd5e1; }
+.stat-card:nth-child(9) { background:#fdf2f8; border-color:#fbcfe8; }
+.stat-card:nth-child(10) { background:#eef2ff; border-color:#c7d2fe; }
+
+.medal {
+  font-size:18px;
+  margin-right:5px;
+}
+
+.small {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.diff-plus {
+  color:var(--green);
+  font-weight:bold;
+}
+
+.diff-minus {
+  color:var(--darkred);
+  font-weight:bold;
+}
+
+.warning {
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
+
+.vipps-box {
+  text-align:center;
+  margin:22px auto 8px;
+  padding:15px;
+  background:rgba(255,255,255,0.95);
+  border-radius:18px;
+  max-width:300px;
+  box-shadow:0 8px 20px rgba(19,41,75,0.1);
+}
+
+.vipps-box img {
+  width:120px;
+  max-width:80%;
+  border-radius:16px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+
+.vipps-box div {
+  font-size:16px;
+  color:gray;
+  margin-top:8px;
+}
+
+@media (max-width:620px) {
+  .menu-btn {
+    position:static;
+    margin:14px 0 0 14px;
+  }
+
+  header {
+    padding-top:30px;
+  }
+
+  h1 {
+    font-size:36px;
+  }
+
+  header::after {
+    font-size:54px;
+  }
+
+  .compare-row {
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
+<header>
+  <div class="logo-wrap">
+    <img src="lblogoen.png" alt="Lynbørs-logo">
+  </div>
+  <h1>Lynbørs</h1>
+  <p>Supporternes spillerbørs. 100% subjektivt. Heldigvis.</p>
+</header>
+
+<main>
+
+<h2 class="section-title">1. Send inn børs</h2>
+
+<div class="box">
+  <label>Velg kamp</label>
+  <select id="match">
+    <option>13.04 Haugesund hjemme</option>
+    <option>21.04 Sogndal borte</option>
+    <option>27.04 Sandnes Ulf hjemme</option>
+    <option>30.04 Moss borte</option>
+    <option>01.05 Lyn - Stabæk</option>
+    <option>10.05 Raufoss - Lyn</option>
+    <option>16.05 Lyn - Kongsvinger</option>
+    <option>20.05 Egersund - Lyn</option>
+    <option>25.05 Lyn - Strømmen</option>
+    <option>31.05 Odd - Lyn</option>
+    <option>14.06 Lyn - Bryne</option>
+    <option>19.06 Ranheim - Lyn</option>
+    <option>27.06 Lyn - Hødd</option>
+    <option>02.07 Lyn - Åsane</option>
+    <option>26.07 Strømsgodset - Lyn</option>
+    <option>02.08 Lyn - Sogndal</option>
+    <option>09.08 Stabæk - Lyn</option>
+    <option>16.08 Lyn - Odd</option>
+    <option>26.08 Åsane - Lyn</option>
+    <option>30.08 Kongsvinger - Lyn</option>
+    <option>06.09 Lyn - Egersund</option>
+    <option>13.09 Hødd - Lyn</option>
+    <option>20.09 Lyn - Ranheim</option>
+    <option>04.10 Bryne - Lyn</option>
+    <option>11.10 Lyn - Strømsgodset</option>
+    <option>14.10 Haugesund - Lyn</option>
+    <option>18.10 Lyn - Moss</option>
+    <option>25.10 Sandnes Ulf - Lyn</option>
+    <option>01.11 Lyn - Raufoss</option>
+    <option>08.11 Strømmen - Lyn</option>
+  </select>
+</div>
+
+<div class="box">
+  <label>Navn / forumbruker</label>
+  <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
+  <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
+</div>
+
+<div class="box">
+  <h2>Spillerbørs</h2>
+  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
+  <div class="grid" id="players"></div>
+</div>
+
+<div class="box">
+  <h2>Motstanderens tribuneliv</h2>
+  <p>Hvordan var motstandernes tribuneliv? Helt frivillig. Kun hele tall fra 1 til 10.</p>
+  <input type="number" id="awayFans" min="1" max="10" step="1" placeholder="1–10">
+  <div class="small">For moro skyld.</div>
+</div>
+
+<div class="box">
+  <button onclick="sendVote()">Send inn børs</button>
+</div>
+
+<h2 class="section-title">2. Se børs for valgt kamp</h2>
+
+<div class="box blue">
+  <div class="button-row">
+    <button onclick="loadResults()">Vis kampsnitt</button>
+    <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
+    <button onclick="loadSuperbenVsRest()">superben vs resten</button>
+    <button onclick="location.href='/lynligaen.html'">Lynligaen</button>
+  </div>
+  <div id="results" style="margin-top:16px;"></div>
+</div>
+
+<h2 class="section-title">3. Børsstats</h2>
+
+<div class="box blue">
+  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. Bortefeltet holdes utenfor spillerstats.</p>
+  <div id="statsCenter">
+    <div class="small">Laster stats...</div>
+  </div>
+</div>
+
+<div class="vipps-box">
+  <img src="bilder/vipps.png.png" onerror="this.style.display='none'" alt="Vipps">
+  <div>Scan for å spandere en kaffekapsel</div>
+</div>
+
+</main>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const MY_NAME = "superben";
+const AWAY_FANS_PLAYER = "Bortefeltet";
+
+const matchesData = [
+  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund" },
+  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn" },
+  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf" },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn" },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk" },
+  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn" },
+  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger" },
+  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn" },
+  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen" },
+  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn" },
+  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne" },
+  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn" },
+  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd" },
+  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane" },
+  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn" },
+  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal" },
+  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn" },
+  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd" },
+  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn" },
+  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn" },
+  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund" },
+  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn" },
+  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim" },
+  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn" },
+  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset" },
+  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn" },
+  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss" },
+  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn" },
+  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss" },
+  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn" }
+];
+
+const players = [
+  { name:"Alexander Pedersen", short:"Pedersen", img:"pedersen.png" },
+  { name:"Sander Amble Haugen", short:"SAH", img:"sah.png" },
+  { name:"William Sell", short:"Sell", img:"sell.png" },
+  { name:"Ådne Midtskogen", short:"Midtskogen", img:"midtskogen.png" },
+  { name:"Herman Solberg Nilsen", short:"HSN", img:"hsn.png" },
+  { name:"Isaac Barnett", short:"Barnett", img:"barnett.png" },
+  { name:"Didrik Fredriksen", short:"Fredriksen", img:"fredriksen.png" },
+  { name:"Eron Isufi", short:"Isufi", img:"isufi.png" },
+  { name:"Julius Skaug", short:"Skaug", img:"skaug.png" },
+  { name:"William Kurtovic", short:"Kurtovic", img:"kurtovic.png" },
+  { name:"Isaac Monglo", short:"Monglo", img:"monglo.png" },
+  { name:"William Wæhler", short:"Wæhler", img:"wæhler.png" },
+  { name:"Anders Bjørntvedt Olsen", short:"ABO", img:"abo.png" },
+  { name:"Matias Johansen", short:"MJ", img:"mj.png" },
+  { name:"Andreas Hellum", short:"Hellum", img:"hellum.png" },
+  { name:"Ibrahim Sawaneh", short:"Sawaneh", img:"sawaneh.png" },
+  { name:"Fallou Sock", short:"Sock", img:"sock.png" },
+  { name:"Isak Vik", short:"Vik", img:"vik.png" },
+  { name:"Marcus Andersen", short:"Andersen", img:"andersen.png" },
+  { name:"Mats Trige", short:"Trige", img:"trige.png" },
+  { name:"Magnus Aadland", short:"Aadland", img:"aadland.png" }
+];
+
+const playersDiv = document.getElementById("players");
+
+players.forEach(p => {
+  const img = p.img ? `<img src="bilder/${p.img}" onerror="this.remove()">` : "";
+  playersDiv.innerHTML += `
+    <div class="player">
+      <div class="avatar">${img}</div>
+      <div class="player-short">${p.short}</div>
+      <div class="player-name">${p.name}</div>
+      <input type="number" id="${p.short}" min="1" max="10" step="1" placeholder="-">
+    </div>
+  `;
+});
+
+function cleanVoterName(name) {
+  return (name || "").trim().toLowerCase();
+}
+
+const voterInput = document.getElementById("voter");
+voterInput.value = localStorage.getItem("lynbors_voter") || "";
+voterInput.addEventListener("input", () => {
+  localStorage.setItem("lynbors_voter", voterInput.value.trim());
+});
+
+function isRealMatch(v) {
+  return v.match_id;
+}
+
+function isPlayerVote(v) {
+  return isRealMatch(v) && v.player !== AWAY_FANS_PLAYER;
+}
+
+function isAwayFansVote(v) {
+  return isRealMatch(v) && v.player === AWAY_FANS_PLAYER;
+}
+
+function getMatchIndex(matchId) {
+  const options = Array.from(document.getElementById("match").options).map(o => o.value);
+  return options.indexOf(matchId);
+}
+
+function getMatchData(matchId) {
+  return matchesData.find(m => m.id === matchId) || null;
+}
+
+function setDefaultMatch() {
+  const select = document.getElementById("match");
+  const now = new Date();
+
+  const nextMatch = matchesData
+    .filter(match => new Date(match.date + "T23:59:59") >= now)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+  if (nextMatch) {
+    select.value = nextMatch.id;
+  }
+}
+
+function getOpponentName(matchId) {
+  const match = getMatchData(matchId);
+  if (!match) return "Ukjent";
+  return match.home === "Lyn" ? match.away : match.home;
+}
+
+function validateRating(label, rating) {
+  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    alert(`${label}: karakter må være et helt tall fra 1 til 10.`);
+    return false;
+  }
+  return true;
+}
+
+async function sendVote() {
+  const match = document.getElementById("match").value;
+  const voter = cleanVoterName(document.getElementById("voter").value);
+  const awayFansRaw = document.getElementById("awayFans").value;
+
+  if (!voter) {
+    alert("Skriv inn forumbrukernavnet ditt først.");
+    return;
+  }
+
+  localStorage.setItem("lynbors_voter", document.getElementById("voter").value.trim());
+
+  let rows = [];
+
+  for (const p of players) {
+    const raw = document.getElementById(p.short).value;
+    if (!raw) continue;
+
+    const rating = Number(raw);
+    if (!validateRating(p.short, rating)) return;
+
+    rows.push({
+      match_id: match,
+      voter: voter,
+      player: p.short,
+      rating: rating
+    });
+  }
+
+  if (awayFansRaw) {
+    const awayFansRating = Number(awayFansRaw);
+    if (!validateRating(AWAY_FANS_PLAYER, awayFansRating)) return;
+
+    rows.push({
+      match_id: match,
+      voter: voter,
+      player: AWAY_FANS_PLAYER,
+      rating: awayFansRating
+    });
+  }
+
+  if (rows.length === 0) {
+    alert("Du må gi minst én karakter først.");
+    return;
+  }
+
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
+    {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"resolution=merge-duplicates,return=minimal"
+      },
+      body:JSON.stringify(rows)
+    }
+  );
+
+  if (!response.ok) {
+    alert("Noe gikk feil. Stemmen ble ikke sendt.");
+    return;
+  }
+
+  alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
+
+  players.forEach(p => document.getElementById(p.short).value = "");
+  document.getElementById("awayFans").value = "";
+  loadResults();
+  loadStatsCenter();
+}
+
+async function fetchVotes(query = "") {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes" + query,
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return await response.json();
+}
+
+async function getVotesForSelectedMatch() {
+  const match = document.getElementById("match").value;
+  return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
+}
+
+function buildStats(data) {
+  let stats = {};
+
+  data.forEach(v => {
+    if (!stats[v.player]) stats[v.player] = { total:0, count:0, ratings:[], matches:{} };
+    stats[v.player].total += Number(v.rating);
+    stats[v.player].count += 1;
+    stats[v.player].ratings.push(Number(v.rating));
+
+    if (!stats[v.player].matches[v.match_id]) stats[v.player].matches[v.match_id] = [];
+    stats[v.player].matches[v.match_id].push(Number(v.rating));
+  });
+
+  return Object.keys(stats).map(player => ({
+    player,
+    avg: stats[player].total / stats[player].count,
+    count: stats[player].count,
+    ratings: stats[player].ratings,
+    matches: stats[player].matches
+  })).sort((a,b) => b.avg - a.avg);
+}
+
+function stdDev(values) {
+  if (!values || values.length < 2) return 0;
+  const avg = values.reduce((a,b)=>a+b,0) / values.length;
+  const variance = values.reduce((sum,v)=>sum + Math.pow(v - avg, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function renderMiniRanking(items, limit = 5, showMedals = true) {
+  if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇","🥈","🥉"];
+  let html = "";
+
+  items.slice(0, limit).forEach((r, i) => {
+    const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
+    html += `
+      <div class="result-row">
+        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
+        <div class="result-score">${r.score}</div>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+async function loadResults() {
+  const data = await getVotesForSelectedMatch();
+  const playerVotes = data.filter(isPlayerVote);
+  const awayVotes = data.filter(isAwayFansVote);
+
+  if (playerVotes.length === 0 && awayVotes.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
+    return;
+  }
+
+  let html = "";
+
+  if (playerVotes.length > 0) {
+    const ranking = buildStats(playerVotes);
+    const best = ranking[0];
+    html += `<div class="bb">🔥 Banens beste: ${best.player} med ${best.avg.toFixed(2)}</div>`;
+    html += renderMiniRanking(ranking.map(r => ({
+      player:r.player,
+      score:r.avg.toFixed(2),
+      sub:`${r.count} stemmer`
+    })), 99);
+  }
+
+  if (awayVotes.length > 0) {
+    const away = buildStats(awayVotes)[0];
+    html += `
+      <div class="away-box">
+        🏟️ Bortefeltet: ${away.avg.toFixed(2)}<br>
+        <span class="small">${away.count} stemmer på motstandernes tribuneliv</span>
+      </div>
+    `;
+  }
+
+  document.getElementById("results").innerHTML = html;
+}
+
+async function loadSeasonResults() {
+  const data = (await fetchVotes()).filter(isPlayerVote);
+
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen sesongstemmer enda.</p>";
+    return;
+  }
+
+  const resultList = buildStats(data).filter(r => r.count >= 2);
+
+  if (resultList.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ikke nok stemmer til sesongsnitt enda.</p>";
+    return;
+  }
+
+  const best = resultList[0];
+
+  document.getElementById("results").innerHTML = `
+    <div class="bb">🏆 Sesongtoppen: ${best.player} med ${best.avg.toFixed(2)}</div>
+    ${renderMiniRanking(resultList.map(r => ({
+      player:r.player,
+      score:r.avg.toFixed(2),
+      sub:`${r.count} stemmer`
+    })), 99)}
+  `;
+}
+
+async function loadSuperbenVsRest() {
+  const data = (await getVotesForSelectedMatch()).filter(isPlayerVote);
+
+  if (!data || data.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen spillerstemmer på denne kampen enda.</p>";
+    return;
+  }
+
+  let mine = {};
+  let rest = {};
+
+  data.forEach(v => {
+    const name = cleanVoterName(v.voter);
+    const target = name === MY_NAME ? mine : rest;
+
+    if (!target[v.player]) target[v.player] = { total:0, count:0 };
+
+    target[v.player].total += Number(v.rating);
+    target[v.player].count += 1;
+  });
+
+  let rows = players.map(p => {
+    const myData = mine[p.short];
+    const restData = rest[p.short];
+
+    const myAvg = myData ? myData.total / myData.count : null;
+    const restAvg = restData ? restData.total / restData.count : null;
+    const diff = myAvg !== null && restAvg !== null ? myAvg - restAvg : null;
+
+    return { player:p.short, myAvg, restAvg, diff };
+  }).filter(r => r.myAvg !== null || r.restAvg !== null);
+
+  rows.sort((a,b) => {
+    if (a.diff === null) return 1;
+    if (b.diff === null) return -1;
+    return Math.abs(b.diff) - Math.abs(a.diff);
+  });
+
+  let html = `
+    <div class="bb">🧠 superben vs resten</div>
+    <p class="small">Positive tall betyr at superben er snillere. Negative tall betyr strengere.</p>
+  `;
+
+  rows.forEach(r => {
+    const diffText = r.diff === null ? "–" : (r.diff > 0 ? "+" : "") + r.diff.toFixed(2);
+    const diffClass = r.diff === null ? "" : (r.diff >= 0 ? "diff-plus" : "diff-minus");
+
+    html += `
+      <div class="compare-row">
+        <div><strong>${r.player}</strong></div>
+        <div>superben: ${r.myAvg === null ? "–" : r.myAvg.toFixed(2)}</div>
+        <div>resten: ${r.restAvg === null ? "–" : r.restAvg.toFixed(2)}</div>
+        <div class="${diffClass}">${diffText}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("results").innerHTML = html;
+}
+
+function buildBBCounts(allVotes) {
+  const matches = [...new Set(allVotes.filter(isPlayerVote).map(v => v.match_id))];
+  let counts = {};
+  let margins = [];
+
+  matches.forEach(match => {
+    const matchVotes = allVotes.filter(v => v.match_id === match && isPlayerVote(v));
+    const ranking = buildStats(matchVotes);
+
+    if (ranking.length > 0) {
+      const winner = ranking[0].player;
+      counts[winner] = (counts[winner] || 0) + 1;
+
+      if (ranking.length > 1) {
+        margins.push({
+          player: winner,
+          score: (ranking[0].avg - ranking[1].avg).toFixed(2),
+          raw: ranking[0].avg - ranking[1].avg,
+          sub: match
+        });
+      }
+    }
+  });
+
+  return {
+    counts: Object.keys(counts).map(player => ({
+      player,
+      score: counts[player],
+      sub: "BB"
+    })).sort((a,b) => b.score - a.score),
+    margins: margins.sort((a,b)=>b.raw-a.raw)
+  };
+}
+
+function buildWorstPlayers(allVotes) {
+  return buildStats(allVotes.filter(isPlayerVote))
+    .filter(r => r.count >= 2)
+    .sort((a,b) => a.avg - b.avg)
+    .map(r => ({
+      player:r.player,
+      score:r.avg.toFixed(2),
+      sub:`${r.count} stemmer`
+    }));
+}
+
+function buildTopVoters(allVotes) {
+  let voters = {};
+
+  allVotes.filter(isPlayerVote).forEach(v => {
+    const name = cleanVoterName(v.voter);
+    voters[name] = (voters[name] || 0) + 1;
+  });
+
+  return Object.keys(voters).map(v => ({
+    player:v,
+    score:voters[v],
+    sub:"stemmer"
+  })).sort((a,b)=>b.score-a.score);
+}
+
+function buildUserAverages(allVotes) {
+  let users = {};
+
+  allVotes.filter(isPlayerVote).forEach(v => {
+    const name = cleanVoterName(v.voter);
+    if (!users[name]) users[name] = { total:0, count:0 };
+    users[name].total += Number(v.rating);
+    users[name].count += 1;
+  });
+
+  return Object.keys(users).map(user => ({
+    player:user,
+    avg:users[user].total / users[user].count,
+    count:users[user].count,
+    score:(users[user].total / users[user].count).toFixed(2),
+    sub:`${users[user].count} stemmer`
+  }));
+}
+
+function buildControversial(allVotes) {
+  return buildStats(allVotes.filter(isPlayerVote))
+    .filter(r => r.count >= 3)
+    .map(r => ({
+      player:r.player,
+      score:stdDev(r.ratings).toFixed(2),
+      raw:stdDev(r.ratings),
+      sub:`${r.count} stemmer`
+    }))
+    .sort((a,b) => b.raw - a.raw);
+}
+
+function buildStable(allVotes) {
+  return buildStats(allVotes.filter(isPlayerVote))
+    .filter(r => r.count >= 3)
+    .map(r => ({
+      player:r.player,
+      score:stdDev(r.ratings).toFixed(2),
+      raw:stdDev(r.ratings),
+      sub:`${r.count} stemmer`
+    }))
+    .sort((a,b) => a.raw - b.raw);
+}
+
+function perPlayerMatchAverages(allVotes) {
+  let map = {};
+
+  allVotes.filter(isPlayerVote).forEach(v => {
+    if (!map[v.player]) map[v.player] = {};
+    if (!map[v.player][v.match_id]) map[v.player][v.match_id] = [];
+    map[v.player][v.match_id].push(Number(v.rating));
+  });
+
+  let output = {};
+
+  Object.keys(map).forEach(player => {
+    output[player] = Object.keys(map[player]).map(match => {
+      const ratings = map[player][match];
+      return {
+        match,
+        idx:getMatchIndex(match),
+        avg:ratings.reduce((a,b)=>a+b,0) / ratings.length
+      };
+    }).filter(x => x.idx >= 0).sort((a,b)=>a.idx-b.idx);
+  });
+
+  return output;
+}
+
+function buildFormStats(allVotes) {
+  const byPlayer = perPlayerMatchAverages(allVotes);
+  let rows = [];
+
+  Object.keys(byPlayer).forEach(player => {
+    const arr = byPlayer[player];
+    if (arr.length < 2) return;
+
+    const first = arr.slice(0, Math.min(3, arr.length));
+    const last = arr.slice(-Math.min(3, arr.length));
+
+    const firstAvg = first.reduce((s,x)=>s+x.avg,0) / first.length;
+    const lastAvg = last.reduce((s,x)=>s+x.avg,0) / last.length;
+    const diff = lastAvg - firstAvg;
+
+    rows.push({
+      player,
+      score:(diff > 0 ? "+" : "") + diff.toFixed(2),
+      raw:diff,
+      sub:`før ${firstAvg.toFixed(2)} → nå ${lastAvg.toFixed(2)}`
+    });
+  });
+
+  return {
+    up:[...rows].sort((a,b)=>b.raw-a.raw),
+    down:[...rows].sort((a,b)=>a.raw-b.raw)
+  };
+}
+
+function buildAwayFansStats(allVotes) {
+  let teams = {};
+
+  allVotes.filter(isAwayFansVote).forEach(v => {
+    const opponent = getOpponentName(v.match_id);
+    if (!teams[opponent]) teams[opponent] = { total:0, count:0 };
+    teams[opponent].total += Number(v.rating);
+    teams[opponent].count += 1;
+  });
+
+  return Object.keys(teams).map(team => ({
+    player:team,
+    score:(teams[team].total / teams[team].count).toFixed(2),
+    raw:teams[team].total / teams[team].count,
+    sub:`${teams[team].count} stemmer`
+  })).sort((a,b)=>b.raw-a.raw);
+}
+
+async function loadStatsCenter() {
+  const allVotes = await fetchVotes();
+  const realVotes = allVotes.filter(isPlayerVote);
+  const box = document.getElementById("statsCenter");
+
+  if (!realVotes || realVotes.length === 0) {
+    box.innerHTML = `<div class="warning">Ingen ekte spillerstemmer enda.</div>`;
+    return;
+  }
+
+  const season = buildStats(realVotes).filter(r => r.count >= 2);
+  const seasonItems = season.map(r => ({
+    player:r.player,
+    score:r.avg.toFixed(2),
+    sub:`${r.count} stemmer`
+  }));
+
+  const totalVotes = realVotes.length;
+  const uniqueMatches = new Set(realVotes.map(v => v.match_id)).size;
+  const uniqueVoters = new Set(realVotes.map(v => cleanVoterName(v.voter))).size;
+
+  const bb = buildBBCounts(realVotes);
+  const controversial = buildControversial(realVotes);
+  const stable = buildStable(realVotes);
+  const worstPlayers = buildWorstPlayers(realVotes);
+  const topVoters = buildTopVoters(realVotes);
+  const userAvgs = buildUserAverages(realVotes).filter(u=>u.count >= 5);
+  const strictest = [...userAvgs].sort((a,b)=>a.avg-b.avg);
+  const kindest = [...userAvgs].sort((a,b)=>b.avg-a.avg);
+  const form = buildFormStats(realVotes);
+  const awayFansStats = buildAwayFansStats(allVotes);
+
+  box.innerHTML = `
+    <div class="hero-stat">
+      <h3>Sesongstatus</h3>
+      <div class="big">${totalVotes} spillerstemmer</div>
+      <div>${uniqueMatches} kamper · ${uniqueVoters} brukere</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>🏆 Sesongtoppen</h3>
+        ${renderMiniRanking(seasonItems, 8)}
+      </div>
+
+      <div class="stat-card">
+        <h3>😬 Skjerpings</h3>
+        <div class="small">Lavest snitt denne sesongen.</div>
+        ${renderMiniRanking(worstPlayers, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>👑 Flest BB</h3>
+        ${renderMiniRanking(bb.counts, 8)}
+      </div>
+
+      <div class="stat-card">
+        <h3>💪 Størst BB-margin</h3>
+        <div class="small">Hvor klart BB vant en kamp.</div>
+        ${renderMiniRanking(bb.margins, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>📈 Formkonge</h3>
+        <div class="small">Størst positiv utvikling.</div>
+        ${renderMiniRanking(form.up, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>📉 Formsvikt</h3>
+        <div class="small">Størst negativ utvikling.</div>
+        ${renderMiniRanking(form.down, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🤯 Mest uenighet</h3>
+        <div class="small">Basert på variasjon i karakterene.</div>
+        ${renderMiniRanking(controversial, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🧱 Mest stabil</h3>
+        <div class="small">Lavest variasjon.</div>
+        ${renderMiniRanking(stable, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🏅 Topp bidragsytere</h3>
+        <div class="small">Hvem stemmer mest.</div>
+        ${renderMiniRanking(topVoters, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>😇 Snilleste brukere</h3>
+        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>😈 Strengeste brukere</h3>
+        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🏟️ Beste motstanderfans</h3>
+        ${renderMiniRanking(awayFansStats, 8, false)}
+      </div>
+    </div>
+  `;
+}
+
+setDefaultMatch();
+loadStatsCenter();
+</script>
+
+<script defer src="/_vercel/analytics/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tippetips</title>
+<link rel="icon" href="lblogoen.png">
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+  --paper:#f4ead8;
+  --paper2:#fff8e8;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --line:#d8c8aa;
+  --green:#027a48;
+  --darkred:#b42318;
+  --stamp:#b51218;
+}
+
+body {
+  margin:0;
+  font-family:"Courier New", Courier, monospace;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.09), transparent 28%),
+    linear-gradient(180deg, #f7eedc, #efe2ca);
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(19,41,75,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19,41,75,0.035) 1px, transparent 1px);
+  background-size:22px 22px;
+  pointer-events:none;
+  z-index:-1;
+}
+
+.menu-btn {
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:9999;
+  width:auto;
+  padding:10px 15px;
+  border:none;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.22);
+}
+
+header {
+  text-align:center;
+  padding:55px 20px 30px;
+}
+
+.coupon-hero {
+  max-width:900px;
+  margin:0 auto;
+  background:var(--paper2);
+  border:2px dashed var(--blue);
+  border-radius:18px;
+  padding:26px 20px;
+  position:relative;
+  box-shadow:0 14px 35px rgba(19,41,75,0.16);
+}
+
+.coupon-hero::before,
+.coupon-hero::after {
+  content:"";
+  position:absolute;
+  top:50%;
+  width:28px;
+  height:28px;
+  background:#f7eedc;
+  border-radius:50%;
+  transform:translateY(-50%);
+  border:2px solid var(--blue);
+}
+
+.coupon-hero::before { left:-16px; }
+.coupon-hero::after { right:-16px; }
+
+.logo-wrap {
+  width:120px;
+  margin:0 auto 12px;
+}
+
+.logo-wrap img {
+  width:100%;
+  height:auto;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,0.22));
+}
+
+.ticket-label {
+  display:inline-block;
+  border:2px solid var(--stamp);
+  color:var(--stamp);
+  padding:6px 12px;
+  transform:rotate(-2deg);
+  font-weight:bold;
+  letter-spacing:1px;
+  margin-bottom:10px;
+  background:rgba(255,255,255,0.45);
+}
+
+h1 {
+  margin:8px 0 5px;
+  font-size:42px;
+  color:var(--blue);
+  letter-spacing:1px;
+}
+
+header p {
+  margin:0 auto;
+  max-width:620px;
+  color:#374151;
+  font-family:Arial, sans-serif;
+}
+
+main {
+  max-width:1000px;
+  margin:auto;
+  padding:15px 15px 60px;
+}
+
+.section-title {
+  color:var(--blue);
+  margin:34px 0 12px;
+  font-size:25px;
+  letter-spacing:0.5px;
+}
+
+.section-title::after {
+  content:"";
+  display:block;
+  width:90px;
+  height:4px;
+  background:var(--red);
+  border-radius:999px;
+  margin-top:8px;
+}
+
+.box {
+  background:rgba(255,248,232,0.96);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
+  border:2px solid var(--line);
+  box-shadow:0 8px 20px rgba(19,41,75,0.08);
+  position:relative;
+}
+
+.box.blue {
+  border-color:var(--blue);
+  background:linear-gradient(180deg, #fff8e8, #eef5ff);
+}
+
+.notice {
+  background:#fff4cc;
+  border:2px dashed #d6a200;
+  color:#7a4b00;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  font-weight:bold;
+}
+
+label {
+  display:block;
+  color:var(--blue);
+  font-weight:bold;
+}
+
+select, input {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:2px solid #d8c8aa;
+  margin-top:7px;
+  box-sizing:border-box;
+  font-size:16px;
+  background:#fffdf7;
+  font-family:"Courier New", Courier, monospace;
+}
+
+button {
+  background:var(--blue);
+  color:white;
+  border:none;
+  padding:14px;
+  border-radius:12px;
+  width:100%;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:16px;
+  font-family:"Courier New", Courier, monospace;
+  box-shadow:0 4px 12px rgba(19,41,75,0.2);
+}
+
+button:hover {
+  background:#0d1d36;
+}
+
+.coupon-list {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:16px;
+}
+
+.match-coupon {
+  background:#fffdf7;
+  border:2px dashed var(--blue);
+  border-radius:18px;
+  padding:16px;
+  position:relative;
+  box-shadow:0 5px 14px rgba(19,41,75,0.08);
+}
+
+.match-coupon::after {
+  content:"KUPONG";
+  position:absolute;
+  right:12px;
+  top:10px;
+  color:rgba(215,25,32,0.16);
+  font-weight:bold;
+  transform:rotate(8deg);
+}
+
+.coupon-top {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:start;
+  margin-bottom:12px;
+}
+
+.coupon-title {
+  color:var(--blue);
+  font-weight:bold;
+  font-size:18px;
+}
+
+.coupon-number {
+  color:var(--red);
+  font-weight:bold;
+  border:2px solid var(--red);
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:13px;
+  background:white;
+}
+
+.score-entry {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:12px;
+  align-items:end;
+  background:#13294b;
+  color:white;
+  border-radius:16px;
+  padding:14px;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,0.12);
+}
+
+.score-entry input {
+  font-size:34px;
+  text-align:center;
+  font-weight:bold;
+  padding:12px 8px;
+  border-radius:14px;
+  border:3px solid rgba(255,255,255,0.3);
+  background:#fffdf7;
+  color:var(--blue);
+}
+
+.score-entry label {
+  color:white;
+  font-size:13px;
+  min-height:30px;
+}
+
+.score-dash {
+  font-size:38px;
+  font-weight:bold;
+  padding-bottom:10px;
+  color:#fff;
+}
+
+.button-row {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+@media (min-width:700px) {
+  .button-row {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.prediction-row, .result-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px dashed #c9b894;
+  align-items:center;
+}
+
+.prediction-row {
+  grid-template-columns:1fr auto auto;
+}
+
+.prediction-score, .result-score {
+  font-weight:bold;
+  color:var(--blue);
+  font-size:18px;
+}
+
+.hero-stat {
+  background:linear-gradient(135deg, #13294b, #d71920);
+  color:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(19,41,75,0.16);
+}
+
+.hero-stat h3 {
+  margin:0 0 5px;
+}
+
+.hero-stat .big {
+  font-size:30px;
+  font-weight:bold;
+}
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:850px) {
+  .stats-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.stat-card {
+  border-radius:16px;
+  padding:15px;
+  border:2px solid #e5d4b5;
+  box-shadow:0 4px 12px rgba(19,41,75,0.06);
+  background:#fffdf7;
+}
+
+.stat-card:nth-child(1) { background:#eff6ff; border-color:#bfdbfe; }
+.stat-card:nth-child(2) { background:#fff1f2; border-color:#fecdd3; }
+.stat-card:nth-child(3) { background:#fffbeb; border-color:#fde68a; }
+.stat-card:nth-child(4) { background:#f0fdf4; border-color:#bbf7d0; }
+
+.bb {
+  background:#fff1f2;
+  border:2px dashed #fecdd3;
+  color:#b51218;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+  font-weight:bold;
+}
+
+.people-box {
+  background:#fffdf7;
+  border:2px dashed var(--blue);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.bar-row {
+  display:grid;
+  grid-template-columns:95px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin:10px 0;
+}
+
+.bar {
+  height:16px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.bar-fill {
+  height:100%;
+  background:var(--red);
+  border-radius:999px;
+}
+
+.medal {
+  font-size:18px;
+  margin-right:5px;
+}
+
+.small {
+  color:var(--muted);
+  font-size:13px;
+  font-family:Arial, sans-serif;
+}
+
+.warning {
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
+
+@media (max-width:620px) {
+  .menu-btn {
+    position:static;
+    margin:14px 0 0 14px;
+  }
+
+  header {
+    padding-top:24px;
+  }
+
+  h1 {
+    font-size:34px;
+  }
+
+  .score-entry {
+    grid-template-columns:1fr auto 1fr;
+    gap:8px;
+    padding:12px;
+  }
+
+  .score-entry input {
+    font-size:30px;
+  }
+
+  .score-dash {
+    font-size:32px;
+  }
+
+  .prediction-row {
+    grid-template-columns:1fr auto;
+  }
+
+  .prediction-row div:last-child {
+    grid-column:1 / -1;
+    text-align:right;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
+<header>
+  <div class="coupon-hero">
+    <div class="logo-wrap">
+      <img src="lblogoen.png" alt="Lynbørs-logo">
+    </div>
+    <div class="ticket-label">KAMPKUPONG</div>
+    <h1>Tippetips</h1>
+    <p>Tippekonkurransen for folk som egentlig vet bedre etter kampen.</p>
+  </div>
+</header>
+
+<main>
+
+<h2 class="section-title">1. Lever kupong</h2>
+
+<div class="box">
+  <div class="notice">
+    Du kan levere tips for én, to eller tre kamper samtidig. Tomme kuponger lagres ikke.
+  </div>
+
+  <label>Navn / forumbruker</label>
+  <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
+  <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
+
+  <div id="couponList" class="coupon-list"></div>
+
+  <div style="margin-top:14px;">
+    <button onclick="sendTips()">Lever kupong</button>
+  </div>
+</div>
+
+<h2 class="section-title">2. Tips for valgt kamp</h2>
+
+<div class="box blue">
+  <label>Velg kamp å se tips for</label>
+  <select id="resultMatch"></select>
+
+  <div class="button-row" style="margin-top:12px;">
+    <button onclick="loadMatchPredictions()">Vis tips for valgt kamp</button>
+    <button onclick="loadPredictionLeaderboard()">Vis tippetabell</button>
+  </div>
+
+  <div id="results" style="margin-top:16px;"></div>
+</div>
+
+<h2 class="section-title">3. Tippestatistikk</h2>
+
+<div class="box blue">
+  <div id="tipStats">
+    <div class="small">Laster tippestatistikk...</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+let openCouponMatches = [];
+
+const matchesData = [
+  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
+  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
+  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
+  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
+  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
+  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
+  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00", actual:null },
+  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00", actual:null },
+  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00", actual:null },
+  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00", actual:null },
+  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00", actual:null },
+  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00", actual:null },
+  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00", actual:null },
+  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00", actual:null },
+  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00", actual:null },
+  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00", actual:null },
+  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00", actual:null },
+  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00", actual:null },
+  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00", actual:null },
+  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00", actual:null },
+  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00", actual:null },
+  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00", actual:null },
+  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00", actual:null },
+  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00", actual:null },
+  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00", actual:null },
+  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00", actual:null },
+  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00", actual:null },
+  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00", actual:null }
+];
+
+function cleanVoterName(name) {
+  return (name || "").trim().toLowerCase();
+}
+
+const voterInput = document.getElementById("voter");
+voterInput.value = localStorage.getItem("lynbors_voter") || "";
+voterInput.addEventListener("input", () => {
+  localStorage.setItem("lynbors_voter", voterInput.value.trim());
+});
+
+function isRealMatch(v) {
+  return v.match_id && v.match_id !== "TEST";
+}
+
+function isPredictionVote(v) {
+  return isRealMatch(v) && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
+}
+
+function getMatchData(matchId) {
+  return matchesData.find(m => m.id === matchId) || null;
+}
+
+function isTipLocked(matchData) {
+  if (!matchData || !matchData.deadline) return true;
+  return new Date() > new Date(matchData.deadline);
+}
+
+function formatDate(dateString) {
+  const d = new Date(dateString + "T12:00:00");
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
+
+function formatDeadline(deadline) {
+  const d = new Date(deadline);
+  return d.toLocaleString("no-NO", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+}
+
+function getNextTipMatches(limit = 3) {
+  return matchesData
+    .filter(m => !isTipLocked(m))
+    .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
+    .slice(0, limit);
+}
+
+function renderCoupons() {
+  openCouponMatches = getNextTipMatches(3);
+  const box = document.getElementById("couponList");
+
+  if (openCouponMatches.length === 0) {
+    box.innerHTML = `<div class="warning">Ingen åpne kamper å tippe på akkurat nå.</div>`;
+    return;
+  }
+
+  box.innerHTML = openCouponMatches.map((m, i) => `
+    <div class="match-coupon">
+      <div class="coupon-top">
+        <div>
+          <div class="coupon-title">${m.home} - ${m.away}</div>
+          <div class="small">${formatDate(m.date)} · Frist: ${formatDeadline(m.deadline)}</div>
+        </div>
+        <div class="coupon-number">#${i + 1}</div>
+      </div>
+
+      <div class="score-entry">
+        <div>
+          <label>${m.home}</label>
+          <input type="number" min="0" max="9" step="1" placeholder="0" data-match="${m.id}" data-side="home">
+        </div>
+
+        <div class="score-dash">–</div>
+
+        <div>
+          <label>${m.away}</label>
+          <input type="number" min="0" max="9" step="1" placeholder="0" data-match="${m.id}" data-side="away">
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderResultMatchSelect() {
+  const select = document.getElementById("resultMatch");
+
+  select.innerHTML = matchesData
+    .map(m => `<option value="${m.id}">${formatDate(m.date)} · ${m.home} - ${m.away}</option>`)
+    .join("");
+
+  if (openCouponMatches[0]) {
+    select.value = openCouponMatches[0].id;
+  }
+}
+
+function encodeGoals(goals) {
+  return goals + 1;
+}
+
+function decodeGoals(value) {
+  return Number(value) - 1;
+}
+
+function getOutcome(home, away) {
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
+
+function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
+  if (tipHome === actualHome && tipAway === actualAway) return 3;
+  if (getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway)) return 1;
+  return 0;
+}
+
+function validateTip(label, value) {
+  if (!Number.isInteger(value) || value < 0 || value > 9) {
+    alert(`${label}: tips må være et helt tall fra 0 til 9.`);
+    return false;
+  }
+  return true;
+}
+
+async function sendTips() {
+  const voter = cleanVoterName(document.getElementById("voter").value);
+
+  if (!voter) {
+    alert("Skriv inn forumbrukernavnet ditt først.");
+    return;
+  }
+
+  localStorage.setItem("lynbors_voter", document.getElementById("voter").value.trim());
+
+  let rows = [];
+  let savedMatches = [];
+
+  for (const match of openCouponMatches) {
+    const homeInput = document.querySelector(`input[data-match="${match.id}"][data-side="home"]`);
+    const awayInput = document.querySelector(`input[data-match="${match.id}"][data-side="away"]`);
+
+    const homeRaw = homeInput ? homeInput.value : "";
+    const awayRaw = awayInput ? awayInput.value : "";
+
+    if (!homeRaw && !awayRaw) continue;
+
+    if (!homeRaw || !awayRaw) {
+      alert(`Du må fylle inn både hjemme og borte for ${match.home} - ${match.away}.`);
+      return;
+    }
+
+    if (isTipLocked(match)) {
+      alert(`Fristen for ${match.home} - ${match.away} er passert.`);
+      return;
+    }
+
+    const home = Number(homeRaw);
+    const away = Number(awayRaw);
+
+    if (!validateTip(`${match.home}`, home) || !validateTip(`${match.away}`, away)) return;
+
+    rows.push(
+      {
+        match_id: match.id,
+        voter: voter,
+        player: TIP_HOME_PLAYER,
+        rating: encodeGoals(home)
+      },
+      {
+        match_id: match.id,
+        voter: voter,
+        player: TIP_AWAY_PLAYER,
+        rating: encodeGoals(away)
+      }
+    );
+
+    savedMatches.push(match.id);
+  }
+
+  if (rows.length === 0) {
+    alert("Fyll inn minst én kupong først.");
+    return;
+  }
+
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
+    {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"resolution=merge-duplicates,return=minimal"
+      },
+      body:JSON.stringify(rows)
+    }
+  );
+
+  if (!response.ok) {
+    alert("Noe gikk feil. Kupongen ble ikke sendt.");
+    return;
+  }
+
+  alert(`${savedMatches.length} kupong${savedMatches.length === 1 ? "" : "er"} levert! Gamle tips på samme kamp ble oppdatert.`);
+
+  document.querySelectorAll("#couponList input").forEach(input => input.value = "");
+
+  if (savedMatches[0]) {
+    document.getElementById("resultMatch").value = savedMatches[0];
+  }
+
+  loadMatchPredictions();
+  loadPredictionLeaderboard();
+  loadTipStats();
+}
+
+async function fetchVotes(query = "") {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes" + query,
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return await response.json();
+}
+
+async function getVotesForSelectedMatch() {
+  const match = document.getElementById("resultMatch").value;
+  return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
+}
+
+function buildPredictions(votes) {
+  let map = {};
+
+  votes.filter(isPredictionVote).forEach(v => {
+    const voter = cleanVoterName(v.voter);
+    const key = `${v.match_id}|||${voter}`;
+
+    if (!map[key]) {
+      map[key] = {
+        match_id:v.match_id,
+        voter,
+        home:null,
+        away:null
+      };
+    }
+
+    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+  });
+
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
+
+function renderPeoplePrediction(predictions) {
+  if (!predictions || predictions.length === 0) return "";
+
+  const resultCounts = {};
+  let homeTotal = 0;
+  let awayTotal = 0;
+  let homeWins = 0;
+  let draws = 0;
+  let awayWins = 0;
+
+  predictions.forEach(p => {
+    const result = `${p.home}-${p.away}`;
+    resultCounts[result] = (resultCounts[result] || 0) + 1;
+
+    homeTotal += p.home;
+    awayTotal += p.away;
+
+    const outcome = getOutcome(p.home, p.away);
+    if (outcome === "H") homeWins += 1;
+    if (outcome === "U") draws += 1;
+    if (outcome === "B") awayWins += 1;
+  });
+
+  const total = predictions.length;
+  const mostCommon = Object.entries(resultCounts).sort((a,b) => b[1] - a[1])[0];
+
+  const bars = [
+    { label:"Hjemme", value:homeWins },
+    { label:"Uavgjort", value:draws },
+    { label:"Borte", value:awayWins }
+  ];
+
+  return `
+    <div class="people-box">
+      <strong>Folkets kupong</strong><br>
+      <span class="small">
+        Mest tippet resultat: ${mostCommon[0]} · Snittips: ${(homeTotal / total).toFixed(1)}-${(awayTotal / total).toFixed(1)}
+      </span>
+
+      ${bars.map(row => {
+        const percent = total ? Math.round((row.value / total) * 100) : 0;
+
+        return `
+          <div class="bar-row">
+            <div>${row.label}</div>
+            <div class="bar"><div class="bar-fill" style="width:${percent}%"></div></div>
+            <div>${percent}%</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+async function loadMatchPredictions() {
+  const match = document.getElementById("resultMatch").value;
+
+  if (!match) {
+    document.getElementById("results").innerHTML = "<p>Ingen kamp valgt.</p>";
+    return;
+  }
+
+  const data = await getVotesForSelectedMatch();
+  const predictions = buildPredictions(data).sort((a,b) => a.voter.localeCompare(b.voter));
+  const matchData = getMatchData(match);
+  const actual = matchData ? matchData.actual : null;
+
+  if (!predictions || predictions.length === 0) {
+    document.getElementById("results").innerHTML = "<p>Ingen tips på denne kampen enda.</p>";
+    return;
+  }
+
+  let html = `
+    <div class="bb">Kuponger for ${match}</div>
+    <p class="small">
+      ${matchData ? `${matchData.home} - ${matchData.away}` : ""}
+      ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
+    </p>
+
+    ${renderPeoplePrediction(predictions)}
+  `;
+
+  predictions.forEach(p => {
+    const points = actual ? scorePrediction(p.home, p.away, actual.home, actual.away) : null;
+
+    html += `
+      <div class="prediction-row">
+        <div><strong>${p.voter}</strong></div>
+        <div class="prediction-score">${p.home}-${p.away}</div>
+        <div>${points === null ? "venter" : points + " p"}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("results").innerHTML = html;
+}
+
+function buildPredictionLeaderboardRows(allVotes) {
+  const predictions = buildPredictions(allVotes);
+  let users = {};
+
+  predictions.forEach(p => {
+    const matchData = getMatchData(p.match_id);
+    const actual = matchData ? matchData.actual : null;
+
+    if (!actual) return;
+
+    const points = scorePrediction(p.home, p.away, actual.home, actual.away);
+
+    if (!users[p.voter]) {
+      users[p.voter] = {
+        points:0,
+        correct:0,
+        outcomes:0,
+        zeroes:0,
+        tips:0
+      };
+    }
+
+    users[p.voter].points += points;
+    users[p.voter].tips += 1;
+
+    if (points === 3) users[p.voter].correct += 1;
+    if (points === 1) users[p.voter].outcomes += 1;
+    if (points === 0) users[p.voter].zeroes += 1;
+  });
+
+  return Object.keys(users).map(user => ({
+    player:user,
+    score:users[user].points + " p",
+    raw:users[user].points,
+    correct:users[user].correct,
+    outcomes:users[user].outcomes,
+    zeroes:users[user].zeroes,
+    tips:users[user].tips,
+    sub:`${users[user].correct} helt riktige · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
+  })).sort((a,b) =>
+    b.raw - a.raw ||
+    b.correct - a.correct ||
+    b.outcomes - a.outcomes ||
+    a.player.localeCompare(b.player)
+  );
+}
+
+function buildMostAccuratePredictors(allVotes) {
+  return buildPredictionLeaderboardRows(allVotes)
+    .filter(r => r.correct > 0)
+    .sort((a,b) =>
+      b.correct - a.correct ||
+      b.raw - a.raw ||
+      a.player.localeCompare(b.player)
+    )
+    .map(r => ({
+      player:r.player,
+      score:r.correct,
+      sub:`${r.raw} poeng · ${r.tips} tips`
+    }));
+}
+
+function renderMiniRanking(items, limit = 5, showMedals = true) {
+  if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇","🥈","🥉"];
+  let html = "";
+
+  items.slice(0, limit).forEach((r, i) => {
+    const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
+
+    html += `
+      <div class="result-row">
+        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
+        <div class="result-score">${r.score}</div>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+async function loadPredictionLeaderboard() {
+  const allVotes = await fetchVotes();
+  const rows = buildPredictionLeaderboardRows(allVotes);
+
+  if (rows.length === 0) {
+    document.getElementById("results").innerHTML =
+      "<p>Ingen tippetabell enda. Resultater må legges inn i koden først.</p>";
+    return;
+  }
+
+  document.getElementById("results").innerHTML = `
+    <div class="bb">Tippetabell</div>
+    ${renderMiniRanking(rows, 99)}
+  `;
+}
+
+async function loadTipStats() {
+  const allVotes = await fetchVotes();
+  const predictionVotes = allVotes.filter(isPredictionVote);
+  const predictions = buildPredictions(predictionVotes);
+  const leaderboard = buildPredictionLeaderboardRows(allVotes);
+  const accurate = buildMostAccuratePredictors(allVotes);
+
+  const totalTips = predictions.length;
+  const uniqueUsers = new Set(predictions.map(p => p.voter)).size;
+  const finishedMatches = matchesData.filter(m => m.actual).length;
+
+  const mostActive = {};
+  predictions.forEach(p => {
+    mostActive[p.voter] = (mostActive[p.voter] || 0) + 1;
+  });
+
+  const mostActiveRows = Object.keys(mostActive).map(user => ({
+    player:user,
+    score:mostActive[user],
+    sub:"kuponger levert"
+  })).sort((a,b) => b.score - a.score);
+
+  document.getElementById("tipStats").innerHTML = `
+    <div class="hero-stat">
+      <h3>Kupongstatus</h3>
+      <div class="big">${totalTips} tips</div>
+      <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Tippetabellen</h3>
+        ${renderMiniRanking(leaderboard, 8)}
+      </div>
+
+      <div class="stat-card">
+        <h3>Treffsikre typer</h3>
+        <div class="small">Flest helt riktige resultater.</div>
+        ${renderMiniRanking(accurate, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>Mest aktive tippere</h3>
+        ${renderMiniRanking(mostActiveRows, 8, false)}
+      </div>
+
+      <div class="stat-card">
+        <h3>Poengsystem</h3>
+        <div class="result-row">
+          <div><strong>Helt riktig resultat</strong><br><span class="small">For eksempel 2-1 og kampen ender 2-1</span></div>
+          <div class="result-score">3 p</div>
+        </div>
+        <div class="result-row">
+          <div><strong>Riktig utfall</strong><br><span class="small">Riktig vinner eller riktig uavgjort</span></div>
+          <div class="result-score">1 p</div>
+        </div>
+        <div class="result-row">
+          <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
+          <div class="result-score">0 p</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+renderCoupons();
+renderResultMatchSelect();
+loadTipStats();
+</script>
+
+<script defer src="/_vercel/analytics/script.js"></script>
+
+</body>
+</html>

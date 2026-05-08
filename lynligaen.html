@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lyn Central</title>
+<link rel="icon" href="lblogoen.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+  --gold:#ffd166;
+  --green:#28d17c;
+  --dark:#050814;
+  --panel:rgba(8,15,32,0.82);
+  --glass:rgba(255,255,255,0.1);
+  --line:rgba(255,255,255,0.18);
+  --muted:rgba(255,255,255,0.72);
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  color:white;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.28), transparent 30%),
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 24%),
+    rgba(3,7,18,0.82);
+  z-index:-1;
+}
+
+.menu-btn {
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:9999;
+  padding:10px 15px;
+  border:none;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  width:auto;
+}
+
+header {
+  text-align:center;
+  padding:56px 20px 30px;
+}
+
+.logo-wrap {
+  width:170px;
+  margin:0 auto 12px;
+}
+
+.logo-wrap img {
+  width:100%;
+  filter:drop-shadow(0 10px 25px rgba(0,0,0,0.55));
+}
+
+.kicker {
+  display:inline-block;
+  border:1px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.1);
+  border-radius:999px;
+  padding:7px 13px;
+  font-size:13px;
+  font-weight:bold;
+  letter-spacing:0.4px;
+}
+
+h1 {
+  margin:14px 0 6px;
+  font-size:44px;
+}
+
+header p {
+  margin:0 auto;
+  max-width:720px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+main {
+  max-width:1150px;
+  margin:auto;
+  padding:15px 16px 70px;
+}
+
+.section-title {
+  margin:34px 0 12px;
+  font-size:27px;
+}
+
+.box {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 12px 35px rgba(0,0,0,0.35);
+  backdrop-filter:blur(8px);
+}
+
+.hero-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:800px) {
+  .hero-grid {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.hero-stat {
+  background:linear-gradient(135deg, rgba(215,25,32,0.35), rgba(19,41,75,0.88));
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:20px;
+  padding:16px;
+}
+
+.hero-stat h3 {
+  margin:0 0 8px;
+  font-size:15px;
+  color:var(--muted);
+}
+
+.hero-stat .big {
+  font-size:32px;
+  font-weight:bold;
+}
+
+.explain-box {
+  margin-top:16px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:20px;
+  padding:18px;
+  line-height:1.7;
+}
+
+.podium {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:10px;
+}
+
+@media (min-width:850px) {
+  .podium {
+    grid-template-columns:1fr 1.15fr 1fr;
+    align-items:end;
+  }
+
+  .podium-card.first {
+    transform:translateY(-10px);
+  }
+}
+
+.podium-card {
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+}
+
+.podium-card.first {
+  border-color:rgba(255,209,102,0.9);
+  box-shadow:0 0 30px rgba(255,209,102,0.16);
+  background:
+    linear-gradient(135deg, rgba(255,209,102,0.17), rgba(215,25,32,0.16)),
+    rgba(255,255,255,0.1);
+}
+
+.medal-big {
+  font-size:36px;
+}
+
+.podium-name {
+  margin-top:6px;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.podium-score {
+  margin-top:8px;
+  font-size:38px;
+  font-weight:bold;
+}
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:850px) {
+  .stats-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.stat-card {
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+}
+
+.stat-card h3 {
+  margin-top:0;
+}
+
+.result-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.14);
+}
+
+.result-score {
+  font-weight:bold;
+  font-size:19px;
+  color:var(--gold);
+}
+
+.small {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.table-wrap {
+  overflow-x:auto;
+}
+
+.league-table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  min-width:680px;
+}
+
+.league-table th,
+.league-table td {
+  padding:11px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.14);
+  text-align:left;
+}
+
+.league-table th {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.league-table th:last-child,
+.league-table td:last-child {
+  text-align:right;
+  font-weight:bold;
+}
+
+.badge {
+  display:inline-block;
+  border-radius:999px;
+  padding:4px 9px;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:4px;
+}
+
+.badge.gold {
+  background:rgba(255,209,102,0.18);
+  border:1px solid rgba(255,209,102,0.7);
+  color:#ffe29a;
+}
+
+.badge.blue {
+  background:rgba(96,165,250,0.18);
+  border:1px solid rgba(96,165,250,0.65);
+  color:#bfdbfe;
+}
+
+.warning {
+  background:rgba(255,247,237,0.12);
+  border:1px solid rgba(253,186,116,0.45);
+  color:#fed7aa;
+  padding:12px;
+  border-radius:14px;
+}
+
+.ticker {
+  overflow:hidden;
+  white-space:nowrap;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:10px 0;
+  margin-top:18px;
+}
+
+.ticker span {
+  display:inline-block;
+  padding-left:100%;
+  animation:ticker 24s linear infinite;
+}
+
+@keyframes ticker {
+  0% { transform:translateX(0); }
+  100% { transform:translateX(-100%); }
+}
+
+@media (max-width:620px) {
+  .menu-btn {
+    position:static;
+    margin:14px 0 0 14px;
+  }
+
+  header {
+    padding-top:24px;
+  }
+
+  h1 {
+    font-size:36px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
+<header>
+  <div class="logo-wrap">
+    <img src="lblogoen.png" alt="Lynbørs-logo">
+  </div>
+  <div class="kicker">LYN CENTRAL</div>
+  <h1>Lynligaen</h1>
+  <p>Sammenlagttabellen for Tippetips og Lyn Fantasy. Her kårer vi den ultimate Lynbørs-nerden.</p>
+</header>
+
+<main>
+
+<div class="box">
+  <div id="overview">
+    <div class="small">Laster Lynligaen...</div>
+  </div>
+</div>
+
+<div class="box">
+  <h2 class="section-title">🏆 Total liga</h2>
+  <div id="leagueTable">
+    <div class="small">Laster tabell...</div>
+  </div>
+</div>
+
+<div class="box">
+  <h2 class="section-title">📺 Central Awards</h2>
+  <div id="awards">
+    <div class="small">Laster awards...</div>
+  </div>
+</div>
+
+<div class="box">
+  <h2 class="section-title">📊 Runder</h2>
+  <div id="rounds">
+    <div class="small">Laster runder...</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+  const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const AWAY_FANS_PLAYER = "Bortefeltet";
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+const matchesData = [
+  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
+  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
+  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
+  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
+  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
+  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
+  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00", actual:null },
+  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00", actual:null },
+  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00", actual:null },
+  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00", actual:null },
+  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00", actual:null },
+  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00", actual:null },
+  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00", actual:null },
+  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00", actual:null },
+  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00", actual:null },
+  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00", actual:null },
+  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00", actual:null },
+  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00", actual:null },
+  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00", actual:null },
+  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00", actual:null },
+  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00", actual:null },
+  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00", actual:null },
+  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00", actual:null },
+  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00", actual:null },
+  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00", actual:null },
+  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00", actual:null },
+  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00", actual:null },
+  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00", actual:null }
+];
+
+const players = [
+  { name:"Alexander Pedersen", short:"Pedersen", position:"KEEPER" },
+  { name:"Sander Amble Haugen", short:"SAH", position:"FORS" },
+  { name:"William Sell", short:"Sell", position:"FORS" },
+  { name:"Ådne Midtskogen", short:"Midtskogen", position:"FORS" },
+  { name:"Herman Solberg Nilsen", short:"HSN", position:"FORS" },
+  { name:"Isaac Barnett", short:"Barnett", position:"FORS" },
+  { name:"Didrik Fredriksen", short:"Fredriksen", position:"MID" },
+  { name:"Eron Isufi", short:"Isufi", position:"MID" },
+  { name:"Julius Skaug", short:"Skaug", position:"MID" },
+  { name:"William Kurtovic", short:"Kurtovic", position:"MID" },
+  { name:"Isaac Monglo", short:"Monglo", position:"MID" },
+  { name:"William Wæhler", short:"Wæhler", position:"MID" },
+  { name:"Anders Bjørntvedt Olsen", short:"ABO", position:"ANG" },
+  { name:"Matias Johansen", short:"MJ", position:"ANG" },
+  { name:"Andreas Hellum", short:"Hellum", position:"ANG" },
+  { name:"Ibrahim Sawaneh", short:"Sawaneh", position:"ANG" },
+  { name:"Fallou Sock", short:"Sock", position:"ANG" },
+  { name:"Isak Vik", short:"Vik", position:"KEEPER" },
+  { name:"Marcus Andersen", short:"Andersen", position:"MID" },
+  { name:"Mats Trige", short:"Trige", position:"KEEPER" },
+  { name:"Magnus Aadland", short:"Aadland", position:"MID" }
+];
+
+function cleanVoterName(name) {
+  return (name || "").trim().toLowerCase();
+}
+
+function isRealMatch(v) {
+  return v.match_id && v.match_id !== "TEST";
+}
+
+function isPredictionVote(v) {
+  return isRealMatch(v) && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
+}
+
+function isPlayerVote(v) {
+  return isRealMatch(v) && v.player !== AWAY_FANS_PLAYER && !isPredictionVote(v);
+}
+
+function decodeGoals(value) {
+  return Number(value) - 1;
+}
+
+function getOutcome(home, away) {
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
+
+function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
+  if (tipHome === actualHome && tipAway === actualAway) return 3;
+  if (getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway)) return 1;
+  return 0;
+}
+
+function getMatchData(matchId) {
+  return matchesData.find(m => m.id === matchId) || null;
+}
+
+function formatDate(dateString) {
+  const d = new Date(dateString + "T12:00:00");
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
+
+function fantasyPosition(playerName) {
+  const p = players.find(x => x.short === playerName || x.name === playerName);
+  return p ? p.position : "";
+}
+
+function calculateFantasyPoints(player, isCaptain, statsMap) {
+  const stat = statsMap[player];
+  const position = fantasyPosition(player);
+  if (!stat) return 0;
+
+  let points = 0;
+
+  if (stat.goals > 0) {
+    if (position === "ANG") points += stat.goals * 4;
+    if (position === "MID") points += stat.goals * 5;
+    if (position === "FORS") points += stat.goals * 6;
+    if (position === "KEEPER") points += stat.goals * 10;
+  }
+
+  points += (stat.assists || 0) * 3;
+
+  if (stat.clean_sheet) {
+    if (position === "MID") points += 1;
+    if (position === "FORS") points += 4;
+    if (position === "KEEPER") points += 5;
+  }
+
+  if (stat.penalty_save && position === "KEEPER") points += 5;
+  if (stat.red_card) points -= 3;
+  if (stat.rating >= 7.5) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+  if (isCaptain) points += 2;
+
+  return points;
+}
+
+async function fetchVotes(query = "") {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes" + query,
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return await response.json();
+}
+
+function buildPredictions(votes) {
+  let map = {};
+
+  votes.filter(isPredictionVote).forEach(v => {
+    const voter = cleanVoterName(v.voter);
+    const key = `${v.match_id}|||${voter}`;
+
+    if (!map[key]) map[key] = { match_id:v.match_id, voter, home:null, away:null };
+
+    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+  });
+
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
+
+function awardFantasyTierPoints(rows) {
+  const sorted = [...rows].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter));
+  const n = sorted.length;
+  if (n === 0) return [];
+
+  const topCut = Math.ceil(n / 3);
+  const midCut = Math.ceil((n * 2) / 3);
+
+  return sorted.map((row, index) => {
+    let tier = "Bunn";
+    let points = 0;
+
+    if (index < topCut) {
+      tier = "Elite";
+      points = 3;
+    } else if (index < midCut) {
+      tier = "Mid";
+      points = 1;
+    }
+
+    return { ...row, tier, tierPoints:points, rank:index + 1 };
+  });
+}
+
+function ensureUser(users, voter) {
+  if (!users[voter]) {
+    users[voter] = {
+      voter,
+      fantasy:0,
+      tipping:0,
+      total:0,
+      fantasyRounds:0,
+      tipRounds:0,
+      eliteFantasy:0,
+      perfectTips:0,
+      correctOutcomes:0,
+      rawFantasy:0,
+      rawTips:0
+    };
+  }
+
+  return users[voter];
+}
+
+function buildTipRounds(allVotes) {
+  const predictions = buildPredictions(allVotes);
+  const byMatch = {};
+
+  predictions.forEach(p => {
+    const match = getMatchData(p.match_id);
+    if (!match || !match.actual) return;
+
+    const raw = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+
+    if (!byMatch[p.match_id]) byMatch[p.match_id] = [];
+
+    byMatch[p.match_id].push({
+      match_id:p.match_id,
+      voter:p.voter,
+      raw,
+      tipPoints:raw,
+      home:p.home,
+      away:p.away
+    });
+  });
+
+  return Object.keys(byMatch).map(matchId => ({
+    match_id:matchId,
+    type:"tips",
+    rows:byMatch[matchId].sort((a,b) =>
+      b.raw - a.raw ||
+      a.voter.localeCompare(b.voter)
+    )
+  }));
+}
+
+function buildRatingMaps(allVotes) {
+  const ratingMaps = {};
+
+  allVotes.filter(isPlayerVote).forEach(v => {
+    if (!ratingMaps[v.match_id]) ratingMaps[v.match_id] = {};
+    if (!ratingMaps[v.match_id][v.player]) ratingMaps[v.match_id][v.player] = { total:0, count:0 };
+
+    ratingMaps[v.match_id][v.player].total += Number(v.rating);
+    ratingMaps[v.match_id][v.player].count += 1;
+  });
+
+  return ratingMaps;
+}
+
+function buildFantasyRounds(picks, stats, allVotes) {
+  const ratingMaps = buildRatingMaps(allVotes);
+  const statsByMatch = {};
+
+  (stats || []).forEach(row => {
+    if (!statsByMatch[row.match_id]) statsByMatch[row.match_id] = {};
+
+    const ratingData = ratingMaps[row.match_id] && ratingMaps[row.match_id][row.player];
+    const rating = ratingData ? ratingData.total / ratingData.count : 0;
+
+    statsByMatch[row.match_id][row.player] = {
+      ...row,
+      rating
+    };
+  });
+
+  const byMatch = {};
+
+  (picks || []).forEach(pick => {
+    const matchId = pick.match_id;
+    const statsMap = statsByMatch[matchId] || {};
+
+    const raw =
+      calculateFantasyPoints(pick.player1, false, statsMap) +
+      calculateFantasyPoints(pick.player2, false, statsMap) +
+      calculateFantasyPoints(pick.captain, true, statsMap);
+
+    if (!byMatch[matchId]) byMatch[matchId] = [];
+
+    byMatch[matchId].push({
+      match_id:matchId,
+      voter:cleanVoterName(pick.voter),
+      raw,
+      team:`${pick.player1}, ${pick.player2}, ⭐ ${pick.captain}`
+    });
+  });
+
+  return Object.keys(byMatch).map(matchId => ({
+    match_id:matchId,
+    type:"fantasy",
+    rows:awardFantasyTierPoints(byMatch[matchId])
+  }));
+}
+  
+  function combineLeague(fantasyRounds, tipRounds) {
+  const users = {};
+  const roundMap = {};
+
+  fantasyRounds.forEach(round => {
+    if (!roundMap[round.match_id]) {
+      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
+    }
+
+    roundMap[round.match_id].fantasy = round.rows;
+
+    round.rows.forEach(row => {
+      const user = ensureUser(users, row.voter);
+      user.fantasy += row.tierPoints;
+      user.rawFantasy += row.raw;
+      user.fantasyRounds += 1;
+
+      if (row.tierPoints === 3) {
+        user.eliteFantasy += 1;
+      }
+    });
+  });
+
+  tipRounds.forEach(round => {
+    if (!roundMap[round.match_id]) {
+      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
+    }
+
+    roundMap[round.match_id].tips = round.rows;
+
+    round.rows.forEach(row => {
+      const user = ensureUser(users, row.voter);
+      user.tipping += row.tipPoints;
+      user.rawTips += row.raw;
+      user.tipRounds += 1;
+
+      if (row.raw === 3) {
+        user.perfectTips += 1;
+      }
+
+      if (row.raw === 1) {
+        user.correctOutcomes += 1;
+      }
+    });
+  });
+
+  Object.values(users).forEach(user => {
+    user.total = user.fantasy + user.tipping;
+  });
+
+  const league = Object.values(users).sort((a,b) =>
+    b.total - a.total ||
+    b.fantasy - a.fantasy ||
+    b.tipping - a.tipping ||
+    a.voter.localeCompare(b.voter)
+  );
+
+  const rounds = Object.values(roundMap).sort((a,b) => {
+    const aMatch = getMatchData(a.match_id);
+    const bMatch = getMatchData(b.match_id);
+    return new Date(aMatch?.date || "2099-01-01") - new Date(bMatch?.date || "2099-01-01");
+  });
+
+  return { league, rounds };
+}
+
+function renderPodium(league) {
+  const first = league[0];
+  const second = league[1];
+  const third = league[2];
+
+  const card = (row, medal, extraClass = "") => {
+    if (!row) return `<div></div>`;
+
+    return `
+      <div class="podium-card ${extraClass}">
+        <div class="medal-big">${medal}</div>
+        <div class="podium-name">${row.voter}</div>
+        <div class="podium-score">${row.total}</div>
+        <div class="small">Lynliga poeng</div>
+        <div class="small">Fantasy ${row.fantasy} · Tipp ${row.tipping}</div>
+      </div>
+    `;
+  };
+
+  return `
+    <div class="podium">
+      ${card(second, "🥈")}
+      ${card(first, "🥇", "first")}
+      ${card(third, "🥉")}
+    </div>
+  `;
+}
+
+function renderLeagueTable(league) {
+  if (!league.length) {
+    return `<div class="warning">Ingen ligaresultater ennå. Når det finnes fantasy eller ferdig scoret tipping, dukker tabellen opp her.</div>`;
+  }
+
+  return `
+    ${renderPodium(league)}
+
+    <div class="table-wrap">
+      <table class="league-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Bruker</th>
+            <th>Fantasy</th>
+            <th>Tipp</th>
+            <th>Runder</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${league.map((row, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>
+                <strong>${row.voter}</strong><br>
+                ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
+                ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
+              </td>
+              <td>${row.fantasy}</td>
+              <td>${row.tipping}</td>
+              <td><span class="small">F ${row.fantasyRounds} · T ${row.tipRounds}</span></td>
+              <td>${row.total}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderMiniRanking(items, limit = 5) {
+  if (!items || !items.length) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇", "🥈", "🥉"];
+
+  return items.slice(0, limit).map((row, index) => `
+    <div class="result-row">
+      <div>
+        ${index < 3 ? `<span class="medal">${medals[index]}</span>` : ""}
+        <strong>${row.label}</strong><br>
+        <span class="small">${row.sub || ""}</span>
+      </div>
+      <div class="result-score">${row.score}</div>
+    </div>
+  `).join("");
+}
+
+function renderAwards(league) {
+  if (!league.length) return `<div class="warning">Ingen awards ennå.</div>`;
+
+  const mostComplete = [...league].sort((a,b) =>
+    (b.fantasy + b.tipping) - (a.fantasy + a.tipping)
+  );
+
+  const fantasyKings = [...league].sort((a,b) =>
+    b.fantasy - a.fantasy ||
+    b.eliteFantasy - a.eliteFantasy
+  );
+
+  const tipKings = [...league].sort((a,b) =>
+    b.tipping - a.tipping ||
+    b.perfectTips - a.perfectTips
+  );
+
+  const oracle = [...league].sort((a,b) =>
+    b.perfectTips - a.perfectTips ||
+    b.tipping - a.tipping
+  );
+
+  const grinders = [...league].sort((a,b) =>
+    (b.fantasyRounds + b.tipRounds) - (a.fantasyRounds + a.tipRounds)
+  );
+
+  const balanced = [...league].filter(u => u.fantasy > 0 && u.tipping > 0).sort((a,b) => {
+    const aBalance = Math.abs(a.fantasy - a.tipping);
+    const bBalance = Math.abs(b.fantasy - b.tipping);
+    return aBalance - bBalance || b.total - a.total;
+  });
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>👑 Mest komplett manager</h3>
+        ${renderMiniRanking(mostComplete.map(u => ({
+          label:u.voter,
+          score:u.total,
+          sub:`Fantasy ${u.fantasy} · Tipp ${u.tipping}`
+        })), 6)}
+      </div>
+
+      <div class="stat-card">
+        <h3>⚽ Fantasy sjefen</h3>
+        ${renderMiniRanking(fantasyKings.map(u => ({
+          label:u.voter,
+          score:u.fantasy,
+          sub:`${u.eliteFantasy} elite runder · ${u.fantasyRounds} runder`
+        })), 6)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🎯 Tippekongen</h3>
+        ${renderMiniRanking(tipKings.map(u => ({
+          label:u.voter,
+          score:u.tipping,
+          sub:`${u.perfectTips} helt riktige · ${u.correctOutcomes} riktige utfall`
+        })), 6)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🔮 Orakelet</h3>
+        ${renderMiniRanking(oracle.filter(u => u.perfectTips > 0).map(u => ({
+          label:u.voter,
+          score:u.perfectTips,
+          sub:`Helt riktige resultater`
+        })), 6)}
+      </div>
+
+      <div class="stat-card">
+        <h3>⚖️ Mest balansert</h3>
+        ${renderMiniRanking(balanced.map(u => ({
+          label:u.voter,
+          score:u.total,
+          sub:`Fantasy ${u.fantasy} · Tipp ${u.tipping}`
+        })), 6)}
+      </div>
+
+      <div class="stat-card">
+        <h3>🏅 Mest aktiv</h3>
+        ${renderMiniRanking(grinders.map(u => ({
+          label:u.voter,
+          score:u.fantasyRounds + u.tipRounds,
+          sub:`Fantasy ${u.fantasyRounds} · Tipp ${u.tipRounds}`
+        })), 6)}
+      </div>
+    </div>
+  `;
+}
+
+function renderRounds(rounds) {
+  if (!rounds.length) return `<div class="warning">Ingen runder klare ennå.</div>`;
+
+  return `
+    <div class="stats-grid">
+      ${rounds.map(round => {
+        const match = getMatchData(round.match_id);
+        const fantasyWinner = [...round.fantasy].sort((a,b) => b.raw - a.raw)[0];
+        const tipWinner = [...round.tips].sort((a,b) => b.raw - a.raw)[0];
+
+        return `
+          <div class="stat-card">
+            <h3>${match ? formatDate(match.date) : ""} ${round.match_id}</h3>
+
+            <div class="result-row">
+              <div>
+                <strong>Fantasy elite</strong><br>
+                <span class="small">${round.fantasy.filter(r => r.tierPoints === 3).map(r => r.voter).join(", ") || "Ingen"}</span>
+              </div>
+              <div class="result-score">${fantasyWinner ? fantasyWinner.raw : "–"}</div>
+            </div>
+
+            <div class="result-row">
+              <div>
+                <strong>Tippevinner</strong><br>
+                <span class="small">${tipWinner ? tipWinner.voter : "Ingen scoret tips ennå"}</span>
+              </div>
+              <div class="result-score">${tipWinner ? tipWinner.raw : "–"}</div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+async function loadLynCentral() {
+  const allVotes = await fetchVotes();
+
+  const { data:picks, error:picksError } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*");
+
+  const { data:stats, error:statsError } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*");
+
+  if (picksError || statsError) {
+    console.error(picksError || statsError);
+    document.getElementById("overview").innerHTML = `<div class="warning">Klarte ikke å laste fantasydata.</div>`;
+    return;
+  }
+
+  const fantasyRounds = buildFantasyRounds(picks || [], stats || [], allVotes);
+  const tipRounds = buildTipRounds(allVotes);
+  const { league, rounds } = combineLeague(fantasyRounds, tipRounds);
+
+  const totalFantasyPicks = (picks || []).length;
+  const totalTipPredictions = buildPredictions(allVotes).length;
+  const totalVotes = allVotes.filter(isPlayerVote).length;
+  const leader = league[0];
+
+  document.getElementById("overview").innerHTML = `
+    <div class="hero-grid">
+      <div class="hero-stat">
+        <h3>Ligaleder</h3>
+        <div class="big">${leader ? leader.voter : "–"}</div>
+        <div class="small">${leader ? leader.total + " poeng" : "Ingen data ennå"}</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Fantasy picks</h3>
+        <div class="big">${totalFantasyPicks}</div>
+        <div class="small">${fantasyRounds.length} fantasyrunder</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Kuponger</h3>
+        <div class="big">${totalTipPredictions}</div>
+        <div class="small">${tipRounds.length} scorede tipperunder</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Børsstemmer</h3>
+        <div class="big">${totalVotes}</div>
+        <div class="small">spillerstemmer totalt</div>
+      </div>
+    </div>
+
+    <div class="explain-box">
+      <h3>🏆 Slik fungerer Lynligaen</h3>
+
+      <div>
+        Lynligaen er <strong>sammenlagttabellen</strong> for <strong>Tippetips</strong> og <strong>Lyn Fantasy</strong>.
+
+        <br><br>
+
+        <strong>🎯 Tippetips</strong><br>
+        Her brukes de vanlige tippepoengene:
+        <br>
+        3 poeng for helt riktig resultat
+        <br>
+        1 poeng for riktig utfall
+        <br>
+        0 poeng for bom
+
+        <br><br>
+
+        <strong>⭐ Lyn Fantasy</strong><br>
+        Fantasy har ofte mye høyere råpoeng, så fantasy gjøres om til ligapoeng per kamp:
+        <br>
+        🔥 Øverste tredjedel får 3 poeng
+        <br>
+        ⚪ Midterste tredjedel får 1 poeng
+        <br>
+        💀 Nederste tredjedel får 0 poeng
+
+        <br><br>
+
+        <strong>Totalen:</strong><br>
+        Tippetips + Fantasy = Lynligaen.
+      </div>
+    </div>
+
+    <div class="ticker">
+      <span>
+        ${leader ? `🔥 ${leader.voter} leder Lynligaen med ${leader.total} poeng` : "Lynligaen venter på data"}
+        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        Tippetips teller med vanlige 3, 1 og 0 poeng
+        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        Fantasy deles i tredjedeler
+        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        Sammenlagt kårer den ultimate Lynbørs-nerden
+      </span>
+    </div>
+  `;
+
+  document.getElementById("leagueTable").innerHTML = renderLeagueTable(league);
+  document.getElementById("awards").innerHTML = renderAwards(league);
+  document.getElementById("rounds").innerHTML = renderRounds(rounds);
+}
+
+loadLynCentral();
+</script>
+
+<script defer src="/_vercel/analytics/script.js"></script>
+</body>
+</html>

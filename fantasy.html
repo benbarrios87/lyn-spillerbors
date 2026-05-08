@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyn Fantasy</title>
+<link rel="icon" href="lblogoen.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+  --gold:#ffd166;
+  --green:#28d17c;
+  --dark:#05070d;
+  --card:rgba(0,0,0,0.76);
+  --soft:rgba(255,255,255,0.12);
+  --line:rgba(255,255,255,0.18);
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  color:white;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top, rgba(215,25,32,0.25), transparent 35%),
+    rgba(0,0,0,0.72);
+  z-index:-1;
+}
+
+.menu-btn {
+  position:fixed;
+  top:20px;
+  left:20px;
+  z-index:9999;
+  width:auto;
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.container {
+  max-width:1050px;
+  margin:0 auto;
+  padding:30px 20px 70px;
+}
+
+.hero {
+  margin-top:35px;
+  padding:34px 24px;
+  border-radius:28px;
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.34), rgba(19,41,75,0.86)),
+    rgba(0,0,0,0.72);
+  border:1px solid rgba(255,255,255,0.2);
+  box-shadow:0 14px 40px rgba(0,0,0,0.45);
+  text-align:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.hero::after {
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  right:-80px;
+  top:-90px;
+}
+
+.hero-kicker {
+  display:inline-block;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.22);
+  padding:7px 13px;
+  border-radius:999px;
+  font-weight:bold;
+  font-size:13px;
+  letter-spacing:0.3px;
+}
+
+h1 {
+  margin:16px 0 8px;
+  font-size:42px;
+  line-height:1.05;
+}
+
+.hero p {
+  max-width:680px;
+  margin:0 auto;
+  opacity:0.86;
+  line-height:1.5;
+}
+
+.card {
+  background:var(--card);
+  border-radius:22px;
+  padding:25px;
+  margin-top:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.section-title {
+  margin:36px 0 10px;
+  font-size:26px;
+  text-shadow:0 3px 10px rgba(0,0,0,0.5);
+}
+
+h2 {
+  text-align:center;
+}
+
+.match-box {
+  background:
+    linear-gradient(135deg, rgba(19,41,75,0.95), rgba(215,25,32,0.55));
+  border:2px solid rgba(255,255,255,0.16);
+  text-align:center;
+}
+
+.match-title {
+  font-size:25px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.match-date {
+  margin-top:8px;
+  opacity:0.85;
+}
+
+.rules {
+  background:rgba(0,0,0,0.62);
+}
+
+.rules-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+@media (min-width:760px) {
+  .rules-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.rule-pill {
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  line-height:1.45;
+}
+
+select, input, button {
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+  box-sizing:border-box;
+}
+
+button {
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#b9151b;
+}
+
+button:disabled {
+  background:#777;
+  cursor:not-allowed;
+}
+
+.select-row {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:10px;
+}
+
+.select-row img {
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+  flex-shrink:0;
+  border:2px solid rgba(255,255,255,0.35);
+}
+
+.select-row select {
+  margin-top:0;
+}
+
+.result {
+  margin-top:20px;
+  background:rgba(255,255,255,0.1);
+  padding:18px;
+  border-radius:16px;
+  line-height:1.7;
+}
+
+.team-total-card {
+  text-align:center;
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.32), rgba(19,41,75,0.85));
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:20px;
+  padding:18px;
+  margin-top:8px;
+}
+
+.total-points {
+  font-size:42px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.team-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:15px;
+}
+
+@media (min-width:760px) {
+  .team-grid {
+    grid-template-columns:1fr 1fr 1fr;
+  }
+}
+
+.player-points-card {
+  background:rgba(0,0,0,0.35);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:15px;
+}
+
+.player-points-card.captain {
+  border:1px solid rgba(255,209,102,0.95);
+  box-shadow:0 0 24px rgba(255,209,102,0.18);
+  background:
+    linear-gradient(135deg, rgba(255,209,102,0.15), rgba(215,25,32,0.2)),
+    rgba(0,0,0,0.42);
+}
+
+.player-card-top {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.player-card-top img {
+  width:52px;
+  height:52px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+}
+
+.player-card-name {
+  font-weight:bold;
+  font-size:18px;
+}
+
+.position-tag {
+  display:inline-block;
+  font-size:12px;
+  margin-top:4px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(19,41,75,0.95);
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+.points-number {
+  margin-top:12px;
+  font-size:30px;
+  font-weight:bold;
+}
+
+.breakdown {
+  margin-top:10px;
+  font-size:14px;
+  opacity:0.9;
+}
+
+.small {
+  opacity:0.8;
+  font-size:14px;
+  text-align:center;
+}
+
+.locked {
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.35);
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+label {
+  display:block;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+.podium {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+@media (min-width:820px) {
+  .podium {
+    grid-template-columns:1fr 1.15fr 1fr;
+    align-items:end;
+  }
+
+  .podium-card.first {
+    transform:translateY(-10px);
+  }
+}
+
+.podium-card {
+  background:rgba(255,255,255,0.11);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:20px;
+  padding:18px;
+  text-align:center;
+}
+
+.podium-card.first {
+  border-color:rgba(255,209,102,0.85);
+  box-shadow:0 0 28px rgba(255,209,102,0.18);
+  background:
+    linear-gradient(135deg, rgba(255,209,102,0.16), rgba(215,25,32,0.18)),
+    rgba(255,255,255,0.1);
+}
+
+.medal {
+  font-size:32px;
+}
+
+.podium-name {
+  font-size:20px;
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.podium-team {
+  font-size:13px;
+  opacity:0.8;
+  margin-top:6px;
+  line-height:1.35;
+}
+
+.podium-score {
+  font-size:34px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:800px) {
+  .stats-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.stat-card {
+  background:rgba(255,255,255,0.11);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:18px;
+  padding:16px;
+}
+
+.stat-card.mvp {
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.22), rgba(19,41,75,0.7)),
+    rgba(255,255,255,0.09);
+}
+
+.stat-card h3 {
+  margin-top:0;
+}
+
+.result-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.18);
+}
+
+.result-score {
+  font-weight:bold;
+  font-size:22px;
+}
+
+.player-chip {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.player-chip img {
+  width:42px;
+  height:42px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+}
+
+.fantasy-table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:18px;
+}
+
+.fantasy-table th,
+.fantasy-table td {
+  padding:10px 7px;
+  border-bottom:1px solid rgba(255,255,255,0.18);
+  text-align:left;
+}
+
+.fantasy-table th:last-child,
+.fantasy-table td:last-child {
+  text-align:right;
+  font-weight:bold;
+}
+
+.round-players {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:15px;
+}
+
+@media (min-width:760px) {
+  .round-players {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.round-player {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+  background:rgba(255,255,255,0.09);
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:16px;
+  padding:10px;
+}
+
+.round-player img {
+  width:46px;
+  height:46px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+}
+
+.positive {
+  color:var(--green);
+}
+
+.negative {
+  color:#ff6b6b;
+}
+
+@media (max-width:620px) {
+  .menu-btn {
+    position:static;
+    margin:15px 0 0 15px;
+  }
+
+  h1 {
+    font-size:34px;
+  }
+
+  .container {
+    padding-top:10px;
+  }
+
+  .fantasy-table {
+    font-size:13px;
+  }
+
+  .fantasy-table th:nth-child(3),
+  .fantasy-table td:nth-child(3) {
+    display:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-kicker">Lyn Fantasy</div>
+    <h1>Bygg laget. Velg kaptein. Klatre på tabellen.</h1>
+    <p>Velg 2 Lyn-spillere og én kaptein før kamp. Mål, assist, clean sheet, røde kort og børsbonus avgjør runden.</p>
+  </div>
+
+  <h2 class="section-title">1. Neste runde</h2>
+
+  <div class="card match-box">
+    <div>Neste fantasy-kamp</div>
+    <div class="match-title" id="matchTitle"></div>
+    <div class="match-date" id="matchDate"></div>
+  </div>
+
+  <h2 class="section-title">2. Regler</h2>
+
+  <div class="card rules">
+    <h2>Sånn funker det</h2>
+
+    <div class="rules-grid">
+      <div class="rule-pill"><strong>Lag:</strong><br>Velg 2 Lyn-spillere og én kaptein før kampstart.</div>
+      <div class="rule-pill"><strong>Kaptein:</strong><br>Kapteinen får +2 ekstra poeng.</div>
+      <div class="rule-pill"><strong>Børsbonus:</strong><br>7.5 eller høyere gir +1. 4.5 eller lavere gir −1.</div>
+      <div class="rule-pill"><strong>Lås:</strong><br>Laget låses når kampen starter.</div>
+    </div>
+
+    <h3>Poengsystem</h3>
+
+    <div class="rules-grid">
+      <div class="rule-pill"><strong>Angrep:</strong><br>Mål +4, assist +3</div>
+      <div class="rule-pill"><strong>Midtbane:</strong><br>Mål +5, assist +3, clean sheet +1</div>
+      <div class="rule-pill"><strong>Forsvar:</strong><br>Mål +6, assist +3, clean sheet +4</div>
+      <div class="rule-pill"><strong>Keeper:</strong><br>Mål +10, clean sheet +5, strafferedning +5</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">3. Velg lag</h2>
+
+  <div class="card">
+    <h2>Ditt lag</h2>
+
+    <div id="lockMessage"></div>
+
+    <label for="username">Forumbrukernavn</label>
+    <input id="username" placeholder="Forumbrukernavn">
+
+    <label for="player1">Spiller 1</label>
+    <div class="select-row">
+      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
+      <select id="player1"></select>
+    </div>
+
+    <label for="player2">Spiller 2</label>
+    <div class="select-row">
+      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
+      <select id="player2"></select>
+    </div>
+
+    <label for="captain">Kaptein ⭐</label>
+    <div class="select-row">
+      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
+      <select id="captain"></select>
+    </div>
+
+    <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
+
+    <div id="output" class="result" style="display:none;"></div>
+  </div>
+
+  <h2 class="section-title">4. Fantasy-stats</h2>
+
+  <div class="card">
+    <h2>Fantasy leaderboard</h2>
+    <div id="fantasyStats">
+      <div class="small">Laster fantasy-stats...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const matchesData = [
+  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00" },
+  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00" },
+  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00" },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00" },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00" },
+  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00" },
+  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00" },
+  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00" },
+  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00" },
+  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00" },
+  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00" },
+  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00" },
+  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00" },
+  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00" },
+  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00" },
+  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00" },
+  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00" },
+  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00" },
+  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00" },
+  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00" },
+  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00" },
+  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00" },
+  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00" },
+  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00" },
+  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00" },
+  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00" },
+  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00" },
+  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00" },
+  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00" },
+  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00" }
+];
+
+const players = [
+  { name:"Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
+  { name:"SAH", position:"FORS", image:"bilder/sah.png" },
+  { name:"Sell", position:"FORS", image:"bilder/sell.png" },
+  { name:"Midtskogen", position:"FORS", image:"bilder/midtskogen.png" },
+  { name:"HSN", position:"FORS", image:"bilder/hsn.png" },
+  { name:"Barnett", position:"FORS", image:"bilder/barnett.png" },
+  { name:"Fredriksen", position:"MID", image:"bilder/fredriksen.png" },
+  { name:"Isufi", position:"MID", image:"bilder/isufi.png" },
+  { name:"Skaug", position:"MID", image:"bilder/skaug.png" },
+  { name:"Kurtovic", position:"MID", image:"bilder/kurtovic.png" },
+  { name:"Monglo", position:"MID", image:"bilder/monglo.png" },
+  { name:"Wæhler", position:"MID", image:"bilder/wæhler.png" },
+  { name:"ABO", position:"ANG", image:"bilder/abo.png" },
+  { name:"MJ", position:"ANG", image:"bilder/mj.png" },
+  { name:"Hellum", position:"ANG", image:"bilder/hellum.png" },
+  { name:"Sawaneh", position:"ANG", image:"bilder/sawaneh.png" },
+  { name:"Sock", position:"ANG", image:"bilder/sock.png" },
+  { name:"Vik", position:"KEEPER", image:"bilder/vik.png" },
+  { name:"Trige", position:"KEEPER", image:"bilder/trige.png" }
+];
+
+let matchStats = {};
+
+function getNextMatch() {
+  const now = new Date();
+  return matchesData
+    .filter(match => new Date(match.deadline) > now)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+}
+
+const nextMatch = getNextMatch();
+
+function getPlayer(playerName) {
+  return players.find(p => p.name === playerName);
+}
+
+function getPlayerPosition(playerName) {
+  const player = getPlayer(playerName);
+  return player ? player.position : "";
+}
+
+function getPlayerImage(playerName) {
+  const player = getPlayer(playerName);
+  return player ? player.image : "bilder/lyn-logo.png";
+}
+
+function playerChip(playerName) {
+  return `
+    <div class="player-chip">
+      <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='bilder/lyn-logo.png'">
+      <div>
+        <strong>${playerName}</strong><br>
+        <span class="small">${getPlayerPosition(playerName)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function formatPointClass(points) {
+  if (points > 0) return "positive";
+  if (points < 0) return "negative";
+  return "";
+}
+
+function isDeadlinePassed() {
+  if (!nextMatch) return true;
+  return new Date() > new Date(nextMatch.deadline);
+}
+
+function fillMatchInfo() {
+  if (!nextMatch) {
+    document.getElementById("matchTitle").textContent = "Ingen kommende kamp";
+    document.getElementById("matchDate").textContent = "";
+    return;
+  }
+
+  document.getElementById("matchTitle").textContent = `${nextMatch.home} - ${nextMatch.away}`;
+  document.getElementById("matchDate").textContent =
+    `${nextMatch.date} | Frist: ${nextMatch.deadline.replace("T", " kl. ")}`;
+}
+
+function applyDeadlineLock() {
+  const lockMessage = document.getElementById("lockMessage");
+
+  if (!nextMatch) {
+    document.getElementById("saveBtn").disabled = true;
+    lockMessage.innerHTML = `<div class="locked">Ingen kommende kamp å velge lag til.</div>`;
+    return;
+  }
+
+  if (isDeadlinePassed()) {
+    document.getElementById("saveBtn").disabled = true;
+    document.getElementById("player1").disabled = true;
+    document.getElementById("player2").disabled = true;
+    document.getElementById("captain").disabled = true;
+    document.getElementById("username").disabled = true;
+    lockMessage.innerHTML = `<div class="locked">Fristen har gått ut. Laget er låst.</div>`;
+  }
+}
+
+function getSavedUsername() {
+  return (
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    ""
+  );
+}
+
+function saveUsernameEverywhere(username) {
+  localStorage.setItem("lynBorsUsername", username);
+  localStorage.setItem("username", username);
+  localStorage.setItem("voter", username);
+}
+
+function fillSelects() {
+  ["player1", "player2", "captain"].forEach(id => {
+    const select = document.getElementById(id);
+    select.innerHTML = `<option value="">Velg spiller</option>`;
+
+    players.forEach(player => {
+      select.innerHTML += `<option value="${player.name}">${player.name} (${player.position})</option>`;
+    });
+  });
+}
+
+function updatePlayerImages() {
+  ["player1", "player2", "captain"].forEach(id => {
+    const select = document.getElementById(id);
+    const image = document.getElementById(`img-${id}`);
+    const player = getPlayer(select.value);
+    image.src = player ? player.image : "bilder/lyn-logo.png";
+  });
+}
+
+async function loadMatchStats() {
+  if (!nextMatch) return;
+
+  const { data, error } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*")
+    .eq("match_id", nextMatch.id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  matchStats = {};
+
+  (data || []).forEach(row => {
+    matchStats[row.player] = {
+      goals: row.goals || 0,
+      assists: row.assists || 0,
+      cleanSheet: row.clean_sheet || false,
+      penaltySave: row.penalty_save || false,
+      redCard: row.red_card || false,
+      rating: 0
+    };
+  });
+}
+
+async function loadBorsRatings() {
+  if (!nextMatch) return;
+
+  const { data, error } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .eq("match_id", nextMatch.id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const ratingMap = {};
+
+  (data || []).forEach(vote => {
+    if (
+      vote.player === "Bortefeltet" ||
+      vote.player === "TIP_HOME_GOALS" ||
+      vote.player === "TIP_AWAY_GOALS"
+    ) {
+      return;
+    }
+
+    if (!ratingMap[vote.player]) {
+      ratingMap[vote.player] = { total:0, count:0 };
+    }
+
+    ratingMap[vote.player].total += Number(vote.rating);
+    ratingMap[vote.player].count += 1;
+  });
+
+  Object.keys(ratingMap).forEach(player => {
+    if (!matchStats[player]) return;
+    matchStats[player].rating = ratingMap[player].total / ratingMap[player].count;
+  });
+}
+
+function calculatePoints(playerName, isCaptain) {
+  const stat = matchStats[playerName];
+  const position = getPlayerPosition(playerName);
+
+  if (!stat) return { total:0, lines:["Ingen kampdata registrert ennå"] };
+
+  let points = 0;
+  const lines = [];
+
+  if (stat.goals > 0) {
+    let goalPoints = 0;
+    if (position === "ANG") goalPoints = stat.goals * 4;
+    if (position === "MID") goalPoints = stat.goals * 5;
+    if (position === "FORS") goalPoints = stat.goals * 6;
+    if (position === "KEEPER") goalPoints = stat.goals * 10;
+    points += goalPoints;
+    lines.push(`Mål: +${goalPoints}`);
+  }
+
+  if (stat.assists > 0) {
+    const assistPoints = stat.assists * 3;
+    points += assistPoints;
+    lines.push(`Assist: +${assistPoints}`);
+  }
+
+  if (stat.cleanSheet) {
+    let csPoints = 0;
+    if (position === "MID") csPoints = 1;
+    if (position === "FORS") csPoints = 4;
+    if (position === "KEEPER") csPoints = 5;
+    if (csPoints > 0) {
+      points += csPoints;
+      lines.push(`Clean sheet: +${csPoints}`);
+    }
+  }
+
+  if (stat.penaltySave && position === "KEEPER") {
+    points += 5;
+    lines.push("Strafferedning: +5");
+  }
+
+  if (stat.redCard) {
+    points -= 3;
+    lines.push("Rødt kort: −3");
+  }
+
+  if (stat.rating >= 7.5) {
+    points += 1;
+    lines.push(`Børsbonus: +1 (${stat.rating.toFixed(1)})`);
+  }
+
+  if (stat.rating > 0 && stat.rating <= 4.5) {
+    points -= 1;
+    lines.push(`Børsbonus: −1 (${stat.rating.toFixed(1)})`);
+  }
+
+  if (isCaptain) {
+    points += 2;
+    lines.push("Kaptein: +2");
+  }
+
+  if (lines.length === 0) lines.push("Ingen poenggivende hendelser");
+
+  return { total:points, lines };
+}
+
+async function saveTeam() {
+  if (isDeadlinePassed()) {
+    alert("Fristen har gått ut. Laget er låst.");
+    return;
+  }
+
+  const username = document.getElementById("username").value.trim();
+  const player1 = document.getElementById("player1").value;
+  const player2 = document.getElementById("player2").value;
+  const captain = document.getElementById("captain").value;
+
+  if (!username || !player1 || !player2 || !captain) {
+    alert("Fyll inn brukernavn, to spillere og kaptein.");
+    return;
+  }
+
+  const chosenPlayers = [player1, player2, captain];
+
+  if (new Set(chosenPlayers).size !== 3) {
+    alert("Du kan ikke velge samme spiller flere ganger.");
+    return;
+  }
+
+  saveUsernameEverywhere(username);
+
+  const team = {
+    match_id: nextMatch.id,
+    username,
+    player1,
+    player2,
+    captain
+  };
+
+  localStorage.setItem("lynFantasyTeam", JSON.stringify(team));
+
+  const { error } = await supabaseClient
+    .from("fantasy_picks")
+    .upsert(
+      {
+        match_id: team.match_id,
+        voter: team.username,
+        player1: team.player1,
+        player2: team.player2,
+        captain: team.captain
+      },
+      { onConflict:"match_id,voter" }
+    );
+
+  if (error) {
+    console.error(error);
+    alert("Noe gikk galt ved lagring.");
+    return;
+  }
+
+  alert("Fantasy-laget er lagret!");
+  showTeam(team);
+  loadFantasyStats();
+}
+
+function playerPointsCard(playerName, pointsData, isCaptain) {
+  return `
+    <div class="player-points-card ${isCaptain ? "captain" : ""}">
+      <div class="player-card-top">
+        <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='bilder/lyn-logo.png'">
+        <div>
+          <div class="player-card-name">${isCaptain ? "⭐ " : ""}${playerName}</div>
+          <div class="position-tag">${getPlayerPosition(playerName)}</div>
+        </div>
+      </div>
+
+      <div class="points-number ${formatPointClass(pointsData.total)}">${pointsData.total} poeng</div>
+
+      <div class="breakdown">
+        ${pointsData.lines.join("<br>")}
+      </div>
+    </div>
+  `;
+}
+
+function showTeam(team) {
+  const output = document.getElementById("output");
+  output.style.display = "block";
+
+  const p1 = calculatePoints(team.player1, false);
+  const p2 = calculatePoints(team.player2, false);
+  const cap = calculatePoints(team.captain, true);
+  const total = p1.total + p2.total + cap.total;
+
+  output.innerHTML = `
+    <div class="team-total-card">
+      <div>${team.username}</div>
+      <div class="small">Kamp: ${nextMatch.home} - ${nextMatch.away}</div>
+      <div class="total-points">${total}</div>
+      <div class="small">fantasypoeng denne runden</div>
+    </div>
+
+    <div class="team-grid">
+      ${playerPointsCard(team.player1, p1, false)}
+      ${playerPointsCard(team.player2, p2, false)}
+      ${playerPointsCard(team.captain, cap, true)}
+    </div>
+  `;
+}
+
+function loadSavedTeam() {
+  const savedUsername = getSavedUsername();
+  if (savedUsername) document.getElementById("username").value = savedUsername;
+
+  const saved = localStorage.getItem("lynFantasyTeam");
+  if (!saved) return;
+
+  const team = JSON.parse(saved);
+
+  if (!nextMatch || team.match_id !== nextMatch.id) return;
+
+  document.getElementById("username").value = team.username;
+  document.getElementById("player1").value = team.player1;
+  document.getElementById("player2").value = team.player2;
+  document.getElementById("captain").value = team.captain;
+
+  showTeam(team);
+}
+
+function renderPodium(leaderboard) {
+  if (!leaderboard.length) return "";
+
+  const first = leaderboard[0];
+  const second = leaderboard[1];
+  const third = leaderboard[2];
+
+  const card = (row, medal, extraClass = "") => {
+    if (!row) return `<div></div>`;
+
+    return `
+      <div class="podium-card ${extraClass}">
+        <div class="medal">${medal}</div>
+        <div class="podium-name">${row.voter}</div>
+        <div class="podium-team">${row.player1}, ${row.player2}, ⭐ ${row.captain}</div>
+        <div class="podium-score">${row.total}</div>
+        <div class="small">poeng</div>
+      </div>
+    `;
+  };
+
+  return `
+    <div class="podium">
+      ${card(second, "🥈")}
+      ${card(first, "🥇", "first")}
+      ${card(third, "🥉")}
+    </div>
+  `;
+}
+
+function renderRoundPlayers() {
+  const rows = players.map(player => {
+    const points = calculatePoints(player.name, false).total;
+
+    return {
+      name: player.name,
+      position: player.position,
+      image: player.image,
+      points
+    };
+  }).sort((a,b) => b.points - a.points);
+
+  return `
+    <h3>Rundens fantasyspillere</h3>
+    <div class="round-players">
+      ${rows.slice(0, 8).map((row, index) => `
+        <div class="round-player">
+          <img src="${row.image}" alt="${row.name}" onerror="this.src='bilder/lyn-logo.png'">
+          <div>
+            <strong>${index + 1}. ${row.name}</strong><br>
+            <span class="small">${row.position}</span>
+          </div>
+          <div class="result-score ${formatPointClass(row.points)}">${row.points}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+async function loadFantasyStats() {
+  if (!nextMatch) {
+    document.getElementById("fantasyStats").innerHTML = "Ingen kommende fantasykamp.";
+    return;
+  }
+
+  const { data:picks, error:picksError } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*")
+    .eq("match_id", nextMatch.id);
+
+  if (picksError) {
+    console.error(picksError);
+    document.getElementById("fantasyStats").innerHTML = "Klarte ikke å laste fantasy.";
+    return;
+  }
+
+  if (!picks || picks.length === 0) {
+    document.getElementById("fantasyStats").innerHTML = "Ingen fantasy-lag sendt inn ennå.";
+    return;
+  }
+
+  const leaderboard = picks.map(pick => {
+    const p1 = calculatePoints(pick.player1, false).total;
+    const p2 = calculatePoints(pick.player2, false).total;
+    const cap = calculatePoints(pick.captain, true).total;
+
+    return {
+      voter: pick.voter,
+      player1: pick.player1,
+      player2: pick.player2,
+      captain: pick.captain,
+      total: p1 + p2 + cap
+    };
+  }).sort((a,b) => b.total - a.total);
+
+  const pickCounts = {};
+  const captainCounts = {};
+
+  leaderboard.forEach(row => {
+    [row.player1, row.player2, row.captain].forEach(player => {
+      pickCounts[player] = (pickCounts[player] || 0) + 1;
+    });
+
+    captainCounts[row.captain] = (captainCounts[row.captain] || 0) + 1;
+  });
+
+  const mostPicked = Object.entries(pickCounts).sort((a,b) => b[1] - a[1])[0];
+  const mostCaptain = Object.entries(captainCounts).sort((a,b) => b[1] - a[1])[0];
+
+  const fantasyMVP = Object.keys(matchStats).map(player => ({
+    player,
+    points: calculatePoints(player, false).total
+  })).sort((a,b) => b.points - a.points)[0];
+
+  const roundWinner = leaderboard[0];
+
+  document.getElementById("fantasyStats").innerHTML = `
+    ${renderPodium(leaderboard)}
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>🏆 Rundeleder</h3>
+        <div class="result-row">
+          <div><strong>${roundWinner.voter}</strong><br><span class="small">${roundWinner.player1}, ${roundWinner.player2}, ⭐ ${roundWinner.captain}</span></div>
+          <div class="result-score">${roundWinner.total}</div>
+        </div>
+      </div>
+
+      <div class="stat-card mvp">
+        <h3>👑 Fantasy MVP</h3>
+        <div class="result-row">
+          <div>${fantasyMVP ? playerChip(fantasyMVP.player) : "Ikke klart"}</div>
+          <div class="result-score">${fantasyMVP ? fantasyMVP.points : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>🔥 Mest valgt</h3>
+        <div class="result-row">
+          <div>${mostPicked ? playerChip(mostPicked[0]) : "Ikke klart"}</div>
+          <div class="result-score">${mostPicked ? mostPicked[1] : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>⭐ Mest valgt kaptein</h3>
+        <div class="result-row">
+          <div>${mostCaptain ? playerChip(mostCaptain[0]) : "Ikke klart"}</div>
+          <div class="result-score">${mostCaptain ? mostCaptain[1] : "–"}</div>
+        </div>
+      </div>
+    </div>
+
+    ${renderRoundPlayers()}
+
+    <table class="fantasy-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Bruker</th>
+          <th>Lag</th>
+          <th>Poeng</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${leaderboard.map((row, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${row.voter}</td>
+            <td>${row.player1}, ${row.player2}, ⭐ ${row.captain}</td>
+            <td>${row.total}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+fillMatchInfo();
+fillSelects();
+
+["player1", "player2", "captain"].forEach(id => {
+  document.getElementById(id).addEventListener("change", updatePlayerImages);
+});
+
+loadMatchStats().then(async () => {
+  await loadBorsRatings();
+  loadSavedTeam();
+  updatePlayerImages();
+  applyDeadlineLock();
+  loadFantasyStats();
+});
+</script>
+
+</body>
+</html>

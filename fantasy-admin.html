@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyn Fantasy Admin</title>
+<link rel="icon" href="lblogoen.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+  --dark:#070b12;
+  --card:rgba(0,0,0,0.74);
+  --line:rgba(255,255,255,0.18);
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  color:white;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.72);
+  z-index:-1;
+}
+
+.menu-btn {
+  position:fixed;
+  top:20px;
+  left:20px;
+  z-index:9999;
+  width:auto;
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.container {
+  max-width:1100px;
+  margin:0 auto;
+  padding:30px 20px 60px;
+}
+
+h1, h2 {
+  text-align:center;
+}
+
+.small {
+  opacity:0.78;
+  font-size:14px;
+  text-align:center;
+}
+
+.card {
+  background:var(--card);
+  border-radius:20px;
+  padding:22px;
+  margin-top:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+}
+
+.admin-warning {
+  background:rgba(215,25,32,0.18);
+  border:1px solid rgba(215,25,32,0.8);
+  border-radius:14px;
+  padding:14px;
+  line-height:1.5;
+}
+
+label {
+  display:block;
+  font-weight:bold;
+  margin-top:14px;
+}
+
+select, input, button {
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+  box-sizing:border-box;
+}
+
+select, input {
+  background:white;
+  color:#111;
+}
+
+button {
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#b9151b;
+}
+
+button.secondary {
+  background:var(--blue);
+}
+
+button.secondary:hover {
+  background:#0d1d36;
+}
+
+.top-actions {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+@media (min-width:750px) {
+  .top-actions {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.status {
+  display:none;
+  margin-top:15px;
+  padding:13px;
+  border-radius:12px;
+  line-height:1.5;
+}
+
+.status.ok {
+  display:block;
+  background:rgba(2,122,72,0.25);
+  border:1px solid rgba(2,122,72,0.9);
+}
+
+.status.error {
+  display:block;
+  background:rgba(215,25,32,0.25);
+  border:1px solid rgba(215,25,32,0.9);
+}
+
+.players-list {
+  margin-top:20px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+.player-card {
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:15px;
+}
+
+.player-header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.player-header img {
+  width:54px;
+  height:54px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+  border:2px solid rgba(255,255,255,0.35);
+  flex-shrink:0;
+}
+
+.player-name {
+  font-size:19px;
+  font-weight:bold;
+}
+
+.position {
+  display:inline-block;
+  margin-top:4px;
+  font-size:12px;
+  background:var(--blue);
+  border:1px solid rgba(255,255,255,0.25);
+  padding:4px 8px;
+  border-radius:999px;
+}
+
+.stat-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+@media (min-width:850px) {
+  .stat-grid {
+    grid-template-columns:1fr 1fr 1fr 1fr 1fr;
+  }
+}
+
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(0,0,0,0.25);
+  border-radius:12px;
+  padding:10px;
+  min-height:46px;
+}
+
+.check-row input {
+  width:auto;
+  margin:0;
+  transform:scale(1.25);
+}
+
+.check-row label {
+  margin:0;
+  font-weight:normal;
+  cursor:pointer;
+}
+
+.number-field label {
+  font-size:13px;
+  opacity:0.85;
+  margin-top:0;
+}
+
+.number-field input {
+  margin-top:5px;
+}
+
+.summary {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+@media (min-width:700px) {
+  .summary {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.summary-box {
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+}
+
+.summary-number {
+  font-size:26px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+hr {
+  border:none;
+  border-top:1px solid var(--line);
+  margin:20px 0;
+}
+</style>
+</head>
+
+<body>
+
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
+<div class="container">
+
+  <h1>Lyn Fantasy Admin</h1>
+  <p class="small">Legg inn mål, assist, clean sheet, strafferedning og rødt kort etter kamp.</p>
+
+  <div class="card admin-warning">
+    <strong>Adminside</strong><br>
+    Denne siden lagrer direkte til Supabase. Velg riktig kamp før du trykker lagre, ellers blir det klassisk hobbyprosjektkaos.
+  </div>
+
+  <div class="card">
+    <h2>Velg kamp</h2>
+
+    <label for="matchSelect">Kamp</label>
+    <select id="matchSelect"></select>
+
+    <div class="top-actions">
+      <button class="secondary" onclick="loadStats()">Last inn stats for valgt kamp</button>
+      <button onclick="saveStats()">Lagre alle stats</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="card">
+    <h2>Oppsummering</h2>
+
+    <div class="summary">
+      <div class="summary-box">
+        Mål
+        <div class="summary-number" id="sumGoals">0</div>
+      </div>
+
+      <div class="summary-box">
+        Assist
+        <div class="summary-number" id="sumAssists">0</div>
+      </div>
+
+      <div class="summary-box">
+        Clean sheet
+        <div class="summary-number" id="sumCleanSheets">0</div>
+      </div>
+
+      <div class="summary-box">
+        Røde kort
+        <div class="summary-number" id="sumRedCards">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Spillerstats</h2>
+    <p class="small">Alle spillere er tilgjengelige hver kamp. Tomme felt lagres som 0.</p>
+
+    <div id="playersList" class="players-list"></div>
+
+    <hr>
+
+    <button onclick="saveStats()">Lagre alle stats</button>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const matchesData = [
+  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00" },
+  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00" },
+  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00" },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00" },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00" },
+  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00" },
+  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00" },
+  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00" },
+  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00" },
+  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00" },
+  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00" },
+  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00" },
+  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00" },
+  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00" },
+  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00" },
+  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00" },
+  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00" },
+  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00" },
+  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00" },
+  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00" },
+  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00" },
+  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00" },
+  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00" },
+  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00" },
+  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00" },
+  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00" },
+  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00" },
+  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00" },
+  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00" },
+  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00" }
+];
+
+const players = [
+  { name:"Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
+  { name:"SAH", position:"FORS", image:"bilder/sah.png" },
+  { name:"Sell", position:"FORS", image:"bilder/sell.png" },
+  { name:"Midtskogen", position:"FORS", image:"bilder/midtskogen.png" },
+  { name:"HSN", position:"FORS", image:"bilder/hsn.png" },
+  { name:"Barnett", position:"FORS", image:"bilder/barnett.png" },
+  { name:"Fredriksen", position:"MID", image:"bilder/fredriksen.png" },
+  { name:"Isufi", position:"MID", image:"bilder/isufi.png" },
+  { name:"Skaug", position:"MID", image:"bilder/skaug.png" },
+  { name:"Kurtovic", position:"MID", image:"bilder/kurtovic.png" },
+  { name:"Monglo", position:"MID", image:"bilder/monglo.png" },
+  { name:"Wæhler", position:"MID", image:"bilder/wæhler.png" },
+  { name:"ABO", position:"ANG", image:"bilder/abo.png" },
+  { name:"MJ", position:"ANG", image:"bilder/mj.png" },
+  { name:"Hellum", position:"ANG", image:"bilder/hellum.png" },
+  { name:"Sawaneh", position:"ANG", image:"bilder/sawaneh.png" },
+  { name:"Sock", position:"ANG", image:"bilder/sock.png" },
+  { name:"Vik", position:"KEEPER", image:"bilder/vik.png" },
+  { name:"Trige", position:"KEEPER", image:"bilder/trige.png" }
+];
+
+function showStatus(message, type = "ok") {
+  const status = document.getElementById("status");
+  status.className = `status ${type}`;
+  status.innerHTML = message;
+}
+
+function getSelectedMatchId() {
+  return document.getElementById("matchSelect").value;
+}
+
+function fillMatchSelect() {
+  const select = document.getElementById("matchSelect");
+  select.innerHTML = "";
+
+  matchesData.forEach(match => {
+    const option = document.createElement("option");
+    option.value = match.id;
+    option.textContent = `${match.date} | ${match.home} - ${match.away}`;
+    select.appendChild(option);
+  });
+
+  const nextMatch = matchesData
+    .filter(match => new Date(match.deadline) > new Date())
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+
+  if (nextMatch) {
+    select.value = nextMatch.id;
+  }
+}
+
+function safeId(playerName) {
+  return playerName
+    .toLowerCase()
+    .replaceAll("æ", "ae")
+    .replaceAll("ø", "o")
+    .replaceAll("å", "a")
+    .replaceAll(" ", "_")
+    .replaceAll(".", "")
+    .replaceAll("-", "_");
+}
+
+function renderPlayers() {
+  const list = document.getElementById("playersList");
+  list.innerHTML = "";
+
+  players.forEach(player => {
+    const id = safeId(player.name);
+
+    const card = document.createElement("div");
+    card.className = "player-card";
+
+    card.innerHTML = `
+      <div class="player-header">
+        <img src="${player.image}" alt="${player.name}" onerror="this.src='bilder/lyn-logo.png'">
+        <div>
+          <div class="player-name">${player.name}</div>
+          <div class="position">${player.position}</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="number-field">
+          <label for="goals_${id}">Mål</label>
+          <input id="goals_${id}" type="number" min="0" value="0" data-player="${player.name}" data-stat="goals">
+        </div>
+
+        <div class="number-field">
+          <label for="assists_${id}">Assist</label>
+          <input id="assists_${id}" type="number" min="0" value="0" data-player="${player.name}" data-stat="assists">
+        </div>
+
+        <div class="number-field">
+          <label for="penalty_${id}">Strafferedning</label>
+          <input id="penalty_${id}" type="number" min="0" value="0" data-player="${player.name}" data-stat="penalty_save">
+        </div>
+
+        <div class="check-row">
+          <input id="cs_${id}" type="checkbox" data-player="${player.name}" data-stat="clean_sheet">
+          <label for="cs_${id}">Clean sheet</label>
+        </div>
+
+        <div class="check-row">
+          <input id="red_${id}" type="checkbox" data-player="${player.name}" data-stat="red_card">
+          <label for="red_${id}">Rødt kort</label>
+        </div>
+      </div>
+    `;
+
+    list.appendChild(card);
+  });
+
+  document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", updateSummary);
+    input.addEventListener("change", updateSummary);
+  });
+
+  updateSummary();
+}
+
+function clearInputs() {
+  players.forEach(player => {
+    const id = safeId(player.name);
+
+    document.getElementById(`goals_${id}`).value = 0;
+    document.getElementById(`assists_${id}`).value = 0;
+    document.getElementById(`penalty_${id}`).value = 0;
+    document.getElementById(`cs_${id}`).checked = false;
+    document.getElementById(`red_${id}`).checked = false;
+  });
+
+  updateSummary();
+}
+
+async function loadStats() {
+  const matchId = getSelectedMatchId();
+
+  clearInputs();
+
+  const { data, error } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*")
+    .eq("match_id", matchId);
+
+  if (error) {
+    console.error(error);
+    showStatus("Klarte ikke å laste stats fra Supabase.", "error");
+    return;
+  }
+
+  (data || []).forEach(row => {
+    const id = safeId(row.player);
+
+    const goals = document.getElementById(`goals_${id}`);
+    const assists = document.getElementById(`assists_${id}`);
+    const penalty = document.getElementById(`penalty_${id}`);
+    const cleanSheet = document.getElementById(`cs_${id}`);
+    const redCard = document.getElementById(`red_${id}`);
+
+    if (!goals) return;
+
+    goals.value = row.goals || 0;
+    assists.value = row.assists || 0;
+    penalty.value = row.penalty_save || 0;
+    cleanSheet.checked = !!row.clean_sheet;
+    redCard.checked = !!row.red_card;
+  });
+
+  updateSummary();
+  showStatus(`Stats lastet for <strong>${matchId}</strong>.`);
+}
+
+function getInputNumber(id) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function collectRows() {
+  const matchId = getSelectedMatchId();
+
+  return players.map(player => {
+    const id = safeId(player.name);
+
+    return {
+      match_id: matchId,
+      player: player.name,
+      goals: getInputNumber(`goals_${id}`),
+      assists: getInputNumber(`assists_${id}`),
+      penalty_save: getInputNumber(`penalty_${id}`),
+      clean_sheet: document.getElementById(`cs_${id}`).checked,
+      red_card: document.getElementById(`red_${id}`).checked
+    };
+  });
+}
+
+async function saveStats() {
+  const matchId = getSelectedMatchId();
+  const rows = collectRows();
+
+  const { error } = await supabaseClient
+    .from("fantasy_stats")
+    .upsert(rows, { onConflict:"match_id,player" });
+
+  if (error) {
+    console.error(error);
+    showStatus("Noe gikk galt ved lagring. Sjekk console og Supabase.", "error");
+    return;
+  }
+
+  showStatus(`Stats lagret for <strong>${matchId}</strong>. Fantasy-tabellen kan nå regne poeng.`);
+}
+
+function updateSummary() {
+  const rows = collectRows();
+
+  const goals = rows.reduce((sum, row) => sum + row.goals, 0);
+  const assists = rows.reduce((sum, row) => sum + row.assists, 0);
+  const cleanSheets = rows.filter(row => row.clean_sheet).length;
+  const redCards = rows.filter(row => row.red_card).length;
+
+  document.getElementById("sumGoals").textContent = goals;
+  document.getElementById("sumAssists").textContent = assists;
+  document.getElementById("sumCleanSheets").textContent = cleanSheets;
+  document.getElementById("sumRedCards").textContent = redCards;
+}
+
+document.getElementById("matchSelect")?.addEventListener("change", loadStats);
+
+fillMatchSelect();
+renderPlayers();
+loadStats();
+</script>
+
+</body>
+</html>
