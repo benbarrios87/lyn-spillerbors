@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lynbørs</title>
+<title>Tippetips</title>
 <link rel="icon" href="lblogoen.png">
 
 <style>
@@ -17,31 +17,6 @@
 body {
   margin:0;
   font-family:Arial, sans-serif;
-}
-</style>
-</head>
-
-<body>
-
-<button onclick="location.href='/'" style="
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 10px;
-  background: #d71920;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-">
-← Meny
-</button>
-
-  margin:0;
-  font-family:Arial, sans-serif;
   background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
 }
 
@@ -53,49 +28,81 @@ body::before {
   z-index:-1;
 }
 
+.menu-btn {
+  position:fixed;
+  top:20px;
+  left:20px;
+  z-index:9999;
+  width:auto;
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  background:var(--red);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
 header {
   text-align:center;
-  padding:40px 20px;
+  padding:45px 20px 25px;
   color:white;
 }
 
 .logo-wrap {
   width:220px;
   margin:0 auto 15px;
-  background:transparent;
-  border-radius:25px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
 .logo-wrap img {
   width:100%;
   height:auto;
-  object-fit:contain;
   filter:drop-shadow(0 10px 25px rgba(0,0,0,0.5));
 }
 
-h1 { margin:10px 0 5px; font-size:38px; }
-h2 { margin-top:0; }
+h1 {
+  margin:10px 0 5px;
+  font-size:38px;
+}
+
+h2 {
+  margin-top:0;
+}
 
 main {
-  max-width:1120px;
+  max-width:1000px;
   margin:auto;
   padding:15px;
 }
 
+.section-title {
+  color:white;
+  margin:30px 0 12px;
+  font-size:26px;
+  text-shadow:0 3px 10px rgba(0,0,0,0.5);
+}
+
 .box {
-  background:rgba(255,255,255,0.95);
+  background:rgba(255,255,255,0.96);
   border-radius:18px;
   padding:18px;
   margin-bottom:18px;
   border-left:6px solid var(--red);
 }
 
-.stats-center {
-  border-left:6px solid var(--blue);
-  background:rgba(255,255,255,0.97);
+.box.blue {
+  border-left-color:var(--blue);
+}
+
+.notice {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:var(--blue);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  font-weight:bold;
 }
 
 select, input {
@@ -107,46 +114,6 @@ select, input {
   box-sizing:border-box;
   font-size:15px;
 }
-
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(145px, 1fr));
-  gap:12px;
-}
-
-.player {
-  background:white;
-  border-radius:14px;
-  padding:12px;
-  text-align:center;
-  border:1px solid #eee;
-}
-
-.avatar {
-  width:64px;
-  height:64px;
-  background:white;
-  color:white;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:auto;
-  font-weight:bold;
-  overflow:hidden;
-  border:2px solid #eee;
-  box-shadow:0 2px 6px rgba(0,0,0,0.15);
-}
-
-.avatar img {
-  width:110%;
-  height:110%;
-  object-fit:cover;
-  transform:translateX(8%);
-}
-
-.player-short { font-weight:bold; margin-top:8px; }
-.player-name { font-size:12px; color:gray; min-height:30px; }
 
 button {
   background:var(--red);
@@ -160,16 +127,8 @@ button {
   font-size:16px;
 }
 
-button:hover { background:#b51218; }
-
-.button-row {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-
-@media (min-width:700px) {
-  .button-row { grid-template-columns:repeat(5, 1fr); }
+button:hover {
+  background:#b51218;
 }
 
 .next-grid {
@@ -180,7 +139,9 @@ button:hover { background:#b51218; }
 }
 
 @media (min-width:850px) {
-  .next-grid { grid-template-columns:repeat(3, 1fr); }
+  .next-grid {
+    grid-template-columns:repeat(3, 1fr);
+  }
 }
 
 .next-card {
@@ -196,12 +157,6 @@ button:hover { background:#b51218; }
   font-size:17px;
 }
 
-.next-card.locked {
-  background:#f8fafc;
-  border-color:#cbd5e1;
-  opacity:0.72;
-}
-
 .tip-grid {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -214,20 +169,77 @@ button:hover { background:#b51218; }
   color:var(--blue);
 }
 
-.prediction-row {
+.button-row {
   display:grid;
-  grid-template-columns:1fr auto auto;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+@media (min-width:700px) {
+  .button-row {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.prediction-row, .result-row {
+  display:grid;
+  grid-template-columns:1fr auto;
   gap:10px;
   padding:9px 0;
   border-bottom:1px solid #e5e7eb;
   align-items:center;
 }
 
-.prediction-score {
+.prediction-row {
+  grid-template-columns:1fr auto auto;
+}
+
+.prediction-score, .result-score {
   font-weight:bold;
   color:var(--blue);
   font-size:17px;
 }
+
+.hero-stat {
+  background:linear-gradient(135deg, #13294b, #1f3f73);
+  color:white;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.hero-stat h3 {
+  margin:0 0 5px;
+}
+
+.hero-stat .big {
+  font-size:28px;
+  font-weight:bold;
+}
+
+.stats-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:850px) {
+  .stats-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.stat-card {
+  border-radius:16px;
+  padding:15px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+}
+
+.stat-card:nth-child(1) { background:#eff6ff; border-color:#bfdbfe; }
+.stat-card:nth-child(2) { background:#fff1f2; border-color:#fecdd3; }
+.stat-card:nth-child(3) { background:#fffbeb; border-color:#fde68a; }
+.stat-card:nth-child(4) { background:#f0fdf4; border-color:#bbf7d0; }
 
 .bb {
   background:#fff1f2;
@@ -239,100 +251,15 @@ button:hover { background:#b51218; }
   font-weight:bold;
 }
 
-.away-box {
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
-  color:#13294b;
-  border-radius:14px;
-  padding:14px;
-  margin:14px 0;
-  font-weight:bold;
+.medal {
+  font-size:18px;
+  margin-right:5px;
 }
 
-.hero-stat {
-  background:linear-gradient(135deg, #13294b, #1f3f73);
-  color:white;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
+.small {
+  color:gray;
+  font-size:13px;
 }
-
-.hero-stat h3 { margin:0 0 5px; color:white; }
-.hero-stat .big { font-size:28px; font-weight:bold; }
-
-.stats-grid {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:14px;
-}
-
-@media (min-width:850px) {
-  .stats-grid { grid-template-columns:1fr 1fr; }
-}
-
-.stat-card {
-  border-radius:16px;
-  padding:15px;
-  border:1px solid #e5e7eb;
-  box-shadow:0 3px 10px rgba(0,0,0,0.06);
-}
-
-.stat-card h3 { margin:0 0 10px; }
-
-.stat-card:nth-child(1) { background:#eff6ff; border-color:#bfdbfe; }
-.stat-card:nth-child(1) h3 { color:#13294b; }
-.stat-card:nth-child(2) { background:#fff1f2; border-color:#fecdd3; }
-.stat-card:nth-child(2) h3 { color:#b51218; }
-.stat-card:nth-child(3) { background:#fffbeb; border-color:#fde68a; }
-.stat-card:nth-child(3) h3 { color:#92400e; }
-.stat-card:nth-child(4) { background:#f0fdf4; border-color:#bbf7d0; }
-.stat-card:nth-child(4) h3 { color:#166534; }
-.stat-card:nth-child(5) { background:#f5f3ff; border-color:#ddd6fe; }
-.stat-card:nth-child(5) h3 { color:#5b21b6; }
-.stat-card:nth-child(6) { background:#ecfeff; border-color:#a5f3fc; }
-.stat-card:nth-child(6) h3 { color:#155e75; }
-.stat-card:nth-child(7) { background:#fff7ed; border-color:#fed7aa; }
-.stat-card:nth-child(7) h3 { color:#9a3412; }
-.stat-card:nth-child(8) { background:#f8fafc; border-color:#cbd5e1; }
-.stat-card:nth-child(8) h3 { color:#334155; }
-.stat-card:nth-child(9) { background:#fdf2f8; border-color:#fbcfe8; }
-.stat-card:nth-child(9) h3 { color:#9d174d; }
-.stat-card:nth-child(10) { background:#eef2ff; border-color:#c7d2fe; }
-.stat-card:nth-child(10) h3 { color:#3730a3; }
-.stat-card:nth-child(11) { background:#f0f9ff; border-color:#bae6fd; }
-.stat-card:nth-child(11) h3 { color:#075985; }
-.stat-card:nth-child(12) { background:#fefce8; border-color:#fef08a; }
-.stat-card:nth-child(12) h3 { color:#854d0e; }
-.stat-card:nth-child(13) { background:#f7fee7; border-color:#d9f99d; }
-.stat-card:nth-child(13) h3 { color:#3f6212; }
-.stat-card:nth-child(14) { background:#faf5ff; border-color:#e9d5ff; }
-.stat-card:nth-child(14) h3 { color:#6b21a8; }
-.stat-card:nth-child(15) { background:#fff7ed; border-color:#fed7aa; }
-.stat-card:nth-child(15) h3 { color:#9a3412; }
-
-.result-row, .compare-row {
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  padding:9px 0;
-  border-bottom:1px solid #e5e7eb;
-}
-
-.compare-row {
-  grid-template-columns:1fr auto auto auto;
-  font-size:14px;
-}
-
-.result-score {
-  font-weight:bold;
-  color:var(--blue);
-  font-size:17px;
-}
-
-.medal { font-size:18px; margin-right:5px; }
-.small { color:gray; font-size:13px; }
-.diff-plus { color:var(--green); font-weight:bold; }
-.diff-minus { color:var(--darkred); font-weight:bold; }
 
 .warning {
   background:#fff7ed;
@@ -342,107 +269,37 @@ button:hover { background:#b51218; }
   border-radius:12px;
   margin-bottom:12px;
 }
-
-.vipps-box {
-  text-align:center;
-  margin:22px auto 8px;
-  padding:15px;
-  background:rgba(255,255,255,0.95);
-  border-radius:16px;
-  max-width:300px;
-}
-
-.vipps-box img {
-  width:120px;
-  max-width:80%;
-  border-radius:16px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.25);
-}
-
-.vipps-box div {
-  font-size:16px;
-  color:gray;
-  margin-top:8px;
-}
 </style>
 </head>
 
 <body>
 
+<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+
 <header>
   <div class="logo-wrap">
     <img src="lblogoen.png" alt="Lynbørs-logo">
   </div>
-  <h1>Lynbørs</h1>
-  <p>100% subjektivt. Heldigvis. Sett børsen.</p>
+  <h1>Tippetips</h1>
+  <p>Tippekonkurransen for folk som egentlig vet bedre etter kampen.</p>
 </header>
 
 <main>
 
-<div class="box">
-  <label>OBS: Velg kamp</label>
-  <select id="match">
-    <option>TEST</option>
-    <option>13.04 Haugesund hjemme</option>
-    <option>21.04 Sogndal borte</option>
-    <option>27.04 Sandnes Ulf hjemme</option>
-    <option>30.04 Moss borte</option>
-    <option>01.05 Lyn - Stabæk</option>
-    <option>10.05 Raufoss - Lyn</option>
-    <option>16.05 Lyn - Kongsvinger</option>
-    <option>20.05 Egersund - Lyn</option>
-    <option>25.05 Lyn - Strømmen</option>
-    <option>31.05 Odd - Lyn</option>
-    <option>14.06 Lyn - Bryne</option>
-    <option>19.06 Ranheim - Lyn</option>
-    <option>27.06 Lyn - Hødd</option>
-    <option>02.07 Lyn - Åsane</option>
-    <option>26.07 Strømsgodset - Lyn</option>
-    <option>02.08 Lyn - Sogndal</option>
-    <option>09.08 Stabæk - Lyn</option>
-    <option>16.08 Lyn - Odd</option>
-    <option>26.08 Åsane - Lyn</option>
-    <option>30.08 Kongsvinger - Lyn</option>
-    <option>06.09 Lyn - Egersund</option>
-    <option>13.09 Hødd - Lyn</option>
-    <option>20.09 Lyn - Ranheim</option>
-    <option>04.10 Bryne - Lyn</option>
-    <option>11.10 Lyn - Strømsgodset</option>
-    <option>14.10 Haugesund - Lyn</option>
-    <option>18.10 Lyn - Moss</option>
-    <option>25.10 Sandnes Ulf - Lyn</option>
-    <option>01.11 Lyn - Raufoss</option>
-    <option>08.11 Strømmen - Lyn</option>
-  </select>
-</div>
+<h2 class="section-title">1. Send inn tips</h2>
 
 <div class="box">
+  <div class="notice">
+    Tips kan endres helt frem til kampfristen. Etter fristen låses kampen.
+  </div>
+
+  <div id="nextMatches" class="next-grid"></div>
+
   <label>Navn / forumbruker</label>
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
-  <div class="small">Viktig: skriv forumnavnet nøyaktig likt hver gang. Store og små bokstaver behandles likt.</div>
-</div>
+  <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
 
-<div class="box">
-  <h2>Gi karakter</h2>
-  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
-  <div class="grid" id="players"></div>
-</div>
-
-<div class="box">
-  <h2>🏟️ motstanderens tribuneliv</h2>
-  <p>Hvordan var motstandernes tribuneliv? Helt frivillig. Kun hele tall fra 1 til 10.</p>
-  <input type="number" id="awayFans" min="1" max="10" step="1" placeholder="1–10">
-  <div class="small">for moro skyld.</div>
-</div>
-
-<div class="box">
-  <button onclick="sendVote()">Send inn børs</button>
-</div>
-
-<div class="box">
-  <h2>🎯 Tippekonkurranse</h2>
-  <p>Tipset kan endres helt frem til kampfristen. Etter fristen låses kampen.</p>
-  <div id="nextMatches" class="next-grid"></div>
+  <br>
 
   <label>Velg kamp å tippe på</label>
   <select id="tipMatch"></select>
@@ -457,37 +314,33 @@ button:hover { background:#b51218; }
       <input type="number" id="tipAway" min="0" max="9" step="1" placeholder="0–9">
     </div>
   </div>
-  <div class="small">3 poeng for helt riktig resultat. 1 poeng for riktig utfall. Samme bruker + samme kamp overskriver gammelt tips før fristen.</div>
+
+  <div class="small" style="margin-top:10px;">
+    3 poeng for helt riktig resultat. 1 poeng for riktig utfall.
+  </div>
+
   <div style="margin-top:14px;">
     <button onclick="sendTip()">Send tips</button>
   </div>
 </div>
 
-<div class="box">
-  <h2>Valgt kamp</h2>
- <div class="button-row">
-  <button onclick="loadResults()">Vis kampsnitt</button>
-  <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
-  <button onclick="loadSuperbenVsRest()">superben vs resten</button>
-  <button onclick="loadMatchPredictions()">Vis tips</button>
-  <button onclick="loadPredictionLeaderboard()">Tippetabell</button>
-  <button onclick="location.href='/statscenter.html'">Statscenter</button>
-</div>
+<h2 class="section-title">2. Tips for valgt kamp</h2>
+
+<div class="box blue">
+  <div class="button-row">
+    <button onclick="loadMatchPredictions()">Vis tips for valgt kamp</button>
+    <button onclick="loadPredictionLeaderboard()">Vis tippetabell</button>
   </div>
+
   <div id="results" style="margin-top:16px;"></div>
 </div>
 
-<div class="box stats-center">
-  <h2>📊 Statscenter</h2>
-  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. TEST-kampen, Bortefeltet og tipping holdes utenfor spillerstats.</p>
-  <div id="statsCenter">
-    <div class="small">Laster stats...</div>
-  </div>
-</div>
+<h2 class="section-title">3. Tippestatistikk</h2>
 
-<div class="vipps-box">
-  <img src="bilder/vipps.png.png" onerror="this.style.display='none'" alt="Vipps">
-  <div>Scan for å spandere en kaffekapsel 🙏</div>
+<div class="box blue">
+  <div id="tipStats">
+    <div class="small">Laster tippestatistikk...</div>
+  </div>
 </div>
 
 </main>
@@ -495,8 +348,7 @@ button:hover { background:#b51218; }
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
-const MY_NAME = "superben";
-const AWAY_FANS_PLAYER = "Bortefeltet";
+
 const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
 const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
@@ -504,9 +356,8 @@ const matchesData = [
   { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
   { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
   { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
-  { id:"30.04 Moss borte", date:"2026-04-26", home:"Moss", away:"Lyn", deadline:"2026-04-26T18:00:00", actual:null },
-  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
-{ id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
+  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
+  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
   { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
   { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
   { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
@@ -534,44 +385,6 @@ const matchesData = [
   { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00", actual:null }
 ];
 
-const players = [
-  { name:"Alexander Pedersen", short:"Pedersen", img:"pedersen.png" },
-  { name:"Sander Amble Haugen", short:"SAH", img:"sah.png" },
-  { name:"William Sell", short:"Sell", img:"sell.png" },
-  { name:"Ådne Midtskogen", short:"Midtskogen", img:"midtskogen.png" },
-  { name:"Herman Solberg Nilsen", short:"HSN", img:"hsn.png" },
-  { name:"Isaac Barnett", short:"Barnett", img:"barnett.png" },
-  { name:"Didrik Fredriksen", short:"Fredriksen", img:"fredriksen.png" },
-  { name:"Eron Isufi", short:"Isufi", img:"isufi.png" },
-  { name:"Julius Skaug", short:"Skaug", img:"skaug.png" },
-  { name:"William Kurtovic", short:"Kurtovic", img:"kurtovic.png" },
-  { name:"Isaac Monglo", short:"Monglo", img:"monglo.png" },
-  { name:"William Wæhler", short:"Wæhler", img:"wæhler.png" },
-  { name:"Anders Bjørntvedt Olsen", short:"ABO", img:"abo.png" },
-  { name:"Matias Johansen", short:"MJ", img:"mj.png" },
-  { name:"Andreas Hellum", short:"Hellum", img:"hellum.png" },
-  { name:"Ibrahim Sawaneh", short:"Sawaneh", img:"sawaneh.png" },
-  { name:"Fallou Sock", short:"Sock", img:"sock.png" },
-  { name:"Isak Vik", short:"Vik", img:"vik.png" },
-  { name:"Marcus Andersen", short:"Andersen", img:"andersen.png" },
-  { name:"Mats Trige", short:"Trige", img:"trige.png" },
-  { name:"Magnus Aadland", short:"Aadland", img:"aadland.png" }
-];
-
-const playersDiv = document.getElementById("players");
-
-players.forEach(p => {
-  const img = p.img ? `<img src="bilder/${p.img}" onerror="this.remove()">` : "";
-  playersDiv.innerHTML += `
-    <div class="player">
-      <div class="avatar">${img}</div>
-      <div class="player-short">${p.short}</div>
-      <div class="player-name">${p.name}</div>
-      <input type="number" id="${p.short}" min="1" max="10" step="1" placeholder="-">
-    </div>
-  `;
-});
-
 function cleanVoterName(name) {
   return (name || "").trim().toLowerCase();
 }
@@ -590,27 +403,8 @@ function isPredictionVote(v) {
   return isRealMatch(v) && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
 }
 
-function isPlayerVote(v) {
-  return isRealMatch(v) && v.player !== AWAY_FANS_PLAYER && !isPredictionVote(v);
-}
-
-function isAwayFansVote(v) {
-  return isRealMatch(v) && v.player === AWAY_FANS_PLAYER;
-}
-
-function getMatchIndex(matchId) {
-  const options = Array.from(document.getElementById("match").options).map(o => o.value);
-  return options.indexOf(matchId);
-}
-
 function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
-}
-
-function getOpponentName(matchId) {
-  const match = getMatchData(matchId);
-  if (!match) return "Ukjent";
-  return match.home === "Lyn" ? match.away : match.home;
 }
 
 function isTipLocked(matchData) {
@@ -667,7 +461,6 @@ function updateTipLabels() {
 }
 
 document.getElementById("tipMatch").addEventListener("change", updateTipLabels);
-renderNextMatches();
 
 function encodeGoals(goals) {
   return goals + 1;
@@ -689,100 +482,12 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   return 0;
 }
 
-function validateRating(label, rating) {
-  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
-    alert(`${label}: karakter må være et helt tall fra 1 til 10.`);
-    return false;
-  }
-  return true;
-}
-
 function validateTip(label, value) {
   if (!Number.isInteger(value) || value < 0 || value > 9) {
     alert(`${label}: tips må være et helt tall fra 0 til 9.`);
     return false;
   }
   return true;
-}
-
-async function sendVote() {
-  const match = document.getElementById("match").value;
-  const voter = cleanVoterName(document.getElementById("voter").value);
-  const awayFansRaw = document.getElementById("awayFans").value;
-
-  if (match === "TEST") {
-    alert("TEST-kampen er bare for testing. Velg en ekte kamp før du sender inn børs.");
-    document.getElementById("match").focus();
-    return;
-  }
-
-  if (!voter) {
-    alert("Skriv inn forumbrukernavnet ditt først.");
-    document.getElementById("voter").focus();
-    return;
-  }
-
-  localStorage.setItem("lynbors_voter", document.getElementById("voter").value.trim());
-
-  let rows = [];
-
-  for (const p of players) {
-    const raw = document.getElementById(p.short).value;
-    if (!raw) continue;
-
-    const rating = Number(raw);
-    if (!validateRating(p.short, rating)) return;
-
-    rows.push({
-      match_id: match,
-      voter: voter,
-      player: p.short,
-      rating: rating
-    });
-  }
-
-  if (awayFansRaw) {
-    const awayFansRating = Number(awayFansRaw);
-    if (!validateRating(AWAY_FANS_PLAYER, awayFansRating)) return;
-
-    rows.push({
-      match_id: match,
-      voter: voter,
-      player: AWAY_FANS_PLAYER,
-      rating: awayFansRating
-    });
-  }
-
-  if (rows.length === 0) {
-    alert("Du må gi minst én spillerkarakter eller Bortefeltet-karakter først.");
-    return;
-  }
-
-  const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
-    {
-      method:"POST",
-      headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY,
-        "Content-Type":"application/json",
-        "Prefer":"resolution=merge-duplicates,return=minimal"
-      },
-      body:JSON.stringify(rows)
-    }
-  );
-
-  if (!response.ok) {
-    alert("Noe gikk feil. Stemmen ble ikke sendt.");
-    return;
-  }
-
-  alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
-
-  players.forEach(p => document.getElementById(p.short).value = "");
-  document.getElementById("awayFans").value = "";
-  loadResults();
-  loadStatsCenter();
 }
 
 async function sendTip() {
@@ -793,7 +498,6 @@ async function sendTip() {
 
   if (!voter) {
     alert("Skriv inn forumbrukernavnet ditt først.");
-    document.getElementById("voter").focus();
     return;
   }
 
@@ -810,6 +514,7 @@ async function sendTip() {
   }
 
   const matchData = getMatchData(tipMatch);
+
   if (!matchData) {
     alert("Velg en gyldig kamp å tippe på.");
     return;
@@ -822,6 +527,7 @@ async function sendTip() {
 
   const tipHome = Number(tipHomeRaw);
   const tipAway = Number(tipAwayRaw);
+
   if (!validateTip("Hjemmemål", tipHome) || !validateTip("Bortemål", tipAway)) return;
 
   const rows = [
@@ -859,10 +565,13 @@ async function sendTip() {
   }
 
   alert("Tipset er lagret! Hvis du hadde tippet før på samme kamp, ble det gamle tipset oppdatert.");
+
   document.getElementById("tipHome").value = "";
   document.getElementById("tipAway").value = "";
+
   loadMatchPredictions();
-  loadStatsCenter();
+  loadPredictionLeaderboard();
+  loadTipStats();
 }
 
 async function fetchVotes(query = "") {
@@ -881,110 +590,8 @@ async function fetchVotes(query = "") {
 }
 
 async function getVotesForSelectedMatch() {
-  const match = document.getElementById("match").value;
+  const match = document.getElementById("tipMatch").value;
   return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
-}
-
-function buildStats(data) {
-  let stats = {};
-
-  data.forEach(v => {
-    if (!stats[v.player]) stats[v.player] = { total:0, count:0, ratings:[], matches:{} };
-    stats[v.player].total += Number(v.rating);
-    stats[v.player].count += 1;
-    stats[v.player].ratings.push(Number(v.rating));
-
-    if (!stats[v.player].matches[v.match_id]) stats[v.player].matches[v.match_id] = [];
-    stats[v.player].matches[v.match_id].push(Number(v.rating));
-  });
-
-  return Object.keys(stats).map(player => ({
-    player,
-    avg: stats[player].total / stats[player].count,
-    count: stats[player].count,
-    ratings: stats[player].ratings,
-    matches: stats[player].matches
-  })).sort((a,b) => b.avg - a.avg);
-}
-
-function stdDev(values) {
-  if (!values || values.length < 2) return 0;
-  const avg = values.reduce((a,b)=>a+b,0) / values.length;
-  const variance = values.reduce((sum,v)=>sum + Math.pow(v - avg, 2), 0) / values.length;
-  return Math.sqrt(variance);
-}
-
-function renderMiniRanking(items, limit = 5, showMedals = true) {
-  if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
-
-  const medals = ["🥇","🥈","🥉"];
-  let html = "";
-
-  items.slice(0, limit).forEach((r, i) => {
-    const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
-    html += `
-      <div class="result-row">
-        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
-        <div class="result-score">${r.score}</div>
-      </div>
-    `;
-  });
-
-  return html;
-}
-
-function renderRanking(title, resultList) {
-  if (!resultList || resultList.length === 0) {
-    document.getElementById("results").innerHTML = "<p>Ingen stemmer funnet.</p>";
-    return;
-  }
-
-  const best = resultList[0];
-  let html = `<div class="bb">🔥 ${title}: ${best.player} med ${best.avg.toFixed(2)}</div>`;
-
-  html += renderMiniRanking(resultList.map(r => ({
-    player:r.player,
-    score:r.avg.toFixed(2),
-    sub:`${r.count} stemmer`
-  })), 99);
-
-  document.getElementById("results").innerHTML = html;
-}
-
-async function loadResults() {
-  const data = await getVotesForSelectedMatch();
-  const playerVotes = data.filter(v => v.player !== AWAY_FANS_PLAYER && !isPredictionVote(v));
-  const awayVotes = data.filter(v => v.player === AWAY_FANS_PLAYER);
-
-  if ((!playerVotes || playerVotes.length === 0) && (!awayVotes || awayVotes.length === 0)) {
-    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
-    return;
-  }
-
-  let html = "";
-
-  if (playerVotes.length > 0) {
-    const ranking = buildStats(playerVotes);
-    const best = ranking[0];
-    html += `<div class="bb">🔥 Banens beste: ${best.player} med ${best.avg.toFixed(2)}</div>`;
-    html += renderMiniRanking(ranking.map(r => ({
-      player:r.player,
-      score:r.avg.toFixed(2),
-      sub:`${r.count} stemmer`
-    })), 99);
-  }
-
-  if (awayVotes.length > 0) {
-    const away = buildStats(awayVotes)[0];
-    html += `
-      <div class="away-box">
-        🏟️ Bortefeltet: ${away.avg.toFixed(2)}<br>
-        <span class="small">${away.count} stemmer på motstandernes tribuneliv</span>
-      </div>
-    `;
-  }
-
-  document.getElementById("results").innerHTML = html;
 }
 
 function buildPredictions(votes) {
@@ -993,7 +600,15 @@ function buildPredictions(votes) {
   votes.filter(isPredictionVote).forEach(v => {
     const voter = cleanVoterName(v.voter);
     const key = `${v.match_id}|||${voter}`;
-    if (!map[key]) map[key] = { match_id:v.match_id, voter, home:null, away:null };
+
+    if (!map[key]) {
+      map[key] = {
+        match_id:v.match_id,
+        voter,
+        home:null,
+        away:null
+      };
+    }
 
     if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
     if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
@@ -1003,7 +618,13 @@ function buildPredictions(votes) {
 }
 
 async function loadMatchPredictions() {
-  const match = document.getElementById("match").value;
+  const match = document.getElementById("tipMatch").value;
+
+  if (!match) {
+    document.getElementById("results").innerHTML = "<p>Ingen kamp valgt.</p>";
+    return;
+  }
+
   const data = await getVotesForSelectedMatch();
   const predictions = buildPredictions(data).sort((a,b) => a.voter.localeCompare(b.voter));
   const matchData = getMatchData(match);
@@ -1015,12 +636,16 @@ async function loadMatchPredictions() {
   }
 
   let html = `
-    <div class="bb">🎯 Tips for ${match}</div>
-    <p class="small">${matchData ? `${matchData.home} - ${matchData.away}` : ""}${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}</p>
+    <div class="bb">Tips for ${match}</div>
+    <p class="small">
+      ${matchData ? `${matchData.home} - ${matchData.away}` : ""}
+      ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
+    </p>
   `;
 
   predictions.forEach(p => {
     const points = actual ? scorePrediction(p.home, p.away, actual.home, actual.away) : null;
+
     html += `
       <div class="prediction-row">
         <div><strong>${p.voter}</strong></div>
@@ -1040,10 +665,20 @@ function buildPredictionLeaderboardRows(allVotes) {
   predictions.forEach(p => {
     const matchData = getMatchData(p.match_id);
     const actual = matchData ? matchData.actual : null;
+
     if (!actual) return;
 
     const points = scorePrediction(p.home, p.away, actual.home, actual.away);
-    if (!users[p.voter]) users[p.voter] = { points:0, correct:0, outcomes:0, zeroes:0, tips:0 };
+
+    if (!users[p.voter]) {
+      users[p.voter] = {
+        points:0,
+        correct:0,
+        outcomes:0,
+        zeroes:0,
+        tips:0
+      };
+    }
 
     users[p.voter].points += points;
     users[p.voter].tips += 1;
@@ -1061,7 +696,7 @@ function buildPredictionLeaderboardRows(allVotes) {
     outcomes:users[user].outcomes,
     zeroes:users[user].zeroes,
     tips:users[user].tips,
-    sub:`🎯 ${users[user].correct} helt riktige · 🔮 ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
+    sub:`${users[user].correct} helt riktige · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
   })).sort((a,b) =>
     b.raw - a.raw ||
     b.correct - a.correct ||
@@ -1085,469 +720,112 @@ function buildMostAccuratePredictors(allVotes) {
     }));
 }
 
+function renderMiniRanking(items, limit = 5, showMedals = true) {
+  if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇","🥈","🥉"];
+  let html = "";
+
+  items.slice(0, limit).forEach((r, i) => {
+    const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
+
+    html += `
+      <div class="result-row">
+        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
+        <div class="result-score">${r.score}</div>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
 async function loadPredictionLeaderboard() {
   const allVotes = await fetchVotes();
   const rows = buildPredictionLeaderboardRows(allVotes);
 
   if (rows.length === 0) {
-    document.getElementById("results").innerHTML = `<p>Ingen tippetabell enda. Legg inn faktiske resultater i matchesData først.</p>`;
+    document.getElementById("results").innerHTML =
+      "<p>Ingen tippetabell enda. Resultater må legges inn i koden først.</p>";
     return;
   }
 
-  let html = `<div class="bb">🏆 Tippetabell</div>`;
-  html += renderMiniRanking(rows, 99);
-  document.getElementById("results").innerHTML = html;
-}
-
-async function loadSeasonResults() {
-  const data = (await fetchVotes()).filter(isPlayerVote);
-
-  if (!data || data.length === 0) {
-    document.getElementById("results").innerHTML = "<p>Ingen sesongstemmer enda.</p>";
-    return;
-  }
-
-  const resultList = buildStats(data).filter(r => r.count >= 2);
-  renderRanking("Sesongtoppen", resultList);
-}
-
-async function loadSuperbenVsRest() {
-  const data = (await getVotesForSelectedMatch()).filter(isPlayerVote);
-
-  if (!data || data.length === 0) {
-    document.getElementById("results").innerHTML = "<p>Ingen spillerstemmer på denne kampen enda.</p>";
-    return;
-  }
-
-  let mine = {};
-  let rest = {};
-
-  data.forEach(v => {
-    const name = cleanVoterName(v.voter);
-    const target = name === MY_NAME ? mine : rest;
-
-    if (!target[v.player]) target[v.player] = { total:0, count:0 };
-
-    target[v.player].total += Number(v.rating);
-    target[v.player].count += 1;
-  });
-
-  let rows = players.map(p => {
-    const myData = mine[p.short];
-    const restData = rest[p.short];
-
-    const myAvg = myData ? myData.total / myData.count : null;
-    const restAvg = restData ? restData.total / restData.count : null;
-    const diff = myAvg !== null && restAvg !== null ? myAvg - restAvg : null;
-
-    return { player:p.short, myAvg, restAvg, diff };
-  }).filter(r => r.myAvg !== null || r.restAvg !== null);
-
-  rows.sort((a,b) => {
-    if (a.diff === null) return 1;
-    if (b.diff === null) return -1;
-    return Math.abs(b.diff) - Math.abs(a.diff);
-  });
-
-  let html = `
-    <div class="bb">🧠 superben vs resten</div>
-    <p class="small">Positive tall betyr at superben er snillere. Negative tall betyr strengere. Bortefeltet og tips er ikke med her.</p>
+  document.getElementById("results").innerHTML = `
+    <div class="bb">Tippetabell</div>
+    ${renderMiniRanking(rows, 99)}
   `;
-
-  rows.forEach(r => {
-    const diffText = r.diff === null ? "–" : (r.diff > 0 ? "+" : "") + r.diff.toFixed(2);
-    const diffClass = r.diff === null ? "" : (r.diff >= 0 ? "diff-plus" : "diff-minus");
-
-    html += `
-      <div class="compare-row">
-        <div><strong>${r.player}</strong></div>
-        <div>superben: ${r.myAvg === null ? "–" : r.myAvg.toFixed(2)}</div>
-        <div>resten: ${r.restAvg === null ? "–" : r.restAvg.toFixed(2)}</div>
-        <div class="${diffClass}">${diffText}</div>
-      </div>
-    `;
-  });
-
-  document.getElementById("results").innerHTML = html;
 }
 
-function buildBBCounts(allVotes) {
-  const matches = [...new Set(allVotes.filter(isPlayerVote).map(v => v.match_id))];
-  let counts = {};
-  let margins = [];
-
-  matches.forEach(match => {
-    const matchVotes = allVotes.filter(v => v.match_id === match && isPlayerVote(v));
-    const ranking = buildStats(matchVotes);
-
-    if (ranking.length > 0) {
-      const winner = ranking[0].player;
-      counts[winner] = (counts[winner] || 0) + 1;
-
-      if (ranking.length > 1) {
-        margins.push({
-          player: winner,
-          score: (ranking[0].avg - ranking[1].avg).toFixed(2),
-          raw: ranking[0].avg - ranking[1].avg,
-          sub: match
-        });
-      }
-    }
-  });
-
-  return {
-    counts: Object.keys(counts).map(player => ({
-      player,
-      score: counts[player],
-      sub: "BB"
-    })).sort((a,b) => b.score - a.score),
-    margins: margins.sort((a,b)=>b.raw-a.raw)
-  };
-}
-
-function buildSuperbenSeason(allVotes) {
-  let mine = {};
-  let rest = {};
-
-  allVotes.filter(isPlayerVote).forEach(v => {
-    const name = cleanVoterName(v.voter);
-    const target = name === MY_NAME ? mine : rest;
-
-    if (!target[v.player]) target[v.player] = { total:0, count:0 };
-    target[v.player].total += Number(v.rating);
-    target[v.player].count += 1;
-  });
-
-  return players.map(p => {
-    const myData = mine[p.short];
-    const restData = rest[p.short];
-    const myAvg = myData ? myData.total / myData.count : null;
-    const restAvg = restData ? restData.total / restData.count : null;
-    const diff = myAvg !== null && restAvg !== null ? myAvg - restAvg : null;
-
-    return { player:p.short, myAvg, restAvg, diff };
-  }).filter(r => r.diff !== null)
-    .sort((a,b) => Math.abs(b.diff) - Math.abs(a.diff));
-}
-
-function buildControversial(allVotes) {
-  return buildStats(allVotes.filter(isPlayerVote))
-    .filter(r => r.count >= 3)
-    .map(r => ({
-      player:r.player,
-      score:stdDev(r.ratings).toFixed(2),
-      raw:stdDev(r.ratings),
-      sub:`${r.count} stemmer`
-    }))
-    .sort((a,b) => b.raw - a.raw);
-}
-
-function buildStable(allVotes) {
-  return buildStats(allVotes.filter(isPlayerVote))
-    .filter(r => r.count >= 3)
-    .map(r => ({
-      player:r.player,
-      score:stdDev(r.ratings).toFixed(2),
-      raw:stdDev(r.ratings),
-      sub:`${r.count} stemmer`
-    }))
-    .sort((a,b) => a.raw - b.raw);
-}
-
-function buildWorstPlayers(allVotes) {
-  return buildStats(allVotes.filter(isPlayerVote))
-    .filter(r => r.count >= 2)
-    .sort((a,b) => a.avg - b.avg)
-    .map(r => ({
-      player:r.player,
-      score:r.avg.toFixed(2),
-      sub:`${r.count} stemmer`
-    }));
-}
-
-function buildTopVoters(allVotes) {
-  let voters = {};
-
-  allVotes.filter(isPlayerVote).forEach(v => {
-    const name = cleanVoterName(v.voter);
-    voters[name] = (voters[name] || 0) + 1;
-  });
-
-  return Object.keys(voters).map(v => ({
-    player:v,
-    score:voters[v],
-    sub:"stemmer"
-  })).sort((a,b)=>b.score-a.score);
-}
-
-function buildUserAverages(allVotes) {
-  let users = {};
-
-  allVotes.filter(isPlayerVote).forEach(v => {
-    const name = cleanVoterName(v.voter);
-    if (!users[name]) users[name] = { total:0, count:0 };
-    users[name].total += Number(v.rating);
-    users[name].count += 1;
-  });
-
-  return Object.keys(users).map(user => ({
-    player:user,
-    avg:users[user].total / users[user].count,
-    count:users[user].count,
-    score:(users[user].total / users[user].count).toFixed(2),
-    sub:`${users[user].count} stemmer`
-  }));
-}
-
-function perPlayerMatchAverages(allVotes) {
-  let map = {};
-
-  allVotes.filter(isPlayerVote).forEach(v => {
-    if (!map[v.player]) map[v.player] = {};
-    if (!map[v.player][v.match_id]) map[v.player][v.match_id] = [];
-    map[v.player][v.match_id].push(Number(v.rating));
-  });
-
-  let output = {};
-
-  Object.keys(map).forEach(player => {
-    output[player] = Object.keys(map[player]).map(match => {
-      const ratings = map[player][match];
-      return {
-        match,
-        idx:getMatchIndex(match),
-        avg:ratings.reduce((a,b)=>a+b,0) / ratings.length
-      };
-    }).filter(x => x.idx >= 0).sort((a,b)=>a.idx-b.idx);
-  });
-
-  return output;
-}
-
-function buildFormStats(allVotes) {
-  const byPlayer = perPlayerMatchAverages(allVotes);
-  let rows = [];
-
-  Object.keys(byPlayer).forEach(player => {
-    const arr = byPlayer[player];
-    if (arr.length < 2) return;
-
-    const first = arr.slice(0, Math.min(3, arr.length));
-    const last = arr.slice(-Math.min(3, arr.length));
-
-    const firstAvg = first.reduce((s,x)=>s+x.avg,0) / first.length;
-    const lastAvg = last.reduce((s,x)=>s+x.avg,0) / last.length;
-    const diff = lastAvg - firstAvg;
-
-    rows.push({
-      player,
-      score:(diff > 0 ? "+" : "") + diff.toFixed(2),
-      raw:diff,
-      sub:`før ${firstAvg.toFixed(2)} → nå ${lastAvg.toFixed(2)}`
-    });
-  });
-
-  return {
-    up:[...rows].sort((a,b)=>b.raw-a.raw),
-    down:[...rows].sort((a,b)=>a.raw-b.raw)
-  };
-}
-
-function buildJojo(allVotes) {
-  const byPlayer = perPlayerMatchAverages(allVotes);
-
-  return Object.keys(byPlayer).map(player => {
-    const arr = byPlayer[player].map(x=>x.avg);
-    if (arr.length < 2) return null;
-
-    return {
-      player,
-      score:stdDev(arr).toFixed(2),
-      raw:stdDev(arr),
-      sub:`${arr.length} kamper`
-    };
-  }).filter(Boolean).sort((a,b)=>b.raw-a.raw);
-}
-
-function buildFanFavourite(allVotes) {
-  const stats = buildStats(allVotes.filter(isPlayerVote));
-
-  return stats.filter(r => r.count >= 2).map(r => ({
-    player:r.player,
-    score:(r.avg * Math.log10(r.count + 1)).toFixed(2),
-    raw:r.avg * Math.log10(r.count + 1),
-    sub:`${r.avg.toFixed(2)} snitt · ${r.count} stemmer`
-  })).sort((a,b)=>b.raw-a.raw);
-}
-
-function buildAwayFansStats(allVotes) {
-  let teams = {};
-
-  allVotes.filter(isAwayFansVote).forEach(v => {
-    const opponent = getOpponentName(v.match_id);
-    if (!teams[opponent]) teams[opponent] = { total:0, count:0, matches:new Set() };
-    teams[opponent].total += Number(v.rating);
-    teams[opponent].count += 1;
-    teams[opponent].matches.add(v.match_id);
-  });
-
-  return Object.keys(teams).map(team => ({
-    player:team,
-    score:(teams[team].total / teams[team].count).toFixed(2),
-    raw:teams[team].total / teams[team].count,
-    sub:`${teams[team].count} stemmer · ${teams[team].matches.size} kamp(er)`
-  })).sort((a,b)=>b.raw-a.raw);
-}
-
-async function loadStatsCenter() {
+async function loadTipStats() {
   const allVotes = await fetchVotes();
-  const realVotes = allVotes.filter(isPlayerVote);
-  const awayFansStats = buildAwayFansStats(allVotes);
-  const predictionLeaders = buildPredictionLeaderboardRows(allVotes);
-  const accuratePredictors = buildMostAccuratePredictors(allVotes);
-  const box = document.getElementById("statsCenter");
+  const predictionVotes = allVotes.filter(isPredictionVote);
+  const predictions = buildPredictions(predictionVotes);
+  const leaderboard = buildPredictionLeaderboardRows(allVotes);
+  const accurate = buildMostAccuratePredictors(allVotes);
 
-  if (!realVotes || realVotes.length === 0) {
-    box.innerHTML = `<div class="warning">Ingen ekte spillerstemmer enda. TEST-kampen, Bortefeltet og tipping vises ikke i spillerstats.</div>`;
-    return;
-  }
+  const totalTips = predictions.length;
+  const uniqueUsers = new Set(predictions.map(p => p.voter)).size;
+  const finishedMatches = matchesData.filter(m => m.actual).length;
 
-  const season = buildStats(realVotes).filter(r => r.count >= 2);
-  const seasonItems = season.map(r => ({
-    player:r.player,
-    score:r.avg.toFixed(2),
-    sub:`${r.count} stemmer`
-  }));
+  const mostActive = {};
+  predictions.forEach(p => {
+    mostActive[p.voter] = (mostActive[p.voter] || 0) + 1;
+  });
 
-  const totalVotes = realVotes.length;
-  const uniqueMatches = new Set(realVotes.map(v => v.match_id)).size;
-  const uniqueVoters = new Set(realVotes.map(v => cleanVoterName(v.voter))).size;
+  const mostActiveRows = Object.keys(mostActive).map(user => ({
+    player:user,
+    score:mostActive[user],
+    sub:"tips sendt inn"
+  })).sort((a,b) => b.score - a.score);
 
-  const bb = buildBBCounts(realVotes);
-  const controversial = buildControversial(realVotes);
-  const stable = buildStable(realVotes);
-  const worstPlayers = buildWorstPlayers(realVotes);
-  const topVoters = buildTopVoters(realVotes);
-  const userAvgs = buildUserAverages(realVotes).filter(u=>u.count >= 5);
-  const strictest = [...userAvgs].sort((a,b)=>a.avg-b.avg);
-  const kindest = [...userAvgs].sort((a,b)=>b.avg-a.avg);
-  const form = buildFormStats(realVotes);
-  const jojo = buildJojo(realVotes);
-  const fanFav = buildFanFavourite(realVotes);
-  const superbenSeason = buildSuperbenSeason(realVotes);
-
-  const superbenMostDifferent = superbenSeason.slice(0,8).map(r => ({
-    player:r.player,
-    score:(r.diff > 0 ? "+" : "") + r.diff.toFixed(2),
-    sub:`superben ${r.myAvg.toFixed(2)} / resten ${r.restAvg.toFixed(2)}`
-  }));
-
-  let html = `
+  document.getElementById("tipStats").innerHTML = `
     <div class="hero-stat">
-      <h3>Sesongstatus</h3>
-      <div class="big">${totalVotes} spillerstemmer</div>
-      <div>${uniqueMatches} kamper · ${uniqueVoters} brukere</div>
+      <h3>Tippestatus</h3>
+      <div class="big">${totalTips} tips</div>
+      <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat</div>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>🏆 Sesongtoppen</h3>
-        ${renderMiniRanking(seasonItems, 8)}
+        <h3>Tippetabellen</h3>
+        ${renderMiniRanking(leaderboard, 8)}
       </div>
 
       <div class="stat-card">
-        <h3>😬 Skjerpings</h3>
-        <div class="small">Lavest snitt denne sesongen.</div>
-        ${renderMiniRanking(worstPlayers, 8, false)}
+        <h3>Treffsikre typer</h3>
+        <div class="small">Flest helt riktige resultater.</div>
+        ${renderMiniRanking(accurate, 8, false)}
       </div>
 
       <div class="stat-card">
-        <h3>👑 Flest BB</h3>
-        ${renderMiniRanking(bb.counts, 8)}
+        <h3>Mest aktive tippere</h3>
+        ${renderMiniRanking(mostActiveRows, 8, false)}
       </div>
 
       <div class="stat-card">
-        <h3>💪 Størst BB-margin</h3>
-        <div class="small">Hvor klart BB vant en kamp.</div>
-        ${renderMiniRanking(bb.margins, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>📈 Formkonge</h3>
-        <div class="small">Størst positiv utvikling.</div>
-        ${renderMiniRanking(form.up, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>📉 Formsvikt</h3>
-        <div class="small">Størst negativ utvikling.</div>
-        ${renderMiniRanking(form.down, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🎢 Jojo-spiller</h3>
-        <div class="small">Størst svingninger fra kamp til kamp.</div>
-        ${renderMiniRanking(jojo, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🧱 Mest stabil</h3>
-        <div class="small">Lavest variasjon.</div>
-        ${renderMiniRanking(stable, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🤯 Mest uenighet</h3>
-        <div class="small">Basert på variasjon i karakterene.</div>
-        ${renderMiniRanking(controversial, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🏅 Topp bidragsytere</h3>
-        <div class="small">Hvem stemmer mest.</div>
-        ${renderMiniRanking(topVoters, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>😇 Snilleste brukere</h3>
-        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>😈 Strengeste brukere</h3>
-        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🧠 superben vs resten</h3>
-        <div class="small">Største avvik totalt.</div>
-        ${renderMiniRanking(superbenMostDifferent, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🏟️ Beste motstanderfans</h3>
-        <div class="small">Høyest snitt på motstandernes tribuneliv.</div>
-        ${renderMiniRanking(awayFansStats, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>🎯 Tippetabellen</h3>
-        <div class="small">Rangert etter poeng. Ved lik poengsum teller flest helt riktige først.</div>
-        ${renderMiniRanking(predictionLeaders, 99)}
-        <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.12);">
-          <strong>🎯 Treffsikre typer</strong>
-          ${renderMiniRanking(accuratePredictors, 5, false)}
+        <h3>Poengsystem</h3>
+        <div class="result-row">
+          <div><strong>Helt riktig resultat</strong><br><span class="small">For eksempel 2-1 og kampen ender 2-1</span></div>
+          <div class="result-score">3 p</div>
+        </div>
+        <div class="result-row">
+          <div><strong>Riktig utfall</strong><br><span class="small">Riktig vinner eller riktig uavgjort</span></div>
+          <div class="result-score">1 p</div>
+        </div>
+        <div class="result-row">
+          <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
+          <div class="result-score">0 p</div>
         </div>
       </div>
     </div>
   `;
-
-  box.innerHTML = html;
 }
 
-loadStatsCenter();
+renderNextMatches();
+loadTipStats();
 </script>
 
 <script defer src="/_vercel/analytics/script.js"></script>
+
 </body>
 </html>
