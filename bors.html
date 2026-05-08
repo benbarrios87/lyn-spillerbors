@@ -493,7 +493,7 @@ button:hover {
     <button onclick="loadResults()">Vis kampsnitt</button>
     <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
     <button onclick="loadSuperbenVsRest()">superben vs resten</button>
-    <button onclick="location.href='/lynligaen.html'">lynligaen</button>
+    <button onclick="location.href='/lynligaen.html'">Lynligaen</button>
   </div>
   <div id="results" style="margin-top:16px;"></div>
 </div>
@@ -501,7 +501,7 @@ button:hover {
 <h2 class="section-title">3. Børsstats</h2>
 
 <div class="box blue">
-  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. TEST-kampen og Bortefeltet holdes utenfor spillerstats.</p>
+  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. Bortefeltet holdes utenfor spillerstats.</p>
   <div id="statsCenter">
     <div class="small">Laster stats...</div>
   </div>
@@ -603,7 +603,7 @@ voterInput.addEventListener("input", () => {
 });
 
 function isRealMatch(v) {
-  return v.match_id && v.match_id !== "TEST";
+  return v.match_id;
 }
 
 function isPlayerVote(v) {
@@ -621,6 +621,19 @@ function getMatchIndex(matchId) {
 
 function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
+}
+
+function setDefaultMatch() {
+  const select = document.getElementById("match");
+  const now = new Date();
+
+  const nextMatch = matchesData
+    .filter(match => new Date(match.date + "T23:59:59") >= now)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+  if (nextMatch) {
+    select.value = nextMatch.id;
+  }
 }
 
 function getOpponentName(matchId) {
@@ -641,11 +654,6 @@ async function sendVote() {
   const match = document.getElementById("match").value;
   const voter = cleanVoterName(document.getElementById("voter").value);
   const awayFansRaw = document.getElementById("awayFans").value;
-
-  if (match === "TEST") {
-    alert("TEST-kampen er bare for testing. Velg en ekte kamp før du sender inn børs.");
-    return;
-  }
 
   if (!voter) {
     alert("Skriv inn forumbrukernavnet ditt først.");
@@ -1191,6 +1199,7 @@ async function loadStatsCenter() {
   `;
 }
 
+setDefaultMatch();
 loadStatsCenter();
 </script>
 
