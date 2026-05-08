@@ -520,6 +520,8 @@ const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
 const MY_NAME = "superben";
 const AWAY_FANS_PLAYER = "Bortefeltet";
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
 const matchesData = [
   { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund" },
@@ -607,7 +609,13 @@ function isRealMatch(v) {
 }
 
 function isPlayerVote(v) {
-  return isRealMatch(v) && v.player !== AWAY_FANS_PLAYER;
+  return (
+    isRealMatch(v) &&
+    v.player !== AWAY_FANS_PLAYER &&
+    v.player !== TIP_HOME_PLAYER &&
+    v.player !== TIP_AWAY_PLAYER
+  );
+}
 }
 
 function isAwayFansVote(v) {
