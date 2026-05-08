@@ -494,13 +494,33 @@ function updatePlayerImages() {
 
 async function loadMatchStats() {
   if (!nextMatch) return;
+
+  const { data, error } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*")
+    .eq("match_id", nextMatch.id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  matchStats = {};
+
+  (data || []).forEach(row => {
+    matchStats[row.player] = {
+      goals: row.goals || 0,
+      assists: row.assists || 0,
+      cleanSheet: row.clean_sheet || false,
+      penaltySave: row.penalty_save || false,
+      redCard: row.red_card || false,
+      rating: 0
+    };
+  });
 }
-
-
 
 async function loadBorsRatings() {
   if (!nextMatch) return;
-}
 
   const { data, error } = await supabaseClient
     .from("votes")
@@ -525,8 +545,8 @@ async function loadBorsRatings() {
 
     if (!ratingMap[vote.player]) {
       ratingMap[vote.player] = {
-        total: 0,
-        count: 0
+        total:0,
+        count:0
       };
     }
 
@@ -539,30 +559,6 @@ async function loadBorsRatings() {
 
     matchStats[player].rating =
       ratingMap[player].total / ratingMap[player].count;
-  });
-}
-
-  const { data, error } = await supabaseClient
-    .from("fantasy_stats")
-    .select("*")
-    .eq("match_id", nextMatch.id);
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  matchStats = {};
-
-  (data || []).forEach(row => {
-  matchStats[row.player] = {
-  goals: row.goals || 0,
-  assists: row.assists || 0,
-  cleanSheet: row.clean_sheet || false,
-  penaltySave: row.penalty_save || false,
-  redCard: row.red_card || false,
-  rating: 0
-    };
   });
 }
 
