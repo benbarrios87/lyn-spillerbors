@@ -869,7 +869,8 @@ fillSelects();
   document.getElementById(id).addEventListener("change", updatePlayerImages);
 });
 
-loadMatchStats().then(() => {
+loadMatchStats().then(async () => {
+  await loadBorsRatings();
   loadSavedTeam();
   updatePlayerImages();
   applyDeadlineLock();
