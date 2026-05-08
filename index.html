@@ -6,85 +6,103 @@
 <title>Lynbørs</title>
 
 <style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+}
+
 body {
   margin:0;
-  font-family:Arial;
-  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  font-family:Arial, sans-serif;
+  background:
+    linear-gradient(rgba(5,10,20,0.72), rgba(5,10,20,0.72)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  height:100vh;
-  overflow:hidden;
+  color:white;
 }
 
-.container {
+.wrapper {
+  width:100%;
+  max-width:900px;
+  padding:30px 20px;
+  text-align:center;
+}
+
+.logo {
+  width:170px;
+  max-width:70%;
+  margin-bottom:12px;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+}
+
+h1 {
+  margin:0;
+  font-size:52px;
+  letter-spacing:1px;
+}
+
+.subtitle {
+  margin-top:12px;
+  font-size:18px;
+  opacity:0.88;
+  line-height:1.5;
+}
+
+.grid {
+  margin-top:40px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:20px;
 }
 
 .card {
-  background:rgba(0,0,0,0.7);
-  color:white;
-  padding:40px;
-  text-align:center;
-  border-radius:20px;
-  font-size:22px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  border-radius:24px;
+  padding:38px 24px;
   cursor:pointer;
-  transition:0.2s;
-  backdrop-filter:blur(4px);
+  transition:0.18s ease;
+  box-shadow:0 10px 25px rgba(0,0,0,0.22);
 }
 
 .card:hover {
-  transform:scale(1.05);
+  transform:translateY(-4px);
   background:rgba(215,25,32,0.9);
 }
 
-.vipps-box {
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  text-align:center;
-  background:rgba(255,255,255,0.95);
-  padding:12px;
-  border-radius:18px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+.card-title {
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:10px;
 }
 
-.vipps-box img {
-  width:90px;
-  border-radius:12px;
+.card-text {
+  font-size:15px;
+  opacity:0.9;
+  line-height:1.5;
 }
 
-.vipps-box div {
-  margin-top:6px;
+.footer {
+  margin-top:36px;
   font-size:13px;
-  color:#444;
+  opacity:0.72;
 }
 
 @media (max-width:700px) {
-  .container {
+  h1 {
+    font-size:40px;
+  }
+
+  .grid {
     grid-template-columns:1fr;
-    width:90%;
   }
 
   .card {
-    padding:28px;
-    font-size:20px;
-  }
-
-  .vipps-box {
-    bottom:12px;
-    right:12px;
-    padding:10px;
-  }
-
-  .vipps-box img {
-    width:75px;
-  }
-
-  .vipps-box div {
-    font-size:12px;
+    padding:30px 22px;
   }
 }
 </style>
@@ -92,16 +110,52 @@ body {
 
 <body>
 
-<div class="container">
-  <div class="card" onclick="location.href='bors.html'">Spillerbørs</div>
-  <div class="card" onclick="location.href='tippetips.html'">Tippetips</div>
-  <div class="card" onclick="location.href='fantasy.html'">Lynfantasy</div>
-  <div class="card" onclick="location.href='lynligaen.html'">Lynligaen</div>
-</div>
+<div class="wrapper">
 
-<div class="vipps-box">
-  <img src="bilder/vipps.png.png" onerror="this.style.display='none'" alt="Vipps">
-  <div>Holder hobbyprosjektet og kaffeforbruket i live ☕</div>
+  <img src="lblogoen.png" class="logo" alt="Lynbørs">
+
+  <h1>Lynbørs</h1>
+
+  <div class="subtitle">
+    Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
+  </div>
+
+  <div class="grid">
+
+    <div class="card" onclick="location.href='bors.html'">
+      <div class="card-title">Spillerbørs</div>
+      <div class="card-text">
+        Sett karakterer etter kamp og se hvem forumet kåret til banens beste.
+      </div>
+    </div>
+
+    <div class="card" onclick="location.href='tippetips.html'">
+      <div class="card-title">Tippetips</div>
+      <div class="card-text">
+        Tipp resultater gjennom sesongen og konkurrer mot resten av forumet.
+      </div>
+    </div>
+
+    <div class="card" onclick="location.href='fantasy.html'">
+      <div class="card-title">Lyn Fantasy</div>
+      <div class="card-text">
+        Velg to spillere og en kaptein. Poeng basert på faktisk prestasjon på banen.
+      </div>
+    </div>
+
+    <div class="card" onclick="location.href='lynligaen.html'">
+      <div class="card-title">Lynligaen</div>
+      <div class="card-text">
+        Sammenlagttabellen som kombinerer børs, tipping og fantasy.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Hvis noe ser litt hjemmelaget ut, så er det fordi det er hjemmelaget.
+  </div>
+
 </div>
 
 <script defer src="/_vercel/analytics/script.js"></script>
