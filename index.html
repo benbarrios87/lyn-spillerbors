@@ -12,8 +12,10 @@
 
 body {
   margin:0;
-  font-family:Arial;
-  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  font-family:Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
   min-height:100vh;
   display:flex;
   flex-direction:column;
@@ -34,20 +36,24 @@ body {
   width:170px;
   max-width:70%;
   margin-bottom:12px;
-  filter:drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,0.45));
 }
 
 h1 {
   margin:0;
   font-size:52px;
   letter-spacing:1px;
+  color:white;
+  text-shadow:0 4px 18px rgba(0,0,0,0.5);
 }
 
 .subtitle {
   margin-top:12px;
   font-size:18px;
-  opacity:0.88;
+  opacity:0.92;
   line-height:1.5;
+  color:white;
+  text-shadow:0 2px 10px rgba(0,0,0,0.55);
 }
 
 .grid {
@@ -58,7 +64,7 @@ h1 {
 }
 
 .card {
-   background:rgba(0,0,0,0.82);
+  background:rgba(0,0,0,0.82);
   color:white;
   padding:40px;
   text-align:center;
@@ -68,6 +74,7 @@ h1 {
   transition:0.2s;
   border:1px solid rgba(255,255,255,0.08);
   box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  backdrop-filter:blur(4px);
 }
 
 .card:hover {
@@ -90,7 +97,9 @@ h1 {
 .footer {
   margin-top:36px;
   font-size:13px;
-  opacity:0.72;
+  opacity:0.75;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
 }
 
 @media (max-width:700px) {
@@ -154,7 +163,7 @@ h1 {
   </div>
 
   <div class="footer">
-    Hvis noe ser litt hjemmelaget ut, så er det fordi det er hjemmelaget.
+   Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt. 
   </div>
 
 </div>
