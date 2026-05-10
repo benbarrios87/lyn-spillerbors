@@ -545,7 +545,7 @@ label {
   <h2 class="section-title">1. Neste runde</h2>
 
   <div class="card match-box">
-    <div>Neste fantasy-kamp</div>
+    <div>Åpen fantasy-kamp</div>
     <div class="match-title" id="matchTitle"></div>
     <div class="match-date" id="matchDate"></div>
   </div>
@@ -555,27 +555,27 @@ label {
   <div class="card rules">
     <h2>Sånn funker det</h2>
 
- <div class="rules-grid">
-  <div class="rule-pill">
-    <strong>Lag:</strong><br>
-    Velg 2 Lyn-spillere og én kaptein før kampstart.
-  </div>
+    <div class="rules-grid">
+      <div class="rule-pill">
+        <strong>Lag:</strong><br>
+        Velg 2 Lyn-spillere og én kaptein før kampstart.
+      </div>
 
-  <div class="rule-pill">
-    <strong>Kaptein:</strong><br>
-    Kapteinens totale fantasy-poeng multipliseres med 1.5.
-  </div>
+      <div class="rule-pill">
+        <strong>Kaptein:</strong><br>
+        Kapteinens totale fantasy-poeng multipliseres med 1.5.
+      </div>
 
-  <div class="rule-pill">
-    <strong>Børsbonus:</strong><br>
-    7.5 børssnitt eller høyere gir +1. 4.5 børssnitt eller lavere gir −1.
-  </div>
+      <div class="rule-pill">
+        <strong>Børsbonus:</strong><br>
+        7.5 børssnitt eller høyere gir +1. 4.5 børssnitt eller lavere gir −1.
+      </div>
 
-  <div class="rule-pill">
-    <strong>Lås:</strong><br>
-    Laget låses når kampen starter.
-  </div>
-</div>
+      <div class="rule-pill">
+        <strong>Lås:</strong><br>
+        Laget låses når kampen starter.
+      </div>
+    </div>
 
     <h3>Poengsystem</h3>
 
@@ -627,7 +627,16 @@ label {
     <div id="fantasyStats">
       <div class="small">Laster fantasy-stats...</div>
     </div>
-</div>
+  </div>
+
+  <h2 class="section-title">5. Fantasy Central</h2>
+
+  <div class="card">
+    <h2>Sesongstats</h2>
+    <div id="seasonFantasyStats">
+      <div class="small">Laster sesongstats...</div>
+    </div>
+  </div>
 
 </div>
 
@@ -666,9 +675,19 @@ const players = [
 
 let matchStats = {};
 
-function getNextMatch() {
+function cleanVoterName(name) {
+  return String(name || "").trim().toLowerCase();
+}
+
+function getPickMatch() {
   const now = new Date();
 
+  return matchesData
+    .filter(match => new Date(match.deadline) > now)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+}
+
+function getStatsMatch() {
   const latestFinishedMatch = matchesData
     .filter(match =>
       match.actual &&
@@ -677,14 +696,11 @@ function getNextMatch() {
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
-  if (latestFinishedMatch) return latestFinishedMatch;
-
-  return matchesData
-    .filter(match => new Date(match.deadline) > now)
-    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+  return latestFinishedMatch || getPickMatch();
 }
 
-const nextMatch = getNextMatch();
+const nextMatch = getPickMatch();
+const statsMatch = getStatsMatch();
 
 function getPlayer(playerName) {
   return players.find(p => p.name === playerName);
@@ -790,12 +806,12 @@ function updatePlayerImages() {
 }
 
 async function loadMatchStats() {
-  if (!nextMatch) return;
+  if (!statsMatch) return;
 
   const { data, error } = await supabaseClient
     .from("fantasy_stats")
     .select("*")
-    .eq("match_id", nextMatch.id);
+    .eq("match_id", statsMatch.id);
 
   if (error) {
     console.error(error);
@@ -817,12 +833,12 @@ async function loadMatchStats() {
 }
 
 async function loadBorsRatings() {
-  if (!nextMatch) return;
+  if (!statsMatch) return;
 
   const { data, error } = await supabaseClient
     .from("votes")
     .select("*")
-    .eq("match_id", nextMatch.id);
+    .eq("match_id", statsMatch.id);
 
   if (error) {
     console.error(error);
@@ -854,8 +870,7 @@ async function loadBorsRatings() {
   });
 }
 
-function calculatePoints(playerName, isCaptain) {
-  const stat = matchStats[playerName];
+function calculatePointsFromStat(playerName, stat, isCaptain) {
   const position = getPlayerPosition(playerName);
 
   if (!stat) return { total:0, lines:["Ingen kampdata registrert ennå"] };
@@ -910,15 +925,19 @@ function calculatePoints(playerName, isCaptain) {
     lines.push(`Børsbonus: −1 (${stat.rating.toFixed(1)})`);
   }
 
- if (isCaptain) {
-  const boosted = Math.round(points * 1.5);
-  lines.push(`Kaptein: ${points} → ${boosted}`);
-  points = boosted;
-}
+  if (isCaptain) {
+    const boosted = Math.round(points * 1.5);
+    lines.push(`Kaptein: ${points} → ${boosted}`);
+    points = boosted;
+  }
 
   if (lines.length === 0) lines.push("Ingen poenggivende hendelser");
 
   return { total:points, lines };
+}
+
+function calculatePoints(playerName, isCaptain) {
+  return calculatePointsFromStat(playerName, matchStats[playerName], isCaptain);
 }
 
 async function saveTeam() {
@@ -978,6 +997,7 @@ async function saveTeam() {
   alert("Fantasy-laget er lagret!");
   showTeam(team);
   loadFantasyStats();
+  loadSeasonFantasyStats();
 }
 
 function playerPointsCard(playerName, pointsData, isCaptain) {
@@ -1104,15 +1124,15 @@ function renderRoundPlayers() {
 }
 
 async function loadFantasyStats() {
-  if (!nextMatch) {
-    document.getElementById("fantasyStats").innerHTML = "Ingen kommende fantasykamp.";
+  if (!statsMatch) {
+    document.getElementById("fantasyStats").innerHTML = "Ingen fantasykamp å vise.";
     return;
   }
 
   const { data:picks, error:picksError } = await supabaseClient
     .from("fantasy_picks")
     .select("*")
-    .eq("match_id", nextMatch.id);
+    .eq("match_id", statsMatch.id);
 
   if (picksError) {
     console.error(picksError);
@@ -1161,6 +1181,8 @@ async function loadFantasyStats() {
   const roundWinner = leaderboard[0];
 
   document.getElementById("fantasyStats").innerHTML = `
+    <div class="small">Viser stats for: <strong>${statsMatch.home} - ${statsMatch.away}</strong></div>
+
     ${renderPodium(leaderboard)}
 
     <div class="stats-grid">
@@ -1222,6 +1244,333 @@ async function loadFantasyStats() {
   `;
 }
 
+function buildStatsByMatch(statsRows, voteRows) {
+  const statsByMatch = {};
+
+  (statsRows || []).forEach(row => {
+    if (!statsByMatch[row.match_id]) statsByMatch[row.match_id] = {};
+
+    statsByMatch[row.match_id][row.player] = {
+      goals: row.goals || 0,
+      assists: row.assists || 0,
+      cleanSheet: row.clean_sheet || false,
+      penaltySave: row.penalty_save || false,
+      redCard: row.red_card || false,
+      rating: 0
+    };
+  });
+
+  const ratingMap = {};
+
+  (voteRows || []).forEach(vote => {
+    if (
+      vote.player === "Bortefeltet" ||
+      vote.player === "TIP_HOME_GOALS" ||
+      vote.player === "TIP_AWAY_GOALS"
+    ) {
+      return;
+    }
+
+    if (!ratingMap[vote.match_id]) ratingMap[vote.match_id] = {};
+    if (!ratingMap[vote.match_id][vote.player]) {
+      ratingMap[vote.match_id][vote.player] = { total:0, count:0 };
+    }
+
+    ratingMap[vote.match_id][vote.player].total += Number(vote.rating);
+    ratingMap[vote.match_id][vote.player].count += 1;
+  });
+
+  Object.keys(ratingMap).forEach(matchId => {
+    Object.keys(ratingMap[matchId]).forEach(player => {
+      if (!statsByMatch[matchId]) statsByMatch[matchId] = {};
+      if (!statsByMatch[matchId][player]) {
+        statsByMatch[matchId][player] = {
+          goals:0,
+          assists:0,
+          cleanSheet:false,
+          penaltySave:false,
+          redCard:false,
+          rating:0
+        };
+      }
+
+      const rating = ratingMap[matchId][player];
+      statsByMatch[matchId][player].rating = rating.total / rating.count;
+    });
+  });
+
+  return statsByMatch;
+}
+
+function calculateSeasonPlayerPoints(statsByMatch, matchId, playerName, isCaptain) {
+  const stat = statsByMatch[matchId] ? statsByMatch[matchId][playerName] : null;
+  return calculatePointsFromStat(playerName, stat, isCaptain).total;
+}
+
+function topEntry(entries, fallback = "Ikke klart") {
+  if (!entries || !entries.length) return fallback;
+  return entries[0];
+}
+
+async function loadSeasonFantasyStats() {
+  const box = document.getElementById("seasonFantasyStats");
+
+  const [{ data:picks, error:picksError }, { data:statsRows, error:statsError }, { data:voteRows, error:votesError }] = await Promise.all([
+    supabaseClient.from("fantasy_picks").select("*"),
+    supabaseClient.from("fantasy_stats").select("*"),
+    supabaseClient.from("votes").select("*")
+  ]);
+
+  if (picksError || statsError || votesError) {
+    console.error(picksError || statsError || votesError);
+    box.innerHTML = "Klarte ikke å laste sesongstats.";
+    return;
+  }
+
+  if (!picks || picks.length === 0) {
+    box.innerHTML = "Ingen sesongstats ennå.";
+    return;
+  }
+
+  const statsByMatch = buildStatsByMatch(statsRows, voteRows);
+
+  const userTotals = {};
+  const roundWins = {};
+  const pickCounts = {};
+  const captainCounts = {};
+  const playerTotals = {};
+  const playerGames = {};
+  const captainPointTotals = {};
+  const captainPointGames = {};
+  const matchLeaderboards = {};
+
+  picks.forEach(pick => {
+    const voterKey = cleanVoterName(pick.voter);
+    const voterDisplay = pick.voter || voterKey || "Ukjent";
+
+    const p1 = calculateSeasonPlayerPoints(statsByMatch, pick.match_id, pick.player1, false);
+    const p2 = calculateSeasonPlayerPoints(statsByMatch, pick.match_id, pick.player2, false);
+    const cap = calculateSeasonPlayerPoints(statsByMatch, pick.match_id, pick.captain, true);
+    const total = p1 + p2 + cap;
+
+    if (!userTotals[voterKey]) {
+      userTotals[voterKey] = {
+        voter: voterDisplay,
+        total:0,
+        rounds:0,
+        bestRound:0
+      };
+    }
+
+    userTotals[voterKey].total += total;
+    userTotals[voterKey].rounds += 1;
+    userTotals[voterKey].bestRound = Math.max(userTotals[voterKey].bestRound, total);
+
+    if (!matchLeaderboards[pick.match_id]) matchLeaderboards[pick.match_id] = [];
+    matchLeaderboards[pick.match_id].push({
+      voterKey,
+      voter:voterDisplay,
+      total
+    });
+
+    [
+      { player:pick.player1, points:p1 },
+      { player:pick.player2, points:p2 },
+      { player:pick.captain, points:cap }
+    ].forEach(item => {
+      pickCounts[item.player] = (pickCounts[item.player] || 0) + 1;
+      playerTotals[item.player] = (playerTotals[item.player] || 0) + item.points;
+      playerGames[item.player] = (playerGames[item.player] || 0) + 1;
+    });
+
+    captainCounts[pick.captain] = (captainCounts[pick.captain] || 0) + 1;
+    captainPointTotals[pick.captain] = (captainPointTotals[pick.captain] || 0) + cap;
+    captainPointGames[pick.captain] = (captainPointGames[pick.captain] || 0) + 1;
+  });
+
+  Object.keys(matchLeaderboards).forEach(matchId => {
+    const sorted = matchLeaderboards[matchId].sort((a,b) => b.total - a.total);
+    const winner = sorted[0];
+    if (winner) {
+      roundWins[winner.voterKey] = (roundWins[winner.voterKey] || 0) + 1;
+    }
+  });
+
+  const seasonTable = Object.values(userTotals)
+    .sort((a,b) => b.total - a.total);
+
+  const mostPicked = Object.entries(pickCounts).sort((a,b) => b[1] - a[1])[0];
+  const mostCaptain = Object.entries(captainCounts).sort((a,b) => b[1] - a[1])[0];
+
+  const mostRoundWins = Object.entries(roundWins)
+    .map(([voterKey, wins]) => ({
+      voter:userTotals[voterKey] ? userTotals[voterKey].voter : voterKey,
+      wins
+    }))
+    .sort((a,b) => b.wins - a.wins)[0];
+
+  const seasonMVP = Object.entries(playerTotals)
+    .map(([player, total]) => ({
+      player,
+      total,
+      games:playerGames[player] || 0,
+      avg:(playerGames[player] || 0) ? total / playerGames[player] : 0
+    }))
+    .sort((a,b) => b.total - a.total)[0];
+
+  const bestCaptainAvg = Object.entries(captainPointTotals)
+    .map(([player, total]) => ({
+      player,
+      total,
+      games:captainPointGames[player] || 0,
+      avg:(captainPointGames[player] || 0) ? total / captainPointGames[player] : 0
+    }))
+    .filter(row => row.games >= 1)
+    .sort((a,b) => b.avg - a.avg)[0];
+
+  const differentials = Object.entries(playerTotals)
+    .map(([player, total]) => ({
+      player,
+      total,
+      picks:pickCounts[player] || 0,
+      avg:(playerGames[player] || 0) ? total / playerGames[player] : 0
+    }))
+    .filter(row => row.picks <= 2 && row.total > 0)
+    .sort((a,b) => b.total - a.total);
+
+  const differentialKing = differentials[0];
+
+  const overrated = Object.entries(playerTotals)
+    .map(([player, total]) => ({
+      player,
+      total,
+      picks:pickCounts[player] || 0,
+      avg:(playerGames[player] || 0) ? total / playerGames[player] : 0
+    }))
+    .filter(row => row.picks >= 2)
+    .sort((a,b) => a.avg - b.avg)[0];
+
+  const folketsXI = Object.entries(pickCounts)
+    .map(([player, count]) => ({
+      player,
+      count
+    }))
+    .sort((a,b) => b.count - a.count)
+    .slice(0, 11);
+
+  const hallOfFameBestRound = seasonTable
+    .slice()
+    .sort((a,b) => b.bestRound - a.bestRound)[0];
+
+  box.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card mvp">
+        <h3>🏅 Sesongleder</h3>
+        <div class="result-row">
+          <div><strong>${seasonTable[0] ? seasonTable[0].voter : "Ikke klart"}</strong><br><span class="small">${seasonTable[0] ? seasonTable[0].rounds : 0} runder</span></div>
+          <div class="result-score">${seasonTable[0] ? seasonTable[0].total : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>🏆 Flest rundeseire</h3>
+        <div class="result-row">
+          <div><strong>${mostRoundWins ? mostRoundWins.voter : "Ikke klart"}</strong></div>
+          <div class="result-score">${mostRoundWins ? mostRoundWins.wins : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>👑 Sesongens MVP</h3>
+        <div class="result-row">
+          <div>${seasonMVP ? playerChip(seasonMVP.player) : "Ikke klart"}</div>
+          <div class="result-score">${seasonMVP ? seasonMVP.total : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>🔥 Mest valgt totalt</h3>
+        <div class="result-row">
+          <div>${mostPicked ? playerChip(mostPicked[0]) : "Ikke klart"}</div>
+          <div class="result-score">${mostPicked ? mostPicked[1] : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>⭐ Kapteinkongen</h3>
+        <div class="result-row">
+          <div>${mostCaptain ? playerChip(mostCaptain[0]) : "Ikke klart"}</div>
+          <div class="result-score">${mostCaptain ? mostCaptain[1] : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>💫 Beste kapteinssnitt</h3>
+        <div class="result-row">
+          <div>${bestCaptainAvg ? playerChip(bestCaptainAvg.player) : "Ikke klart"}</div>
+          <div class="result-score">${bestCaptainAvg ? bestCaptainAvg.avg.toFixed(1) : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>🧠 Differensial-konge</h3>
+        <div class="result-row">
+          <div>${differentialKing ? playerChip(differentialKing.player) : "Ikke klart"}</div>
+          <div class="result-score">${differentialKing ? differentialKing.total : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>😬 Mest overvurdert</h3>
+        <div class="result-row">
+          <div>${overrated ? playerChip(overrated.player) : "Ikke klart"}</div>
+          <div class="result-score">${overrated ? overrated.avg.toFixed(1) : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>⚡ Høyeste enkeltrunde</h3>
+        <div class="result-row">
+          <div><strong>${hallOfFameBestRound ? hallOfFameBestRound.voter : "Ikke klart"}</strong></div>
+          <div class="result-score">${hallOfFameBestRound ? hallOfFameBestRound.bestRound : "–"}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h3>❤️ Folkets favoritt-XI</h3>
+        ${folketsXI.length ? folketsXI.map((row, index) => `
+          <div class="result-row">
+            <div>${index + 1}. ${playerChip(row.player)}</div>
+            <div class="result-score">${row.count}</div>
+          </div>
+        `).join("") : "Ikke klart"}
+      </div>
+    </div>
+
+    <h3>Sesongtabell</h3>
+    <table class="fantasy-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Bruker</th>
+          <th>Runder</th>
+          <th>Poeng</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${seasonTable.map((row, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${row.voter}</td>
+            <td>${row.rounds}</td>
+            <td>${row.total}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
 fillMatchInfo();
 fillSelects();
 
@@ -1235,6 +1584,7 @@ loadMatchStats().then(async () => {
   updatePlayerImages();
   applyDeadlineLock();
   loadFantasyStats();
+  loadSeasonFantasyStats();
 });
 </script>
 
