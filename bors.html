@@ -514,6 +514,8 @@ button:hover {
 
 </main>
 
+<script src="matches.js"></script>
+
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -522,38 +524,6 @@ const MY_NAME = "superben";
 const AWAY_FANS_PLAYER = "Bortefeltet";
 const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
 const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
-
-const matchesData = [
-  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund" },
-  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn" },
-  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf" },
-  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn" },
-  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk" },
-  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn" },
-  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger" },
-  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn" },
-  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen" },
-  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn" },
-  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne" },
-  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn" },
-  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd" },
-  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane" },
-  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn" },
-  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal" },
-  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn" },
-  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd" },
-  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn" },
-  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn" },
-  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund" },
-  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn" },
-  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim" },
-  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn" },
-  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset" },
-  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn" },
-  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss" },
-  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn" },
-  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss" },
-  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn" }
 ];
 
 const players = [
