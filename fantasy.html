@@ -668,6 +668,17 @@ let matchStats = {};
 
 function getNextMatch() {
   const now = new Date();
+
+  const latestFinishedMatch = matchesData
+    .filter(match =>
+      match.actual &&
+      match.actual.home !== undefined &&
+      match.actual.away !== undefined
+    )
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+  if (latestFinishedMatch) return latestFinishedMatch;
+
   return matchesData
     .filter(match => new Date(match.deadline) > now)
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
