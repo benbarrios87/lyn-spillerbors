@@ -520,6 +520,16 @@ const players = [
 
 const playersDiv = document.getElementById("players");
 
+const matchSelect = document.getElementById("match");
+
+matchesData.forEach(match => {
+  matchSelect.innerHTML += `
+    <option value="${match.id}">
+      ${match.id}
+    </option>
+  `;
+});
+
 players.forEach(p => {
   const img = p.img ? `<img src="bilder/${p.img}" onerror="this.remove()">` : "";
   playersDiv.innerHTML += `
