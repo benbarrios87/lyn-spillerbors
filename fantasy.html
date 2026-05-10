@@ -555,12 +555,27 @@ label {
   <div class="card rules">
     <h2>Sånn funker det</h2>
 
-    <div class="rules-grid">
-      <div class="rule-pill"><strong>Lag:</strong><br>Velg 2 Lyn-spillere og én kaptein før kampstart.</div>
-      <div class="rule-pill"><strong>Kaptein:</strong><br>Kapteinen får +2 ekstra poeng.</div>
-      <div class="rule-pill"><strong>Børsbonus:</strong><br>7.5 børssnitt eller høyere gir +1. 4.5 børssnitt eller lavere gir −1.</div>
-      <div class="rule-pill"><strong>Lås:</strong><br>Laget låses når kampen starter.</div>
-    </div>
+ <div class="rules-grid">
+  <div class="rule-pill">
+    <strong>Lag:</strong><br>
+    Velg 2 Lyn-spillere og én kaptein før kampstart.
+  </div>
+
+  <div class="rule-pill">
+    <strong>Kaptein:</strong><br>
+    Kapteinens totale fantasy-poeng multipliseres med 1.5.
+  </div>
+
+  <div class="rule-pill">
+    <strong>Børsbonus:</strong><br>
+    7.5 børssnitt eller høyere gir +1. 4.5 børssnitt eller lavere gir −1.
+  </div>
+
+  <div class="rule-pill">
+    <strong>Lås:</strong><br>
+    Laget låses når kampen starter.
+  </div>
+</div>
 
     <h3>Poengsystem</h3>
 
@@ -884,10 +899,11 @@ function calculatePoints(playerName, isCaptain) {
     lines.push(`Børsbonus: −1 (${stat.rating.toFixed(1)})`);
   }
 
-  if (isCaptain) {
-    points += 2;
-    lines.push("Kaptein: +2");
-  }
+ if (isCaptain) {
+  const boosted = Math.round(points * 1.5);
+  lines.push(`Kaptein: ${points} → ${boosted}`);
+  points = boosted;
+}
 
   if (lines.length === 0) lines.push("Ingen poenggivende hendelser");
 
