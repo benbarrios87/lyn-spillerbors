@@ -45,7 +45,7 @@ const matchesData = [
     home:"Raufoss",
     away:"Lyn",
     deadline:"2026-05-10T17:00:00",
-    actual:null
+    actual:{ home:0, away:1 }
   },
   {
     id:"16.05 Lyn - Kongsvinger",
