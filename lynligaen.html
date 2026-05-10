@@ -686,7 +686,11 @@ function buildFantasyRounds(picks, stats, allVotes) {
     });
   });
 
-  return Object.keys(byMatch).map(matchId => ({
+return Object.keys(byMatch)
+  .filter(matchId => {
+    return byMatch[matchId].some(row => row.raw !== 0);
+  })
+  .map(matchId => ({
     match_id:matchId,
     type:"fantasy",
     rows:awardFantasyTierPoints(byMatch[matchId])
