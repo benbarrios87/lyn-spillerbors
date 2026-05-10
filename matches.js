@@ -44,7 +44,7 @@ const matchesData = [
     date:"2026-05-10",
     home:"Raufoss",
     away:"Lyn",
-    deadline:"2026-05-10T18:00:00",
+    deadline:"2026-05-10T17:00:00",
     actual:null
   },
   {
