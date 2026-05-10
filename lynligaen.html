@@ -447,8 +447,13 @@ function getOutcome(home, away) {
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
-  if (tipHome === actualHome && tipAway === actualAway) return 3;
-  if (getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway)) return 1;
+  const exact = tipHome === actualHome && tipAway === actualAway;
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
   return 0;
 }
 
@@ -492,7 +497,7 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
   if (stat.red_card) points -= 3;
   if (stat.rating >= 7.5) points += 1;
   if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
-  if (isCaptain) points += 2;
+  if (isCaptain) points = Math.round(points * 1.5);
 
   return points;
 }
@@ -706,9 +711,13 @@ return Object.keys(byMatch)
         user.perfectTips += 1;
       }
 
-      if (row.raw === 1) {
-        user.correctOutcomes += 1;
-      }
+     if (row.raw === 2) {
+  user.correctDiffs = (user.correctDiffs || 0) + 1;
+}
+
+if (row.raw === 1) {
+  user.correctOutcomes += 1;
+}
     });
   });
 
@@ -875,7 +884,7 @@ function renderAwards(league) {
         ${renderMiniRanking(tipKings.map(u => ({
           label:u.voter,
           score:u.tipping,
-          sub:`${u.perfectTips} helt riktige · ${u.correctOutcomes} riktige utfall`
+        sub:`${u.perfectTips} helt riktige · ${u.correctDiffs || 0} målforskjell · ${u.correctOutcomes} riktige utfall`
         })), 6)}
       </div>
 
@@ -1009,12 +1018,13 @@ async function loadLynCentral() {
         <strong>🎯 Tippetips</strong><br>
         Her brukes de vanlige tippepoengene:
         <br>
-        3 poeng for helt riktig resultat
-        <br>
-        1 poeng for riktig utfall
-        <br>
-        0 poeng for bom
-
+      3 poeng for helt riktig resultat
+<br>
+2 poeng for riktig utfall og riktig målforskjell
+<br>
+1 poeng for riktig utfall
+<br>
+0 poeng for bom
         <br><br>
 
         <strong>⭐ Lyn Fantasy</strong><br>
@@ -1037,7 +1047,7 @@ async function loadLynCentral() {
       <span>
         ${leader ? `🔥 ${leader.voter} leder Lynligaen med ${leader.total} poeng` : "Lynligaen venter på data"}
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Tippetips teller med vanlige 3, 1 og 0 poeng
+        Tippetips teller med 3, 2, 1 og 0 poeng
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         Fantasy deles i tredjedeler
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
