@@ -491,9 +491,15 @@ button:hover {
 
 <div class="box">
   <div class="notice">
-    Du kan levere tips for én, to eller tre kamper samtidig. Tomme kuponger lagres ikke.
-  </div>
+  Du kan levere tips for én, to eller tre kamper samtidig. Tomme kuponger lagres ikke.
+</div>
 
+<div class="people-box">
+  <strong>Poengsystem</strong><br>
+  <span class="small">
+    3 poeng for helt riktig resultat · 2 poeng for riktig utfall og riktig målforskjell · 1 poeng for riktig utfall · 0 poeng for bom.
+  </span>
+</div>
   <label>Navn / forumbruker</label>
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
@@ -647,8 +653,13 @@ function getOutcome(home, away) {
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
-  if (tipHome === actualHome && tipAway === actualAway) return 3;
-  if (getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway)) return 1;
+  const exact = tipHome === actualHome && tipAway === actualAway;
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
   return 0;
 }
 
@@ -1036,21 +1047,29 @@ async function loadTipStats() {
         ${renderMiniRanking(mostActiveRows, 8, false)}
       </div>
 
-      <div class="stat-card">
-        <h3>Poengsystem</h3>
-        <div class="result-row">
-          <div><strong>Helt riktig resultat</strong><br><span class="small">For eksempel 2-1 og kampen ender 2-1</span></div>
-          <div class="result-score">3 p</div>
-        </div>
-        <div class="result-row">
-          <div><strong>Riktig utfall</strong><br><span class="small">Riktig vinner eller riktig uavgjort</span></div>
-          <div class="result-score">1 p</div>
-        </div>
-        <div class="result-row">
-          <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
-          <div class="result-score">0 p</div>
-        </div>
-      </div>
+   <div class="stat-card">
+  <h3>Poengsystem</h3>
+
+  <div class="result-row">
+    <div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div>
+    <div class="result-score">3 p</div>
+  </div>
+
+  <div class="result-row">
+    <div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div>
+    <div class="result-score">2 p</div>
+  </div>
+
+  <div class="result-row">
+    <div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div>
+    <div class="result-score">1 p</div>
+  </div>
+
+  <div class="result-row">
+    <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
+    <div class="result-score">0 p</div>
+  </div>
+</div>
     </div>
   `;
 }
