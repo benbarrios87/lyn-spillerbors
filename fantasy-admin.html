@@ -271,6 +271,90 @@ button.secondary:hover {
   margin-top:5px;
 }
 
+.analytics-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+@media (min-width:700px) {
+  .analytics-grid {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.analytics-box {
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+}
+
+.analytics-number {
+  font-size:28px;
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.analytics-layout {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:16px;
+}
+
+@media (min-width:850px) {
+  .analytics-layout {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.analytics-panel {
+  background:rgba(255,255,255,0.08);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:15px;
+}
+
+.analytics-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  align-items:center;
+}
+
+.analytics-row:last-child {
+  border-bottom:none;
+}
+
+.analytics-label {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.analytics-value {
+  font-weight:bold;
+}
+
+.analytics-bar {
+  height:9px;
+  background:rgba(255,255,255,0.16);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:5px;
+}
+
+.analytics-fill {
+  height:100%;
+  background:var(--red);
+  border-radius:999px;
+}
+
 hr {
   border:none;
   border-top:1px solid var(--line);
@@ -291,6 +375,62 @@ hr {
   <div class="card admin-warning">
     <strong>Adminside</strong><br>
     Denne siden lagrer direkte til Supabase. Velg riktig kamp før du trykker lagre, ellers blir det klassisk hobbyprosjektkaos.
+  </div>
+
+  <div class="card">
+    <h2>Lyn Central trafikk</h2>
+    <p class="small">Tallene hentes fra <strong>site_visits</strong> i Supabase. Dette er din egen lille supporter-radar.</p>
+
+    <div class="analytics-grid">
+      <div class="analytics-box">
+        Besøk i dag
+        <div class="analytics-number" id="visitsToday">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Siste 24 timer
+        <div class="analytics-number" id="visits24h">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Siste 7 dager
+        <div class="analytics-number" id="visits7d">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Unike økter i dag
+        <div class="analytics-number" id="sessionsToday">–</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="secondary" onclick="loadTrafficStats()">Oppdater trafikkstats</button>
+      <button onclick="location.href='/fantasy.html'">Åpne Fantasy</button>
+    </div>
+
+    <div id="trafficStatus" class="status"></div>
+
+    <div class="analytics-layout">
+      <div class="analytics-panel">
+        <h3>Mest besøkte sider</h3>
+        <div id="topPages"><div class="small">Laster...</div></div>
+      </div>
+
+      <div class="analytics-panel">
+        <h3>Enheter</h3>
+        <div id="deviceStats"><div class="small">Laster...</div></div>
+      </div>
+
+      <div class="analytics-panel">
+        <h3>Siste besøk</h3>
+        <div id="latestVisits"><div class="small">Laster...</div></div>
+      </div>
+
+      <div class="analytics-panel">
+        <h3>Referrals</h3>
+        <div id="referrerStats"><div class="small">Laster...</div></div>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -379,6 +519,12 @@ const players = [
 
 function showStatus(message, type = "ok") {
   const status = document.getElementById("status");
+  status.className = `status ${type}`;
+  status.innerHTML = message;
+}
+
+function showTrafficStatus(message, type = "ok") {
+  const status = document.getElementById("trafficStatus");
   status.className = `status ${type}`;
   status.innerHTML = message;
 }
@@ -582,11 +728,166 @@ function updateSummary() {
   document.getElementById("sumRedCards").textContent = redCards;
 }
 
+function countBy(rows, key) {
+  const map = {};
+
+  rows.forEach(row => {
+    const value = row[key] || "Ukjent";
+    map[value] = (map[value] || 0) + 1;
+  });
+
+  return Object.keys(map)
+    .map(name => ({ name, count:map[name] }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+function uniqueCount(rows, key) {
+  return new Set(rows.map(row => row[key]).filter(Boolean)).size;
+}
+
+function formatTime(value) {
+  const d = new Date(value);
+  return d.toLocaleString("no-NO", {
+    day:"2-digit",
+    month:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+function nicePath(path) {
+  if (!path || path === "/") return "Forsiden";
+  return path.replace("/", "");
+}
+
+function renderAnalyticsRows(items, limit = 8) {
+  if (!items || items.length === 0) {
+    return `<div class="small">Ingen data enda.</div>`;
+  }
+
+  const max = Math.max(...items.map(item => item.count), 1);
+
+  return items.slice(0, limit).map(item => {
+    const percent = Math.round((item.count / max) * 100);
+
+    return `
+      <div class="analytics-row">
+        <div class="analytics-label">
+          ${item.name}
+          <div class="analytics-bar"><div class="analytics-fill" style="width:${percent}%"></div></div>
+        </div>
+        <div class="analytics-value">${item.count}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderLatestVisits(rows) {
+  if (!rows || rows.length === 0) {
+    return `<div class="small">Ingen besøk logget enda.</div>`;
+  }
+
+  return rows.slice(0, 10).map(row => `
+    <div class="analytics-row">
+      <div class="analytics-label">
+        ${nicePath(row.path)}<br>
+        <span class="small">${row.device || "ukjent"}</span>
+      </div>
+      <div class="analytics-value">${formatTime(row.created_at)}</div>
+    </div>
+  `).join("");
+}
+
+async function loadTrafficStats() {
+  const now = new Date();
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+
+  const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const { data, error } = await supabaseClient
+    .from("site_visits")
+    .select("created_at,page,path,referrer,device,session_id")
+    .gte("created_at", last7d.toISOString())
+    .order("created_at", { ascending:false })
+    .limit(3000);
+
+  if (error) {
+    console.error(error);
+    showTrafficStatus("Klarte ikke å hente trafikkstats. Sjekk at tabellen site_visits finnes i Supabase.", "error");
+    return;
+  }
+
+  const rows = data || [];
+  const todayRows = rows.filter(row => new Date(row.created_at) >= startToday);
+  const last24Rows = rows.filter(row => new Date(row.created_at) >= last24h);
+
+  document.getElementById("visitsToday").textContent = todayRows.length;
+  document.getElementById("visits24h").textContent = last24Rows.length;
+  document.getElementById("visits7d").textContent = rows.length;
+  document.getElementById("sessionsToday").textContent = uniqueCount(todayRows, "session_id");
+
+  document.getElementById("topPages").innerHTML = renderAnalyticsRows(
+    countBy(rows.map(row => ({ ...row, path:nicePath(row.path) })), "path"),
+    10
+  );
+
+  document.getElementById("deviceStats").innerHTML = renderAnalyticsRows(
+    countBy(rows, "device"),
+    10
+  );
+
+  const refRows = rows
+    .map(row => ({ ...row, referrer: row.referrer ? row.referrer.replace(/^https?:\/\//, "") : "Direkte / ukjent" }));
+
+  document.getElementById("referrerStats").innerHTML = renderAnalyticsRows(
+    countBy(refRows, "referrer"),
+    10
+  );
+
+  document.getElementById("latestVisits").innerHTML = renderLatestVisits(rows);
+
+  showTrafficStatus(`Trafikkstats oppdatert. Viser opptil ${rows.length} besøk fra siste 7 dager.`);
+}
+
+function trackAdminVisit() {
+  let sessionId = localStorage.getItem("lyncentral_session_id");
+
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("lyncentral_session_id", sessionId);
+  }
+
+  const width = window.innerWidth;
+  const device = width < 700 ? "mobil" : width < 1100 ? "tablet" : "desktop";
+
+  fetch(SUPABASE_URL + "/rest/v1/site_visits", {
+    method:"POST",
+    headers:{
+      "apikey":SUPABASE_ANON_KEY,
+      "Authorization":"Bearer " + SUPABASE_ANON_KEY,
+      "Content-Type":"application/json",
+      "Prefer":"return=minimal"
+    },
+    body:JSON.stringify({
+      page:document.title || "Ukjent side",
+      path:location.pathname,
+      referrer:document.referrer || "",
+      user_agent:navigator.userAgent,
+      device:device,
+      session_id:sessionId
+    })
+  });
+}
+
 document.getElementById("matchSelect")?.addEventListener("change", loadStats);
 
 fillMatchSelect();
 renderPlayers();
 loadStats();
+trackAdminVisit();
+loadTrafficStats();
 </script>
 
 </body>
