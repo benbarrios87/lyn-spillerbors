@@ -218,6 +218,32 @@ select, input {
   min-height:30px;
 }
 
+.player-link,
+.user-link {
+  color:inherit;
+  text-decoration:none;
+  font-weight:inherit;
+}
+
+.player-link:hover,
+.user-link:hover {
+  color:var(--red);
+  text-decoration:underline;
+}
+
+.avatar-link {
+  display:block;
+  width:68px;
+  height:68px;
+  margin:auto;
+  border-radius:50%;
+  text-decoration:none;
+}
+
+.avatar-link:hover .avatar {
+  border-color:var(--red);
+}
+
 button {
   background:var(--red);
   color:white;
@@ -519,25 +545,77 @@ const players = [
 ];
 
 const playersDiv = document.getElementById("players");
-
 const matchSelect = document.getElementById("match");
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function getPlayerFullName(playerNameOrShort) {
+  const value = String(playerNameOrShort || "").trim();
+  const found = players.find(p =>
+    p.short.toLowerCase() === value.toLowerCase() ||
+    p.name.toLowerCase() === value.toLowerCase()
+  );
+  return found ? found.name : value;
+}
+
+function playerLink(playerNameOrShort, displayText = null) {
+  const fullName = getPlayerFullName(playerNameOrShort);
+  const text = displayText || playerNameOrShort;
+
+  if (!fullName) return "";
+
+  return `
+    <a href="spiller.html?player=${encodeURIComponent(fullName)}" class="player-link">
+      ${escapeHTML(text)}
+    </a>
+  `;
+}
+
+function userLink(username, displayText = null) {
+  const user = String(username || "").trim();
+  const text = displayText || user;
+
+  if (!user) return "";
+
+  return `
+    <a href="profil.html?user=${encodeURIComponent(user)}" class="user-link">
+      ${escapeHTML(text)}
+    </a>
+  `;
+}
+
+function renderLinkedName(value, linkType = "player") {
+  if (linkType === "user") return userLink(value);
+  if (linkType === "none") return escapeHTML(value);
+  return playerLink(value);
+}
 
 matchesData.forEach(match => {
   matchSelect.innerHTML += `
-    <option value="${match.id}">
-      ${match.id}
+    <option value="${escapeHTML(match.id)}">
+      ${escapeHTML(match.id)}
     </option>
   `;
 });
 
 players.forEach(p => {
-  const img = p.img ? `<img src="bilder/${p.img}" onerror="this.remove()">` : "";
+  const img = p.img ? `<img src="bilder/${escapeHTML(p.img)}" onerror="this.remove()">` : "";
+
   playersDiv.innerHTML += `
     <div class="player">
-      <div class="avatar">${img}</div>
-      <div class="player-short">${p.short}</div>
-      <div class="player-name">${p.name}</div>
-      <input type="number" id="${p.short}" min="1" max="10" step="1" placeholder="-">
+      <a class="avatar-link" href="spiller.html?player=${encodeURIComponent(p.name)}" aria-label="Åpne spillerprofil for ${escapeHTML(p.name)}">
+        <div class="avatar">${img}</div>
+      </a>
+      <div class="player-short">${playerLink(p.name, p.short)}</div>
+      <div class="player-name">${playerLink(p.name, p.name)}</div>
+      <input type="number" id="${escapeHTML(p.short)}" min="1" max="10" step="1" placeholder="-">
     </div>
   `;
 });
@@ -727,7 +805,7 @@ function stdDev(values) {
   return Math.sqrt(variance);
 }
 
-function renderMiniRanking(items, limit = 5, showMedals = true) {
+function renderMiniRanking(items, limit = 5, showMedals = true, linkType = "player") {
   if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
 
   const medals = ["🥇","🥈","🥉"];
@@ -735,10 +813,12 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
 
   items.slice(0, limit).forEach((r, i) => {
     const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
+    const name = renderLinkedName(r.player, linkType);
+
     html += `
       <div class="result-row">
-        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
-        <div class="result-score">${r.score}</div>
+        <div>${medal}<strong>${name}</strong><br><span class="small">${escapeHTML(r.sub || "")}</span></div>
+        <div class="result-score">${escapeHTML(r.score)}</div>
       </div>
     `;
   });
@@ -761,12 +841,12 @@ async function loadResults() {
   if (playerVotes.length > 0) {
     const ranking = buildStats(playerVotes);
     const best = ranking[0];
-    html += `<div class="bb">🔥 Banens beste: ${best.player} med ${best.avg.toFixed(2)}</div>`;
+    html += `<div class="bb">🔥 Banens beste: ${playerLink(best.player)} med ${best.avg.toFixed(2)}</div>`;
     html += renderMiniRanking(ranking.map(r => ({
       player:r.player,
       score:r.avg.toFixed(2),
       sub:`${r.count} stemmer`
-    })), 99);
+    })), 99, true, "player");
   }
 
   if (awayVotes.length > 0) {
@@ -800,12 +880,12 @@ async function loadSeasonResults() {
   const best = resultList[0];
 
   document.getElementById("results").innerHTML = `
-    <div class="bb">🏆 Sesongtoppen: ${best.player} med ${best.avg.toFixed(2)}</div>
+    <div class="bb">🏆 Sesongtoppen: ${playerLink(best.player)} med ${best.avg.toFixed(2)}</div>
     ${renderMiniRanking(resultList.map(r => ({
       player:r.player,
       score:r.avg.toFixed(2),
       sub:`${r.count} stemmer`
-    })), 99)}
+    })), 99, true, "player")}
   `;
 }
 
@@ -848,7 +928,7 @@ async function loadSuperbenVsRest() {
   });
 
   let html = `
-    <div class="bb">🧠 superben vs resten</div>
+    <div class="bb">🧠 ${userLink("superben")} vs resten</div>
     <p class="small">Positive tall betyr at superben er snillere. Negative tall betyr strengere.</p>
   `;
 
@@ -858,8 +938,8 @@ async function loadSuperbenVsRest() {
 
     html += `
       <div class="compare-row">
-        <div><strong>${r.player}</strong></div>
-        <div>superben: ${r.myAvg === null ? "–" : r.myAvg.toFixed(2)}</div>
+        <div><strong>${playerLink(r.player)}</strong></div>
+        <div>${userLink("superben")}: ${r.myAvg === null ? "–" : r.myAvg.toFixed(2)}</div>
         <div>resten: ${r.restAvg === null ? "–" : r.restAvg.toFixed(2)}</div>
         <div class="${diffClass}">${diffText}</div>
       </div>
@@ -1086,69 +1166,69 @@ async function loadStatsCenter() {
     <div class="stats-grid">
       <div class="stat-card">
         <h3>🏆 Sesongtoppen</h3>
-        ${renderMiniRanking(seasonItems, 8)}
+        ${renderMiniRanking(seasonItems, 8, true, "player")}
       </div>
 
       <div class="stat-card">
         <h3>😬 Skjerpings</h3>
         <div class="small">Lavest snitt denne sesongen.</div>
-        ${renderMiniRanking(worstPlayers, 8, false)}
+        ${renderMiniRanking(worstPlayers, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>👑 Flest BB</h3>
-        ${renderMiniRanking(bb.counts, 8)}
+        ${renderMiniRanking(bb.counts, 8, true, "player")}
       </div>
 
       <div class="stat-card">
         <h3>💪 Størst BB-margin</h3>
         <div class="small">Hvor klart BB vant en kamp.</div>
-        ${renderMiniRanking(bb.margins, 8, false)}
+        ${renderMiniRanking(bb.margins, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>📈 Formkonge</h3>
         <div class="small">Størst positiv utvikling.</div>
-        ${renderMiniRanking(form.up, 8, false)}
+        ${renderMiniRanking(form.up, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>📉 Formsvikt</h3>
         <div class="small">Størst negativ utvikling.</div>
-        ${renderMiniRanking(form.down, 8, false)}
+        ${renderMiniRanking(form.down, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>🤯 Mest uenighet</h3>
         <div class="small">Basert på variasjon i karakterene.</div>
-        ${renderMiniRanking(controversial, 8, false)}
+        ${renderMiniRanking(controversial, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>🧱 Mest stabil</h3>
         <div class="small">Lavest variasjon.</div>
-        ${renderMiniRanking(stable, 8, false)}
+        ${renderMiniRanking(stable, 8, false, "player")}
       </div>
 
       <div class="stat-card">
         <h3>🏅 Topp bidragsytere</h3>
         <div class="small">Hvem stemmer mest.</div>
-        ${renderMiniRanking(topVoters, 8, false)}
+        ${renderMiniRanking(topVoters, 8, false, "user")}
       </div>
 
       <div class="stat-card">
         <h3>😇 Snilleste brukere</h3>
-        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
+        ${renderMiniRanking(kindest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false, "user")}
       </div>
 
       <div class="stat-card">
         <h3>😈 Strengeste brukere</h3>
-        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false)}
+        ${renderMiniRanking(strictest.map(u=>({player:u.player, score:u.score, sub:u.sub})), 8, false, "user")}
       </div>
 
       <div class="stat-card">
         <h3>🏟️ Beste motstanderfans</h3>
-        ${renderMiniRanking(awayFansStats, 8, false)}
+        ${renderMiniRanking(awayFansStats, 8, false, "none")}
       </div>
     </div>
   `;
