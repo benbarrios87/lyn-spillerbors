@@ -455,13 +455,13 @@ function managerType(data){
   return "🧠 Allrounder";
 }
 
-function renderRows(rows, emptyText = "Ingen data enda."){
+function renderRows(rows, emptyText = "Ingen data enda.", makePlayersClickable = false){
   if (!rows || rows.length === 0) return `<div class="small">${emptyText}</div>`;
 
   return rows.map(row => `
     <div class="result-row">
       <div>
-        <strong>${row.name}</strong><br>
+        <strong>${makePlayersClickable ? playerLink(row.name) : row.name}</strong><br>
         <span class="small">${row.sub || ""}</span>
       </div>
       <div class="score">${row.count}${row.suffix || ""}</div>
@@ -621,12 +621,12 @@ async function loadProfile(){
     <div class="grid" style="margin-top:16px;">
       <div class="card">
         <h2>⭐ Kapteinsvalg</h2>
-        ${renderRows(captains, "Ingen kapteinsvalg enda.")}
+       ${renderRows(captains, "Ingen kapteinsvalg enda.", true)}
       </div>
 
       <div class="card">
         <h2>❤️ Favorittspillere</h2>
-        ${renderRows(favoritePlayers.length ? favoritePlayers : favoriteChosen, "Ingen favorittdata enda.")}
+        ${renderRows(favoritePlayers.length ? favoritePlayers : favoriteChosen, "Ingen favorittdata enda.", true)}
       </div>
     </div>
 
