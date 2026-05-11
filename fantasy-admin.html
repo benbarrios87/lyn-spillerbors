@@ -368,6 +368,12 @@ hr {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <div class="container">
+  <div class="card">
+  <h2>Siste aktivitet</h2>
+  <div id="activityFeed">
+    <div class="small">Laster aktivitet...</div>
+  </div>
+</div>
 
   <h1>Lyn Fantasy Admin</h1>
   <p class="small">Legg inn mål, assist, clean sheet, strafferedning og rødt kort etter kamp.</p>
@@ -883,12 +889,69 @@ function trackAdminVisit() {
 
 document.getElementById("matchSelect")?.addEventListener("change", loadStats);
 
-fillMatchSelect();
+async function loadActivityFeed() {
+  fillMatchSelect();
 renderPlayers();
 loadStats();
 trackAdminVisit();
 loadTrafficStats();
+loadActivityFeed();
+
+  const { data, error } = await supabaseClient
+    .from("site_events")
+    .select("*")
+    .order("created_at", { ascending:false })
+    .limit(30);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const box = document.getElementById("activityFeed");
+
+  if (!data || data.length === 0) {
+    box.innerHTML = `<div class="small">Ingen aktivitet enda.</div>`;
+    return;
+  }
+
+  box.innerHTML = data.map(event => {
+
+    const time = new Date(event.created_at)
+      .toLocaleTimeString("no-NO", {
+        hour:"2-digit",
+        minute:"2-digit"
+      });
+
+    let text = "";
+
+    if (event.event_type === "tips_submitted") {
+      text = `🎯 <strong>${event.voter}</strong> leverte tips`;
+    }
+
+    else if (event.event_type === "bors_submitted") {
+      text = `⭐ <strong>${event.voter}</strong> leverte børs`;
+    }
+
+    else if (event.event_type === "fantasy_saved") {
+      text = `🧠 <strong>${event.voter}</strong> lagret fantasylag`;
+    }
+
+    else {
+      text = `⚡ ${event.event_type}`;
+    }
+
+    return `
+      <div class="result-row">
+        <div>${text}</div>
+        <div class="small">${time}</div>
+      </div>
+    `;
+
+  }).join("");
+}
 </script>
+  
 
 </body>
 </html>
