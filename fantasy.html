@@ -1600,7 +1600,11 @@ async function loadSeasonFantasyStats() {
         ${seasonTable.map((row, index) => `
           <tr>
             <td>${index + 1}</td>
-            <td>${row.voter}</td>
+          <td>
+  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+    ${row.voter}
+  </a>
+</td>
             <td>${row.rounds}</td>
             <td>${row.total}</td>
           </tr>
