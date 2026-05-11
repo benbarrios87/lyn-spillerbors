@@ -1,1 +1,286 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Lynprofil</title>
+
+<link rel="icon" href="lblogoen.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --red:#d71920;
+  --blue:#13294b;
+  --gold:#ffd166;
+  --panel:rgba(8,15,32,0.82);
+  --line:rgba(255,255,255,0.14);
+  --muted:rgba(255,255,255,0.7);
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:white;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(3,7,18,0.82);
+  z-index:-1;
+}
+
+main{
+  max-width:900px;
+  margin:auto;
+  padding:30px 16px 80px;
+}
+
+.back-btn{
+  display:inline-block;
+  margin-bottom:20px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.hero{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:24px;
+  margin-bottom:18px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:42px;
+}
+
+.hero p{
+  color:var(--muted);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+@media(min-width:800px){
+  .grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+}
+
+.card h2{
+  margin-top:0;
+}
+
+.big{
+  font-size:42px;
+  font-weight:bold;
+  color:var(--gold);
+}
+
+.small{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.row{
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.row:last-child{
+  border-bottom:none;
+}
+
+.match{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<main>
+
+<a href="lyn-central.html" class="back-btn">← Til Lyn Central</a>
+
+<div class="hero">
+  <h1 id="username">Laster...</h1>
+  <p>Personlig Lynbørs-profil</p>
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>🏆 Oversikt</h2>
+
+    <div class="row">
+      <div class="small">Fantasy picks</div>
+      <div class="big" id="fantasyCount">0</div>
+    </div>
+
+    <div class="row">
+      <div class="small">Tips levert</div>
+      <div class="big" id="tipsCount">0</div>
+    </div>
+
+    <div class="row">
+      <div class="small">Kapteinsvalg</div>
+      <div class="big" id="captainCount">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⭐ Favorittspillere</h2>
+
+    <div id="favoritePlayers">
+      Laster...
+    </div>
+  </div>
+
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h2>📊 Siste fantasy picks</h2>
+
+  <div id="recentFantasy">
+    Laster...
+  </div>
+</div>
+
+</main>
+
+<script src="matches.js"></script>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "DIN_KEY_HER";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const params = new URLSearchParams(window.location.search);
+const profileUser = (params.get("user") || "").toLowerCase();
+
+document.getElementById("username").textContent = profileUser;
+
+async function loadProfile(){
+
+  const { data:picks } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*");
+
+  const { data:votes } = await supabaseClient
+    .from("votes")
+    .select("*");
+
+  const userPicks = (picks || []).filter(p =>
+    (p.voter || "").trim().toLowerCase() === profileUser
+  );
+
+  const userVotes = (votes || []).filter(v =>
+    (v.voter || "").trim().toLowerCase() === profileUser
+  );
+
+  document.getElementById("fantasyCount").textContent =
+    userPicks.length;
+
+  const tipCount = userVotes.filter(v =>
+    v.player === "TIP_HOME_GOALS"
+  ).length;
+
+  document.getElementById("tipsCount").textContent =
+    tipCount;
+
+  const captainMap = {};
+
+  userPicks.forEach(p => {
+    captainMap[p.captain] =
+      (captainMap[p.captain] || 0) + 1;
+  });
+
+  const sortedCaptains =
+    Object.entries(captainMap)
+      .sort((a,b) => b[1] - a[1]);
+
+  document.getElementById("captainCount").textContent =
+    sortedCaptains[0]
+      ? sortedCaptains[0][0]
+      : "-";
+
+  const playerMap = {};
+
+  userVotes.forEach(v => {
+
+    if(
+      v.player === "TIP_HOME_GOALS" ||
+      v.player === "TIP_AWAY_GOALS" ||
+      v.player === "Bortefeltet"
+    ){
+      return;
+    }
+
+    playerMap[v.player] =
+      (playerMap[v.player] || 0) + 1;
+  });
+
+  const favoritePlayers =
+    Object.entries(playerMap)
+      .sort((a,b) => b[1] - a[1]);
+
+  document.getElementById("favoritePlayers").innerHTML =
+    favoritePlayers.slice(0,5).map(p => `
+      <div class="row">
+        <strong>${p[0]}</strong><br>
+        <span class="small">${p[1]} stemmer</span>
+      </div>
+    `).join("");
+
+  document.getElementById("recentFantasy").innerHTML =
+    userPicks.reverse().slice(0,8).map(p => `
+      <div class="row match">
+        <div>
+          <strong>${p.match_id}</strong><br>
+          <span class="small">
+            ${p.player1}, ${p.player2}
+          </span>
+        </div>
+
+        <div>
+          ⭐ ${p.captain}
+        </div>
+      </div>
+    `).join("");
+}
+
+loadProfile();
+
+</script>
+
+</body>
+</html>
