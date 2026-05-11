@@ -503,7 +503,15 @@ label {
 .negative {
   color:#ff6b6b;
 }
+.profile-link {
+  color:white;
+  text-decoration:none;
+}
 
+.profile-link:hover {
+  text-decoration:underline;
+}
+  
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -1077,7 +1085,11 @@ function renderPodium(leaderboard) {
     return `
       <div class="podium-card ${extraClass}">
         <div class="medal">${medal}</div>
-        <div class="podium-name">${row.voter}</div>
+      <div class="podium-name">
+  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+    ${row.voter}
+  </a>
+</div>
         <div class="podium-team">${row.player1}, ${row.player2}, ⭐ ${row.captain}</div>
         <div class="podium-score">${row.total}</div>
         <div class="small">poeng</div>
@@ -1188,11 +1200,15 @@ async function loadFantasyStats() {
     <div class="stats-grid">
       <div class="stat-card">
         <h3>🏆 Rundeleder</h3>
-        <div class="result-row">
-          <div><strong>${roundWinner.voter}</strong><br><span class="small">${roundWinner.player1}, ${roundWinner.player2}, ⭐ ${roundWinner.captain}</span></div>
-          <div class="result-score">${roundWinner.total}</div>
-        </div>
-      </div>
+       <div class="result-row">
+  <div>
+    <a href="profil.html?user=${encodeURIComponent(roundWinner.voter)}" class="profile-link">
+      <strong>${roundWinner.voter}</strong>
+    </a><br>
+    <span class="small">${roundWinner.player1}, ${roundWinner.player2}, ⭐ ${roundWinner.captain}</span>
+  </div>
+  <div class="result-score">${roundWinner.total}</div>
+</div>
 
       <div class="stat-card mvp">
         <h3>👑 Fantasy MVP</h3>
@@ -1234,7 +1250,11 @@ async function loadFantasyStats() {
         ${leaderboard.map((row, index) => `
           <tr>
             <td>${index + 1}</td>
-            <td>${row.voter}</td>
+            <td>
+  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+    ${row.voter}
+  </a>
+</td>
             <td>${row.player1}, ${row.player2}, ⭐ ${row.captain}</td>
             <td>${row.total}</td>
           </tr>
