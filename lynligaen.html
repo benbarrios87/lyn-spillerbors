@@ -322,7 +322,15 @@ main {
   0% { transform:translateX(0); }
   100% { transform:translateX(-100%); }
 }
+.profile-link {
+  color:white;
+  text-decoration:none;
+}
 
+.profile-link:hover {
+  text-decoration:underline;
+}
+    
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -794,7 +802,9 @@ function renderLeagueTable(league) {
             <tr>
               <td>${index + 1}</td>
               <td>
-                <strong>${row.voter}</strong><br>
+  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+    <strong>${row.voter}</strong>
+  </a><br>
                 ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
                 ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
               </td>
