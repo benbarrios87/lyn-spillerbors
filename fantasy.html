@@ -1017,7 +1017,11 @@ async function saveTeam() {
     alert("Noe gikk galt ved lagring.");
     return;
   }
-
+trackEvent("fantasy_saved", {
+  voter:voter,
+  match_id:matchId,
+  captain:captain
+});
   alert("Fantasy-laget er lagret!");
   showTeam(team);
   loadFantasyStats();
