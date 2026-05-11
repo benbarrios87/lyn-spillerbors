@@ -139,7 +139,16 @@ h1 {
   color:#ffd166;
   font-size:16px;
 }
+.season-link{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  transition:0.2s;
+}
 
+.season-link:hover{
+  color:#ffd166;
+}
 .footer {
   margin-top:36px;
   font-size:13px;
@@ -276,21 +285,24 @@ async function loadSeasonStats(){
     .slice(0,3);
 
   document.getElementById("topScorers").innerHTML =
-    topGoals.map((p,i) => `
-      <div class="season-row">
-        <span>${i+1}. ${p[0]}</span>
-        <strong>${p[1]} mål</strong>
-      </div>
-    `).join("");
+  topGoals.map((p,i) => `
+    <div class="season-row">
+      <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
+        ${i+1}. ${p[0]}
+      </a>
+      <strong>${p[1]} mål</strong>
+    </div>
+  `).join("");
 
-  document.getElementById("topAssists").innerHTML =
-    topAssist.map((p,i) => `
-      <div class="season-row">
-        <span>${i+1}. ${p[0]}</span>
-        <strong>${p[1]} assist</strong>
-      </div>
-    `).join("");
-
+document.getElementById("topAssists").innerHTML =
+  topAssist.map((p,i) => `
+    <div class="season-row">
+      <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
+        ${i+1}. ${p[0]}
+      </a>
+      <strong>${p[1]} assist</strong>
+    </div>
+  `).join("");
 }
 
 loadSeasonStats();
