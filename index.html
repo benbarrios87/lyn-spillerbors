@@ -212,59 +212,90 @@ h1 {
 
   </div>
 
-  <div class="season-strip">
+ <div class="season-strip">
 
-    <div class="season-grid">
+  <div class="season-grid">
 
-      <div class="season-card">
-        <div class="season-title">⚽ Toppscorer</div>
+    <div class="season-card">
+      <div class="season-title">⚽ Toppscorer</div>
+      <div id="topScorers"></div>
+    </div>
 
-        <div class="season-row">
-          <span>1. Hellum</span>
-          <strong>7 mål</strong>
-        </div>
-
-        <div class="season-row">
-          <span>2. MJ</span>
-          <strong>4 mål</strong>
-        </div>
-
-        <div class="season-row">
-          <span>3. Sawaneh</span>
-          <strong>3 mål</strong>
-        </div>
-      </div>
-
-      <div class="season-card">
-        <div class="season-title">🎁 Assistkonge</div>
-
-        <div class="season-row">
-          <span>1. MJ</span>
-          <strong>5 assist</strong>
-        </div>
-
-        <div class="season-row">
-          <span>2. Skaug</span>
-          <strong>3 assist</strong>
-        </div>
-
-        <div class="season-row">
-          <span>3. Hellum</span>
-          <strong>2 assist</strong>
-        </div>
-      </div>
-
+    <div class="season-card">
+      <div class="season-title">🎁 Assistkonge</div>
+      <div id="topAssists"></div>
     </div>
 
   </div>
 
+</div>
   <div class="footer">
     Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt.
   </div>
 
 </div>
 
-<script defer src="/_vercel/analytics/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function loadSeasonStats(){
+
+  const { data } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*");
+
+  const goals = {};
+  const assists = {};
+
+  data.forEach(row => {
+
+    if(!row.player || row.match_id === "TEST") return;
+
+    goals[row.player] =
+      (goals[row.player] || 0) + (row.goals || 0);
+
+    assists[row.player] =
+      (assists[row.player] || 0) + (row.assists || 0);
+
+  });
+
+  const topGoals = Object.entries(goals)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  const topAssist = Object.entries(assists)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  document.getElementById("topScorers").innerHTML =
+    topGoals.map((p,i) => `
+      <div class="season-row">
+        <span>${i+1}. ${p[0]}</span>
+        <strong>${p[1]} mål</strong>
+      </div>
+    `).join("");
+
+  document.getElementById("topAssists").innerHTML =
+    topAssist.map((p,i) => `
+      <div class="season-row">
+        <span>${i+1}. ${p[0]}</span>
+        <strong>${p[1]} assist</strong>
+      </div>
+    `).join("");
+
+}
+
+loadSeasonStats();
+</script>
+
+<script defer src="/_vercel/analytics/script.js"></script>
 </body>
 </html>
