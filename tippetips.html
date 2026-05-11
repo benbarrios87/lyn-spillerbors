@@ -429,7 +429,16 @@ button:hover {
   border-radius:12px;
   margin-bottom:12px;
 }
+.profile-link {
+  color:var(--blue);
+  text-decoration:none;
+  font-weight:bold;
+}
 
+.profile-link:hover {
+  text-decoration:underline;
+}
+  
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -893,7 +902,11 @@ async function loadMatchPredictions() {
 
     html += `
       <div class="prediction-row">
-        <div><strong>${p.voter}</strong></div>
+<div>
+  <a href="profil.html?user=${encodeURIComponent(p.voter)}" class="profile-link">
+    <strong>${p.voter}</strong>
+  </a>
+</div>
         <div class="prediction-score">${p.home}-${p.away}</div>
         <div>${points === null ? "venter" : points + " p"}</div>
       </div>
@@ -918,10 +931,11 @@ function buildPredictionLeaderboardRows(allVotes) {
     if (!users[p.voter]) {
       users[p.voter] = {
         points:0,
-        correct:0,
-        outcomes:0,
-        zeroes:0,
-        tips:0
+correct:0,
+diffs:0,
+outcomes:0,
+zeroes:0,
+tips:0
       };
     }
 
@@ -929,24 +943,27 @@ function buildPredictionLeaderboardRows(allVotes) {
     users[p.voter].tips += 1;
 
     if (points === 3) users[p.voter].correct += 1;
-    if (points === 1) users[p.voter].outcomes += 1;
-    if (points === 0) users[p.voter].zeroes += 1;
+if (points === 2) users[p.voter].diffs += 1;
+if (points === 1) users[p.voter].outcomes += 1;
+if (points === 0) users[p.voter].zeroes += 1;
   });
 
-  return Object.keys(users).map(user => ({
-    player:user,
-    score:users[user].points + " p",
-    raw:users[user].points,
-    correct:users[user].correct,
-    outcomes:users[user].outcomes,
-    zeroes:users[user].zeroes,
-    tips:users[user].tips,
-    sub:`${users[user].correct} helt riktige · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
+ return Object.keys(users).map(user => ({
+  player:user,
+  score:users[user].points + " p",
+  raw:users[user].points,
+  correct:users[user].correct,
+  diffs:users[user].diffs,
+  outcomes:users[user].outcomes,
+  zeroes:users[user].zeroes,
+  tips:users[user].tips,
+    sub:`${users[user].correct} helt riktige · ${users[user].diffs} målforskjell · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
   })).sort((a,b) =>
-    b.raw - a.raw ||
-    b.correct - a.correct ||
-    b.outcomes - a.outcomes ||
-    a.player.localeCompare(b.player)
+   b.raw - a.raw ||
+b.correct - a.correct ||
+b.diffs - a.diffs ||
+b.outcomes - a.outcomes ||
+a.player.localeCompare(b.player)
   );
 }
 
@@ -976,7 +993,13 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
 
     html += `
       <div class="result-row">
-        <div>${medal}<strong>${r.player}</strong><br><span class="small">${r.sub || ""}</span></div>
+     <div>
+  ${medal}
+  <a href="profil.html?user=${encodeURIComponent(r.player)}" class="profile-link">
+    <strong>${r.player}</strong>
+  </a><br>
+  <span class="small">${r.sub || ""}</span>
+</div>
         <div class="result-score">${r.score}</div>
       </div>
     `;
