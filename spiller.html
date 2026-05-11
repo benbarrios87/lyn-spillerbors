@@ -520,9 +520,11 @@ const worstGame = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.
             value:bestGame ? bestGame.fantasyPoints : "–"
           },
           {
-            label:"Verste fantasykamp",
-            sub:worstGame ? worstGame.label : "Ingen",
-            value:worstGame ? worstGame.fantasyPoints : "–"
+            {
+  label:"Verste kamp",
+  sub:worstGame ? worstGame.label : "Ingen",
+  value:worstGame ? worstGame.rating.toFixed(1) : "–"
+},
           },
           {
             label:"Beste børs",
