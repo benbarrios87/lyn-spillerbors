@@ -56,42 +56,6 @@ h1 {
   text-shadow:0 2px 10px rgba(0,0,0,0.55);
 }
 
-.topstats{
-  margin-top:24px;
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.topstat{
-  background:rgba(0,0,0,0.45);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:999px;
-  padding:10px 16px;
-  backdrop-filter:blur(4px);
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.topstat-label{
-  font-size:12px;
-  opacity:0.65;
-  text-transform:uppercase;
-  letter-spacing:1px;
-}
-
-.topstat-player{
-  font-weight:bold;
-  color:white;
-}
-
-.topstat-value{
-  color:#ffd166;
-  font-weight:bold;
-}
-
 .grid {
   margin-top:40px;
   display:grid;
@@ -130,6 +94,52 @@ h1 {
   line-height:1.5;
 }
 
+.season-strip {
+  margin-top:34px;
+}
+
+.season-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.season-card {
+  background:rgba(0,0,0,0.60);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:20px;
+  padding:18px;
+  backdrop-filter:blur(4px);
+  text-align:left;
+  color:white;
+}
+
+.season-title {
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:14px;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.6);
+}
+
+.season-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  font-size:15px;
+}
+
+.season-row:last-child {
+  border-bottom:none;
+}
+
+.season-row strong {
+  color:#ffd166;
+  font-size:16px;
+}
+
 .footer {
   margin-top:36px;
   font-size:13px;
@@ -150,6 +160,10 @@ h1 {
   .card {
     padding:30px 22px;
   }
+
+  .season-grid {
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -162,22 +176,10 @@ h1 {
 
   <h1>Lynbørs</h1>
 
-<div class="topstats">
-
-  <div class="topstat">
-    <div class="topstat-label">Toppscorer</div>
-    <div class="topstat-player">⚽ Hellum · 7 mål</div>
+  <div class="subtitle">
+    Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
   </div>
 
-  <div class="topstat">
-    <div class="topstat-label">Assistkonge</div>
-    <div class="topstat-player">🎁 MJ · 5 assist</div>
-  </div>
-
-</div>
-
-
-</div>
   <div class="grid">
 
     <div class="card" onclick="location.href='bors.html'">
@@ -210,8 +212,54 @@ h1 {
 
   </div>
 
+  <div class="season-strip">
+
+    <div class="season-grid">
+
+      <div class="season-card">
+        <div class="season-title">⚽ Toppscorer</div>
+
+        <div class="season-row">
+          <span>1. Hellum</span>
+          <strong>7 mål</strong>
+        </div>
+
+        <div class="season-row">
+          <span>2. MJ</span>
+          <strong>4 mål</strong>
+        </div>
+
+        <div class="season-row">
+          <span>3. Sawaneh</span>
+          <strong>3 mål</strong>
+        </div>
+      </div>
+
+      <div class="season-card">
+        <div class="season-title">🎁 Assistkonge</div>
+
+        <div class="season-row">
+          <span>1. MJ</span>
+          <strong>5 assist</strong>
+        </div>
+
+        <div class="season-row">
+          <span>2. Skaug</span>
+          <strong>3 assist</strong>
+        </div>
+
+        <div class="season-row">
+          <span>3. Hellum</span>
+          <strong>2 assist</strong>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
   <div class="footer">
-   Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt. 
+    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt.
   </div>
 
 </div>
