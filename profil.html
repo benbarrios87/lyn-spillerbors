@@ -221,7 +221,16 @@ th:last-child{
 .profile-link{
   color:white;
 }
+.player-link{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
 
+.player-link:hover{
+  color:var(--gold);
+  text-decoration:underline;
+}
 </style>
 </head>
 
@@ -324,7 +333,13 @@ function fantasyPosition(playerName){
   const p = players.find(x => x.short === playerName || x.name === playerName);
   return p ? p.position : "";
 }
-
+function playerLink(playerName){
+  return `
+    <a href="spiller.html?player=${encodeURIComponent(playerName)}" class="player-link">
+      ${playerName}
+    </a>
+  `;
+}
 function calculateFantasyPoints(player, isCaptain, statsMap){
   const stat = statsMap[player];
   const position = fantasyPosition(player);
@@ -496,7 +511,7 @@ async function loadProfile(){
       match_id:pick.match_id,
       label:match ? `${formatDate(match.date)} ${match.home} - ${match.away}` : pick.match_id,
       total,
-      team:`${pick.player1}, ${pick.player2}, ⭐ ${pick.captain}`
+      team:`${playerLink(pick.player1)}, ${playerLink(pick.player2)}, ⭐ ${playerLink(pick.captain)}`
     });
 
     [pick.player1, pick.player2, pick.captain].forEach(player => {
