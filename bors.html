@@ -747,7 +747,12 @@ async function sendVote() {
     alert("Noe gikk feil. Stemmen ble ikke sendt.");
     return;
   }
-
+trackEvent("bors_submitted", {
+  voter:voter,
+  match_id:match,
+  ratings:rows.length
+});
+  
   alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
 
   players.forEach(p => document.getElementById(p.short).value = "");
