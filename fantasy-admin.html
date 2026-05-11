@@ -890,13 +890,6 @@ function trackAdminVisit() {
 document.getElementById("matchSelect")?.addEventListener("change", loadStats);
 
 async function loadActivityFeed() {
-  fillMatchSelect();
-renderPlayers();
-loadStats();
-trackAdminVisit();
-loadTrafficStats();
-loadActivityFeed();
-
   const { data, error } = await supabaseClient
     .from("site_events")
     .select("*")
@@ -905,6 +898,8 @@ loadActivityFeed();
 
   if (error) {
     console.error(error);
+    const box = document.getElementById("activityFeed");
+    box.innerHTML = `<div class="small">Klarte ikke å hente aktivitet.</div>`;
     return;
   }
 
@@ -916,7 +911,6 @@ loadActivityFeed();
   }
 
   box.innerHTML = data.map(event => {
-
     const time = new Date(event.created_at)
       .toLocaleTimeString("no-NO", {
         hour:"2-digit",
@@ -927,29 +921,29 @@ loadActivityFeed();
 
     if (event.event_type === "tips_submitted") {
       text = `🎯 <strong>${event.voter}</strong> leverte tips`;
-    }
-
-    else if (event.event_type === "bors_submitted") {
+    } else if (event.event_type === "bors_submitted") {
       text = `⭐ <strong>${event.voter}</strong> leverte børs`;
-    }
-
-    else if (event.event_type === "fantasy_saved") {
+    } else if (event.event_type === "fantasy_saved") {
       text = `🧠 <strong>${event.voter}</strong> lagret fantasylag`;
-    }
-
-    else {
+    } else {
       text = `⚡ ${event.event_type}`;
     }
 
     return `
-      <div class="result-row">
+      <div class="analytics-row">
         <div>${text}</div>
         <div class="small">${time}</div>
       </div>
     `;
-
   }).join("");
 }
+
+fillMatchSelect();
+renderPlayers();
+loadStats();
+trackAdminVisit();
+loadTrafficStats();
+loadActivityFeed();
 </script>
   
 
