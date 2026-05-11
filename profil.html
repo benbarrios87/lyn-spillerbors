@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Lynprofil</title>
-
 <link rel="icon" href="lblogoen.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,9 +14,10 @@
   --red:#d71920;
   --blue:#13294b;
   --gold:#ffd166;
-  --panel:rgba(8,15,32,0.82);
-  --line:rgba(255,255,255,0.14);
-  --muted:rgba(255,255,255,0.7);
+  --green:#28d17c;
+  --panel:rgba(8,15,32,0.84);
+  --line:rgba(255,255,255,0.16);
+  --muted:rgba(255,255,255,0.72);
 }
 
 body{
@@ -31,19 +31,22 @@ body::before{
   content:"";
   position:fixed;
   inset:0;
-  background:rgba(3,7,18,0.82);
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.30), transparent 30%),
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 24%),
+    rgba(3,7,18,0.84);
   z-index:-1;
 }
 
 main{
-  max-width:900px;
+  max-width:1050px;
   margin:auto;
-  padding:30px 16px 80px;
+  padding:28px 16px 80px;
 }
 
 .back-btn{
   display:inline-block;
-  margin-bottom:20px;
+  margin-bottom:18px;
   padding:10px 14px;
   border-radius:999px;
   background:var(--red);
@@ -53,19 +56,33 @@ main{
 }
 
 .hero{
-  background:var(--panel);
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.28), rgba(19,41,75,0.85)),
+    var(--panel);
   border:1px solid var(--line);
-  border-radius:24px;
-  padding:24px;
+  border-radius:28px;
+  padding:26px;
   margin-bottom:18px;
+  box-shadow:0 14px 35px rgba(0,0,0,0.35);
+}
+
+.kicker{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.2);
+  font-size:13px;
+  font-weight:bold;
 }
 
 .hero h1{
-  margin:0;
-  font-size:42px;
+  margin:12px 0 6px;
+  font-size:44px;
 }
 
 .hero p{
+  margin:0;
   color:var(--muted);
 }
 
@@ -75,9 +92,13 @@ main{
   gap:16px;
 }
 
-@media(min-width:800px){
+@media(min-width:850px){
   .grid{
     grid-template-columns:1fr 1fr;
+  }
+
+  .grid.four{
+    grid-template-columns:repeat(4,1fr);
   }
 }
 
@@ -86,14 +107,16 @@ main{
   border:1px solid var(--line);
   border-radius:22px;
   padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
 }
 
-.card h2{
+.card h2,
+.card h3{
   margin-top:0;
 }
 
 .big{
-  font-size:42px;
+  font-size:38px;
   font-weight:bold;
   color:var(--gold);
 }
@@ -105,17 +128,98 @@ main{
 
 .row{
   padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,0.08);
+  border-bottom:1px solid rgba(255,255,255,0.10);
 }
 
 .row:last-child{
   border-bottom:none;
 }
 
-.match{
-  display:flex;
-  justify-content:space-between;
+.result-row{
+  display:grid;
+  grid-template-columns:1fr auto;
   gap:10px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+}
+
+.result-row:last-child{
+  border-bottom:none;
+}
+
+.score{
+  font-weight:bold;
+  font-size:22px;
+  color:var(--gold);
+}
+
+.badge{
+  display:inline-block;
+  margin:4px 4px 0 0;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+  border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.10);
+}
+
+.badge.gold{
+  color:#ffe29a;
+  border-color:rgba(255,209,102,0.65);
+  background:rgba(255,209,102,0.14);
+}
+
+.badge.red{
+  color:#fecaca;
+  border-color:rgba(248,113,113,0.65);
+  background:rgba(248,113,113,0.14);
+}
+
+.badge.green{
+  color:#bbf7d0;
+  border-color:rgba(34,197,94,0.65);
+  background:rgba(34,197,94,0.14);
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:680px;
+}
+
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  text-align:left;
+}
+
+th{
+  color:var(--muted);
+  font-size:13px;
+}
+
+td:last-child,
+th:last-child{
+  text-align:right;
+  font-weight:bold;
+}
+
+.warning{
+  background:rgba(255,247,237,0.12);
+  border:1px solid rgba(253,186,116,0.45);
+  color:#fed7aa;
+  padding:14px;
+  border-radius:14px;
+}
+
+.profile-link{
+  color:white;
 }
 
 </style>
@@ -128,47 +232,14 @@ main{
 <a href="lyn-central.html" class="back-btn">← Til Lyn Central</a>
 
 <div class="hero">
+  <div class="kicker">LYNPROFIL</div>
   <h1 id="username">Laster...</h1>
-  <p>Personlig Lynbørs-profil</p>
+  <p id="profileSubtitle">Personlig Lynbørs-profil</p>
+  <div id="profileBadges" style="margin-top:12px;"></div>
 </div>
 
-<div class="grid">
-
-  <div class="card">
-    <h2>🏆 Oversikt</h2>
-
-    <div class="row">
-      <div class="small">Fantasy picks</div>
-      <div class="big" id="fantasyCount">0</div>
-    </div>
-
-    <div class="row">
-      <div class="small">Tips levert</div>
-      <div class="big" id="tipsCount">0</div>
-    </div>
-
-    <div class="row">
-      <div class="small">Kapteinsvalg</div>
-      <div class="big" id="captainCount">0</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>⭐ Favorittspillere</h2>
-
-    <div id="favoritePlayers">
-      Laster...
-    </div>
-  </div>
-
-</div>
-
-<div class="card" style="margin-top:16px;">
-  <h2>📊 Siste fantasy picks</h2>
-
-  <div id="recentFantasy">
-    Laster...
-  </div>
+<div id="content">
+  <div class="warning">Laster profil...</div>
 </div>
 
 </main>
@@ -179,107 +250,471 @@ main{
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const AWAY_FANS_PLAYER = "Bortefeltet";
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+const players = [
+  { name:"Alexander Pedersen", short:"Pedersen", position:"KEEPER" },
+  { name:"Sander Amble Haugen", short:"SAH", position:"FORS" },
+  { name:"William Sell", short:"Sell", position:"FORS" },
+  { name:"Ådne Midtskogen", short:"Midtskogen", position:"FORS" },
+  { name:"Herman Solberg Nilsen", short:"HSN", position:"FORS" },
+  { name:"Isaac Barnett", short:"Barnett", position:"FORS" },
+  { name:"Didrik Fredriksen", short:"Fredriksen", position:"MID" },
+  { name:"Eron Isufi", short:"Isufi", position:"MID" },
+  { name:"Julius Skaug", short:"Skaug", position:"MID" },
+  { name:"William Kurtovic", short:"Kurtovic", position:"MID" },
+  { name:"Isaac Monglo", short:"Monglo", position:"MID" },
+  { name:"William Wæhler", short:"Wæhler", position:"MID" },
+  { name:"Anders Bjørntvedt Olsen", short:"ABO", position:"ANG" },
+  { name:"Matias Johansen", short:"MJ", position:"ANG" },
+  { name:"Andreas Hellum", short:"Hellum", position:"ANG" },
+  { name:"Ibrahim Sawaneh", short:"Sawaneh", position:"ANG" },
+  { name:"Fallou Sock", short:"Sock", position:"ANG" },
+  { name:"Isak Vik", short:"Vik", position:"KEEPER" },
+  { name:"Marcus Andersen", short:"Andersen", position:"MID" },
+  { name:"Mats Trige", short:"Trige", position:"KEEPER" },
+  { name:"Magnus Aadland", short:"Aadland", position:"MID" }
+];
 
 const params = new URLSearchParams(window.location.search);
-const profileUser = (params.get("user") || "").toLowerCase();
+const profileUser = cleanVoterName(params.get("user") || "");
 
-document.getElementById("username").textContent = profileUser;
+document.getElementById("username").textContent = profileUser || "Ukjent bruker";
 
-async function loadProfile(){
+function cleanVoterName(name){
+  return (name || "").trim().toLowerCase();
+}
 
-  const { data:picks } = await supabaseClient
-    .from("fantasy_picks")
-    .select("*");
+function getMatchData(matchId){
+  return matchesData.find(m => m.id === matchId) || null;
+}
 
-  const { data:votes } = await supabaseClient
-    .from("votes")
-    .select("*");
+function formatDate(dateString){
+  if (!dateString) return "";
+  const d = new Date(dateString + "T12:00:00");
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
 
-  const userPicks = (picks || []).filter(p =>
-    (p.voter || "").trim().toLowerCase() === profileUser
-  );
+function decodeGoals(value){
+  return Number(value) - 1;
+}
 
-  const userVotes = (votes || []).filter(v =>
-    (v.voter || "").trim().toLowerCase() === profileUser
-  );
+function getOutcome(home, away){
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
 
-  document.getElementById("fantasyCount").textContent =
-    userPicks.length;
+function scorePrediction(tipHome, tipAway, actualHome, actualAway){
+  const exact = tipHome === actualHome && tipAway === actualAway;
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
 
-  const tipCount = userVotes.filter(v =>
-    v.player === "TIP_HOME_GOALS"
-  ).length;
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
+  return 0;
+}
 
-  document.getElementById("tipsCount").textContent =
-    tipCount;
+function fantasyPosition(playerName){
+  const p = players.find(x => x.short === playerName || x.name === playerName);
+  return p ? p.position : "";
+}
 
-  const captainMap = {};
+function calculateFantasyPoints(player, isCaptain, statsMap){
+  const stat = statsMap[player];
+  const position = fantasyPosition(player);
+  if (!stat) return 0;
 
-  userPicks.forEach(p => {
-    captainMap[p.captain] =
-      (captainMap[p.captain] || 0) + 1;
-  });
+  let points = 0;
 
-  const sortedCaptains =
-    Object.entries(captainMap)
-      .sort((a,b) => b[1] - a[1]);
+  if (stat.goals > 0) {
+    if (position === "ANG") points += stat.goals * 4;
+    if (position === "MID") points += stat.goals * 5;
+    if (position === "FORS") points += stat.goals * 6;
+    if (position === "KEEPER") points += stat.goals * 10;
+  }
 
-  document.getElementById("captainCount").textContent =
-    sortedCaptains[0]
-      ? sortedCaptains[0][0]
-      : "-";
+  points += (stat.assists || 0) * 3;
 
-  const playerMap = {};
+  if (stat.clean_sheet) {
+    if (position === "MID") points += 1;
+    if (position === "FORS") points += 4;
+    if (position === "KEEPER") points += 5;
+  }
 
-  userVotes.forEach(v => {
+  if (stat.penalty_save && position === "KEEPER") points += 5;
+  if (stat.red_card) points -= 3;
+  if (stat.rating >= 7.5) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+  if (isCaptain) points = Math.round(points * 1.5);
 
-    if(
-      v.player === "TIP_HOME_GOALS" ||
-      v.player === "TIP_AWAY_GOALS" ||
-      v.player === "Bortefeltet"
-    ){
-      return;
+  return points;
+}
+
+function isPredictionVote(v){
+  return v.match_id && v.match_id !== "TEST" && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
+}
+
+function isPlayerVote(v){
+  return v.match_id && v.match_id !== "TEST" && v.player !== AWAY_FANS_PLAYER && !isPredictionVote(v);
+}
+
+function buildPredictions(votes){
+  const map = {};
+
+  votes.filter(isPredictionVote).forEach(v => {
+    const voter = cleanVoterName(v.voter);
+    const key = `${v.match_id}|||${voter}`;
+
+    if (!map[key]) {
+      map[key] = {
+        match_id:v.match_id,
+        voter,
+        home:null,
+        away:null
+      };
     }
 
-    playerMap[v.player] =
-      (playerMap[v.player] || 0) + 1;
+    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
   });
 
-  const favoritePlayers =
-    Object.entries(playerMap)
-      .sort((a,b) => b[1] - a[1]);
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
 
-  document.getElementById("favoritePlayers").innerHTML =
-    favoritePlayers.slice(0,5).map(p => `
-      <div class="row">
-        <strong>${p[0]}</strong><br>
-        <span class="small">${p[1]} stemmer</span>
+function buildRatingMaps(allVotes){
+  const ratingMaps = {};
+
+  allVotes.filter(isPlayerVote).forEach(v => {
+    if (!ratingMaps[v.match_id]) ratingMaps[v.match_id] = {};
+    if (!ratingMaps[v.match_id][v.player]) ratingMaps[v.match_id][v.player] = { total:0, count:0 };
+
+    ratingMaps[v.match_id][v.player].total += Number(v.rating);
+    ratingMaps[v.match_id][v.player].count += 1;
+  });
+
+  return ratingMaps;
+}
+
+function buildStatsByMatch(stats, allVotes){
+  const ratingMaps = buildRatingMaps(allVotes);
+  const statsByMatch = {};
+
+  (stats || []).forEach(row => {
+    if (!statsByMatch[row.match_id]) statsByMatch[row.match_id] = {};
+
+    const ratingData = ratingMaps[row.match_id] && ratingMaps[row.match_id][row.player];
+    const rating = ratingData ? ratingData.total / ratingData.count : 0;
+
+    statsByMatch[row.match_id][row.player] = {
+      ...row,
+      rating
+    };
+  });
+
+  return statsByMatch;
+}
+
+function countMapToRows(map, suffix = ""){
+  return Object.entries(map)
+    .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name,count]) => ({
+      name,
+      count,
+      suffix
+    }));
+}
+
+function managerType(data){
+  if (data.perfectTips >= 2) return "🔮 Orakel";
+  if (data.bestFantasy >= 20) return "🔥 Fantasy-monster";
+  if (data.favoritePlayerCount >= 4) return `❤️ ${data.favoritePlayer}-lojalist`;
+  if (data.captainCount >= 4) return "⭐ Kapteinsspesialist";
+  if (data.tipsCount > data.fantasyCount) return "🎯 Tippegeneral";
+  if (data.fantasyCount > data.tipsCount) return "⚽ Fantasygrinder";
+  return "🧠 Allrounder";
+}
+
+function renderRows(rows, emptyText = "Ingen data enda."){
+  if (!rows || rows.length === 0) return `<div class="small">${emptyText}</div>`;
+
+  return rows.map(row => `
+    <div class="result-row">
+      <div>
+        <strong>${row.name}</strong><br>
+        <span class="small">${row.sub || ""}</span>
       </div>
-    `).join("");
+      <div class="score">${row.count}${row.suffix || ""}</div>
+    </div>
+  `).join("");
+}
 
-  document.getElementById("recentFantasy").innerHTML =
-    userPicks.reverse().slice(0,8).map(p => `
-      <div class="row match">
-        <div>
-          <strong>${p.match_id}</strong><br>
-          <span class="small">
-            ${p.player1}, ${p.player2}
-          </span>
+async function loadProfile(){
+  if (!profileUser) {
+    document.getElementById("content").innerHTML = `<div class="warning">Ingen bruker valgt.</div>`;
+    return;
+  }
+
+  const [{ data:picks }, { data:stats }, { data:votes }] = await Promise.all([
+    supabaseClient.from("fantasy_picks").select("*"),
+    supabaseClient.from("fantasy_stats").select("*"),
+    supabaseClient.from("votes").select("*")
+  ]);
+
+  const allPicks = picks || [];
+  const allStats = stats || [];
+  const allVotes = votes || [];
+
+  const statsByMatch = buildStatsByMatch(allStats, allVotes);
+  const predictions = buildPredictions(allVotes);
+
+  const userPicks = allPicks.filter(p => cleanVoterName(p.voter) === profileUser);
+  const userPredictions = predictions.filter(p => p.voter === profileUser);
+  const userVotes = allVotes.filter(v => cleanVoterName(v.voter) === profileUser);
+
+  const fantasyHistory = [];
+  const captainMap = {};
+  const chosenPlayerMap = {};
+  const playerVoteMap = {};
+
+  userPicks.forEach(pick => {
+    const statsMap = statsByMatch[pick.match_id] || {};
+
+    const p1 = calculateFantasyPoints(pick.player1, false, statsMap);
+    const p2 = calculateFantasyPoints(pick.player2, false, statsMap);
+    const cap = calculateFantasyPoints(pick.captain, true, statsMap);
+    const total = p1 + p2 + cap;
+
+    const match = getMatchData(pick.match_id);
+
+    fantasyHistory.push({
+      match_id:pick.match_id,
+      label:match ? `${formatDate(match.date)} ${match.home} - ${match.away}` : pick.match_id,
+      total,
+      team:`${pick.player1}, ${pick.player2}, ⭐ ${pick.captain}`
+    });
+
+    [pick.player1, pick.player2, pick.captain].forEach(player => {
+      chosenPlayerMap[player] = (chosenPlayerMap[player] || 0) + 1;
+    });
+
+    captainMap[pick.captain] = (captainMap[pick.captain] || 0) + 1;
+  });
+
+  userVotes.forEach(v => {
+    if (
+      v.player === TIP_HOME_PLAYER ||
+      v.player === TIP_AWAY_PLAYER ||
+      v.player === AWAY_FANS_PLAYER
+    ) return;
+
+    playerVoteMap[v.player] = (playerVoteMap[v.player] || 0) + 1;
+  });
+
+  const tipHistory = [];
+
+  userPredictions.forEach(p => {
+    const match = getMatchData(p.match_id);
+    if (!match || !match.actual) return;
+
+    const points = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+
+    tipHistory.push({
+      match_id:p.match_id,
+      label:`${formatDate(match.date)} ${match.home} - ${match.away}`,
+      tip:`${p.home}-${p.away}`,
+      actual:`${match.actual.home}-${match.actual.away}`,
+      points
+    });
+  });
+
+  const totalFantasyRaw = fantasyHistory.reduce((sum,r) => sum + r.total, 0);
+  const totalTipPoints = tipHistory.reduce((sum,r) => sum + r.points, 0);
+  const bestFantasy = fantasyHistory.length ? [...fantasyHistory].sort((a,b) => b.total - a.total)[0] : null;
+  const worstFantasy = fantasyHistory.length ? [...fantasyHistory].sort((a,b) => a.total - b.total)[0] : null;
+  const bestTip = tipHistory.filter(r => r.points === 3).length;
+  const diffTips = tipHistory.filter(r => r.points === 2).length;
+  const outcomeTips = tipHistory.filter(r => r.points === 1).length;
+  const zeroTips = tipHistory.filter(r => r.points === 0).length;
+
+  const favoritePlayers = countMapToRows(playerVoteMap, " stemmer");
+  const favoriteChosen = countMapToRows(chosenPlayerMap, " valg");
+  const captains = countMapToRows(captainMap, "x");
+
+  const favoritePlayer = favoritePlayers[0]?.name || favoriteChosen[0]?.name || "-";
+  const favoritePlayerCount = favoritePlayers[0]?.count || favoriteChosen[0]?.count || 0;
+  const captainCount = captains[0]?.count || 0;
+
+  const formFantasy = fantasyHistory.slice(-5);
+  const formPoints = formFantasy.reduce((sum,r) => sum + r.total, 0);
+
+  const profileData = {
+    perfectTips:bestTip,
+    bestFantasy:bestFantasy ? bestFantasy.total : 0,
+    favoritePlayer,
+    favoritePlayerCount,
+    captainCount,
+    tipsCount:userPredictions.length,
+    fantasyCount:userPicks.length
+  };
+
+  const type = managerType(profileData);
+
+  document.getElementById("profileSubtitle").textContent = type;
+
+  const badges = [];
+  if (bestTip > 0) badges.push(`<span class="badge gold">🔮 Orakel x${bestTip}</span>`);
+  if (captainCount >= 3) badges.push(`<span class="badge gold">⭐ Kapteinsspesialist</span>`);
+  if (favoritePlayerCount >= 3) badges.push(`<span class="badge green">❤️ Lojal mot ${favoritePlayer}</span>`);
+  if (bestFantasy && bestFantasy.total >= 15) badges.push(`<span class="badge red">🔥 Høy fantasyrunde</span>`);
+  if (userPicks.length + userPredictions.length >= 8) badges.push(`<span class="badge">🏅 Aktiv bruker</span>`);
+
+  document.getElementById("profileBadges").innerHTML = badges.join("");
+
+  document.getElementById("content").innerHTML = `
+    <div class="grid four">
+      <div class="card">
+        <h3>🏆 Lynprofil</h3>
+        <div class="big">${totalFantasyRaw + totalTipPoints}</div>
+        <div class="small">råpoeng fantasy + tippetips</div>
+      </div>
+
+      <div class="card">
+        <h3>⚽ Fantasy</h3>
+        <div class="big">${totalFantasyRaw}</div>
+        <div class="small">${userPicks.length} lag levert</div>
+      </div>
+
+      <div class="card">
+        <h3>🎯 Tippetips</h3>
+        <div class="big">${totalTipPoints}</div>
+        <div class="small">${userPredictions.length} kuponger levert</div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 Form siste 5</h3>
+        <div class="big">${formPoints}</div>
+        <div class="small">fantasypoeng</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px;">
+      <div class="card">
+        <h2>⭐ Kapteinsvalg</h2>
+        ${renderRows(captains, "Ingen kapteinsvalg enda.")}
+      </div>
+
+      <div class="card">
+        <h2>❤️ Favorittspillere</h2>
+        ${renderRows(favoritePlayers.length ? favoritePlayers : favoriteChosen, "Ingen favorittdata enda.")}
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px;">
+      <div class="card">
+        <h2>🎯 Tippesnacks</h2>
+
+        <div class="result-row">
+          <div><strong>Helt riktige</strong><br><span class="small">Orakel-treff</span></div>
+          <div class="score">${bestTip}</div>
         </div>
 
-        <div>
-          ⭐ ${p.captain}
+        <div class="result-row">
+          <div><strong>Riktig målforskjell</strong><br><span class="small">Riktig utfall + diff</span></div>
+          <div class="score">${diffTips}</div>
+        </div>
+
+        <div class="result-row">
+          <div><strong>Riktig utfall</strong><br><span class="small">Riktig vinner/uavgjort</span></div>
+          <div class="score">${outcomeTips}</div>
+        </div>
+
+        <div class="result-row">
+          <div><strong>Bom</strong><br><span class="small">Vi nevner det diskret</span></div>
+          <div class="score">${zeroTips}</div>
         </div>
       </div>
-    `).join("");
+
+      <div class="card">
+        <h2>📈 Fantasyrekorder</h2>
+
+        <div class="result-row">
+          <div><strong>Beste runde</strong><br><span class="small">${bestFantasy ? bestFantasy.label : "Ingen"}</span></div>
+          <div class="score">${bestFantasy ? bestFantasy.total : "–"}</div>
+        </div>
+
+        <div class="result-row">
+          <div><strong>Verste runde</strong><br><span class="small">${worstFantasy ? worstFantasy.label : "Ingen"}</span></div>
+          <div class="score">${worstFantasy ? worstFantasy.total : "–"}</div>
+        </div>
+
+        <div class="result-row">
+          <div><strong>Snitt fantasy</strong><br><span class="small">Per leverte lag</span></div>
+          <div class="score">${userPicks.length ? (totalFantasyRaw / userPicks.length).toFixed(1) : "–"}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>📊 Fantasyhistorikk</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Kamp</th>
+              <th>Lag</th>
+              <th>Poeng</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${fantasyHistory.slice().reverse().map(r => `
+              <tr>
+                <td>${r.label}</td>
+                <td>${r.team}</td>
+                <td>${r.total}</td>
+              </tr>
+            `).join("") || `<tr><td colspan="3">Ingen fantasyhistorikk.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>🎯 Tippehistorikk</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Kamp</th>
+              <th>Tips</th>
+              <th>Fasit</th>
+              <th>Poeng</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tipHistory.slice().reverse().map(r => `
+              <tr>
+                <td>${r.label}</td>
+                <td>${r.tip}</td>
+                <td>${r.actual}</td>
+                <td>${r.points}</td>
+              </tr>
+            `).join("") || `<tr><td colspan="4">Ingen tippehistorikk.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
 }
 
 loadProfile();
-
 </script>
 
 </body>
