@@ -511,6 +511,15 @@ label {
 .profile-link:hover {
   text-decoration:underline;
 }
+  .player-link {
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.player-link:hover {
+  text-decoration:underline;
+}
   
 @media (max-width:620px) {
   .menu-btn {
@@ -723,13 +732,20 @@ function getPlayerImage(playerName) {
   const player = getPlayer(playerName);
   return player ? player.image : "bilder/lyn-logo.png";
 }
-
+  
+function playerLink(playerName) {
+  return `
+    <a href="spiller.html?player=${encodeURIComponent(playerName)}" class="player-link">
+      ${playerName}
+    </a>
+  `;
+}
 function playerChip(playerName) {
   return `
     <div class="player-chip">
       <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='bilder/lyn-logo.png'">
       <div>
-        <strong>${playerName}</strong><br>
+       <strong>${playerLink(playerName)}</strong><br>
         <span class="small">${getPlayerPosition(playerName)}</span>
       </div>
     </div>
@@ -1090,7 +1106,9 @@ function renderPodium(leaderboard) {
     ${row.voter}
   </a>
 </div>
-        <div class="podium-team">${row.player1}, ${row.player2}, ⭐ ${row.captain}</div>
+        <div class="podium-team">
+  ${playerLink(row.player1)}, ${playerLink(row.player2)}, ⭐ ${playerLink(row.captain)}
+</div>
         <div class="podium-score">${row.total}</div>
         <div class="small">poeng</div>
       </div>
@@ -1125,7 +1143,7 @@ function renderRoundPlayers() {
         <div class="round-player">
           <img src="${row.image}" alt="${row.name}" onerror="this.src='bilder/lyn-logo.png'">
           <div>
-            <strong>${index + 1}. ${row.name}</strong><br>
+            <strong>${index + 1}. ${playerLink(row.name)}</strong><br>
             <span class="small">${row.position}</span>
           </div>
           <div class="result-score ${formatPointClass(row.points)}">${row.points}</div>
@@ -1209,6 +1227,7 @@ async function loadFantasyStats() {
   </div>
   <div class="result-score">${roundWinner.total}</div>
 </div>
+</div>
 
       <div class="stat-card mvp">
         <h3>👑 Fantasy MVP</h3>
@@ -1255,7 +1274,7 @@ async function loadFantasyStats() {
     ${row.voter}
   </a>
 </td>
-            <td>${row.player1}, ${row.player2}, ⭐ ${row.captain}</td>
+            <td>${playerLink(row.player1)}, ${playerLink(row.player2)}, ⭐ ${playerLink(row.captain)}</td>
             <td>${row.total}</td>
           </tr>
         `).join("")}
