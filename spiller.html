@@ -56,116 +56,87 @@ main{
 }
 
 .hero{
+  max-width:420px;
+  margin:0 auto 24px;
+  background:#c4122f;
+  border-radius:24px;
+  padding:22px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.45);
   position:relative;
-  overflow:hidden;
-
-  background:
-    radial-gradient(circle at top left, rgba(255,209,102,0.35), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(215,25,32,0.30), transparent 28%),
-    linear-gradient(145deg, #13294b 0%, #0d1c35 45%, #1d355f 100%);
-
-  border:2px solid rgba(255,209,102,0.35);
-  border-radius:32px;
-
-  padding:30px;
-  margin-bottom:20px;
-
-  box-shadow:
-    0 18px 40px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-
-  display:grid;
-  grid-template-columns:1fr;
-  gap:22px;
-  align-items:center;
 }
 
-.hero::after{
-  content:"";
-  position:absolute;
-  inset:0;
-
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.02),
-      rgba(255,255,255,0.02) 2px,
-      transparent 2px,
-      transparent 8px
-    );
-
-  pointer-events:none;
-}
-
-@media(min-width:780px){
-  .hero{
-    grid-template-columns:auto 1fr;
-  }
+.card-inner{
+  background:white;
+  padding:18px;
+  border-radius:12px;
 }
 
 .player-img{
-  width:160px;
-  height:160px;
-
-  border-radius:24px;
+  width:100%;
+  aspect-ratio:3/4;
   object-fit:cover;
-
+  display:block;
+  border:none;
+  border-radius:0;
   background:white;
-
-  border:4px solid var(--gold);
-
-  box-shadow:
-    0 10px 28px rgba(0,0,0,0.45),
-    0 0 22px rgba(255,209,102,0.30);
-
-  transform:rotate(-2deg);
 }
 
 .kicker{
   display:inline-block;
-
-  padding:7px 14px;
+  padding:6px 12px;
   border-radius:999px;
-
-  background:rgba(255,209,102,0.14);
-
-  border:1px solid rgba(255,209,102,0.35);
-
-  color:#ffe29a;
-
+  background:#13294b;
+  color:white;
+  border:none;
   font-size:12px;
   font-weight:bold;
   letter-spacing:1px;
 }
 
+.hero h1{
+  font-size:38px;
+  margin:14px 0 6px;
+  color:#111;
+}
+
+.hero p{
+  color:#444;
+  margin:0;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+@media(min-width:850px){
+  .grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid.four{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+
 .card{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.10),
-      rgba(255,255,255,0.04)
-    ),
-    var(--panel);
-
-  border:1px solid rgba(255,255,255,0.14);
-
-  border-radius:24px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
   padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
 
-  box-shadow:
-    0 12px 28px rgba(0,0,0,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+.card h2,
+.card h3{
+  margin-top:0;
 }
 
 .big{
-  font-size:42px;
+  font-size:38px;
   font-weight:bold;
-
   color:var(--gold);
-
-  text-shadow:
-    0 0 18px rgba(255,209,102,0.25),
-    0 2px 8px rgba(0,0,0,0.35);
 }
 
 .small{
@@ -221,6 +192,30 @@ main{
   background:rgba(248,113,113,0.14);
 }
 
+.hero .badge{
+  color:#111;
+  border-color:#ddd;
+  background:#f4f4f4;
+}
+
+.hero .badge.gold{
+  color:#7a4b00;
+  border-color:#ffd166;
+  background:#fff4cc;
+}
+
+.hero .badge.green{
+  color:#027a48;
+  border-color:#bbf7d0;
+  background:#ecfdf3;
+}
+
+.hero .badge.red{
+  color:#b42318;
+  border-color:#fecaca;
+  background:#fff1f2;
+}
+
 .table-wrap{
   overflow-x:auto;
 }
@@ -256,6 +251,24 @@ th:last-child{
   border-radius:14px;
 }
 
+@media(max-width:620px){
+  .hero{
+    max-width:330px;
+    padding:16px;
+  }
+
+  .card-inner{
+    padding:14px;
+  }
+
+  .hero h1{
+    font-size:32px;
+  }
+
+  table{
+    font-size:13px;
+  }
+}
 </style>
 </head>
 
@@ -266,24 +279,24 @@ th:last-child{
 <a href="javascript:history.back()" class="back-btn">← Tilbake</a>
 
 <div class="hero">
-  <img
-    id="playerImage"
-    class="player-img"
-    src="bilder/lyn-logo.png"
-    alt=""
-    onerror="this.src='bilder/lyn-logo.png'"
-  >
+  <div class="card-inner">
+    <img
+      id="playerImage"
+      class="player-img"
+      src="bilder/lyn-logo.png"
+      alt=""
+      onerror="this.src='bilder/lyn-logo.png'"
+    >
 
-  <div>
-    <div class="kicker">LYNKORTET</div>
+    <div style="margin-top:14px;">
+      <div class="kicker">LYNKORTET</div>
 
-    <h1 id="playerName">Laster...</h1>
+      <h1 id="playerName">Laster...</h1>
 
-    <p id="playerSubtitle">
-      Lyn Fantasy, børs og kampstatistikk
-    </p>
+      <p id="playerSubtitle">Lyn Fantasy, børs og kampstatistikk</p>
 
-    <div id="playerBadges" style="margin-top:14px;"></div>
+      <div id="playerBadges" style="margin-top:14px;"></div>
+    </div>
   </div>
 </div>
 
@@ -300,10 +313,6 @@ const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
-const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
-const AWAY_FANS_PLAYER = "Bortefeltet";
 
 const players = [
   { name:"Pedersen", full:"Alexander Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
@@ -332,14 +341,14 @@ const players = [
 const params = new URLSearchParams(window.location.search);
 const playerParam = params.get("player") || "";
 
+function cleanName(name){
+  return String(name || "").trim().toLowerCase();
+}
+
 const player = players.find(p =>
   cleanName(p.name) === cleanName(playerParam) ||
   cleanName(p.full) === cleanName(playerParam)
 );
-
-function cleanName(name){
-  return String(name || "").trim().toLowerCase();
-}
 
 function getMatchData(matchId){
   return matchesData.find(m => m.id === matchId) || null;
@@ -434,10 +443,7 @@ async function loadPlayerProfile(){
     if (!v.match_id || v.match_id === "TEST") return;
 
     if (!ratingByMatch[v.match_id]) {
-      ratingByMatch[v.match_id] = {
-        total:0,
-        count:0
-      };
+      ratingByMatch[v.match_id] = { total:0, count:0 };
     }
 
     ratingByMatch[v.match_id].total += Number(v.rating);
@@ -447,11 +453,15 @@ async function loadPlayerProfile(){
   const matchIds = new Set();
 
   (statsRows || []).forEach(row => {
-    if (row.match_id && row.match_id !== "TEST") matchIds.add(row.match_id);
+    if (row.match_id && row.match_id !== "TEST") {
+      matchIds.add(row.match_id);
+    }
   });
 
   Object.keys(ratingByMatch).forEach(matchId => {
-    if (matchId !== "TEST") matchIds.add(matchId);
+    if (matchId !== "TEST") {
+      matchIds.add(matchId);
+    }
   });
 
   const history = Array.from(matchIds).map(matchId => {
@@ -504,16 +514,29 @@ async function loadPlayerProfile(){
   const totalFantasy = history.reduce((sum,r) => sum + r.fantasyPoints, 0);
 
   const gamesWithRating = history.filter(r => r.rating > 0);
+
   const avgRating = gamesWithRating.length
     ? gamesWithRating.reduce((sum,r) => sum + r.rating, 0) / gamesWithRating.length
     : 0;
 
-  const bestGame = history.length ? [...history].sort((a,b) => b.fantasyPoints - a.fantasyPoints)[0] : null;
-const worstGame = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0] : null;
-  const bestRating = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => b.rating - a.rating)[0] : null;
-  const worstRating = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0] : null;
+  const bestGame = history.length
+    ? [...history].sort((a,b) => b.fantasyPoints - a.fantasyPoints)[0]
+    : null;
+
+  const worstGame = gamesWithRating.length
+    ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0]
+    : null;
+
+  const bestRating = gamesWithRating.length
+    ? [...gamesWithRating].sort((a,b) => b.rating - a.rating)[0]
+    : null;
+
+  const worstRating = gamesWithRating.length
+    ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0]
+    : null;
 
   const badges = [];
+
   if (totalGoals > 0) badges.push(`<span class="badge gold">⚽ ${totalGoals} mål</span>`);
   if (totalAssists > 0) badges.push(`<span class="badge green">🎁 ${totalAssists} assist</span>`);
   if (avgRating >= 7.5) badges.push(`<span class="badge gold">🔥 Børsfavoritt</span>`);
@@ -558,11 +581,11 @@ const worstGame = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.
             sub:bestGame ? bestGame.label : "Ingen",
             value:bestGame ? bestGame.fantasyPoints : "–"
           },
-            {
-  label:"Verste kamp",
-  sub:worstGame ? worstGame.label : "Ingen",
-  value:worstGame ? worstGame.rating.toFixed(1) : "–"
-},
+          {
+            label:"Verste kamp",
+            sub:worstGame ? worstGame.label : "Ingen",
+            value:worstGame ? worstGame.rating.toFixed(1) : "–"
+          },
           {
             label:"Beste børs",
             sub:bestRating ? bestRating.label : "Ingen",
