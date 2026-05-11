@@ -5,7 +5,7 @@ const matchesData = [
     home:"Lyn",
     away:"Haugesund",
     deadline:"2026-04-13T18:00:00",
-    actual:null
+    actual:{ home:2, away:4 }
   },
   {
     id:"21.04 Sogndal borte",
@@ -13,7 +13,7 @@ const matchesData = [
     home:"Sogndal",
     away:"Lyn",
     deadline:"2026-04-21T18:00:00",
-    actual:null
+    actual:{ home:0, away:3 }
   },
   {
     id:"27.04 Sandnes Ulf hjemme",
@@ -21,7 +21,7 @@ const matchesData = [
     home:"Lyn",
     away:"Sandnes Ulf",
     deadline:"2026-04-27T18:00:00",
-    actual:null
+    actual:{ home:0, away:2 }
   },
   {
     id:"30.04 Moss borte",
@@ -29,7 +29,7 @@ const matchesData = [
     home:"Moss",
     away:"Lyn",
     deadline:"2026-04-30T18:00:00",
-    actual:null
+    actual:{ home:2, away:1 }
   },
   {
     id:"01.05 Lyn - Stabæk",
