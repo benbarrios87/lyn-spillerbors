@@ -668,20 +668,36 @@ async function loadPlayerProfile(){
               <th>Fantasy</th>
             </tr>
           </thead>
-          <tbody>
-            ${history.slice().reverse().map(r => `
-              <tr>
-                <td>${r.label}</td>
-                <td>${r.result}</td>
-                <td>${r.goals}</td>
-                <td>${r.assists}</td>
-                <td>${r.cleanSheet ? "Ja" : "–"}</td>
-                <td>${r.rating ? r.rating.toFixed(1) : "–"}</td>
-                <td>${r.votes}</td>
-                <td>${r.fantasyPoints}</td>
-              </tr>
-            `).join("") || `<tr><td colspan="8">Ingen kampdata enda.</td></tr>`}
-          </tbody>
+         <tbody>
+
+  ${history.slice().reverse().map(r => `
+    <tr>
+      <td>${r.label}</td>
+      <td>${r.result}</td>
+      <td>${r.goals}</td>
+      <td>${r.assists}</td>
+      <td>${r.cleanSheet ? "Ja" : "–"}</td>
+      <td>${r.rating ? r.rating.toFixed(1) : "–"}</td>
+      <td>${r.votes}</td>
+      <td>${r.fantasyPoints}</td>
+    </tr>
+  `).join("")}
+
+  <tr style="
+    background:rgba(255,255,255,0.06);
+    font-weight:bold;
+  ">
+    <td>TOTAL</td>
+    <td>–</td>
+    <td>${totalGoals}</td>
+    <td>${totalAssists}</td>
+    <td>${totalCleanSheets}</td>
+    <td>${avgRating ? avgRating.toFixed(1) : "–"}</td>
+    <td>${totalVotes}</td>
+    <td>${totalFantasy}</td>
+  </tr>
+
+</tbody>
         </table>
       </div>
     </div>
