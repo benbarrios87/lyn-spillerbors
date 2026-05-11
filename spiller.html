@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Spillerprofil</title>
+<link rel="icon" href="lblogoen.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --red:#d71920;
+  --blue:#13294b;
+  --gold:#ffd166;
+  --green:#28d17c;
+  --panel:rgba(8,15,32,0.84);
+  --line:rgba(255,255,255,0.16);
+  --muted:rgba(255,255,255,0.72);
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:white;
+  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.30), transparent 30%),
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 24%),
+    rgba(3,7,18,0.84);
+  z-index:-1;
+}
+
+main{
+  max-width:1050px;
+  margin:auto;
+  padding:28px 16px 80px;
+}
+
+.back-btn{
+  display:inline-block;
+  margin-bottom:18px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:var(--red);
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.hero{
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.28), rgba(19,41,75,0.85)),
+    var(--panel);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:26px;
+  margin-bottom:18px;
+  box-shadow:0 14px 35px rgba(0,0,0,0.35);
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+  align-items:center;
+}
+
+@media(min-width:780px){
+  .hero{
+    grid-template-columns:auto 1fr;
+  }
+}
+
+.player-img{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  background:white;
+  border:3px solid rgba(255,255,255,0.35);
+}
+
+.kicker{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.2);
+  font-size:13px;
+  font-weight:bold;
+}
+
+.hero h1{
+  margin:12px 0 6px;
+  font-size:44px;
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+@media(min-width:850px){
+  .grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid.four{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+.card h2,
+.card h3{
+  margin-top:0;
+}
+
+.big{
+  font-size:38px;
+  font-weight:bold;
+  color:var(--gold);
+}
+
+.small{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.result-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+}
+
+.result-row:last-child{
+  border-bottom:none;
+}
+
+.score{
+  font-weight:bold;
+  font-size:22px;
+  color:var(--gold);
+}
+
+.badge{
+  display:inline-block;
+  margin:4px 4px 0 0;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+  border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.10);
+}
+
+.badge.gold{
+  color:#ffe29a;
+  border-color:rgba(255,209,102,0.65);
+  background:rgba(255,209,102,0.14);
+}
+
+.badge.green{
+  color:#bbf7d0;
+  border-color:rgba(34,197,94,0.65);
+  background:rgba(34,197,94,0.14);
+}
+
+.badge.red{
+  color:#fecaca;
+  border-color:rgba(248,113,113,0.65);
+  background:rgba(248,113,113,0.14);
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:720px;
+}
+
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  text-align:left;
+}
+
+th{
+  color:var(--muted);
+  font-size:13px;
+}
+
+td:last-child,
+th:last-child{
+  text-align:right;
+  font-weight:bold;
+}
+
+.warning{
+  background:rgba(255,247,237,0.12);
+  border:1px solid rgba(253,186,116,0.45);
+  color:#fed7aa;
+  padding:14px;
+  border-radius:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<main>
+
+<a href="javascript:history.back()" class="back-btn">← Tilbake</a>
+
+<div class="hero">
+  <img id="playerImage" class="player-img" src="bilder/lyn-logo.png" alt="">
+
+  <div>
+    <div class="kicker">SPILLERPROFIL</div>
+    <h1 id="playerName">Laster...</h1>
+    <p id="playerSubtitle">Lyn Fantasy, børs og kampstatistikk</p>
+    <div id="playerBadges" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<div id="content">
+  <div class="warning">Laster spillerprofil...</div>
+</div>
+
+</main>
+
+<script src="matches.js"></script>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+const AWAY_FANS_PLAYER = "Bortefeltet";
+
+const players = [
+  { name:"Pedersen", full:"Alexander Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
+  { name:"SAH", full:"Sander Amble Haugen", position:"FORS", image:"bilder/sah.png" },
+  { name:"Sell", full:"William Sell", position:"FORS", image:"bilder/sell.png" },
+  { name:"Midtskogen", full:"Ådne Midtskogen", position:"FORS", image:"bilder/midtskogen.png" },
+  { name:"HSN", full:"Herman Solberg Nilsen", position:"FORS", image:"bilder/hsn.png" },
+  { name:"Barnett", full:"Isaac Barnett", position:"FORS", image:"bilder/barnett.png" },
+  { name:"Fredriksen", full:"Didrik Fredriksen", position:"MID", image:"bilder/fredriksen.png" },
+  { name:"Isufi", full:"Eron Isufi", position:"MID", image:"bilder/isufi.png" },
+  { name:"Skaug", full:"Julius Skaug", position:"MID", image:"bilder/skaug.png" },
+  { name:"Kurtovic", full:"William Kurtovic", position:"MID", image:"bilder/kurtovic.png" },
+  { name:"Monglo", full:"Isaac Monglo", position:"MID", image:"bilder/monglo.png" },
+  { name:"Wæhler", full:"William Wæhler", position:"MID", image:"bilder/wæhler.png" },
+  { name:"ABO", full:"Anders Bjørntvedt Olsen", position:"ANG", image:"bilder/abo.png" },
+  { name:"MJ", full:"Matias Johansen", position:"ANG", image:"bilder/mj.png" },
+  { name:"Hellum", full:"Andreas Hellum", position:"ANG", image:"bilder/hellum.png" },
+  { name:"Sawaneh", full:"Ibrahim Sawaneh", position:"ANG", image:"bilder/sawaneh.png" },
+  { name:"Sock", full:"Fallou Sock", position:"ANG", image:"bilder/sock.png" },
+  { name:"Vik", full:"Isak Vik", position:"KEEPER", image:"bilder/vik.png" },
+  { name:"Andersen", full:"Marcus Andersen", position:"MID", image:"bilder/andersen.png" },
+  { name:"Trige", full:"Mats Trige", position:"KEEPER", image:"bilder/trige.png" },
+  { name:"Aadland", full:"Magnus Aadland", position:"MID", image:"bilder/aadland.png" }
+];
+
+const params = new URLSearchParams(window.location.search);
+const playerParam = params.get("player") || "";
+
+const player = players.find(p =>
+  cleanName(p.name) === cleanName(playerParam) ||
+  cleanName(p.full) === cleanName(playerParam)
+);
+
+function cleanName(name){
+  return String(name || "").trim().toLowerCase();
+}
+
+function getMatchData(matchId){
+  return matchesData.find(m => m.id === matchId) || null;
+}
+
+function formatDate(dateString){
+  if (!dateString) return "";
+  const d = new Date(dateString + "T12:00:00");
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
+
+function getPlayerPosition(playerName){
+  const p = players.find(x => x.name === playerName || x.full === playerName);
+  return p ? p.position : "";
+}
+
+function calculateFantasyPoints(playerName, stat){
+  const position = getPlayerPosition(playerName);
+  if (!stat) return 0;
+
+  let points = 0;
+
+  if (stat.goals > 0) {
+    if (position === "ANG") points += stat.goals * 4;
+    if (position === "MID") points += stat.goals * 5;
+    if (position === "FORS") points += stat.goals * 6;
+    if (position === "KEEPER") points += stat.goals * 10;
+  }
+
+  points += (stat.assists || 0) * 3;
+
+  if (stat.cleanSheet) {
+    if (position === "MID") points += 1;
+    if (position === "FORS") points += 4;
+    if (position === "KEEPER") points += 5;
+  }
+
+  if (stat.penaltySave && position === "KEEPER") points += 5;
+  if (stat.redCard) points -= 3;
+
+  if (stat.rating >= 7.5) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+
+  return points;
+}
+
+function statFromRow(row, rating){
+  return {
+    goals:row ? row.goals || 0 : 0,
+    assists:row ? row.assists || 0 : 0,
+    cleanSheet:row ? row.clean_sheet || false : false,
+    penaltySave:row ? row.penalty_save || false : false,
+    redCard:row ? row.red_card || false : false,
+    rating:rating || 0
+  };
+}
+
+function renderRows(rows, emptyText = "Ingen data enda."){
+  if (!rows || rows.length === 0) return `<div class="small">${emptyText}</div>`;
+
+  return rows.map(row => `
+    <div class="result-row">
+      <div>
+        <strong>${row.label}</strong><br>
+        <span class="small">${row.sub || ""}</span>
+      </div>
+      <div class="score">${row.value}</div>
+    </div>
+  `).join("");
+}
+
+async function loadPlayerProfile(){
+  if (!player) {
+    document.getElementById("playerName").textContent = playerParam || "Ukjent spiller";
+    document.getElementById("content").innerHTML = `<div class="warning">Fant ikke spilleren i spillerlisten.</div>`;
+    return;
+  }
+
+  document.getElementById("playerName").textContent = player.name;
+  document.getElementById("playerSubtitle").textContent = `${player.full} · ${player.position}`;
+  document.getElementById("playerImage").src = player.image;
+
+  const [{ data:statsRows }, { data:voteRows }, { data:picks }] = await Promise.all([
+    supabaseClient.from("fantasy_stats").select("*").eq("player", player.name),
+    supabaseClient.from("votes").select("*").eq("player", player.name),
+    supabaseClient.from("fantasy_picks").select("*")
+  ]);
+
+  const ratingByMatch = {};
+
+  (voteRows || []).forEach(v => {
+    if (!v.match_id || v.match_id === "TEST") return;
+
+    if (!ratingByMatch[v.match_id]) {
+      ratingByMatch[v.match_id] = {
+        total:0,
+        count:0
+      };
+    }
+
+    ratingByMatch[v.match_id].total += Number(v.rating);
+    ratingByMatch[v.match_id].count += 1;
+  });
+
+  const matchIds = new Set();
+
+  (statsRows || []).forEach(row => {
+    if (row.match_id && row.match_id !== "TEST") matchIds.add(row.match_id);
+  });
+
+  Object.keys(ratingByMatch).forEach(matchId => {
+    if (matchId !== "TEST") matchIds.add(matchId);
+  });
+
+  const history = Array.from(matchIds).map(matchId => {
+    const match = getMatchData(matchId);
+    const row = (statsRows || []).find(r => r.match_id === matchId);
+    const ratingData = ratingByMatch[matchId];
+    const rating = ratingData ? ratingData.total / ratingData.count : 0;
+    const stat = statFromRow(row, rating);
+    const fantasyPoints = calculateFantasyPoints(player.name, stat);
+
+    return {
+      matchId,
+      date:match ? match.date : "",
+      label:match ? `${formatDate(match.date)} ${match.home} - ${match.away}` : matchId,
+      result:match && match.actual ? `${match.actual.home}-${match.actual.away}` : "–",
+      goals:stat.goals,
+      assists:stat.assists,
+      cleanSheet:stat.cleanSheet,
+      penaltySave:stat.penaltySave,
+      redCard:stat.redCard,
+      rating,
+      votes:ratingData ? ratingData.count : 0,
+      fantasyPoints
+    };
+  }).sort((a,b) => new Date(a.date || "2099-01-01") - new Date(b.date || "2099-01-01"));
+
+  let pickedCount = 0;
+  let captainCount = 0;
+
+  (picks || []).forEach(pick => {
+    if (
+      pick.player1 === player.name ||
+      pick.player2 === player.name ||
+      pick.captain === player.name
+    ) {
+      pickedCount += 1;
+    }
+
+    if (pick.captain === player.name) {
+      captainCount += 1;
+    }
+  });
+
+  const totalGoals = history.reduce((sum,r) => sum + r.goals, 0);
+  const totalAssists = history.reduce((sum,r) => sum + r.assists, 0);
+  const totalCleanSheets = history.filter(r => r.cleanSheet).length;
+  const totalPenaltySaves = history.filter(r => r.penaltySave).length;
+  const totalRedCards = history.filter(r => r.redCard).length;
+  const totalVotes = history.reduce((sum,r) => sum + r.votes, 0);
+  const totalFantasy = history.reduce((sum,r) => sum + r.fantasyPoints, 0);
+
+  const gamesWithRating = history.filter(r => r.rating > 0);
+  const avgRating = gamesWithRating.length
+    ? gamesWithRating.reduce((sum,r) => sum + r.rating, 0) / gamesWithRating.length
+    : 0;
+
+  const bestGame = history.length ? [...history].sort((a,b) => b.fantasyPoints - a.fantasyPoints)[0] : null;
+const worstGame = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0] : null;
+  const bestRating = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => b.rating - a.rating)[0] : null;
+  const worstRating = gamesWithRating.length ? [...gamesWithRating].sort((a,b) => a.rating - b.rating)[0] : null;
+
+  const badges = [];
+  if (totalGoals > 0) badges.push(`<span class="badge gold">⚽ ${totalGoals} mål</span>`);
+  if (totalAssists > 0) badges.push(`<span class="badge green">🎁 ${totalAssists} assist</span>`);
+  if (avgRating >= 7.5) badges.push(`<span class="badge gold">🔥 Børsfavoritt</span>`);
+  if (pickedCount >= 5) badges.push(`<span class="badge">❤️ Folkets tillit</span>`);
+  if (captainCount >= 3) badges.push(`<span class="badge red">⭐ Kapteinsvalg</span>`);
+
+  document.getElementById("playerBadges").innerHTML = badges.join("");
+
+  document.getElementById("content").innerHTML = `
+    <div class="grid four">
+      <div class="card">
+        <h3>Fantasy</h3>
+        <div class="big">${totalFantasy}</div>
+        <div class="small">totale fantasypoeng</div>
+      </div>
+
+      <div class="card">
+        <h3>Børsnitt</h3>
+        <div class="big">${avgRating ? avgRating.toFixed(1) : "–"}</div>
+        <div class="small">${totalVotes} stemmer</div>
+      </div>
+
+      <div class="card">
+        <h3>Målpoeng</h3>
+        <div class="big">${totalGoals + totalAssists}</div>
+        <div class="small">${totalGoals} mål · ${totalAssists} assist</div>
+      </div>
+
+      <div class="card">
+        <h3>Fantasyvalg</h3>
+        <div class="big">${pickedCount}</div>
+        <div class="small">${captainCount} som kaptein</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px;">
+      <div class="card">
+        <h2>📈 Beste og verste</h2>
+        ${renderRows([
+          {
+            label:"Beste fantasykamp",
+            sub:bestGame ? bestGame.label : "Ingen",
+            value:bestGame ? bestGame.fantasyPoints : "–"
+          },
+          {
+            label:"Verste fantasykamp",
+            sub:worstGame ? worstGame.label : "Ingen",
+            value:worstGame ? worstGame.fantasyPoints : "–"
+          },
+          {
+            label:"Beste børs",
+            sub:bestRating ? bestRating.label : "Ingen",
+            value:bestRating ? bestRating.rating.toFixed(1) : "–"
+          },
+          {
+            label:"Laveste børs",
+            sub:worstRating ? worstRating.label : "Ingen",
+            value:worstRating ? worstRating.rating.toFixed(1) : "–"
+          }
+        ])}
+      </div>
+
+      <div class="card">
+        <h2>📊 Sesonglinje</h2>
+        ${renderRows([
+          {
+            label:"Kamper med data",
+            sub:"Fantasy stats eller børsstemmer",
+            value:history.length
+          },
+          {
+            label:"Clean sheets",
+            sub:"Gjelder keeper, forsvar og midtbane",
+            value:totalCleanSheets
+          },
+          {
+            label:"Strafferedninger",
+            sub:"Keeperstatistikk",
+            value:totalPenaltySaves
+          },
+          {
+            label:"Røde kort",
+            sub:"Minuspoeng i fantasy",
+            value:totalRedCards
+          }
+        ])}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>🗓️ Kamp for kamp</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Kamp</th>
+              <th>Resultat</th>
+              <th>Mål</th>
+              <th>Assist</th>
+              <th>CS</th>
+              <th>Børs</th>
+              <th>Stemmer</th>
+              <th>Fantasy</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${history.slice().reverse().map(r => `
+              <tr>
+                <td>${r.label}</td>
+                <td>${r.result}</td>
+                <td>${r.goals}</td>
+                <td>${r.assists}</td>
+                <td>${r.cleanSheet ? "Ja" : "–"}</td>
+                <td>${r.rating ? r.rating.toFixed(1) : "–"}</td>
+                <td>${r.votes}</td>
+                <td>${r.fantasyPoints}</td>
+              </tr>
+            `).join("") || `<tr><td colspan="8">Ingen kampdata enda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+loadPlayerProfile();
+</script>
+
+</body>
+</html>
