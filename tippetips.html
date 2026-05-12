@@ -1137,6 +1137,11 @@ loadTipStats();
   
 <script>
 (function trackVisit(){
+
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
+    return;
+  }
+
   const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
   const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
