@@ -455,7 +455,7 @@ button:hover {
 
 <div class="box">
   <label>Velg kamp</label>
- <select id="match"></select>
+  <select id="match"></select>
 </div>
 
 <div class="box">
@@ -514,7 +514,8 @@ button:hover {
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
-  async function trackEvent(eventType, data = {}) {
+
+async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
     return;
   }
@@ -573,6 +574,15 @@ const players = [
 const playersDiv = document.getElementById("players");
 const matchSelect = document.getElementById("match");
 
+function isMensMatchId(matchId) {
+  const match = matchesData.find(m => m.id === matchId);
+  return !match || !match.team || match.team === "men";
+}
+
+function getMensMatches() {
+  return matchesData.filter(m => !m.team || m.team === "men");
+}
+
 function escapeHTML(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -623,7 +633,7 @@ function renderLinkedName(value, linkType = "player") {
   return playerLink(value);
 }
 
-matchesData.forEach(match => {
+getMensMatches().forEach(match => {
   matchSelect.innerHTML += `
     <option value="${escapeHTML(match.id)}">
       ${escapeHTML(match.id)}
@@ -657,7 +667,7 @@ voterInput.addEventListener("input", () => {
 });
 
 function isRealMatch(v) {
-  return v.match_id;
+  return v.match_id && isMensMatchId(v.match_id);
 }
 
 function isPlayerVote(v) {
@@ -686,7 +696,7 @@ function setDefaultMatch() {
   const select = document.getElementById("match");
   const now = new Date();
 
-  const nextMatch = matchesData
+  const nextMatch = getMensMatches()
     .filter(match => new Date(match.date + "T23:59:59") >= now)
     .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
 
@@ -716,6 +726,11 @@ async function sendVote() {
 
   if (!voter) {
     alert("Skriv inn forumbrukernavnet ditt først.");
+    return;
+  }
+
+  if (!isMensMatchId(match)) {
+    alert("Spillerbørs er kun åpen for herrekamper.");
     return;
   }
 
@@ -773,12 +788,13 @@ async function sendVote() {
     alert("Noe gikk feil. Stemmen ble ikke sendt.");
     return;
   }
-trackEvent("bors_submitted", {
-  voter:voter,
-  match_id:match,
-  ratings:rows.length
-});
-  
+
+  trackEvent("bors_submitted", {
+    voter:voter,
+    match_id:match,
+    ratings:rows.length
+  });
+
   alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
 
   players.forEach(p => document.getElementById(p.short).value = "");
@@ -1102,7 +1118,7 @@ function perPlayerMatchAverages(allVotes) {
         idx:getMatchIndex(match),
         avg:ratings.reduce((a,b)=>a+b,0) / ratings.length
       };
-    }).filter(x => x.idx >= 0).sort((a,b)=>a.idx-b.idx);
+    }).filter(x => x.idx >= 0 && isMensMatchId(x.match)).sort((a,b)=>a.idx-b.idx);
   });
 
   return output;
