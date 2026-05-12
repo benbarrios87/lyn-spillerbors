@@ -6,7 +6,6 @@
 <title>Tippetips</title>
 <link rel="icon" href="lblogoen.png">
 
-
 <style>
 :root {
   --red:#d71920;
@@ -211,6 +210,40 @@ button:hover {
   background:#0d1d36;
 }
 
+.filter-row {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+@media (min-width:700px) {
+  .filter-row {
+    grid-template-columns:1fr 1fr;
+    align-items:end;
+  }
+}
+
+.team-tabs {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.team-tab {
+  background:#fffdf7;
+  color:var(--blue);
+  border:2px solid var(--line);
+  box-shadow:none;
+  padding:11px 8px;
+}
+
+.team-tab.active {
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+
 .coupon-list {
   display:grid;
   grid-template-columns:1fr;
@@ -259,6 +292,24 @@ button:hover {
   padding:4px 8px;
   font-size:13px;
   background:white;
+}
+
+.team-badge {
+  display:inline-block;
+  margin-top:6px;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+  background:#eef2ff;
+  color:var(--blue);
+  border:1px solid #c7d2fe;
+}
+
+.team-badge.women {
+  background:#fff1f2;
+  color:#b51218;
+  border-color:#fecdd3;
 }
 
 .score-entry {
@@ -429,6 +480,7 @@ button:hover {
   border-radius:12px;
   margin-bottom:12px;
 }
+
 .profile-link {
   color:var(--blue);
   text-decoration:none;
@@ -438,7 +490,7 @@ button:hover {
 .profile-link:hover {
   text-decoration:underline;
 }
-  
+
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -500,15 +552,27 @@ button:hover {
 
 <div class="box">
   <div class="notice">
-  Du kan levere tips for én, to eller tre kamper samtidig. Tomme kuponger lagres ikke.
-</div>
+    Du kan levere tips for én, to eller tre kamper samtidig. Tomme kuponger lagres ikke.
+  </div>
 
-<div class="people-box">
-  <strong>Poengsystem</strong><br>
-  <span class="small">
-    3 poeng for helt riktig resultat · 2 poeng for riktig utfall og riktig målforskjell · 1 poeng for riktig utfall · 0 poeng for bom.
-  </span>
-</div>
+  <div class="people-box">
+    <strong>Velg kupongtype</strong><br>
+    <span class="small">Velg om du vil se alle åpne kamper, bare herrelaget eller bare kvinnelaget.</span>
+
+    <div class="team-tabs" style="margin-top:12px;">
+      <button class="team-tab active" id="tab-all" onclick="setTeamFilter('all')">Alle</button>
+      <button class="team-tab" id="tab-men" onclick="setTeamFilter('men')">Herrer</button>
+      <button class="team-tab" id="tab-women" onclick="setTeamFilter('women')">Kvinner</button>
+    </div>
+  </div>
+
+  <div class="people-box">
+    <strong>Poengsystem</strong><br>
+    <span class="small">
+      3 poeng for helt riktig resultat · 2 poeng for riktig utfall og riktig målforskjell · 1 poeng for riktig utfall · 0 poeng for bom.
+    </span>
+  </div>
+
   <label>Navn / forumbruker</label>
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
@@ -523,8 +587,21 @@ button:hover {
 <h2 class="section-title">2. Tips for valgt kamp</h2>
 
 <div class="box blue">
-  <label>Velg kamp å se tips for</label>
-  <select id="resultMatch"></select>
+  <div class="filter-row">
+    <div>
+      <label>Vis kamper</label>
+      <select id="viewTeamFilter" onchange="setTeamFilter(this.value)">
+        <option value="all">Alle</option>
+        <option value="men">Herrer</option>
+        <option value="women">Kvinner</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Velg kamp å se tips for</label>
+      <select id="resultMatch"></select>
+    </div>
+  </div>
 
   <div class="button-row" style="margin-top:12px;">
     <button onclick="loadMatchPredictions()">Vis tips for valgt kamp</button>
@@ -549,14 +626,19 @@ button:hover {
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
-async function trackEvent(eventType, data = {}) {
 
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+let openCouponMatches = [];
+let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
+
+async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
     return;
   }
 
   try {
-
     await fetch(SUPABASE_URL + "/rest/v1/site_events", {
       method:"POST",
       headers:{
@@ -573,15 +655,10 @@ async function trackEvent(eventType, data = {}) {
         details:data
       })
     });
-
   } catch(err) {
     console.log("trackEvent feil", err);
   }
 }
-const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
-const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
-
-let openCouponMatches = [];
 
 function cleanVoterName(name) {
   return (name || "").trim().toLowerCase();
@@ -592,6 +669,50 @@ voterInput.value = localStorage.getItem("lynbors_voter") || "";
 voterInput.addEventListener("input", () => {
   localStorage.setItem("lynbors_voter", voterInput.value.trim());
 });
+
+function getMatchTeam(matchData) {
+  return matchData && matchData.team ? matchData.team : "men";
+}
+
+function getTeamLabel(team) {
+  if (team === "women") return "Kvinner";
+  return "Herrer";
+}
+
+function getTeamBadge(matchData) {
+  const team = getMatchTeam(matchData);
+  const label = getTeamLabel(team);
+  const cls = team === "women" ? "women" : "men";
+  return `<span class="team-badge ${cls}">${label}</span>`;
+}
+
+function matchPassesTeamFilter(matchData) {
+  if (currentTeamFilter === "all") return true;
+  return getMatchTeam(matchData) === currentTeamFilter;
+}
+
+function getFilteredMatches() {
+  return matchesData.filter(matchPassesTeamFilter);
+}
+
+function setTeamFilter(filter) {
+  currentTeamFilter = filter || "all";
+  localStorage.setItem("lynbors_tip_team_filter", currentTeamFilter);
+
+  document.querySelectorAll(".team-tab").forEach(btn => btn.classList.remove("active"));
+
+  const activeTab = document.getElementById("tab-" + currentTeamFilter);
+  if (activeTab) activeTab.classList.add("active");
+
+  const viewSelect = document.getElementById("viewTeamFilter");
+  if (viewSelect) viewSelect.value = currentTeamFilter;
+
+  renderCoupons();
+  renderResultMatchSelect();
+  loadTipStats();
+
+  document.getElementById("results").innerHTML = "";
+}
 
 function isRealMatch(v) {
   return v.match_id && v.match_id !== "TEST";
@@ -621,7 +742,7 @@ function formatDeadline(deadline) {
 }
 
 function getNextTipMatches(limit = 3) {
-  return matchesData
+  return getFilteredMatches()
     .filter(m => !isTipLocked(m))
     .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
     .slice(0, limit);
@@ -642,6 +763,7 @@ function renderCoupons() {
         <div>
           <div class="coupon-title">${m.home} - ${m.away}</div>
           <div class="small">${formatDate(m.date)} · Frist: ${formatDeadline(m.deadline)}</div>
+          ${getTeamBadge(m)}
         </div>
         <div class="coupon-number">#${i + 1}</div>
       </div>
@@ -665,13 +787,18 @@ function renderCoupons() {
 
 function renderResultMatchSelect() {
   const select = document.getElementById("resultMatch");
+  const filteredMatches = getFilteredMatches()
+    .slice()
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
 
-  select.innerHTML = matchesData
-    .map(m => `<option value="${m.id}">${formatDate(m.date)} · ${m.home} - ${m.away}</option>`)
+  select.innerHTML = filteredMatches
+    .map(m => `<option value="${m.id}">${formatDate(m.date)} · ${getTeamLabel(getMatchTeam(m))} · ${m.home} - ${m.away}</option>`)
     .join("");
 
   if (openCouponMatches[0]) {
     select.value = openCouponMatches[0].id;
+  } else if (filteredMatches[0]) {
+    select.value = filteredMatches[0].id;
   }
 }
 
@@ -786,12 +913,13 @@ async function sendTips() {
     alert("Noe gikk feil. Kupongen ble ikke sendt.");
     return;
   }
-  
-trackEvent("tips_submitted", {
-  voter:voter,
-  matches:savedMatches.length
-});
-  
+
+  trackEvent("tips_submitted", {
+    voter:voter,
+    matches:savedMatches.length,
+    filter:currentTeamFilter
+  });
+
   alert(`${savedMatches.length} kupong${savedMatches.length === 1 ? "" : "er"} levert! Gamle tips på samme kamp ble oppdatert.`);
 
   document.querySelectorAll("#couponList input").forEach(input => input.value = "");
@@ -846,6 +974,16 @@ function buildPredictions(votes) {
   });
 
   return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
+
+function filterPredictionsByCurrentTeam(predictions) {
+  if (currentTeamFilter === "all") return predictions;
+
+  return predictions.filter(p => {
+    const matchData = getMatchData(p.match_id);
+    if (!matchData) return false;
+    return getMatchTeam(matchData) === currentTeamFilter;
+  });
 }
 
 function renderPeoplePrediction(predictions) {
@@ -923,7 +1061,7 @@ async function loadMatchPredictions() {
   let html = `
     <div class="bb">Kuponger for ${match}</div>
     <p class="small">
-      ${matchData ? `${matchData.home} - ${matchData.away}` : ""}
+      ${matchData ? `${getTeamLabel(getMatchTeam(matchData))} · ${matchData.home} - ${matchData.away}` : ""}
       ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
     </p>
 
@@ -935,11 +1073,11 @@ async function loadMatchPredictions() {
 
     html += `
       <div class="prediction-row">
-<div>
-  <a href="profil.html?user=${encodeURIComponent(p.voter)}" class="profile-link">
-    <strong>${p.voter}</strong>
-  </a>
-</div>
+        <div>
+          <a href="profil.html?user=${encodeURIComponent(p.voter)}" class="profile-link">
+            <strong>${p.voter}</strong>
+          </a>
+        </div>
         <div class="prediction-score">${p.home}-${p.away}</div>
         <div>${points === null ? "venter" : points + " p"}</div>
       </div>
@@ -950,7 +1088,7 @@ async function loadMatchPredictions() {
 }
 
 function buildPredictionLeaderboardRows(allVotes) {
-  const predictions = buildPredictions(allVotes);
+  const predictions = filterPredictionsByCurrentTeam(buildPredictions(allVotes));
   let users = {};
 
   predictions.forEach(p => {
@@ -964,11 +1102,11 @@ function buildPredictionLeaderboardRows(allVotes) {
     if (!users[p.voter]) {
       users[p.voter] = {
         points:0,
-correct:0,
-diffs:0,
-outcomes:0,
-zeroes:0,
-tips:0
+        correct:0,
+        diffs:0,
+        outcomes:0,
+        zeroes:0,
+        tips:0
       };
     }
 
@@ -976,27 +1114,27 @@ tips:0
     users[p.voter].tips += 1;
 
     if (points === 3) users[p.voter].correct += 1;
-if (points === 2) users[p.voter].diffs += 1;
-if (points === 1) users[p.voter].outcomes += 1;
-if (points === 0) users[p.voter].zeroes += 1;
+    if (points === 2) users[p.voter].diffs += 1;
+    if (points === 1) users[p.voter].outcomes += 1;
+    if (points === 0) users[p.voter].zeroes += 1;
   });
 
- return Object.keys(users).map(user => ({
-  player:user,
-  score:users[user].points + " p",
-  raw:users[user].points,
-  correct:users[user].correct,
-  diffs:users[user].diffs,
-  outcomes:users[user].outcomes,
-  zeroes:users[user].zeroes,
-  tips:users[user].tips,
+  return Object.keys(users).map(user => ({
+    player:user,
+    score:users[user].points + " p",
+    raw:users[user].points,
+    correct:users[user].correct,
+    diffs:users[user].diffs,
+    outcomes:users[user].outcomes,
+    zeroes:users[user].zeroes,
+    tips:users[user].tips,
     sub:`${users[user].correct} helt riktige · ${users[user].diffs} målforskjell · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
   })).sort((a,b) =>
-   b.raw - a.raw ||
-b.correct - a.correct ||
-b.diffs - a.diffs ||
-b.outcomes - a.outcomes ||
-a.player.localeCompare(b.player)
+    b.raw - a.raw ||
+    b.correct - a.correct ||
+    b.diffs - a.diffs ||
+    b.outcomes - a.outcomes ||
+    a.player.localeCompare(b.player)
   );
 }
 
@@ -1026,13 +1164,13 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
 
     html += `
       <div class="result-row">
-     <div>
-  ${medal}
-  <a href="profil.html?user=${encodeURIComponent(r.player)}" class="profile-link">
-    <strong>${r.player}</strong>
-  </a><br>
-  <span class="small">${r.sub || ""}</span>
-</div>
+        <div>
+          ${medal}
+          <a href="profil.html?user=${encodeURIComponent(r.player)}" class="profile-link">
+            <strong>${r.player}</strong>
+          </a><br>
+          <span class="small">${r.sub || ""}</span>
+        </div>
         <div class="result-score">${r.score}</div>
       </div>
     `;
@@ -1052,7 +1190,7 @@ async function loadPredictionLeaderboard() {
   }
 
   document.getElementById("results").innerHTML = `
-    <div class="bb">Tippetabell</div>
+    <div class="bb">Tippetabell · ${currentTeamFilter === "all" ? "Alle" : getTeamLabel(currentTeamFilter)}</div>
     ${renderMiniRanking(rows, 99)}
   `;
 }
@@ -1060,13 +1198,13 @@ async function loadPredictionLeaderboard() {
 async function loadTipStats() {
   const allVotes = await fetchVotes();
   const predictionVotes = allVotes.filter(isPredictionVote);
-  const predictions = buildPredictions(predictionVotes);
+  const predictions = filterPredictionsByCurrentTeam(buildPredictions(predictionVotes));
   const leaderboard = buildPredictionLeaderboardRows(allVotes);
   const accurate = buildMostAccuratePredictors(allVotes);
 
   const totalTips = predictions.length;
   const uniqueUsers = new Set(predictions.map(p => p.voter)).size;
-  const finishedMatches = matchesData.filter(m => m.actual).length;
+  const finishedMatches = getFilteredMatches().filter(m => m.actual).length;
 
   const mostActive = {};
   predictions.forEach(p => {
@@ -1079,9 +1217,11 @@ async function loadTipStats() {
     sub:"kuponger levert"
   })).sort((a,b) => b.score - a.score);
 
+  const filterLabel = currentTeamFilter === "all" ? "Alle kamper" : getTeamLabel(currentTeamFilter);
+
   document.getElementById("tipStats").innerHTML = `
     <div class="hero-stat">
-      <h3>Kupongstatus</h3>
+      <h3>Kupongstatus · ${filterLabel}</h3>
       <div class="big">${totalTips} tips</div>
       <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat</div>
     </div>
@@ -1103,38 +1243,36 @@ async function loadTipStats() {
         ${renderMiniRanking(mostActiveRows, 8, false)}
       </div>
 
-   <div class="stat-card">
-  <h3>Poengsystem</h3>
+      <div class="stat-card">
+        <h3>Poengsystem</h3>
 
-  <div class="result-row">
-    <div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div>
-    <div class="result-score">3 p</div>
-  </div>
+        <div class="result-row">
+          <div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div>
+          <div class="result-score">3 p</div>
+        </div>
 
-  <div class="result-row">
-    <div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div>
-    <div class="result-score">2 p</div>
-  </div>
+        <div class="result-row">
+          <div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div>
+          <div class="result-score">2 p</div>
+        </div>
 
-  <div class="result-row">
-    <div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div>
-    <div class="result-score">1 p</div>
-  </div>
+        <div class="result-row">
+          <div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div>
+          <div class="result-score">1 p</div>
+        </div>
 
-  <div class="result-row">
-    <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
-    <div class="result-score">0 p</div>
-  </div>
-</div>
+        <div class="result-row">
+          <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
+          <div class="result-score">0 p</div>
+        </div>
+      </div>
     </div>
   `;
 }
 
-renderCoupons();
-renderResultMatchSelect();
-loadTipStats();
+setTeamFilter(currentTeamFilter);
 </script>
-  
+
 <script>
 (function trackVisit(){
 
