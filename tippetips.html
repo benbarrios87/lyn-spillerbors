@@ -786,7 +786,12 @@ async function sendTips() {
     alert("Noe gikk feil. Kupongen ble ikke sendt.");
     return;
   }
-
+  
+trackEvent("tips_submitted", {
+  voter:voter,
+  matches:savedMatches.length
+});
+  
   alert(`${savedMatches.length} kupong${savedMatches.length === 1 ? "" : "er"} levert! Gamle tips på samme kamp ble oppdatert.`);
 
   document.querySelectorAll("#couponList input").forEach(input => input.value = "");
