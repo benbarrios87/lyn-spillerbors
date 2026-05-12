@@ -225,10 +225,16 @@ button:hover {
   padding:11px 8px;
 }
 
-.team-tab.active {
+.team-tab.men-tab.active {
   background:var(--blue);
   color:white;
   border-color:var(--blue);
+}
+
+.team-tab.women-tab.active {
+  background:var(--women);
+  color:white;
+  border-color:var(--women);
 }
 
 .filter-row {
@@ -643,9 +649,9 @@ button:hover {
     <span class="small">Alle viser først de tre neste herrekampene, og deretter de tre neste kvinnekampene.</span>
 
     <div class="team-tabs" style="margin-top:12px;">
-      <button class="team-tab active" id="tab-all" onclick="setTeamFilter('all')">Alle</button>
-      <button class="team-tab" id="tab-men" onclick="setTeamFilter('men')">Herrer</button>
-      <button class="team-tab" id="tab-women" onclick="setTeamFilter('women')">Kvinner</button>
+<button class="team-tab active" id="tab-all" onclick="setTeamFilter('all')">Alle</button>
+<button class="team-tab men-tab" id="tab-men" onclick="setTeamFilter('men')">Herrer</button>
+<button class="team-tab women-tab" id="tab-women" onclick="setTeamFilter('women')">Kvinner</button>
     </div>
   </div>
 
