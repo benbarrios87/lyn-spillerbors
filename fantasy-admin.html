@@ -554,18 +554,22 @@ function getSelectedMatchId() {
   return document.getElementById("matchSelect").value;
 }
 
+function getMensMatches() {
+  return matchesData.filter(match => !match.team || match.team === "men");
+}
+
 function fillMatchSelect() {
   const select = document.getElementById("matchSelect");
   select.innerHTML = "";
 
-  matchesData.forEach(match => {
+  getMensMatches().forEach(match => {
     const option = document.createElement("option");
     option.value = match.id;
     option.textContent = `${match.date} | ${match.home} - ${match.away}`;
     select.appendChild(option);
   });
 
-  const nextMatch = matchesData
+  const nextMatch = getMensMatches()
     .filter(match => new Date(match.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
 
