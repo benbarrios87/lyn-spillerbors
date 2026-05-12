@@ -514,6 +514,32 @@ button:hover {
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+  async function trackEvent(eventType, data = {}) {
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
+    return;
+  }
+
+  try {
+    await fetch(SUPABASE_URL + "/rest/v1/site_events", {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body:JSON.stringify({
+        event_type:eventType,
+        page:location.pathname,
+        voter:data.voter || null,
+        match_id:data.match_id || null,
+        details:data
+      })
+    });
+  } catch(err) {
+    console.log("trackEvent feil", err);
+  }
+}
 
 const MY_NAME = "superben";
 const AWAY_FANS_PLAYER = "Bortefeltet";
@@ -751,10 +777,6 @@ trackEvent("bors_submitted", {
   voter:voter,
   match_id:match,
   ratings:rows.length
-});
-  trackEvent("bors_submitted", {
-  voter:voter,
-  match_id:matchId
 });
   
   alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
@@ -1249,6 +1271,11 @@ loadStatsCenter();
 
 <script>
 (function trackVisit(){
+
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
+    return;
+  }
+
   const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
   const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
