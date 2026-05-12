@@ -322,6 +322,7 @@ main {
   0% { transform:translateX(0); }
   100% { transform:translateX(-100%); }
 }
+
 .profile-link {
   color:white;
   text-decoration:none;
@@ -542,22 +543,30 @@ function buildPredictions(votes) {
 }
 
 function awardFantasyTierPoints(rows) {
-  const sorted = [...rows].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter));
+  const sorted = [...rows].sort((a,b) =>
+    b.raw - a.raw ||
+    a.voter.localeCompare(b.voter)
+  );
+
   const n = sorted.length;
   if (n === 0) return [];
 
-  const topCut = Math.ceil(n / 3);
-  const midCut = Math.ceil((n * 2) / 3);
+  const q1 = Math.ceil(n / 4);
+  const q2 = Math.ceil(n / 2);
+  const q3 = Math.ceil((n * 3) / 4);
 
   return sorted.map((row, index) => {
     let tier = "Bunn";
     let points = 0;
 
-    if (index < topCut) {
+    if (index < q1) {
       tier = "Elite";
+      points = 5;
+    } else if (index < q2) {
+      tier = "Sterk";
       points = 3;
-    } else if (index < midCut) {
-      tier = "Mid";
+    } else if (index < q3) {
+      tier = "Med";
       points = 1;
     }
 
@@ -575,8 +584,11 @@ function ensureUser(users, voter) {
       fantasyRounds:0,
       tipRounds:0,
       eliteFantasy:0,
+      strongFantasy:0,
+      mediumFantasy:0,
       perfectTips:0,
       correctOutcomes:0,
+      correctDiffs:0,
       rawFantasy:0,
       rawTips:0
     };
@@ -668,18 +680,18 @@ function buildFantasyRounds(picks, stats, allVotes) {
     });
   });
 
-return Object.keys(byMatch)
-  .filter(matchId => {
-    return byMatch[matchId].some(row => row.raw !== 0);
-  })
-  .map(matchId => ({
-    match_id:matchId,
-    type:"fantasy",
-    rows:awardFantasyTierPoints(byMatch[matchId])
-  }));
+  return Object.keys(byMatch)
+    .filter(matchId => {
+      return byMatch[matchId].some(row => row.raw !== 0);
+    })
+    .map(matchId => ({
+      match_id:matchId,
+      type:"fantasy",
+      rows:awardFantasyTierPoints(byMatch[matchId])
+    }));
 }
   
-  function combineLeague(fantasyRounds, tipRounds) {
+function combineLeague(fantasyRounds, tipRounds) {
   const users = {};
   const roundMap = {};
 
@@ -692,13 +704,14 @@ return Object.keys(byMatch)
 
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
+
       user.fantasy += row.tierPoints;
       user.rawFantasy += row.raw;
       user.fantasyRounds += 1;
 
-      if (row.tierPoints === 3) {
-        user.eliteFantasy += 1;
-      }
+      if (row.tierPoints === 5) user.eliteFantasy += 1;
+      if (row.tierPoints === 3) user.strongFantasy += 1;
+      if (row.tierPoints === 1) user.mediumFantasy += 1;
     });
   });
 
@@ -711,21 +724,14 @@ return Object.keys(byMatch)
 
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
+
       user.tipping += row.tipPoints;
       user.rawTips += row.raw;
       user.tipRounds += 1;
 
-      if (row.raw === 3) {
-        user.perfectTips += 1;
-      }
-
-     if (row.raw === 2) {
-  user.correctDiffs = (user.correctDiffs || 0) + 1;
-}
-
-if (row.raw === 1) {
-  user.correctOutcomes += 1;
-}
+      if (row.raw === 3) user.perfectTips += 1;
+      if (row.raw === 2) user.correctDiffs += 1;
+      if (row.raw === 1) user.correctOutcomes += 1;
     });
   });
 
@@ -802,9 +808,9 @@ function renderLeagueTable(league) {
             <tr>
               <td>${index + 1}</td>
               <td>
-  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
-    <strong>${row.voter}</strong>
-  </a><br>
+                <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+                  <strong>${row.voter}</strong>
+                </a><br>
                 ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
                 ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
               </td>
@@ -846,7 +852,8 @@ function renderAwards(league) {
 
   const fantasyKings = [...league].sort((a,b) =>
     b.fantasy - a.fantasy ||
-    b.eliteFantasy - a.eliteFantasy
+    b.eliteFantasy - a.eliteFantasy ||
+    b.strongFantasy - a.strongFantasy
   );
 
   const tipKings = [...league].sort((a,b) =>
@@ -885,7 +892,7 @@ function renderAwards(league) {
         ${renderMiniRanking(fantasyKings.map(u => ({
           label:u.voter,
           score:u.fantasy,
-          sub:`${u.eliteFantasy} elite runder · ${u.fantasyRounds} runder`
+          sub:`${u.eliteFantasy} elite · ${u.strongFantasy} sterke · ${u.fantasyRounds} runder`
         })), 6)}
       </div>
 
@@ -894,7 +901,7 @@ function renderAwards(league) {
         ${renderMiniRanking(tipKings.map(u => ({
           label:u.voter,
           score:u.tipping,
-        sub:`${u.perfectTips} helt riktige · ${u.correctDiffs || 0} målforskjell · ${u.correctOutcomes} riktige utfall`
+          sub:`${u.perfectTips} helt riktige · ${u.correctDiffs || 0} målforskjell · ${u.correctOutcomes} riktige utfall`
         })), 6)}
       </div>
 
@@ -945,7 +952,7 @@ function renderRounds(rounds) {
             <div class="result-row">
               <div>
                 <strong>Fantasy elite</strong><br>
-                <span class="small">${round.fantasy.filter(r => r.tierPoints === 3).map(r => r.voter).join(", ") || "Ingen"}</span>
+                <span class="small">${round.fantasy.filter(r => r.tierPoints === 5).map(r => r.voter).join(", ") || "Ingen"}</span>
               </div>
               <div class="result-score">${fantasyWinner ? fantasyWinner.raw : "–"}</div>
             </div>
@@ -1028,23 +1035,29 @@ async function loadLynCentral() {
         <strong>🎯 Tippetips</strong><br>
         Her brukes de vanlige tippepoengene:
         <br>
-      3 poeng for helt riktig resultat
-<br>
-2 poeng for riktig utfall og riktig målforskjell
-<br>
-1 poeng for riktig utfall
-<br>
-0 poeng for bom
+        3 poeng for helt riktig resultat
+        <br>
+        2 poeng for riktig utfall og riktig målforskjell
+        <br>
+        1 poeng for riktig utfall
+        <br>
+        0 poeng for bom
+
         <br><br>
 
         <strong>⭐ Lyn Fantasy</strong><br>
-        Fantasy har ofte mye høyere råpoeng, så fantasy gjøres om til ligapoeng per kamp:
+        Fantasy har høyere råpoeng enn tipping, så fantasy gjøres om til ligapoeng per kamp.
+        For å balansere at Tippetips nå også kan inneholde både herre og kvinnekamper, deles fantasy inn i fjerdedeler:
+
+        <br><br>
+
+        🔥 Øverste fjerdedel får 5 poeng
         <br>
-        🔥 Øverste tredjedel får 3 poeng
+        ⭐ Andre fjerdedel får 3 poeng
         <br>
-        ⚪ Midterste tredjedel får 1 poeng
+        ⚪ Tredje fjerdedel får 1 poeng
         <br>
-        💀 Nederste tredjedel får 0 poeng
+        💀 Nederste fjerdedel får 0 poeng
 
         <br><br>
 
@@ -1059,7 +1072,7 @@ async function loadLynCentral() {
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         Tippetips teller med 3, 2, 1 og 0 poeng
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Fantasy deles i tredjedeler
+        Fantasy deles i fjerdedeler: 5, 3, 1 og 0 poeng
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         Sammenlagt kårer den ultimate Lynbørs-nerden
       </span>
@@ -1072,7 +1085,7 @@ async function loadLynCentral() {
 }
 
 loadLynCentral();
-  </script>
+</script>
   
 <script>
 (function trackVisit(){
