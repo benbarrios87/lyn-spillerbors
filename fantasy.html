@@ -721,17 +721,24 @@ let matchStats = {};
 function cleanVoterName(name) {
   return String(name || "").trim().toLowerCase();
 }
+function isMensMatchId(matchId) {
+  const match = matchesData.find(m => m.id === matchId);
+  return !match || !match.team || match.team === "men";
+}
 
+function getMensMatches() {
+  return matchesData.filter(m => !m.team || m.team === "men");
+}
 function getPickMatch() {
   const now = new Date();
 
-  return matchesData
+  return getMensMatches()
     .filter(match => new Date(match.deadline) > now)
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
 }
 
 function getStatsMatch() {
-  const latestFinishedMatch = matchesData
+  const latestFinishedMatch = getMensMatches()
     .filter(match =>
       match.actual &&
       match.actual.home !== undefined &&
@@ -1208,8 +1215,13 @@ async function loadFantasyStats() {
     document.getElementById("fantasyStats").innerHTML = "Ingen fantasy-lag sendt inn ennå.";
     return;
   }
+const mensPicks = picks.filter(pick => isMensMatchId(pick.match_id));
 
-  const leaderboard = picks.map(pick => {
+if (mensPicks.length === 0) {
+  document.getElementById("fantasyStats").innerHTML = "Ingen fantasydata for herrekamper ennå.";
+  return;
+}
+const leaderboard = mensPicks.map(pick => {
     const p1 = calculatePoints(pick.player1, false).total;
     const p2 = calculatePoints(pick.player2, false).total;
     const cap = calculatePoints(pick.captain, true).total;
@@ -1417,7 +1429,14 @@ async function loadSeasonFantasyStats() {
   const captainPointGames = {};
   const matchLeaderboards = {};
 
-  picks.forEach(pick => {
+ const mensPicks = picks.filter(pick => isMensMatchId(pick.match_id));
+
+if (mensPicks.length === 0) {
+  box.innerHTML = "Ingen fantasydata for herrekamper ennå.";
+  return;
+}
+
+mensPicks.forEach(pick => {
     const voterKey = cleanVoterName(pick.voter);
     const voterDisplay = pick.voter || voterKey || "Ukjent";
 
