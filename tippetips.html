@@ -654,7 +654,7 @@ button:hover {
     Du kan levere tips for én eller flere kamper samtidig. Tomme kuponger lagres ikke.
   </div>
 
-  <div class="people-box">
+<div class="people-box" id="couponTypeBox">
     <strong>Velg kupongtype</strong><br>
     <span class="small">Alle viser først de tre neste herrekampene, og deretter de tre neste kvinnekampene.</span>
 
@@ -802,6 +802,19 @@ function setTeamFilter(filter) {
 
   const activeTab = document.getElementById("tab-" + currentTeamFilter);
   if (activeTab) activeTab.classList.add("active");
+
+  const couponTypeBox = document.getElementById("couponTypeBox");
+if (couponTypeBox) {
+  couponTypeBox.classList.remove("filter-men", "filter-women");
+
+  if (currentTeamFilter === "men") {
+    couponTypeBox.classList.add("filter-men");
+  }
+
+  if (currentTeamFilter === "women") {
+    couponTypeBox.classList.add("filter-women");
+  }
+}
 
   const viewSelect = document.getElementById("viewTeamFilter");
   if (viewSelect) viewSelect.value = currentTeamFilter;
