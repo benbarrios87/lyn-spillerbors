@@ -667,7 +667,31 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
+async function trackEvent(eventType, data = {}) {
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
+    return;
+  }
 
+  try {
+    await fetch(SUPABASE_URL + "/rest/v1/site_events", {
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_ANON_KEY,
+        "Authorization":"Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body:JSON.stringify({
+        event_type:eventType,
+        page:location.pathname,
+        voter:data.voter || null,
+        match_id:data.match_id || null,
+        details:data
+      })
+    });
+  } catch(err) {
+    console.log("trackEvent feil", err);
+  }
 const players = [
   { name:"Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
   { name:"SAH", position:"FORS", image:"bilder/sah.png" },
@@ -1017,15 +1041,15 @@ async function saveTeam() {
     alert("Noe gikk galt ved lagring.");
     return;
   }
+  
 trackEvent("fantasy_saved", {
-  voter:voter,
-  match_id:matchId,
+  voter:username,
+  match_id:nextMatch.id,
+  player1:player1,
+  player2:player2,
   captain:captain
 });
-  trackEvent("fantasy_saved", {
-  voter:voter,
-  match_id:selectedMatch
-});
+  
   alert("Fantasy-laget er lagret!");
   showTeam(team);
   loadFantasyStats();
