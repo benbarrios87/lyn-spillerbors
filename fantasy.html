@@ -1022,6 +1022,10 @@ trackEvent("fantasy_saved", {
   match_id:matchId,
   captain:captain
 });
+  trackEvent("fantasy_saved", {
+  voter:voter,
+  match_id:selectedMatch
+});
   alert("Fantasy-laget er lagret!");
   showTeam(team);
   loadFantasyStats();
