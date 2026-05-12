@@ -689,9 +689,11 @@ async function trackEvent(eventType, data = {}) {
         details:data
       })
     });
-  } catch(err) {
+   } catch(err) {
     console.log("trackEvent feil", err);
   }
+}
+
 const players = [
   { name:"Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
   { name:"SAH", position:"FORS", image:"bilder/sah.png" },
