@@ -752,6 +752,10 @@ trackEvent("bors_submitted", {
   match_id:match,
   ratings:rows.length
 });
+  trackEvent("bors_submitted", {
+  voter:voter,
+  match_id:matchId
+});
   
   alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
 
