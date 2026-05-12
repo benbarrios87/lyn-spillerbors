@@ -368,8 +368,23 @@ hr {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <div class="container">
-  <div class="card">
+ <div class="card">
   <h2>Siste aktivitet</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
+    <div>
+      <label>Fra dato</label>
+      <input type="date" id="activityFrom">
+    </div>
+
+    <div>
+      <label>Til dato</label>
+      <input type="date" id="activityTo">
+    </div>
+  </div>
+
+  <button class="secondary" onclick="loadActivityFeed()">Oppdater aktivitet</button>
+
   <div id="activityFeed">
     <div class="small">Laster aktivitet...</div>
   </div>
@@ -889,55 +904,84 @@ function trackAdminVisit() {
 
 document.getElementById("matchSelect")?.addEventListener("change", loadStats);
 
-async function loadActivityFeed() {
-  const { data, error } = await supabaseClient
+async function loadActivityFeed(filter = "all") {
+  const from = document.getElementById("activityFrom")?.value;
+  const to = document.getElementById("activityTo")?.value;
+
+  let query = supabaseClient
     .from("site_events")
     .select("*")
     .order("created_at", { ascending:false })
-    .limit(30);
+    .limit(100);
+
+  if (filter !== "all") {
+    query = query.eq("event_type", filter);
+  }
+
+  if (from) {
+    query = query.gte("created_at", from + "T00:00:00");
+  }
+
+  if (to) {
+    query = query.lte("created_at", to + "T23:59:59");
+  }
+
+  const { data, error } = await query;
+  const box = document.getElementById("activityFeed");
 
   if (error) {
     console.error(error);
-    const box = document.getElementById("activityFeed");
     box.innerHTML = `<div class="small">Klarte ikke å hente aktivitet.</div>`;
     return;
   }
 
-  const box = document.getElementById("activityFeed");
-
   if (!data || data.length === 0) {
-    box.innerHTML = `<div class="small">Ingen aktivitet enda.</div>`;
+    box.innerHTML = `<div class="small">Ingen aktivitet i valgt periode.</div>`;
     return;
   }
 
   box.innerHTML = data.map(event => {
-    const time = new Date(event.created_at)
-      .toLocaleTimeString("no-NO", {
-        hour:"2-digit",
-        minute:"2-digit"
-      });
+    const d = new Date(event.created_at);
+    const time = d.toLocaleString("no-NO", {
+      day:"2-digit",
+      month:"2-digit",
+      hour:"2-digit",
+      minute:"2-digit"
+    });
 
-    let text = "";
+    const details = event.details || {};
+    let title = "";
+    let extra = "";
 
     if (event.event_type === "tips_submitted") {
-      text = `🎯 <strong>${event.voter}</strong> leverte tips`;
+      title = `🎯 <strong>${event.voter}</strong> leverte tips`;
+      extra = `${details.matches || 1} kupong${details.matches === 1 ? "" : "er"}`;
     } else if (event.event_type === "bors_submitted") {
-      text = `⭐ <strong>${event.voter}</strong> leverte børs`;
+      title = `⭐ <strong>${event.voter}</strong> leverte børs`;
+      extra = `${details.ratings || "?"} karakterer`;
     } else if (event.event_type === "fantasy_saved") {
-      text = `🧠 <strong>${event.voter}</strong> lagret fantasylag`;
+      title = `🧠 <strong>${event.voter}</strong> lagret fantasylag`;
+      extra = `Kaptein: ${details.captain || "ukjent"}`;
     } else {
-      text = `⚡ ${event.event_type}`;
+      title = `⚡ ${event.event_type}`;
+      extra = event.match_id || "";
     }
 
     return `
       <div class="analytics-row">
-        <div>${text}</div>
+        <div>
+          ${title}<br>
+          <span class="small">${event.match_id || ""}${extra ? " · " + extra : ""}</span>
+        </div>
         <div class="small">${time}</div>
       </div>
     `;
   }).join("");
 }
-
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("activityFrom").value = today;
+document.getElementById("activityTo").value = today;
+  
 fillMatchSelect();
 renderPlayers();
 loadStats();
