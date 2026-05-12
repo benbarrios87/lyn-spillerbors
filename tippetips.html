@@ -1242,14 +1242,21 @@ async function loadMatchPredictions() {
   document.getElementById("results").innerHTML = html;
 }
 
-function buildPredictionLeaderboardRows(allVotes) {
-  const predictions = filterPredictionsByCurrentTeam(buildPredictions(allVotes));
-  let users = {};
+function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
+  let predictions = buildPredictions(allVotes);
+
+  if (teamFilter !== "all") {
+    predictions = predictions.filter(p => {
+      const matchData = getMatchData(p.match_id);
+      return matchData && getMatchTeam(matchData) === teamFilter;
+    });
+  }
+
+  const users = {};
 
   predictions.forEach(p => {
     const matchData = getMatchData(p.match_id);
     const actual = matchData ? matchData.actual : null;
-
     if (!actual) return;
 
     const points = scorePrediction(p.home, p.away, actual.home, actual.away);
@@ -1293,8 +1300,8 @@ function buildPredictionLeaderboardRows(allVotes) {
   );
 }
 
-function buildMostAccuratePredictors(allVotes) {
-  return buildPredictionLeaderboardRows(allVotes)
+function buildMostAccuratePredictors(allVotes, teamFilter = "all") {
+  return buildPredictionLeaderboardRows(allVotes, teamFilter)
     .filter(r => r.correct > 0)
     .sort((a,b) =>
       b.correct - a.correct ||
@@ -1312,12 +1319,11 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
   if (!items || items.length === 0) return `<div class="small">Ingen data enda.</div>`;
 
   const medals = ["🥇","🥈","🥉"];
-  let html = "";
 
-  items.slice(0, limit).forEach((r, i) => {
+  return items.slice(0, limit).map((r, i) => {
     const medal = showMedals && i < 3 ? `<span class="medal">${medals[i]}</span>` : "";
 
-    html += `
+    return `
       <div class="result-row">
         <div>
           ${medal}
@@ -1329,14 +1335,14 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
         <div class="result-score">${r.score}</div>
       </div>
     `;
-  });
-
-  return html;
+  }).join("");
 }
 
 async function loadPredictionLeaderboard() {
   const allVotes = await fetchVotes();
-  const rows = buildPredictionLeaderboardRows(allVotes);
+  const rows = buildPredictionLeaderboardRows(allVotes, "all");
+  const menRows = buildPredictionLeaderboardRows(allVotes, "men");
+  const womenRows = buildPredictionLeaderboardRows(allVotes, "women");
 
   if (rows.length === 0) {
     document.getElementById("results").innerHTML =
@@ -1345,7 +1351,20 @@ async function loadPredictionLeaderboard() {
   }
 
   document.getElementById("results").innerHTML = `
-    <div class="bb">Tippetabell · ${currentTeamFilter === "all" ? "Alle" : getTeamLabel(currentTeamFilter)}</div>
+    <div class="bb">Tippetabell · Samlet for herrer og kvinner</div>
+
+    <div class="stats-grid" style="margin-bottom:14px;">
+      <div class="stat-card">
+        <h3>Beste herretipper</h3>
+        ${renderMiniRanking(menRows, 1, true)}
+      </div>
+
+      <div class="stat-card">
+        <h3>Beste dametipper</h3>
+        ${renderMiniRanking(womenRows, 1, true)}
+      </div>
+    </div>
+
     ${renderMiniRanking(rows, 99)}
   `;
 }
@@ -1353,23 +1372,28 @@ async function loadPredictionLeaderboard() {
 async function loadTipStats() {
   const allVotes = await fetchVotes();
   const predictionVotes = allVotes.filter(isPredictionVote);
-  const predictions = filterPredictionsByCurrentTeam(buildPredictions(predictionVotes));
-  const leaderboard = buildPredictionLeaderboardRows(allVotes);
-  const accurate = buildMostAccuratePredictors(allVotes);
 
-  const totalTips = predictions.length;
-  const uniqueUsers = new Set(predictions.map(p => p.voter)).size;
+  const allPredictions = buildPredictions(predictionVotes);
+  const visiblePredictions = filterPredictionsByCurrentTeam(allPredictions);
+
+  const leaderboard = buildPredictionLeaderboardRows(allVotes, "all");
+  const menLeaderboard = buildPredictionLeaderboardRows(allVotes, "men");
+  const womenLeaderboard = buildPredictionLeaderboardRows(allVotes, "women");
+  const accurate = buildMostAccuratePredictors(allVotes, "all");
+
+  const totalTips = visiblePredictions.length;
+  const uniqueUsers = new Set(visiblePredictions.map(p => p.voter)).size;
   const finishedMatches = getFilteredMatches().filter(m => m.actual).length;
 
   const mostActive = {};
-  predictions.forEach(p => {
+  allPredictions.forEach(p => {
     mostActive[p.voter] = (mostActive[p.voter] || 0) + 1;
   });
 
   const mostActiveRows = Object.keys(mostActive).map(user => ({
     player:user,
     score:mostActive[user],
-    sub:"kuponger levert"
+    sub:"kuponger levert totalt"
   })).sort((a,b) => b.score - a.score);
 
   const filterLabel = currentTeamFilter === "all" ? "Alle kamper" : getTeamLabel(currentTeamFilter);
@@ -1378,18 +1402,29 @@ async function loadTipStats() {
     <div class="hero-stat">
       <h3>Kupongstatus · ${filterLabel}</h3>
       <div class="big">${totalTips} tips</div>
-      <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat</div>
+      <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat i valgt visning</div>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>Tippetabellen</h3>
+        <h3>Tippetabellen samlet</h3>
+        <div class="small">Herrer og kvinner teller i samme tabell.</div>
         ${renderMiniRanking(leaderboard, 999)}
       </div>
 
       <div class="stat-card">
+        <h3>Beste herretipper</h3>
+        ${renderMiniRanking(menLeaderboard, 5, true)}
+      </div>
+
+      <div class="stat-card">
+        <h3>Beste dametipper</h3>
+        ${renderMiniRanking(womenLeaderboard, 5, true)}
+      </div>
+
+      <div class="stat-card">
         <h3>Treffsikre typer</h3>
-        <div class="small">Flest helt riktige resultater.</div>
+        <div class="small">Flest helt riktige resultater samlet.</div>
         ${renderMiniRanking(accurate, 8, false)}
       </div>
 
@@ -1400,26 +1435,10 @@ async function loadTipStats() {
 
       <div class="stat-card">
         <h3>Poengsystem</h3>
-
-        <div class="result-row">
-          <div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div>
-          <div class="result-score">3 p</div>
-        </div>
-
-        <div class="result-row">
-          <div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div>
-          <div class="result-score">2 p</div>
-        </div>
-
-        <div class="result-row">
-          <div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div>
-          <div class="result-score">1 p</div>
-        </div>
-
-        <div class="result-row">
-          <div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div>
-          <div class="result-score">0 p</div>
-        </div>
+        <div class="result-row"><div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div><div class="result-score">3 p</div></div>
+        <div class="result-row"><div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div><div class="result-score">2 p</div></div>
+        <div class="result-row"><div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div><div class="result-score">1 p</div></div>
+        <div class="result-row"><div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div><div class="result-score">0 p</div></div>
       </div>
     </div>
   `;
