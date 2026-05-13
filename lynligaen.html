@@ -544,8 +544,7 @@ function buildPredictions(votes) {
 
 function awardFantasyTierPoints(rows) {
   const sorted = [...rows].sort((a,b) =>
-    b.raw - a.raw ||
-    a.voter.localeCompare(b.voter)
+    b.raw - a.raw
   );
 
   const n = sorted.length;
@@ -555,22 +554,31 @@ function awardFantasyTierPoints(rows) {
   const q2 = Math.ceil(n / 2);
   const q3 = Math.ceil((n * 3) / 4);
 
+  const eliteCutoff = sorted[q1 - 1]?.raw ?? -999;
+  const strongCutoff = sorted[q2 - 1]?.raw ?? -999;
+  const mediumCutoff = sorted[q3 - 1]?.raw ?? -999;
+
   return sorted.map((row, index) => {
     let tier = "Bunn";
     let points = 0;
 
-    if (index < q1) {
+    if (row.raw >= eliteCutoff) {
       tier = "Elite";
       points = 5;
-    } else if (index < q2) {
+    } else if (row.raw >= strongCutoff) {
       tier = "Sterk";
       points = 3;
-    } else if (index < q3) {
+    } else if (row.raw >= mediumCutoff) {
       tier = "Med";
       points = 1;
     }
 
-    return { ...row, tier, tierPoints:points, rank:index + 1 };
+    return {
+      ...row,
+      tier,
+      tierPoints:points,
+      rank:index + 1
+    };
   });
 }
 
