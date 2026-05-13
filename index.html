@@ -103,6 +103,11 @@ h1 {
   filter:drop-shadow(0 10px 18px rgba(0,0,0,0.45));
   transition:0.2s;
 }
+  .fantasy-player {
+  height:205px;
+  max-width:195px;
+  left:-4px;
+}
 
 .card:hover .card-player {
   transform:scale(1.06);
@@ -199,9 +204,12 @@ h1 {
 }
 
 @media (max-width:700px) {
-  h1 {
-    font-size:40px;
+  .fantasy-player {
+    height:155px;
+    max-width:160px;
+    left:-6px;
   }
+}
 
   .grid {
     grid-template-columns:1fr;
@@ -270,7 +278,7 @@ h1 {
 </div>
 
 <div class="card" onclick="location.href='fantasy.html'">
-  <img src="bilder/fantasy-Photoroom.png" class="card-player" alt="">
+  <img src="bilder/fantasy-Photoroom.png" class="card-player fantasy-player" alt="">
   <div class="card-title">Lyn Fantasy</div>
   <div class="card-text">
     Velg to spillere og en kaptein. Poeng basert på faktisk prestasjon på banen.
