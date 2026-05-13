@@ -91,10 +91,6 @@ header::after {
   pointer-events:none;
   filter:drop-shadow(0 14px 24px rgba(0,0,0,0.45));
 }
-  z-index:1;
-  pointer-events:none;
-  filter:drop-shadow(0 14px 24px rgba(0,0,0,0.45));
-}
 
 .logo-wrap,
 h1,
@@ -286,7 +282,41 @@ button:hover {
   grid-template-columns:1fr;
   gap:10px;
 }
+.bors-ticker {
+  margin:18px 0;
+  overflow:hidden;
+  border-radius:18px;
+  background:linear-gradient(135deg,#13294b,#d71920);
+  color:white;
+  box-shadow:0 8px 22px rgba(19,41,75,0.18);
+}
 
+.ticker-inner {
+  display:flex;
+  width:max-content;
+  animation:tickerMove 55s linear infinite;
+}
+
+.bors-ticker:hover .ticker-inner {
+  animation-play-state:paused;
+}
+
+.ticker-item {
+  white-space:nowrap;
+  padding:13px 22px;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.ticker-user {
+  color:#ffd166;
+}
+
+@keyframes tickerMove {
+  from { transform:translateX(0); }
+  to { transform:translateX(-50%); }
+}
+  
 @media (min-width:750px) {
   .button-row {
     grid-template-columns:repeat(4, 1fr);
@@ -469,6 +499,14 @@ button:hover {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <header>
+  <main>
+
+<div class="bors-ticker" id="borsTicker">
+  <div class="ticker-inner">
+    <div class="ticker-item">Laster siste børser...</div>
+  </div>
+</div>
+    
   <img src="bilder/Spillerbørs-Photoroom.png" class="header-player" alt="">
 
   <div class="logo-wrap">
@@ -721,7 +759,81 @@ function getMatchIndex(matchId) {
 function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
 }
+function buildRecentBorsTicker(votes) {
+  const playerVotes = votes
+    .filter(isPlayerVote)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+  const groups = {};
+
+  playerVotes.forEach(v => {
+    const key = `${v.match_id}|||${cleanVoterName(v.voter)}`;
+
+    if (!groups[key]) {
+      groups[key] = {
+        match_id:v.match_id,
+        voter:cleanVoterName(v.voter),
+        created_at:v.created_at,
+        votes:[]
+      };
+    }
+
+    groups[key].votes.push({
+      player:v.player,
+      rating:Number(v.rating)
+    });
+  });
+
+  const latestGroups = Object.values(groups)
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0,5);
+
+  if (latestGroups.length === 0) {
+    return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
+  }
+
+  const items = latestGroups.map(group => {
+    const ratings = group.votes.filter(v => Number.isFinite(v.rating));
+
+    if (ratings.length === 0) return "";
+
+    const max = Math.max(...ratings.map(v => v.rating));
+    const min = Math.min(...ratings.map(v => v.rating));
+
+    const voteText = ratings
+      .sort((a,b) => b.rating - a.rating)
+      .map(v => {
+        const fire = v.rating === max ? "🔥 " : "";
+        const skull = v.rating === min ? "💀 " : "";
+        return `${fire}${skull}${escapeHTML(v.player)} ${v.rating}`;
+      })
+      .join(" · ");
+
+    return `
+      <div class="ticker-item">
+        <span class="ticker-user">${escapeHTML(group.voter)}</span>
+        → ${voteText}
+      </div>
+    `;
+  }).join("");
+
+  return items + items;
+}
+
+async function loadBorsTicker() {
+  const ticker = document.getElementById("borsTicker");
+  if (!ticker) return;
+
+  const allVotes = await fetchVotes();
+  const html = buildRecentBorsTicker(allVotes);
+
+  ticker.innerHTML = `
+    <div class="ticker-inner">
+      ${html}
+    </div>
+  `;
+}
+  
 function setDefaultMatch() {
   const select = document.getElementById("match");
   const now = new Date();
@@ -1313,6 +1425,7 @@ async function loadStatsCenter() {
 
 setDefaultMatch();
 loadStatsCenter();
+loadBorsTicker();
 </script>
 
 <script>
