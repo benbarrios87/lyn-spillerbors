@@ -207,8 +207,9 @@ button {
   box-shadow:0 4px 12px rgba(19,41,75,0.2);
 }
 
-button:hover {
-  background:#0d1d36;
+.team-tab:hover {
+  transform:translateY(-1px);
+  filter:brightness(0.98);
 }
 
 .team-tabs {
@@ -225,6 +226,12 @@ button:hover {
   padding:11px 8px;
 }
 
+  .team-tab.active {
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+  
 .team-tab.men-tab.active {
   background:var(--blue);
   color:white;
@@ -260,15 +267,13 @@ button:hover {
 }
 
 .people-box.filter-men {
-  border-color:var(--blue);
-  background:linear-gradient(180deg, #dbeafe, #fffdf7);
-  box-shadow:0 0 0 3px rgba(19,41,75,0.08);
+  background:linear-gradient(180deg, #eef5ff, #fffdf7);
+  border:2px dashed var(--blue);
 }
 
 .people-box.filter-women {
-  border-color:var(--women);
-  background:linear-gradient(180deg, #fce7f3, #fffdf7);
-  box-shadow:0 0 0 3px rgba(181,18,91,0.10);
+  background:linear-gradient(180deg, #fff1f6, #fffdf7);
+  border:2px dashed var(--women);
 }
 
 .coupon-group {
