@@ -204,10 +204,41 @@ h1 {
 }
 
 @media (max-width:700px) {
+  .grid {
+    grid-template-columns:1fr;
+  }
+
+  .season-grid {
+    grid-template-columns:1fr;
+  }
+
+  .card {
+    min-height:125px;
+    padding:22px 18px 22px 125px;
+  }
+
+  .card-player {
+    height:142px;
+    max-width:145px;
+    left:-2px;
+  }
+
   .fantasy-player {
-    height:155px;
-    max-width:160px;
-    left:-6px;
+    height:165px;
+    max-width:165px;
+    left:-8px;
+  }
+
+  .card-title {
+    font-size:25px;
+  }
+
+  .card-text {
+    font-size:14px;
+  }
+
+  .card::after {
+    display:none;
   }
 }
 
