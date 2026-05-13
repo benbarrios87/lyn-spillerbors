@@ -499,14 +499,6 @@ button:hover {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <header>
-  <main>
-
-<div class="bors-ticker" id="borsTicker">
-  <div class="ticker-inner">
-    <div class="ticker-item">Laster siste børser...</div>
-  </div>
-</div>
-    
   <img src="bilder/Spillerbørs-Photoroom.png" class="header-player" alt="">
 
   <div class="logo-wrap">
@@ -531,8 +523,7 @@ button:hover {
   <label>Velg kamp</label>
   <select id="match"></select>
 </div>
-
-<div class="box">
+ <div class="box">
   <label>Navn / forumbruker</label>
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
@@ -947,8 +938,9 @@ async function sendVote() {
 
   players.forEach(p => document.getElementById(p.short).value = "");
   document.getElementById("awayFans").value = "";
-  loadResults();
-  loadStatsCenter();
+ loadResults();
+loadStatsCenter();
+loadBorsTicker();
 }
 
 async function fetchVotes(query = "") {
