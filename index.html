@@ -205,69 +205,59 @@ h1 {
 }
 
 .fantasy-player {
-  width:165px !important;
+  width:240px !important;
   height:auto !important;
   max-width:none !important;
-  left:-25px !important;
-  bottom:-4px !important;
-}
-}
-
-  .season-grid {
-    grid-template-columns:1fr;
-  }
-
-  .card {
-    min-height:125px;
-    padding:22px 18px 22px 125px;
-  }
-
-  .card-player {
-    height:142px;
-    max-width:145px;
-    left:-2px;
-  }
-
- .fantasy-player {
-  height:330px;
-  max-width:none;
-  left:-45px;
-  bottom:-25px;
+  left:-20px !important;
+  bottom:-8px !important;
 }
 
-  .card-title {
-    font-size:25px;
+@media (max-width:700px) {
+  body {
+    justify-content:flex-start;
+    padding:14px;
   }
 
-  .card-text {
-    font-size:14px;
+  .wrapper {
+    padding:20px 0;
   }
 
-  .card::after {
-    display:none;
+  .logo {
+    width:135px;
   }
-}
+
+  h1 {
+    font-size:38px;
+  }
+
+  .subtitle {
+    font-size:15px;
+  }
 
   .grid {
     grid-template-columns:1fr;
+    gap:16px;
+    margin-top:28px;
   }
-
-  .season-grid {
-    grid-template-columns:1fr;
-  }
-
-  /* LEGG INN HER */
 
   .card {
-    min-height:125px;
-    padding:22px 18px 22px 125px;
+    min-height:150px;
+    padding:22px 18px 22px 145px;
   }
 
- .card-player {
-  height:142px;
-  max-width:145px;
-  left:-2px;
-}
+  .card-player {
+    height:155px;
+    max-width:150px;
+    left:-4px;
+  }
+
+  .fantasy-player {
+    width:185px !important;
+    height:auto !important;
+    max-width:none !important;
+    left:-32px !important;
+    bottom:-8px !important;
+  }
 
   .card-title {
     font-size:25px;
@@ -279,7 +269,11 @@ h1 {
 
   .card::after {
     display:none;
-    }
+  }
+
+  .season-grid {
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
