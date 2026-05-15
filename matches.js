@@ -277,7 +277,7 @@ const matchesData = [
     home:"Lyn",
     away:"Røa Fotball Elite",
     deadline:"2026-05-15T18:00:00",
-    actual:null
+    actual:{ home:0, away:0 }
   },
   {
     id:"26.05 Brann kvinner - Lyn",
