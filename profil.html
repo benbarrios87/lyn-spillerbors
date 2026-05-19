@@ -547,7 +547,11 @@ async function loadProfile(){
   const userPredictions = predictions.filter(p => p.voter === profileUser);
   const userVotes = allVotes.filter(v => cleanVoterName(v.voter) === profileUser);
 
-  const latestActivities = latestMatchActivity(userPicks, userVotes);
+  const latestActivities = latestMatchActivity(
+  userPicks,
+  userVotes,
+  userPredictions
+);
 
   const fantasyHistory = [];
   const captainMap = {};
