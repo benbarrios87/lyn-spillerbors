@@ -761,6 +761,15 @@ function buildRecentBorsTicker(votes) {
     .filter(isPlayerVote)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+  if (playerVotes.length === 0) {
+    return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
+  }
+
+  const latestMatchId = [...new Set(playerVotes.map(v => v.match_id))]
+    .sort((a,b) => getMatchIndex(b) - getMatchIndex(a))[0];
+
+  const latestMatchVotes = playerVotes.filter(v => v.match_id === latestMatchId);
+
   const groups = {};
 
   latestMatchVotes.forEach(v => {
@@ -791,7 +800,7 @@ function buildRecentBorsTicker(votes) {
     .slice(0,6);
 
   if (latestGroups.length === 0) {
-    return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
+    return `<div class="ticker-item">Ingen børsinnsendinger fra siste kamp enda.</div>`;
   }
 
   const items = latestGroups.map(group => {
@@ -1029,10 +1038,6 @@ function renderMiniRanking(items, limit = 5, showMedals = true, linkType = "play
 async function loadResults() {
   const data = await getVotesForSelectedMatch();
   const playerVotes = data.filter(isPlayerVote);
-  const latestMatchId = [...new Set(playerVotes.map(v => v.match_id))]
-  .sort((a,b) => getMatchIndex(b) - getMatchIndex(a))[0];
-
-const latestMatchVotes = playerVotes.filter(v => v.match_id === latestMatchId);
   const awayVotes = data.filter(isAwayFansVote);
 
   if (playerVotes.length === 0 && awayVotes.length === 0) {
