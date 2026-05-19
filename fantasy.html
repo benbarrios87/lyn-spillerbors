@@ -148,6 +148,46 @@ h2 {
 .rules {
   background:rgba(0,0,0,0.62);
 }
+  .rules-dropdown {
+  margin-top:20px;
+  border-radius:22px;
+  overflow:hidden;
+}
+
+.rules-dropdown summary {
+  list-style:none;
+  cursor:pointer;
+  background:rgba(0,0,0,0.72);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:18px 22px;
+  border-radius:22px;
+  font-size:20px;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+.rules-dropdown summary:hover {
+  background:rgba(255,255,255,0.08);
+}
+
+.rules-dropdown summary::-webkit-details-marker {
+  display:none;
+}
+
+.rules-dropdown summary::after {
+  content:"+";
+  float:right;
+  color:var(--gold);
+  font-size:24px;
+}
+
+.rules-dropdown[open] summary::after {
+  content:"–";
+}
+
+.rules-dropdown .card {
+  margin-top:12px;
+}
 
 .rules-grid {
   display:grid;
@@ -567,10 +607,12 @@ label {
     <div class="match-date" id="matchDate"></div>
   </div>
 
-  <h2 class="section-title">2. Regler</h2>
+ <h2 class="section-title">2. fantasyregler</h2>
+
+<details class="rules-dropdown">
+  <summary>Hvordan funker det?</summary>
 
   <div class="card rules">
-    <h2>Sånn funker det</h2>
 
     <div class="rules-grid">
       <div class="rule-pill">
@@ -602,7 +644,9 @@ label {
       <div class="rule-pill"><strong>Forsvar:</strong><br>Mål +6, assist +3, clean sheet +4</div>
       <div class="rule-pill"><strong>Keeper:</strong><br>Mål +10, clean sheet +5, strafferedning +5</div>
     </div>
+
   </div>
+</details>
 
   <h2 class="section-title">3. Velg lag</h2>
 
