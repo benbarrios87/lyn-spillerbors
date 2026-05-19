@@ -359,6 +359,30 @@ hr {
   border-top:1px solid var(--line);
   margin:20px 0;
 }
+  .form-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+@media (min-width:750px) {
+  .form-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.full {
+  grid-column:1 / -1;
+}
+
+button.danger {
+  background:#7f1d1d;
+}
+
+button.danger:hover {
+  background:#991b1b;
+}
+  
 </style>
 </head>
 
@@ -453,6 +477,109 @@ hr {
     </div>
   </div>
 
+  <div class="card">
+  <h2>Kampadministrasjon</h2>
+  <p class="small">Opprett ny kamp, rediger dato/deadline eller legg inn resultat.</p>
+
+  <h3>Opprett ny kamp</h3>
+
+  <div class="form-grid">
+    <div>
+      <label>Lag</label>
+      <select id="newTeam">
+        <option value="men">Herrene</option>
+        <option value="women">Kvinnene</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Turnering</label>
+      <input id="newCompetition" placeholder="OBOS-ligaen, NM, Toppserien">
+    </div>
+
+    <div>
+      <label>Hjemmelag</label>
+      <input id="newHome" placeholder="Lyn">
+    </div>
+
+    <div>
+      <label>Bortelag</label>
+      <input id="newAway" placeholder="Motstander">
+    </div>
+
+    <div>
+      <label>Kampdato</label>
+      <input id="newDate" type="date">
+    </div>
+
+    <div>
+      <label>Deadline</label>
+      <input id="newDeadline" type="datetime-local">
+    </div>
+  </div>
+
+  <button onclick="createMatch()">Opprett kamp</button>
+
+  <hr>
+
+  <h3>Rediger eksisterende kamp</h3>
+
+  <label>Velg kamp</label>
+  <select id="editMatchSelect" onchange="loadMatchEditor()"></select>
+
+  <div class="form-grid">
+    <div>
+      <label>Lag</label>
+      <select id="editTeam">
+        <option value="men">Herrene</option>
+        <option value="women">Kvinnene</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Turnering</label>
+      <input id="editCompetition">
+    </div>
+
+    <div>
+      <label>Hjemmelag</label>
+      <input id="editHome">
+    </div>
+
+    <div>
+      <label>Bortelag</label>
+      <input id="editAway">
+    </div>
+
+    <div>
+      <label>Kampdato</label>
+      <input id="editDate" type="date">
+    </div>
+
+    <div>
+      <label>Deadline</label>
+      <input id="editDeadline" type="datetime-local">
+    </div>
+
+    <div>
+      <label>Hjemmemål</label>
+      <input id="editActualHome" type="number" min="0" placeholder="Tom hvis ikke spilt">
+    </div>
+
+    <div>
+      <label>Bortemål</label>
+      <input id="editActualAway" type="number" min="0" placeholder="Tom hvis ikke spilt">
+    </div>
+  </div>
+
+  <div class="top-actions">
+    <button onclick="saveMatchChanges()">Lagre kampendringer</button>
+    <button class="danger" onclick="deactivateMatch()">Skjul/deaktiver kamp</button>
+  </div>
+
+  <div id="matchAdminStatus" class="status"></div>
+</div>
+  
   <div class="card">
     <h2>Velg kamp</h2>
 
@@ -552,36 +679,77 @@ function showTrafficStatus(message, type = "ok") {
 function getSelectedMatchId() {
   return document.getElementById("matchSelect").value;
 }
+  let allMatches = [];
 
-async function fillMatchSelect() {
-  const select = document.getElementById("matchSelect");
+function showMatchAdminStatus(message, type = "ok") {
+  const status = document.getElementById("matchAdminStatus");
+  status.className = `status ${type}`;
+  status.innerHTML = message;
+}
 
+function makeMatchId(date, home, away) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month} ${home} - ${away}`;
+}
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function numberOrNull(value) {
+  if (value === "" || value === null || value === undefined) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+async function loadMatchesFromSupabase() {
   const { data, error } = await supabaseClient
     .from("matches")
     .select("*")
+    .eq("active", true)
     .order("date", { ascending:true });
 
   if (error) {
     console.error(error);
     showStatus("Klarte ikke å hente kamper fra Supabase.", "error");
-    return;
+    return [];
   }
 
-  select.innerHTML = "";
+  allMatches = data || [];
+  return allMatches;
+}
 
-  const mensMatches = (data || []).filter(
+async function fillMatchSelect() {
+  const select = document.getElementById("matchSelect");
+  const editSelect = document.getElementById("editMatchSelect");
+
+  const matches = await loadMatchesFromSupabase();
+
+  select.innerHTML = "";
+  editSelect.innerHTML = "";
+
+  const mensMatches = matches.filter(
     match => !match.team || match.team === "men"
   );
 
   mensMatches.forEach(match => {
     const option = document.createElement("option");
-
     option.value = match.id;
-
-    option.textContent =
-      `${match.date.slice(0,10)} | ${match.home} - ${match.away}`;
-
+    option.textContent = `${match.date.slice(0,10)} | ${match.home} - ${match.away}`;
     select.appendChild(option);
+  });
+
+  matches.forEach(match => {
+    const option = document.createElement("option");
+    option.value = match.id;
+    option.textContent = `${match.date.slice(0,10)} | ${match.team || "men"} | ${match.home} - ${match.away}`;
+    editSelect.appendChild(option);
   });
 
   const nextMatch = mensMatches
@@ -591,8 +759,123 @@ async function fillMatchSelect() {
   if (nextMatch) {
     select.value = nextMatch.id;
   }
+
+  if (editSelect.options.length > 0) {
+    editSelect.value = select.value || editSelect.options[0].value;
+    loadMatchEditor();
+  }
+}
+  function loadMatchEditor() {
+  const id = document.getElementById("editMatchSelect").value;
+  const match = allMatches.find(m => m.id === id);
+
+  if (!match) return;
+
+  document.getElementById("editTeam").value = match.team || "men";
+  document.getElementById("editCompetition").value = match.competition || "";
+  document.getElementById("editHome").value = match.home || "";
+  document.getElementById("editAway").value = match.away || "";
+  document.getElementById("editDate").value = match.date ? match.date.slice(0,10) : "";
+  document.getElementById("editDeadline").value = toDateTimeLocal(match.deadline);
+  document.getElementById("editActualHome").value = match.actual_home ?? "";
+  document.getElementById("editActualAway").value = match.actual_away ?? "";
 }
 
+async function createMatch() {
+  const team = document.getElementById("newTeam").value;
+  const competition = document.getElementById("newCompetition").value.trim();
+  const home = document.getElementById("newHome").value.trim();
+  const away = document.getElementById("newAway").value.trim();
+  const date = document.getElementById("newDate").value;
+  const deadline = document.getElementById("newDeadline").value;
+
+  if (!home || !away || !date || !deadline) {
+    showMatchAdminStatus("Fyll inn hjemmelag, bortelag, kampdato og deadline.", "error");
+    return;
+  }
+
+  const id = makeMatchId(date, home, away);
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .insert({
+      id,
+      team,
+      competition: competition || null,
+      home,
+      away,
+      date,
+      deadline,
+      actual_home:null,
+      actual_away:null,
+      active:true
+    });
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å opprette kamp. Kanskje finnes den allerede?", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp opprettet: <strong>${id}</strong>`);
+  await fillMatchSelect();
+}
+
+async function saveMatchChanges() {
+  const id = document.getElementById("editMatchSelect").value;
+
+  const updates = {
+    team: document.getElementById("editTeam").value,
+    competition: document.getElementById("editCompetition").value.trim() || null,
+    home: document.getElementById("editHome").value.trim(),
+    away: document.getElementById("editAway").value.trim(),
+    date: document.getElementById("editDate").value,
+    deadline: document.getElementById("editDeadline").value,
+    actual_home: numberOrNull(document.getElementById("editActualHome").value),
+    actual_away: numberOrNull(document.getElementById("editActualAway").value)
+  };
+
+  if (!updates.home || !updates.away || !updates.date || !updates.deadline) {
+    showMatchAdminStatus("Hjemmelag, bortelag, dato og deadline må være fylt ut.", "error");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .update(updates)
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å lagre kampendringer.", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp oppdatert: <strong>${id}</strong>`);
+  await fillMatchSelect();
+}
+
+async function deactivateMatch() {
+  const id = document.getElementById("editMatchSelect").value;
+
+  const ok = confirm(`Skal kampen skjules/deaktiveres?\n\n${id}\n\nDette sletter ikke data, men skjuler kampen fra adminvalg.`);
+  if (!ok) return;
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .update({ active:false })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å deaktivere kampen.", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp deaktivert: <strong>${id}</strong>`);
+  await fillMatchSelect();
+}
+  
 function safeId(playerName) {
   return playerName
     .toLowerCase()
@@ -921,7 +1204,15 @@ function trackAdminVisit() {
   });
 }
 
-document.getElementById("matchSelect")?.addEventListener("change", loadStats);
+document.getElementById("matchSelect")?.addEventListener("change", async () => {
+  await loadStats();
+
+  const editSelect = document.getElementById("editMatchSelect");
+  if (editSelect) {
+    editSelect.value = getSelectedMatchId();
+    loadMatchEditor();
+  }
+});
 
 async function loadActivityFeed(filter = "all") {
   const from = document.getElementById("activityFrom")?.value;
