@@ -765,9 +765,29 @@ function buildRecentBorsTicker(votes) {
     return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
   }
 
-  const latestMatchId = [...new Set(playerVotes.map(v => v.match_id))]
-    .sort((a,b) => getMatchIndex(b) - getMatchIndex(a))[0];
+  const matchGroups = {};
 
+playerVotes.forEach(v => {
+  if (!matchGroups[v.match_id]) {
+    matchGroups[v.match_id] = {
+      match_id:v.match_id,
+      latest_vote:v.created_at,
+      vote_count:0
+    };
+  }
+
+  matchGroups[v.match_id].vote_count++;
+
+  if (new Date(v.created_at) > new Date(matchGroups[v.match_id].latest_vote)) {
+    matchGroups[v.match_id].latest_vote = v.created_at;
+  }
+});
+
+const latestMatchId = Object.values(matchGroups)
+  .sort((a,b) =>
+    new Date(b.latest_vote) - new Date(a.latest_vote) ||
+    b.vote_count - a.vote_count
+  )[0].match_id;
   const latestMatchVotes = playerVotes.filter(v => v.match_id === latestMatchId);
 
   const groups = {};
