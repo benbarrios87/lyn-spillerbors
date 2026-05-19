@@ -471,7 +471,12 @@ function renderRows(rows, emptyText = "Ingen data enda.", makePlayersClickable =
 }
 
 
-function latestMatchActivity(userPicks, userVotes, userPredictions){
+const latestActivities = latestMatchActivity(
+  userPicks,
+  userVotes,
+  userPredictions
+);
+  
   const activities = [];
 
   userPicks.forEach(pick => {
