@@ -511,12 +511,6 @@ button:hover {
 
 <main>
 
-<div class="bors-ticker" id="borsTicker">
-  <div class="ticker-inner">
-    <div class="ticker-item">Laster siste børser...</div>
-  </div>
-</div>
-
 <h2 class="section-title">1. Send inn børs</h2>
 
 <div class="box">
@@ -756,118 +750,6 @@ function getMatchIndex(matchId) {
 function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
 }
-function buildRecentBorsTicker(votes) {
-  const MIN_UNIQUE_VOTERS_FOR_TICKER = 5;
-
-  const playerVotes = votes
-    .filter(isPlayerVote)
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  if (playerVotes.length === 0) {
-    return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
-  }
-
-  const matchGroups = {};
-
-  playerVotes.forEach(v => {
-    const voter = cleanVoterName(v.voter);
-
-    if (!matchGroups[v.match_id]) {
-      matchGroups[v.match_id] = {
-        match_id:v.match_id,
-        voters:new Set(),
-        votes:[]
-      };
-    }
-
-    matchGroups[v.match_id].voters.add(voter);
-    matchGroups[v.match_id].votes.push(v);
-  });
-
-  const validMatches = Object.values(matchGroups)
-    .filter(group => group.voters.size >= MIN_UNIQUE_VOTERS_FOR_TICKER)
-    .sort((a,b) => {
-      const matchA = getMatchData(a.match_id);
-      const matchB = getMatchData(b.match_id);
-
-      return new Date(matchB?.date || "1900-01-01") - new Date(matchA?.date || "1900-01-01");
-    });
-
-  const chosenMatch = validMatches[0] || Object.values(matchGroups)[0];
-  const latestMatchVotes = chosenMatch.votes;
-
-  const groups = {};
-
-  latestMatchVotes.forEach(v => {
-    const voter = cleanVoterName(v.voter);
-    const key = `${v.match_id}|||${voter}`;
-
-    if (!groups[key]) {
-      groups[key] = {
-        match_id:v.match_id,
-        voter:voter,
-        created_at:v.created_at,
-        votes:[]
-      };
-    }
-
-    groups[key].votes.push({
-      player:v.player,
-      rating:Number(v.rating)
-    });
-  });
-
-  const latestGroups = Object.values(groups)
-    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0,6);
-
-  const items = latestGroups.map(group => {
-    const matchData = getMatchData(group.match_id);
-
-    const matchLabel = matchData
-      ? `${matchData.home} - ${matchData.away}`
-      : group.match_id;
-
-    const ratings = group.votes.filter(v => Number.isFinite(v.rating));
-
-    const max = Math.max(...ratings.map(v => v.rating));
-    const min = Math.min(...ratings.map(v => v.rating));
-
-    const voteText = ratings
-      .sort((a,b) => b.rating - a.rating)
-      .map(v => {
-        const fire = v.rating === max ? "🔥 " : "";
-        const skull = v.rating === min ? "💀 " : "";
-        return `${fire}${skull}${escapeHTML(v.player)} ${v.rating}`;
-      })
-      .join(" · ");
-
-    return `
-      <div class="ticker-item">
-        <strong>${escapeHTML(matchLabel)}</strong>
-        · <span class="ticker-user">${escapeHTML(group.voter)}</span>
-        leverte børs:
-        ${voteText}
-      </div>
-    `;
-  }).join("");
-
-  return items + items;
-}
-  
-async function loadBorsTicker() {
-  const ticker = document.getElementById("borsTicker");
-  if (!ticker) return;
-
-  const allVotes = await fetchVotes();
-  const html = buildRecentBorsTicker(allVotes);
-
-  ticker.innerHTML = `
-    <div class="ticker-inner">
-      ${html}
-    </div>
-  `;
-}
   
 function setDefaultMatch() {
   const select = document.getElementById("match");
@@ -978,7 +860,6 @@ async function sendVote() {
   document.getElementById("awayFans").value = "";
  loadResults();
 loadStatsCenter();
-loadBorsTicker();
 }
 
 async function fetchVotes(query = "") {
@@ -1461,7 +1342,6 @@ async function loadStatsCenter() {
 
 setDefaultMatch();
 loadStatsCenter();
-loadBorsTicker();
 </script>
 
 <script>
