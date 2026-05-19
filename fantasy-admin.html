@@ -7,8 +7,7 @@
 <link rel="icon" href="lblogoen.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="matches.js"></script>
-
+  
 <style>
 :root {
   --red:#d71920;
@@ -554,22 +553,38 @@ function getSelectedMatchId() {
   return document.getElementById("matchSelect").value;
 }
 
-function getMensMatches() {
-  return matchesData.filter(match => !match.team || match.team === "men");
-}
-
-function fillMatchSelect() {
+async function fillMatchSelect() {
   const select = document.getElementById("matchSelect");
+
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error(error);
+    showStatus("Klarte ikke å hente kamper fra Supabase.", "error");
+    return;
+  }
+
   select.innerHTML = "";
 
-  getMensMatches().forEach(match => {
+  const mensMatches = (data || []).filter(
+    match => !match.team || match.team === "men"
+  );
+
+  mensMatches.forEach(match => {
     const option = document.createElement("option");
+
     option.value = match.id;
-    option.textContent = `${match.date} | ${match.home} - ${match.away}`;
+
+    option.textContent =
+      `${match.date.slice(0,10)} | ${match.home} - ${match.away}`;
+
     select.appendChild(option);
   });
 
-  const nextMatch = getMensMatches()
+  const nextMatch = mensMatches
     .filter(match => new Date(match.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
 
@@ -986,11 +1001,18 @@ const today = new Date().toISOString().split("T")[0];
 document.getElementById("activityFrom").value = today;
 document.getElementById("activityTo").value = today;
   
-fillMatchSelect();
-renderPlayers();
-loadStats();
-loadTrafficStats();
-loadActivityFeed();
+async function init() {
+  await fillMatchSelect();
+
+  renderPlayers();
+
+  await loadStats();
+
+  loadTrafficStats();
+  loadActivityFeed();
+}
+
+init();
 </script>
   
 
