@@ -764,15 +764,20 @@ function buildRecentBorsTicker(votes) {
   const groups = {};
 
   playerVotes.forEach(v => {
-    const key = `${v.match_id}|||${cleanVoterName(v.voter)}`;
+    const voter = cleanVoterName(v.voter);
+    const key = `${v.match_id}|||${voter}`;
 
     if (!groups[key]) {
       groups[key] = {
         match_id:v.match_id,
-        voter:cleanVoterName(v.voter),
+        voter:voter,
         created_at:v.created_at,
         votes:[]
       };
+    }
+
+    if (new Date(v.created_at) > new Date(groups[key].created_at)) {
+      groups[key].created_at = v.created_at;
     }
 
     groups[key].votes.push({
@@ -783,13 +788,19 @@ function buildRecentBorsTicker(votes) {
 
   const latestGroups = Object.values(groups)
     .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0,5);
+    .slice(0,6);
 
   if (latestGroups.length === 0) {
     return `<div class="ticker-item">Ingen børsinnsendinger enda.</div>`;
   }
 
   const items = latestGroups.map(group => {
+    const matchData = getMatchData(group.match_id);
+
+    const matchLabel = matchData
+      ? `${matchData.home} - ${matchData.away}`
+      : group.match_id;
+
     const ratings = group.votes.filter(v => Number.isFinite(v.rating));
 
     if (ratings.length === 0) return "";
@@ -799,6 +810,7 @@ function buildRecentBorsTicker(votes) {
 
     const voteText = ratings
       .sort((a,b) => b.rating - a.rating)
+      .slice(0,5)
       .map(v => {
         const fire = v.rating === max ? "🔥 " : "";
         const skull = v.rating === min ? "💀 " : "";
@@ -808,8 +820,10 @@ function buildRecentBorsTicker(votes) {
 
     return `
       <div class="ticker-item">
-        <span class="ticker-user">${escapeHTML(group.voter)}</span>
-        → ${voteText}
+        <strong>${escapeHTML(matchLabel)}</strong>
+        · <span class="ticker-user">${escapeHTML(group.voter)}</span>
+        leverte børs:
+        ${voteText}
       </div>
     `;
   }).join("");
