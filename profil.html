@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -334,6 +335,34 @@ function fantasyPosition(playerName){
   const p = players.find(x => x.short === playerName || x.name === playerName);
   return p ? p.position : "";
 }
+function normalizePlayerName(name){
+  return String(name || "").trim().toLowerCase();
+}
+
+function getPlayerStat(statsMap, playerName){
+  if (!statsMap || !playerName) return null;
+  if (statsMap[playerName]) return statsMap[playerName];
+
+  const wanted = normalizePlayerName(playerName);
+  const foundKey = Object.keys(statsMap).find(key => normalizePlayerName(key) === wanted);
+  if (foundKey) return statsMap[foundKey];
+
+  const p = players.find(x =>
+    normalizePlayerName(x.short) === wanted ||
+    normalizePlayerName(x.name) === wanted
+  );
+
+  if (!p) return null;
+
+  return (
+    statsMap[p.short] ||
+    statsMap[p.name] ||
+    statsMap[normalizePlayerName(p.short)] ||
+    statsMap[normalizePlayerName(p.name)] ||
+    null
+  );
+}
+
 function playerLink(playerName){
   return `
     <a href="spiller.html?player=${encodeURIComponent(playerName)}" class="player-link">
@@ -342,7 +371,7 @@ function playerLink(playerName){
   `;
 }
 function calculateFantasyPoints(player, isCaptain, statsMap){
-  const stat = statsMap[player];
+  const stat = getPlayerStat(statsMap, player);
   const position = fantasyPosition(player);
   if (!stat) return 0;
 
@@ -471,12 +500,7 @@ function renderRows(rows, emptyText = "Ingen data enda.", makePlayersClickable =
 }
 
 
-const latestActivities = latestMatchActivity(
-  userPicks,
-  userVotes,
-  userPredictions
-);
-  
+function latestMatchActivity(userPicks, userVotes, userPredictions){
   const activities = [];
 
   userPicks.forEach(pick => {
@@ -553,10 +577,10 @@ async function loadProfile(){
   const userVotes = allVotes.filter(v => cleanVoterName(v.voter) === profileUser);
 
   const latestActivities = latestMatchActivity(
-  userPicks,
-  userVotes,
-  userPredictions
-);
+    userPicks,
+    userVotes,
+    userPredictions
+  );
 
   const fantasyHistory = [];
   const captainMap = {};
@@ -627,8 +651,8 @@ async function loadProfile(){
   const favoriteChosen = countMapToRows(chosenPlayerMap, " valg");
   const captains = countMapToRows(captainMap, "x");
 
-  const favoritePlayer = favoritePlayers[0]?.name || favoriteChosen[0]?.name || "-";
-  const favoritePlayerCount = favoritePlayers[0]?.count || favoriteChosen[0]?.count || 0;
+  const favoritePlayer = favoriteChosen[0]?.name || "-";
+  const favoritePlayerCount = favoriteChosen[0]?.count || 0;
   const captainCount = captains[0]?.count || 0;
 
   const formFantasy = fantasyHistory.slice(-5);
@@ -703,8 +727,9 @@ async function loadProfile(){
       </div>
 
       <div class="card">
-       <h2>🔥 Mest brukt i fantasy</h2>
-${renderRows(favoriteChosen, "Ingen fantasyvalg enda.", true)}
+        <h2>🔥 Mest brukt i fantasy</h2>
+        ${renderRows(favoriteChosen, "Ingen fantasyvalg enda.", true)}
+      </div>
     </div>
 
     <div class="grid" style="margin-top:16px;">
