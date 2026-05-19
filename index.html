@@ -510,6 +510,34 @@ async function loadSeasonStats(){
 }
 
 loadSeasonStats();
+
+async function loadThroneLeader(){
+
+  const { data, error } = await supabaseClient
+    .from("lynligaen")
+    .select("*")
+    .order("total_points", { ascending:false })
+    .limit(1);
+
+  if (error || !data || !data.length) {
+    document.getElementById("throneName").innerHTML =
+      `<a href="lynligaen.html">Ingen leder ennå</a>`;
+    return;
+  }
+
+  const leader = data[0];
+
+  document.getElementById("throneName").innerHTML = `
+    <a href="profil.html?voter=${encodeURIComponent(leader.voter)}">
+      ${leader.voter}
+    </a>
+  `;
+
+  document.getElementById("thronePoints").innerHTML =
+    `${leader.total_points} poeng totalt`;
+}
+
+loadThroneLeader();
 </script>
 
 <script>
