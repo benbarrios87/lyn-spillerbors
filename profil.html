@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -469,6 +470,51 @@ function renderRows(rows, emptyText = "Ingen data enda.", makePlayersClickable =
   `).join("");
 }
 
+
+function latestMatchActivity(userPicks, userVotes){
+  const activities = [];
+
+  userPicks.forEach(pick => {
+    const match = getMatchData(pick.match_id);
+    if (!match) return;
+
+    activities.push({
+      date:match.date,
+      html:`Leverte fantasy mot ${match.home} - ${match.away}: ${playerLink(pick.player1)}, ${playerLink(pick.player2)}, ⭐ ${playerLink(pick.captain)}`
+    });
+  });
+
+  const votesByMatch = {};
+
+  userVotes.filter(isPlayerVote).forEach(v => {
+    if (!votesByMatch[v.match_id]) votesByMatch[v.match_id] = [];
+    votesByMatch[v.match_id].push(v);
+  });
+
+  Object.keys(votesByMatch).forEach(matchId => {
+    const match = getMatchData(matchId);
+    if (!match) return;
+
+    const sortedVotes = votesByMatch[matchId].slice().sort((a,b) => {
+      return String(a.player).localeCompare(String(b.player), "no");
+    });
+
+    const shortVotes = sortedVotes
+      .slice(0, 6)
+      .map(v => `${playerLink(v.player)} ${v.rating}`)
+      .join(", ");
+
+    activities.push({
+      date:match.date,
+      html:`Leverte børs mot ${match.home} - ${match.away}: ${shortVotes}${sortedVotes.length > 6 ? " ..." : ""}`
+    });
+  });
+
+  return activities
+    .sort((a,b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 3);
+}
+
 async function loadProfile(){
   if (!profileUser) {
     document.getElementById("content").innerHTML = `<div class="warning">Ingen bruker valgt.</div>`;
@@ -491,6 +537,8 @@ async function loadProfile(){
   const userPicks = allPicks.filter(p => cleanVoterName(p.voter) === profileUser);
   const userPredictions = predictions.filter(p => p.voter === profileUser);
   const userVotes = allVotes.filter(v => cleanVoterName(v.voter) === profileUser);
+
+  const latestActivities = latestMatchActivity(userPicks, userVotes);
 
   const fantasyHistory = [];
   const captainMap = {};
@@ -616,6 +664,18 @@ async function loadProfile(){
         <div class="big">${formPoints}</div>
         <div class="small">fantasypoeng</div>
       </div>
+    </div>
+
+
+    <div class="card" style="margin-top:16px;">
+      <h2>🕵️ Siste aktivitet</h2>
+      ${
+        latestActivities.length
+          ? latestActivities.map(a => `
+            <div class="row">${a.html}</div>
+          `).join("")
+          : `<div class="small">Ingen aktivitet ennå.</div>`
+      }
     </div>
 
     <div class="grid" style="margin-top:16px;">
