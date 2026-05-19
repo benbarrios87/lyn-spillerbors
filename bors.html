@@ -763,7 +763,7 @@ function buildRecentBorsTicker(votes) {
 
   const groups = {};
 
-  playerVotes.forEach(v => {
+  latestMatchVotes.forEach(v => {
     const voter = cleanVoterName(v.voter);
     const key = `${v.match_id}|||${voter}`;
 
@@ -810,7 +810,6 @@ function buildRecentBorsTicker(votes) {
 
     const voteText = ratings
       .sort((a,b) => b.rating - a.rating)
-      .slice(0,5)
       .map(v => {
         const fire = v.rating === max ? "🔥 " : "";
         const skull = v.rating === min ? "💀 " : "";
@@ -1030,6 +1029,10 @@ function renderMiniRanking(items, limit = 5, showMedals = true, linkType = "play
 async function loadResults() {
   const data = await getVotesForSelectedMatch();
   const playerVotes = data.filter(isPlayerVote);
+  const latestMatchId = [...new Set(playerVotes.map(v => v.match_id))]
+  .sort((a,b) => getMatchIndex(b) - getMatchIndex(a))[0];
+
+const latestMatchVotes = playerVotes.filter(v => v.match_id === latestMatchId);
   const awayVotes = data.filter(isAwayFansVote);
 
   if (playerVotes.length === 0 && awayVotes.length === 0) {
