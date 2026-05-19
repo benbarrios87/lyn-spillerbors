@@ -757,6 +757,8 @@ function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
 }
 function buildRecentBorsTicker(votes) {
+  const MIN_UNIQUE_VOTERS_FOR_TICKER = 5;
+
   const playerVotes = votes
     .filter(isPlayerVote)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -767,28 +769,32 @@ function buildRecentBorsTicker(votes) {
 
   const matchGroups = {};
 
-playerVotes.forEach(v => {
-  if (!matchGroups[v.match_id]) {
-    matchGroups[v.match_id] = {
-      match_id:v.match_id,
-      latest_vote:v.created_at,
-      vote_count:0
-    };
-  }
+  playerVotes.forEach(v => {
+    const voter = cleanVoterName(v.voter);
 
-  matchGroups[v.match_id].vote_count++;
+    if (!matchGroups[v.match_id]) {
+      matchGroups[v.match_id] = {
+        match_id:v.match_id,
+        voters:new Set(),
+        votes:[]
+      };
+    }
 
-  if (new Date(v.created_at) > new Date(matchGroups[v.match_id].latest_vote)) {
-    matchGroups[v.match_id].latest_vote = v.created_at;
-  }
-});
+    matchGroups[v.match_id].voters.add(voter);
+    matchGroups[v.match_id].votes.push(v);
+  });
 
-const latestMatchId = Object.values(matchGroups)
-  .sort((a,b) =>
-    new Date(b.latest_vote) - new Date(a.latest_vote) ||
-    b.vote_count - a.vote_count
-  )[0].match_id;
-  const latestMatchVotes = playerVotes.filter(v => v.match_id === latestMatchId);
+  const validMatches = Object.values(matchGroups)
+    .filter(group => group.voters.size >= MIN_UNIQUE_VOTERS_FOR_TICKER)
+    .sort((a,b) => {
+      const matchA = getMatchData(a.match_id);
+      const matchB = getMatchData(b.match_id);
+
+      return new Date(matchB?.date || "1900-01-01") - new Date(matchA?.date || "1900-01-01");
+    });
+
+  const chosenMatch = validMatches[0] || Object.values(matchGroups)[0];
+  const latestMatchVotes = chosenMatch.votes;
 
   const groups = {};
 
@@ -805,10 +811,6 @@ const latestMatchId = Object.values(matchGroups)
       };
     }
 
-    if (new Date(v.created_at) > new Date(groups[key].created_at)) {
-      groups[key].created_at = v.created_at;
-    }
-
     groups[key].votes.push({
       player:v.player,
       rating:Number(v.rating)
@@ -819,10 +821,6 @@ const latestMatchId = Object.values(matchGroups)
     .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0,6);
 
-  if (latestGroups.length === 0) {
-    return `<div class="ticker-item">Ingen børsinnsendinger fra siste kamp enda.</div>`;
-  }
-
   const items = latestGroups.map(group => {
     const matchData = getMatchData(group.match_id);
 
@@ -831,8 +829,6 @@ const latestMatchId = Object.values(matchGroups)
       : group.match_id;
 
     const ratings = group.votes.filter(v => Number.isFinite(v.rating));
-
-    if (ratings.length === 0) return "";
 
     const max = Math.max(...ratings.map(v => v.rating));
     const min = Math.min(...ratings.map(v => v.rating));
@@ -858,7 +854,7 @@ const latestMatchId = Object.values(matchGroups)
 
   return items + items;
 }
-
+  
 async function loadBorsTicker() {
   const ticker = document.getElementById("borsTicker");
   if (!ticker) return;
