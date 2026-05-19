@@ -483,16 +483,17 @@ function latestMatchActivity(userPicks, userVotes, userPredictions){
       html:`Leverte fantasy mot ${match.home} - ${match.away}: ${playerLink(pick.player1)}, ${playerLink(pick.player2)}, ⭐ ${playerLink(pick.captain)}`
     });
   });
-userPredictions.forEach(tip => {
-  const match = getMatchData(tip.match_id);
-  if (!match) return;
 
-  activities.push({
-    date:match.date,
-    html:`Leverte tippetips mot ${match.home} - ${match.away}: ${tip.home}-${tip.away}`
+  userPredictions.forEach(tip => {
+    const match = getMatchData(tip.match_id);
+    if (!match) return;
+
+    activities.push({
+      date:match.date,
+      html:`Leverte tippetips mot ${match.home} - ${match.away}: ${tip.home}-${tip.away}`
+    });
   });
-});
-  
+
   const votesByMatch = {};
 
   userVotes.filter(isPlayerVote).forEach(v => {
@@ -504,9 +505,9 @@ userPredictions.forEach(tip => {
     const match = getMatchData(matchId);
     if (!match) return;
 
-    const sortedVotes = votesByMatch[matchId].slice().sort((a,b) => {
-      return String(a.player).localeCompare(String(b.player), "no");
-    });
+    const sortedVotes = votesByMatch[matchId]
+      .slice()
+      .sort((a,b) => String(a.player).localeCompare(String(b.player), "no"));
 
     const shortVotes = sortedVotes
       .map(v => `${playerLink(v.player)} ${v.rating}`)
@@ -514,7 +515,7 @@ userPredictions.forEach(tip => {
 
     activities.push({
       date:match.date,
-      html:`Leverte børs mot ${match.home} - ${match.away}: ${shortVotes}${sortedVotes.length > 15 ? " ..." : ""}`
+      html:`Leverte børs mot ${match.home} - ${match.away}: ${shortVotes}`
     });
   });
 
