@@ -500,19 +500,18 @@ function latestMatchActivity(userPicks, userVotes){
     });
 
     const shortVotes = sortedVotes
-      .slice(0, 6)
       .map(v => `${playerLink(v.player)} ${v.rating}`)
       .join(", ");
 
     activities.push({
       date:match.date,
-      html:`Leverte børs mot ${match.home} - ${match.away}: ${shortVotes}${sortedVotes.length > 6 ? " ..." : ""}`
+      html:`Leverte børs mot ${match.home} - ${match.away}: ${shortVotes}${sortedVotes.length > 15 ? " ..." : ""}`
     });
   });
 
   return activities
     .sort((a,b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 3);
+    .slice(0, 5);
 }
 
 async function loadProfile(){
