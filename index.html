@@ -211,6 +211,219 @@ h1 {
   left:-20px !important;
   bottom:-8px !important;
 }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynbørs</title>
+<link rel="icon" href="lblogoen.png">
+
+<style>
+:root {
+  --red:#d71920;
+  --blue:#13294b;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.wrapper {
+  width:100%;
+  max-width:900px;
+  padding:30px 20px;
+  text-align:center;
+}
+
+.logo {
+  width:170px;
+  max-width:70%;
+  margin-bottom:12px;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,0.45));
+}
+
+h1 {
+  margin:0;
+  font-size:52px;
+  letter-spacing:1px;
+  color:white;
+  text-shadow:0 4px 18px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+  margin-top:12px;
+  font-size:18px;
+  opacity:0.92;
+  line-height:1.5;
+  color:white;
+  text-shadow:0 2px 10px rgba(0,0,0,0.55);
+}
+
+.grid {
+  margin-top:40px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.card {
+  position:relative;
+  overflow:hidden;
+  min-height:155px;
+  padding:26px 26px 26px 170px;
+  border-radius:24px;
+  color:white;
+  text-align:left;
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 10px 28px rgba(0,0,0,0.38);
+  backdrop-filter:blur(4px);
+  transition:0.2s;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
+    linear-gradient(135deg,#13294b,#1d4c8f);
+}
+
+.card:nth-child(even) {
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
+    linear-gradient(135deg,#d71920,#ff3942);
+}
+
+.card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 18px 36px rgba(0,0,0,0.46);
+}
+
+.card-player {
+  position:absolute;
+  left:8px;
+  bottom:0;
+  height:180px;
+  max-width:170px;
+  object-fit:contain;
+  object-position:bottom left;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+  transition:0.2s;
+}
+ .fantasy-player {
+  width:220px !important;
+  height:auto !important;
+  max-width:none !important;
+  left: 15px !important;
+  bottom:-8px !important;
+}
+.card:hover .card-player {
+  transform:scale(1.06);
+}
+
+.card-title {
+  position:relative;
+  z-index:2;
+  font-size:30px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.card-text {
+  position:relative;
+  z-index:2;
+  font-size:15px;
+  opacity:0.92;
+  line-height:1.45;
+}
+
+.card::after {
+  content:"›";
+  position:absolute;
+  right:22px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:52px;
+  font-weight:bold;
+  opacity:0.8;
+}
+
+.season-strip {
+  margin-top:34px;
+}
+
+.season-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.season-card {
+  background:rgba(0,0,0,0.60);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:20px;
+  padding:18px;
+  backdrop-filter:blur(4px);
+  text-align:left;
+  color:white;
+}
+
+.season-title {
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:14px;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.6);
+}
+
+.season-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  font-size:15px;
+}
+
+.season-row:last-child {
+  border-bottom:none;
+}
+
+.season-row strong {
+  color:#ffd166;
+  font-size:16px;
+}
+.season-link{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+.season-link:hover{
+  color:#ffd166;
+}
+.footer {
+  margin-top:36px;
+  font-size:13px;
+  opacity:0.75;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+}
+
+.fantasy-player {
+  width:220px !important;
+  height:auto !important;
+  max-width:none !important;
+  left:-20px !important;
+  bottom:-8px !important;
+}
 
 @media (max-width:700px) {
   body {
@@ -258,6 +471,71 @@ h1 {
     left:-32px !important;
     bottom:-8px !important;
   }
+  .throne-card{
+  margin:28px auto 10px;
+  max-width:720px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 22px;
+
+  background:
+    linear-gradient(135deg,
+      rgba(255,209,102,0.22),
+      rgba(215,25,32,0.24)),
+    rgba(0,0,0,0.66);
+
+  border:1px solid rgba(255,209,102,0.5);
+  border-radius:24px;
+
+  box-shadow:
+    0 14px 36px rgba(0,0,0,0.42),
+    0 0 28px rgba(255,209,102,0.12);
+
+  color:white;
+  text-align:left;
+}
+
+.throne-crown{
+  font-size:52px;
+  line-height:1;
+}
+
+.throne-label{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  opacity:0.75;
+  font-weight:bold;
+}
+
+.throne-name{
+  margin-top:2px;
+  font-size:34px;
+  font-weight:900;
+  color:#ffd166;
+}
+
+.throne-points{
+  margin-top:4px;
+  font-size:15px;
+  opacity:0.85;
+}
+
+@media (max-width:700px){
+
+  .throne-card{
+    padding:16px;
+    gap:14px;
+  }
+
+  .throne-name{
+    font-size:26px;
+  }
+
+  .throne-crown{
+    font-size:42px;
+  }
 
   .card-title {
     font-size:25px;
@@ -289,6 +567,20 @@ h1 {
   <div class="subtitle">
     Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
   </div>
+
+  <div id="throneCard" class="throne-card" style="display:none;">
+  <div class="throne-crown">👑</div>
+
+  <div class="throne-content">
+    <div class="throne-label">Nåværende konge av Lynligaen</div>
+
+    <div id="throneName" class="throne-name">
+      Laster...
+    </div>
+
+    <div id="thronePoints" class="throne-points"></div>
+  </div>
+</div>
 
   <div class="grid">
 
@@ -452,6 +744,382 @@ loadSeasonStats();
     })
   });
 })();
+  async function loadLynligaLeader(){
+
+  const response = await fetch("lynligaen.html");
+
+  const { data:picks } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*");
+
+  const { data:stats } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*");
+
+  const allVotes = await fetch(
+    SUPABASE_URL + "/rest/v1/votes",
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  ).then(r => r.json());
+
+  const fantasyRounds = buildFantasyRounds(
+    picks || [],
+    stats || [],
+    allVotes
+  );
+
+  const tipRounds = buildTipRounds(allVotes);
+
+  const { league } = combineLeague(
+    fantasyRounds,
+    tipRounds
+  );
+
+  const leader = league[0];
+
+  if(!leader) return;
+
+  document.getElementById("throneCard").style.display = "flex";
+
+  document.getElementById("throneName").innerHTML = `
+    <a href="profil.html?user=${encodeURIComponent(leader.voter)}"
+       class="season-link">
+      ${leader.voter}
+    </a>
+  `;
+
+  document.getElementById("thronePoints").textContent =
+    `${leader.total} Lynliga-poeng`;
+}
+</script>
+
+</body>
+</html>
+
+@media (max-width:700px) {
+  body {
+    justify-content:flex-start;
+    padding:14px;
+  }
+
+  .wrapper {
+    padding:20px 0;
+  }
+
+  .logo {
+    width:135px;
+  }
+
+  h1 {
+    font-size:38px;
+  }
+
+  .subtitle {
+    font-size:15px;
+  }
+
+  .grid {
+    grid-template-columns:1fr;
+    gap:16px;
+    margin-top:28px;
+  }
+
+  .card {
+    min-height:150px;
+    padding:22px 18px 22px 145px;
+  }
+
+  .card-player {
+    height:155px;
+    max-width:150px;
+    left:-4px;
+  }
+
+  .fantasy-player {
+    width:220px !important;
+    height:auto !important;
+    max-width:none !important;
+    left:-32px !important;
+    bottom:-8px !important;
+  }
+  .throne-card{
+  margin:28px auto 10px;
+  max-width:720px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 22px;
+
+  background:
+    linear-gradient(135deg,
+      rgba(255,209,102,0.22),
+      rgba(215,25,32,0.24)),
+    rgba(0,0,0,0.66);
+
+  border:1px solid rgba(255,209,102,0.5);
+  border-radius:24px;
+
+  box-shadow:
+    0 14px 36px rgba(0,0,0,0.42),
+    0 0 28px rgba(255,209,102,0.12);
+
+  color:white;
+  text-align:left;
+}
+
+.throne-crown{
+  font-size:52px;
+  line-height:1;
+}
+
+.throne-label{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  opacity:0.75;
+  font-weight:bold;
+}
+
+.throne-name{
+  margin-top:2px;
+  font-size:34px;
+  font-weight:900;
+  color:#ffd166;
+}
+
+.throne-points{
+  margin-top:4px;
+  font-size:15px;
+  opacity:0.85;
+}
+
+@media (max-width:700px){
+
+  .throne-card{
+    padding:16px;
+    gap:14px;
+  }
+
+  .throne-name{
+    font-size:26px;
+  }
+
+  .throne-crown{
+    font-size:42px;
+  }
+
+  .card-title {
+    font-size:25px;
+  }
+
+  .card-text {
+    font-size:14px;
+  }
+
+  .card::after {
+    display:none;
+  }
+
+  .season-grid {
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <img src="lblogoen.png" class="logo" alt="Lynbørs">
+
+  <h1>Lynbørs</h1>
+
+  <div class="subtitle">
+    Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
+  </div>
+
+  <div id="throneCard" class="throne-card" style="display:none;">
+  <div class="throne-crown">👑</div>
+
+  <div class="throne-content">
+    <div class="throne-label">Nåværende konge av Lynligaen</div>
+
+    <div id="throneName" class="throne-name">
+      Laster...
+    </div>
+
+    <div id="thronePoints" class="throne-points"></div>
+  </div>
+</div>
+
+  <div class="grid">
+
+  <div class="card" onclick="location.href='bors.html'">
+  <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Spillerbørs</div>
+  <div class="card-text">
+    Sett karakterer etter kamp og se hvem forumet kåret til banens beste.
+  </div>
+</div>
+
+<div class="card" onclick="location.href='tippetips.html'">
+  <img src="bilder/tippetips-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Tippetips</div>
+  <div class="card-text">
+    Tipp resultater gjennom sesongen og konkurrer mot resten av forumet.
+  </div>
+</div>
+
+<div class="card" onclick="location.href='fantasy.html'">
+  <img src="bilder/fantasy-Photoroom.png" class="card-player fantasy-player" alt="">
+  <div class="card-title">Lyn Fantasy</div>
+  <div class="card-text">
+    Velg to spillere og en kaptein. Poeng basert på faktisk prestasjon på banen.
+  </div>
+</div>
+
+<div class="card" onclick="location.href='lynligaen.html'">
+  <img src="bilder/lynlaget-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Lynligaen</div>
+  <div class="card-text">
+    Sammenlagttabellen som kombinerer børs, tipping og fantasy.
+  </div>
+</div>
+
+  </div>
+
+ <div class="season-strip">
+
+  <div class="season-grid">
+
+    <div class="season-card">
+      <div class="season-title">⚽ Toppscorer</div>
+      <div id="topScorers"></div>
+    </div>
+
+    <div class="season-card">
+      <div class="season-title">🎁 Assistkonge</div>
+      <div id="topAssists"></div>
+    </div>
+
+  </div>
+
+</div>
+  <div class="footer">
+    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt.
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function loadSeasonStats(){
+
+  const { data } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*");
+
+  const goals = {};
+  const assists = {};
+
+  data.forEach(row => {
+
+    if(!row.player || row.match_id === "TEST") return;
+
+    goals[row.player] =
+      (goals[row.player] || 0) + (row.goals || 0);
+
+    assists[row.player] =
+      (assists[row.player] || 0) + (row.assists || 0);
+
+  });
+
+  const topGoals = Object.entries(goals)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  const topAssist = Object.entries(assists)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  document.getElementById("topScorers").innerHTML =
+  topGoals.map((p,i) => `
+    <div class="season-row">
+      <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
+        ${i+1}. ${p[0]}
+      </a>
+      <strong>${p[1]} mål</strong>
+    </div>
+  `).join("");
+
+document.getElementById("topAssists").innerHTML =
+  topAssist.map((p,i) => `
+    <div class="season-row">
+      <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
+        ${i+1}. ${p[0]}
+      </a>
+      <strong>${p[1]} assist</strong>
+    </div>
+  `).join("");
+}
+
+loadSeasonStats();
+  </script>
+  
+<script>
+(function trackVisit(){
+  const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+  let sessionId = localStorage.getItem("lyncentral_session_id");
+
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("lyncentral_session_id", sessionId);
+  }
+
+  const width = window.innerWidth;
+
+  const device =
+    width < 700
+      ? "mobil"
+      : width < 1100
+      ? "tablet"
+      : "desktop";
+
+  fetch(SUPABASE_URL + "/rest/v1/site_visits", {
+    method:"POST",
+    headers:{
+      "apikey":SUPABASE_KEY,
+      "Authorization":"Bearer " + SUPABASE_KEY,
+      "Content-Type":"application/json",
+      "Prefer":"return=minimal"
+    },
+    body:JSON.stringify({
+      page:document.title || "Ukjent side",
+      path:location.pathname,
+      referrer:document.referrer || "",
+      user_agent:navigator.userAgent,
+      device:device,
+      session_id:sessionId
+    })
+  });
+})();
+  
 </script>
 
 </body>
