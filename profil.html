@@ -471,7 +471,7 @@ function renderRows(rows, emptyText = "Ingen data enda.", makePlayersClickable =
 }
 
 
-function latestMatchActivity(userPicks, userVotes){
+function latestMatchActivity(userPicks, userVotes, userPredictions){
   const activities = [];
 
   userPicks.forEach(pick => {
@@ -483,7 +483,16 @@ function latestMatchActivity(userPicks, userVotes){
       html:`Leverte fantasy mot ${match.home} - ${match.away}: ${playerLink(pick.player1)}, ${playerLink(pick.player2)}, ⭐ ${playerLink(pick.captain)}`
     });
   });
+userPredictions.forEach(tip => {
+  const match = getMatchData(tip.match_id);
+  if (!match) return;
 
+  activities.push({
+    date:match.date,
+    html:`Leverte tippetips mot ${match.home} - ${match.away}: ${tip.home}-${tip.away}`
+  });
+});
+  
   const votesByMatch = {};
 
   userVotes.filter(isPlayerVote).forEach(v => {
