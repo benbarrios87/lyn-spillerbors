@@ -435,9 +435,24 @@ function formatDate(dateString) {
   });
 }
 
+function parseLocalDeadline(deadline) {
+  if (!deadline) return null;
+
+  const clean = String(deadline)
+    .replace("Z", "")
+    .replace("+00:00", "")
+    .replace("+00", "");
+
+  return new Date(clean);
+}
+
 function formatDeadline(deadline) {
-  if (!deadline) return "Ukjent frist";
-  const d = new Date(deadline);
+  const d = parseLocalDeadline(deadline);
+
+  if (!d || Number.isNaN(d.getTime())) {
+    return "Ukjent frist";
+  }
+
   return d.toLocaleString("no-NO", {
     day:"2-digit",
     month:"2-digit",
