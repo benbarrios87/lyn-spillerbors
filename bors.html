@@ -568,8 +568,6 @@ button:hover {
 
 </main>
 
-<script src="matches.js"></script>
-
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -632,14 +630,36 @@ const players = [
 
 const playersDiv = document.getElementById("players");
 const matchSelect = document.getElementById("match");
+  let allMatches = [];
 
-function isMensMatchId(matchId) {
-  const match = matchesData.find(m => m.id === matchId);
+async function loadMatchesFromSupabase() {
+  const { data, error } = await fetch(
+    SUPABASE_URL + "/rest/v1/matches?active=eq.true&order=date.asc",
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  ).then(r => r.json().then(data => ({ data, error:null })))
+   .catch(error => ({ data:[], error }));
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  allMatches = data || [];
+  return allMatches;
+}
+
+  function isMensMatchId(matchId) {
+  const match = allMatches.find(m => m.id === matchId);
   return !match || !match.team || match.team === "men";
 }
 
 function getMensMatches() {
-  return matchesData.filter(m => !m.team || m.team === "men");
+  return allMatches.filter(m => !m.team || m.team === "men");
 }
 
 function escapeHTML(value) {
@@ -692,13 +712,17 @@ function renderLinkedName(value, linkType = "player") {
   return playerLink(value);
 }
 
-getMensMatches().forEach(match => {
-  matchSelect.innerHTML += `
-    <option value="${escapeHTML(match.id)}">
-      ${escapeHTML(match.id)}
-    </option>
-  `;
-});
+function fillMatchSelect() {
+  matchSelect.innerHTML = "";
+
+  getMensMatches().forEach(match => {
+    matchSelect.innerHTML += `
+      <option value="${escapeHTML(match.id)}">
+        ${escapeHTML(match.id)}
+      </option>
+    `;
+  });
+}
 
 players.forEach(p => {
   const img = p.img ? `<img src="bilder/${escapeHTML(p.img)}" onerror="this.remove()">` : "";
@@ -748,7 +772,7 @@ function getMatchIndex(matchId) {
 }
 
 function getMatchData(matchId) {
-  return matchesData.find(m => m.id === matchId) || null;
+  return allMatches.find(m => m.id === matchId) || null;
 }
   
 function setDefaultMatch() {
@@ -858,8 +882,19 @@ async function sendVote() {
 
   players.forEach(p => document.getElementById(p.short).value = "");
   document.getElementById("awayFans").value = "";
- loadResults();
+  
+  loadResults();
 loadStatsCenter();
+}
+
+async function init() {
+  await loadMatchesFromSupabase();
+
+  fillMatchSelect();
+
+  setDefaultMatch();
+
+  await loadStatsCenter();
 }
 
 async function fetchVotes(query = "") {
@@ -1340,8 +1375,17 @@ async function loadStatsCenter() {
   `;
 }
 
-setDefaultMatch();
-loadStatsCenter();
+async function init() {
+  await loadMatchesFromSupabase();
+
+  fillMatchSelect();
+
+  setDefaultMatch();
+
+  await loadStatsCenter();
+}
+
+init();
 </script>
 
 <script>

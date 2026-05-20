@@ -3,19 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lyn Fantasy Admin</title>
+<title>Lyn Central Admin</title>
 <link rel="icon" href="lblogoen.png">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="matches.js"></script>
 
 <style>
 :root {
   --red:#d71920;
+  --red-dark:#991b1b;
   --blue:#13294b;
+  --blue-dark:#0d1d36;
+  --green:#027a48;
   --dark:#070b12;
   --card:rgba(0,0,0,0.74);
+  --card-soft:rgba(255,255,255,0.08);
   --line:rgba(255,255,255,0.18);
+  --muted:rgba(255,255,255,0.72);
+}
+
+* {
+  box-sizing:border-box;
 }
 
 body {
@@ -29,7 +37,9 @@ body::before {
   content:"";
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.72);
+  background:
+    radial-gradient(circle at top left, rgba(215,25,32,0.22), transparent 30%),
+    rgba(0,0,0,0.74);
   z-index:-1;
 }
 
@@ -41,7 +51,7 @@ body::before {
   width:auto;
   padding:10px 15px;
   border:none;
-  border-radius:10px;
+  border-radius:999px;
   background:var(--red);
   color:white;
   font-weight:bold;
@@ -50,35 +60,105 @@ body::before {
 }
 
 .container {
-  max-width:1100px;
+  max-width:1180px;
   margin:0 auto;
-  padding:30px 20px 60px;
+  padding:34px 20px 70px;
 }
 
-h1, h2 {
+.hero {
+  margin-top:20px;
+  padding:34px 24px;
+  border-radius:28px;
+  background:
+    linear-gradient(135deg, rgba(19,41,75,0.92), rgba(215,25,32,0.56)),
+    rgba(0,0,0,0.65);
+  border:1px solid rgba(255,255,255,0.18);
+  box-shadow:0 14px 40px rgba(0,0,0,0.42);
   text-align:center;
+}
+
+.hero h1 {
+  margin:0 0 8px;
+  font-size:42px;
+  line-height:1.05;
+}
+
+.hero p {
+  margin:0 auto;
+  max-width:760px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.quick-nav {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+@media (min-width:760px) {
+  .quick-nav {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.quick-nav a {
+  text-decoration:none;
+  text-align:center;
+  color:white;
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  font-weight:bold;
+}
+
+.quick-nav a:hover {
+  background:rgba(255,255,255,0.16);
+}
+
+.section-title {
+  margin:38px 0 12px;
+  font-size:28px;
+  line-height:1.1;
+}
+
+.section-title span {
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:normal;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:22px;
+  margin-top:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+}
+
+.card h2,
+.card h3 {
+  margin-top:0;
 }
 
 .small {
   opacity:0.78;
   font-size:14px;
-  text-align:center;
-}
-
-.card {
-  background:var(--card);
-  border-radius:20px;
-  padding:22px;
-  margin-top:20px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+  line-height:1.45;
 }
 
 .admin-warning {
   background:rgba(215,25,32,0.18);
-  border:1px solid rgba(215,25,32,0.8);
-  border-radius:14px;
-  padding:14px;
+  border:1px solid rgba(215,25,32,0.75);
+  border-radius:18px;
+  padding:15px;
   line-height:1.5;
+  margin-top:16px;
 }
 
 label {
@@ -94,7 +174,6 @@ select, input, button {
   border-radius:12px;
   border:none;
   font-size:16px;
-  box-sizing:border-box;
 }
 
 select, input {
@@ -118,7 +197,15 @@ button.secondary {
 }
 
 button.secondary:hover {
-  background:#0d1d36;
+  background:var(--blue-dark);
+}
+
+button.danger {
+  background:#7f1d1d;
+}
+
+button.danger:hover {
+  background:var(--red-dark);
 }
 
 .top-actions {
@@ -131,6 +218,31 @@ button.secondary:hover {
 @media (min-width:750px) {
   .top-actions {
     grid-template-columns:1fr 1fr;
+  }
+}
+
+.form-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+@media (min-width:750px) {
+  .form-grid {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.two-column {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+@media (min-width:900px) {
+  .two-column {
+    grid-template-columns:1fr 1fr;
+    align-items:start;
   }
 }
 
@@ -152,6 +264,35 @@ button.secondary:hover {
   display:block;
   background:rgba(215,25,32,0.25);
   border:1px solid rgba(215,25,32,0.9);
+}
+
+.summary {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+
+@media (min-width:760px) {
+  .summary {
+    grid-template-columns:repeat(4, 1fr);
+  }
+}
+
+.summary-box,
+.analytics-box {
+  background:var(--card-soft);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:14px;
+  text-align:center;
+}
+
+.summary-number,
+.analytics-number {
+  font-size:28px;
+  font-weight:bold;
+  margin-top:6px;
 }
 
 .players-list {
@@ -244,58 +385,17 @@ button.secondary:hover {
   margin-top:5px;
 }
 
-.summary {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-  margin-top:15px;
-}
-
-@media (min-width:700px) {
-  .summary {
-    grid-template-columns:repeat(4, 1fr);
-  }
-}
-
-.summary-box {
-  background:rgba(255,255,255,0.1);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-  text-align:center;
-}
-
-.summary-number {
-  font-size:26px;
-  font-weight:bold;
-  margin-top:5px;
-}
-
 .analytics-grid {
   display:grid;
-  grid-template-columns:1fr;
+  grid-template-columns:1fr 1fr;
   gap:12px;
   margin-top:15px;
 }
 
-@media (min-width:700px) {
+@media (min-width:760px) {
   .analytics-grid {
     grid-template-columns:repeat(4, 1fr);
   }
-}
-
-.analytics-box {
-  background:rgba(255,255,255,0.1);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-  text-align:center;
-}
-
-.analytics-number {
-  font-size:28px;
-  font-weight:bold;
-  margin-top:6px;
 }
 
 .analytics-layout {
@@ -358,7 +458,28 @@ button.secondary:hover {
 hr {
   border:none;
   border-top:1px solid var(--line);
-  margin:20px 0;
+  margin:22px 0;
+}
+
+.fold {
+  margin-top:16px;
+}
+
+.fold summary {
+  cursor:pointer;
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px 16px;
+  font-weight:bold;
+}
+
+.fold summary:hover {
+  background:rgba(255,255,255,0.16);
+}
+
+.fold-content {
+  margin-top:14px;
 }
 </style>
 </head>
@@ -368,94 +489,134 @@ hr {
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <div class="container">
- <div class="card">
-  <h2>Siste aktivitet</h2>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
-    <div>
-      <label>Fra dato</label>
-      <input type="date" id="activityFrom">
+  <section class="hero">
+    <h1>Lyn Central Admin</h1>
+    <p>Opprett kamper, legg inn resultater, før fantasyhendelser og følg med på aktivitet. Arbeid først, nerdestatistikk nederst.</p>
+
+    <div class="quick-nav">
+      <a href="#kampadmin">Kampadmin</a>
+      <a href="#fantasystats">Fantasy-stats</a>
+      <a href="#aktivitet">Aktivitet</a>
+      <a href="#trafikk">Trafikk</a>
     </div>
+  </section>
 
-    <div>
-      <label>Til dato</label>
-      <input type="date" id="activityTo">
-    </div>
-  </div>
-
-  <button class="secondary" onclick="loadActivityFeed()">Oppdater aktivitet</button>
-
-  <div id="activityFeed">
-    <div class="small">Laster aktivitet...</div>
-  </div>
-</div>
-
-  <h1>Lyn Fantasy Admin</h1>
-  <p class="small">Legg inn mål, assist, clean sheet, strafferedning og rødt kort etter kamp.</p>
-
-  <div class="card admin-warning">
+  <div class="admin-warning">
     <strong>Adminside</strong><br>
-    Denne siden lagrer direkte til Supabase. Velg riktig kamp før du trykker lagre, ellers blir det klassisk hobbyprosjektkaos.
+    Denne siden lagrer direkte til Supabase. Dobbeltsjekk kamp før du lagrer, ellers blir det klassisk hobbyprosjektkaos.
   </div>
 
-  <div class="card">
-    <h2>Lyn Central trafikk</h2>
-    <p class="small">Tallene hentes fra <strong>site_visits</strong> i Supabase. Dette er din egen lille supporter-radar.</p>
+  <h2 class="section-title" id="kampadmin">Kampadministrasjon <span>Opprett kamp, endre dato/deadline, legg inn resultat eller skjul kamp.</span></h2>
 
-    <div class="analytics-grid">
-      <div class="analytics-box">
-        Besøk i dag
-        <div class="analytics-number" id="visitsToday">–</div>
+  <div class="two-column">
+    <div class="card">
+      <h2>Opprett ny kamp</h2>
+      <p class="small">Brukes for cupkamp, treningskamp eller nye serie-/Toppserien-kamper.</p>
+
+      <div class="form-grid">
+        <div>
+          <label>Lag</label>
+          <select id="newTeam">
+            <option value="men">Herrene</option>
+            <option value="women">Kvinnene</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Turnering</label>
+          <input id="newCompetition" placeholder="OBOS-ligaen, NM, Toppserien">
+        </div>
+
+        <div>
+          <label>Hjemmelag</label>
+          <input id="newHome" placeholder="Lyn">
+        </div>
+
+        <div>
+          <label>Bortelag</label>
+          <input id="newAway" placeholder="Motstander">
+        </div>
+
+        <div>
+          <label>Kampdato</label>
+          <input id="newDate" type="date">
+        </div>
+
+        <div>
+          <label>Deadline</label>
+          <input id="newDeadline" type="datetime-local">
+        </div>
       </div>
 
-      <div class="analytics-box">
-        Siste 24 timer
-        <div class="analytics-number" id="visits24h">–</div>
-      </div>
-
-      <div class="analytics-box">
-        Siste 7 dager
-        <div class="analytics-number" id="visits7d">–</div>
-      </div>
-
-      <div class="analytics-box">
-        Unike økter i dag
-        <div class="analytics-number" id="sessionsToday">–</div>
-      </div>
+      <button onclick="createMatch()">Opprett kamp</button>
     </div>
 
-    <div class="top-actions">
-      <button class="secondary" onclick="loadTrafficStats()">Oppdater trafikkstats</button>
-      <button onclick="location.href='/fantasy.html'">Åpne Fantasy</button>
-    </div>
+    <div class="card">
+      <h2>Rediger kamp</h2>
+      <p class="small">Endre kampinfo eller legg inn sluttresultat. Tomme resultatfelt betyr at kampen ikke er ferdig.</p>
 
-    <div id="trafficStatus" class="status"></div>
+      <label>Velg kamp</label>
+      <select id="editMatchSelect" onchange="loadMatchEditor()"></select>
 
-    <div class="analytics-layout">
-      <div class="analytics-panel">
-        <h3>Mest besøkte sider</h3>
-        <div id="topPages"><div class="small">Laster...</div></div>
+      <div class="form-grid">
+        <div>
+          <label>Lag</label>
+          <select id="editTeam">
+            <option value="men">Herrene</option>
+            <option value="women">Kvinnene</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Turnering</label>
+          <input id="editCompetition">
+        </div>
+
+        <div>
+          <label>Hjemmelag</label>
+          <input id="editHome">
+        </div>
+
+        <div>
+          <label>Bortelag</label>
+          <input id="editAway">
+        </div>
+
+        <div>
+          <label>Kampdato</label>
+          <input id="editDate" type="date">
+        </div>
+
+        <div>
+          <label>Deadline</label>
+          <input id="editDeadline" type="datetime-local">
+        </div>
+
+        <div>
+          <label>Hjemmemål</label>
+          <input id="editActualHome" type="number" min="0" placeholder="Tom hvis ikke spilt">
+        </div>
+
+        <div>
+          <label>Bortemål</label>
+          <input id="editActualAway" type="number" min="0" placeholder="Tom hvis ikke spilt">
+        </div>
       </div>
 
-      <div class="analytics-panel">
-        <h3>Enheter</h3>
-        <div id="deviceStats"><div class="small">Laster...</div></div>
-      </div>
-
-      <div class="analytics-panel">
-        <h3>Siste besøk</h3>
-        <div id="latestVisits"><div class="small">Laster...</div></div>
-      </div>
-
-      <div class="analytics-panel">
-        <h3>Referrals</h3>
-        <div id="referrerStats"><div class="small">Laster...</div></div>
+      <div class="top-actions">
+        <button onclick="saveMatchChanges()">Lagre kampendringer</button>
+        <button class="danger" onclick="deactivateMatch()">Skjul/deaktiver kamp</button>
       </div>
     </div>
   </div>
 
+  <div id="matchAdminStatus" class="status"></div>
+
+  <h2 class="section-title" id="fantasystats">Fantasy kampstats <span>Legg inn hendelser etter kamp. Dette styrer fantasy-poengene.</span></h2>
+
   <div class="card">
-    <h2>Velg kamp</h2>
+    <h2>Velg kamp og legg inn hendelser</h2>
 
     <label for="matchSelect">Kamp</label>
     <select id="matchSelect"></select>
@@ -466,10 +627,6 @@ hr {
     </div>
 
     <div id="status" class="status"></div>
-  </div>
-
-  <div class="card">
-    <h2>Oppsummering</h2>
 
     <div class="summary">
       <div class="summary-box">
@@ -505,6 +662,89 @@ hr {
     <button onclick="saveStats()">Lagre alle stats</button>
   </div>
 
+  <h2 class="section-title" id="aktivitet">Siste aktivitet <span>Tips, børs og fantasy-lag fra brukerne.</span></h2>
+
+  <div class="card">
+    <div class="form-grid">
+      <div>
+        <label>Fra dato</label>
+        <input type="date" id="activityFrom">
+      </div>
+
+      <div>
+        <label>Til dato</label>
+        <input type="date" id="activityTo">
+      </div>
+    </div>
+
+    <button class="secondary" onclick="loadActivityFeed()">Oppdater aktivitet</button>
+
+    <div id="activityFeed" style="margin-top:16px;">
+      <div class="small">Laster aktivitet...</div>
+    </div>
+  </div>
+
+  <h2 class="section-title" id="trafikk">Trafikk <span>Besøk, enheter og referrals. Kjekt, men ikke noe du trenger å stirre på hele tiden.</span></h2>
+
+  <div class="card">
+    <h2>Lyn Central trafikk</h2>
+    <p class="small">Tallene hentes fra <strong>site_visits</strong> i Supabase.</p>
+
+    <div class="analytics-grid">
+      <div class="analytics-box">
+        Besøk i dag
+        <div class="analytics-number" id="visitsToday">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Siste 24 timer
+        <div class="analytics-number" id="visits24h">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Siste 7 dager
+        <div class="analytics-number" id="visits7d">–</div>
+      </div>
+
+      <div class="analytics-box">
+        Unike økter i dag
+        <div class="analytics-number" id="sessionsToday">–</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="secondary" onclick="loadTrafficStats()">Oppdater trafikkstats</button>
+      <button onclick="location.href='/fantasy.html'">Åpne Fantasy</button>
+    </div>
+
+    <div id="trafficStatus" class="status"></div>
+
+    <details class="fold" open>
+      <summary>Vis trafikkdetaljer</summary>
+      <div class="fold-content analytics-layout">
+        <div class="analytics-panel">
+          <h3>Mest besøkte sider</h3>
+          <div id="topPages"><div class="small">Laster...</div></div>
+        </div>
+
+        <div class="analytics-panel">
+          <h3>Enheter</h3>
+          <div id="deviceStats"><div class="small">Laster...</div></div>
+        </div>
+
+        <div class="analytics-panel">
+          <h3>Siste besøk</h3>
+          <div id="latestVisits"><div class="small">Laster...</div></div>
+        </div>
+
+        <div class="analytics-panel">
+          <h3>Referrals</h3>
+          <div id="referrerStats"><div class="small">Laster...</div></div>
+        </div>
+      </div>
+    </details>
+  </div>
+
 </div>
 
 <script>
@@ -538,6 +778,8 @@ const players = [
   { name:"Trige", position:"KEEPER", image:"bilder/trige.png" }
 ];
 
+let allMatches = [];
+
 function showStatus(message, type = "ok") {
   const status = document.getElementById("status");
   status.className = `status ${type}`;
@@ -550,32 +792,204 @@ function showTrafficStatus(message, type = "ok") {
   status.innerHTML = message;
 }
 
+function showMatchAdminStatus(message, type = "ok") {
+  const status = document.getElementById("matchAdminStatus");
+  status.className = `status ${type}`;
+  status.innerHTML = message;
+}
+
 function getSelectedMatchId() {
   return document.getElementById("matchSelect").value;
 }
 
-function getMensMatches() {
-  return matchesData.filter(match => !match.team || match.team === "men");
+function makeMatchId(date, home, away) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month} ${home} - ${away}`;
 }
 
-function fillMatchSelect() {
-  const select = document.getElementById("matchSelect");
-  select.innerHTML = "";
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+}
 
-  getMensMatches().forEach(match => {
+function numberOrNull(value) {
+  if (value === "" || value === null || value === undefined) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+async function loadMatchesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .eq("active", true)
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error(error);
+    showStatus("Klarte ikke å hente kamper fra Supabase.", "error");
+    return [];
+  }
+
+  allMatches = data || [];
+  return allMatches;
+}
+
+async function fillMatchSelect() {
+  const select = document.getElementById("matchSelect");
+  const editSelect = document.getElementById("editMatchSelect");
+
+  const matches = await loadMatchesFromSupabase();
+
+  select.innerHTML = "";
+  editSelect.innerHTML = "";
+
+  const mensMatches = matches.filter(
+    match => !match.team || match.team === "men"
+  );
+
+  mensMatches.forEach(match => {
     const option = document.createElement("option");
     option.value = match.id;
-    option.textContent = `${match.date} | ${match.home} - ${match.away}`;
+    option.textContent = `${match.date.slice(0,10)} | ${match.home} - ${match.away}`;
     select.appendChild(option);
   });
 
-  const nextMatch = getMensMatches()
+  matches.forEach(match => {
+    const option = document.createElement("option");
+    option.value = match.id;
+    option.textContent = `${match.date.slice(0,10)} | ${match.team || "men"} | ${match.home} - ${match.away}`;
+    editSelect.appendChild(option);
+  });
+
+  const nextMatch = mensMatches
     .filter(match => new Date(match.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
 
   if (nextMatch) {
     select.value = nextMatch.id;
   }
+
+  if (editSelect.options.length > 0) {
+    editSelect.value = select.value || editSelect.options[0].value;
+    loadMatchEditor();
+  }
+}
+
+function loadMatchEditor() {
+  const id = document.getElementById("editMatchSelect").value;
+  const match = allMatches.find(m => m.id === id);
+
+  if (!match) return;
+
+  document.getElementById("editTeam").value = match.team || "men";
+  document.getElementById("editCompetition").value = match.competition || "";
+  document.getElementById("editHome").value = match.home || "";
+  document.getElementById("editAway").value = match.away || "";
+  document.getElementById("editDate").value = match.date ? match.date.slice(0,10) : "";
+  document.getElementById("editDeadline").value = toDateTimeLocal(match.deadline);
+  document.getElementById("editActualHome").value = match.actual_home ?? "";
+  document.getElementById("editActualAway").value = match.actual_away ?? "";
+}
+
+async function createMatch() {
+  const team = document.getElementById("newTeam").value;
+  const competition = document.getElementById("newCompetition").value.trim();
+  const home = document.getElementById("newHome").value.trim();
+  const away = document.getElementById("newAway").value.trim();
+  const date = document.getElementById("newDate").value;
+  const deadline = document.getElementById("newDeadline").value;
+
+  if (!home || !away || !date || !deadline) {
+    showMatchAdminStatus("Fyll inn hjemmelag, bortelag, kampdato og deadline.", "error");
+    return;
+  }
+
+  const id = makeMatchId(date, home, away);
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .insert({
+      id,
+      team,
+      competition: competition || null,
+      home,
+      away,
+      date,
+      deadline,
+      actual_home:null,
+      actual_away:null,
+      active:true
+    });
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å opprette kamp. Kanskje finnes den allerede?", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp opprettet: <strong>${id}</strong>`);
+  await fillMatchSelect();
+}
+
+async function saveMatchChanges() {
+  const id = document.getElementById("editMatchSelect").value;
+
+  const updates = {
+    team: document.getElementById("editTeam").value,
+    competition: document.getElementById("editCompetition").value.trim() || null,
+    home: document.getElementById("editHome").value.trim(),
+    away: document.getElementById("editAway").value.trim(),
+    date: document.getElementById("editDate").value,
+    deadline: document.getElementById("editDeadline").value,
+    actual_home: numberOrNull(document.getElementById("editActualHome").value),
+    actual_away: numberOrNull(document.getElementById("editActualAway").value)
+  };
+
+  if (!updates.home || !updates.away || !updates.date || !updates.deadline) {
+    showMatchAdminStatus("Hjemmelag, bortelag, dato og deadline må være fylt ut.", "error");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .update(updates)
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å lagre kampendringer.", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp oppdatert: <strong>${id}</strong>`);
+  await fillMatchSelect();
+}
+
+async function deactivateMatch() {
+  const id = document.getElementById("editMatchSelect").value;
+
+  const ok = confirm(`Skal kampen skjules/deaktiveres?\n\n${id}\n\nDette sletter ikke data, men skjuler kampen fra adminvalg.`);
+  if (!ok) return;
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .update({ active:false })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    showMatchAdminStatus("Klarte ikke å deaktivere kampen.", "error");
+    return;
+  }
+
+  showMatchAdminStatus(`Kamp deaktivert: <strong>${id}</strong>`);
+  await fillMatchSelect();
 }
 
 function safeId(playerName) {
@@ -906,7 +1320,15 @@ function trackAdminVisit() {
   });
 }
 
-document.getElementById("matchSelect")?.addEventListener("change", loadStats);
+document.getElementById("matchSelect")?.addEventListener("change", async () => {
+  await loadStats();
+
+  const editSelect = document.getElementById("editMatchSelect");
+  if (editSelect) {
+    editSelect.value = getSelectedMatchId();
+    loadMatchEditor();
+  }
+});
 
 async function loadActivityFeed(filter = "all") {
   const from = document.getElementById("activityFrom")?.value;
@@ -982,17 +1404,24 @@ async function loadActivityFeed(filter = "all") {
     `;
   }).join("");
 }
+
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("activityFrom").value = today;
 document.getElementById("activityTo").value = today;
-  
-fillMatchSelect();
-renderPlayers();
-loadStats();
-loadTrafficStats();
-loadActivityFeed();
+
+async function init() {
+  await fillMatchSelect();
+
+  renderPlayers();
+
+  await loadStats();
+
+  loadTrafficStats();
+  loadActivityFeed();
+}
+
+init();
 </script>
-  
 
 </body>
 </html>

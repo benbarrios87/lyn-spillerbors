@@ -779,8 +779,6 @@ padding-right:120px;
 
 </main>
 
-<script src="matches.js"></script>
-
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -790,6 +788,27 @@ const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
 let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
+  let allMatches = [];
+
+async function loadMatchesFromSupabase() {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/matches?active=eq.true&order=date.asc",
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) {
+    console.error("Klarte ikke hente kamper");
+    return [];
+  }
+
+  allMatches = await response.json();
+  return allMatches;
+}
 
 async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
@@ -850,7 +869,7 @@ function matchPassesTeamFilter(matchData) {
 }
 
 function getFilteredMatches() {
-  return matchesData.filter(matchPassesTeamFilter);
+  return allMatches.filter(matchPassesTeamFilter);
 }
 
 function setTeamFilter(filter) {
@@ -894,7 +913,7 @@ function isPredictionVote(v) {
 }
 
 function getMatchData(matchId) {
-  return matchesData.find(m => m.id === matchId) || null;
+  return allMatches.find(m => m.id === matchId) || null;
 }
 
 function isTipLocked(matchData) {
@@ -913,7 +932,7 @@ function formatDeadline(deadline) {
 }
 
 function getOpenMatchesByTeam(team, limit = 3) {
-  return matchesData
+  return allMatches
     .filter(m => getMatchTeam(m) === team)
     .filter(m => !isTipLocked(m))
     .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
@@ -1299,7 +1318,15 @@ async function loadMatchPredictions() {
   const data = await getVotesForSelectedMatch();
   const predictions = buildPredictions(data).sort((a,b) => a.voter.localeCompare(b.voter));
   const matchData = getMatchData(match);
-  const actual = matchData ? matchData.actual : null;
+  const actual =
+  matchData &&
+  matchData.actual_home !== null &&
+  matchData.actual_away !== null
+    ? {
+        home:matchData.actual_home,
+        away:matchData.actual_away
+      }
+    : null;
 
   if (!predictions || predictions.length === 0) {
     document.getElementById("results").innerHTML = "<p>Ingen tips på denne kampen enda.</p>";
@@ -1349,7 +1376,15 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
 
   predictions.forEach(p => {
     const matchData = getMatchData(p.match_id);
-    const actual = matchData ? matchData.actual : null;
+    const actual =
+  matchData &&
+  matchData.actual_home !== null &&
+  matchData.actual_away !== null
+    ? {
+        home:matchData.actual_home,
+        away:matchData.actual_away
+      }
+    : null;
     if (!actual) return;
 
     const points = scorePrediction(p.home, p.away, actual.home, actual.away);
@@ -1476,7 +1511,11 @@ async function loadTipStats() {
 
   const totalTips = visiblePredictions.length;
   const uniqueUsers = new Set(visiblePredictions.map(p => p.voter)).size;
-  const finishedMatches = getFilteredMatches().filter(m => m.actual).length;
+  const finishedMatches = getFilteredMatches()
+  .filter(m =>
+    m.actual_home !== null &&
+    m.actual_away !== null
+  ).length;
 
   const mostActive = {};
   allPredictions.forEach(p => {
@@ -1537,7 +1576,13 @@ async function loadTipStats() {
   `;
 }
 
-setTeamFilter(currentTeamFilter);
+async function init() {
+  await loadMatchesFromSupabase();
+
+  setTeamFilter(currentTeamFilter);
+}
+
+init();
 </script>
 
 <script>

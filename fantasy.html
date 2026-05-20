@@ -701,8 +701,6 @@ label {
 
 </div>
 
-<script src="matches.js"></script>
-
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -761,18 +759,39 @@ const players = [
 ];
 
 let matchStats = {};
+  let allMatches = [];
+let nextMatch = null;
+let statsMatch = null;
+
+async function loadMatchesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .eq("active", true)
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error(error);
+    document.getElementById("matchTitle").textContent = "Klarte ikke å hente kamper";
+    return [];
+  }
+
+  allMatches = data || [];
+  return allMatches;
+}
 
 function cleanVoterName(name) {
   return String(name || "").trim().toLowerCase();
 }
 function isMensMatchId(matchId) {
-  const match = matchesData.find(m => m.id === matchId);
+  const match = allMatches.find(m => m.id === matchId);
   return !match || !match.team || match.team === "men";
 }
 
 function getMensMatches() {
-  return matchesData.filter(m => !m.team || m.team === "men");
+  return allMatches.filter(m => !m.team || m.team === "men");
 }
+  
 function getPickMatch() {
   const now = new Date();
 
@@ -784,17 +803,13 @@ function getPickMatch() {
 function getStatsMatch() {
   const latestFinishedMatch = getMensMatches()
     .filter(match =>
-      match.actual &&
-      match.actual.home !== undefined &&
-      match.actual.away !== undefined
+      match.actual_home !== null &&
+      match.actual_away !== null
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
   return latestFinishedMatch || getPickMatch();
 }
-
-const nextMatch = getPickMatch();
-const statsMatch = getStatsMatch();
 
 function getPlayer(playerName) {
   return players.find(p => p.name === playerName);
@@ -1711,21 +1726,30 @@ mensPicks.forEach(pick => {
   `;
 }
 
-fillMatchInfo();
-fillSelects();
+async function init() {
+  await loadMatchesFromSupabase();
 
-["player1", "player2", "captain"].forEach(id => {
-  document.getElementById(id).addEventListener("change", updatePlayerImages);
-});
+  nextMatch = getPickMatch();
+  statsMatch = getStatsMatch();
 
-loadMatchStats().then(async () => {
+  fillMatchInfo();
+  fillSelects();
+
+  ["player1", "player2", "captain"].forEach(id => {
+    document.getElementById(id).addEventListener("change", updatePlayerImages);
+  });
+
+  await loadMatchStats();
   await loadBorsRatings();
+
   loadSavedTeam();
   updatePlayerImages();
   applyDeadlineLock();
   loadFantasyStats();
   loadSeasonFantasyStats();
-});
+}
+
+init();
 </script>
 
 <script>
