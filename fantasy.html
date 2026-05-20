@@ -786,6 +786,16 @@ let matchStats = {};
   let allMatches = [];
 let nextMatch = null;
 let statsMatch = null;
+  function parseLocalDeadline(deadline) {
+  if (!deadline) return null;
+
+  const clean = String(deadline)
+    .replace("Z", "")
+    .replace("+00:00", "")
+    .replace("+00", "");
+
+  return new Date(clean);
+}
 
 async function loadMatchesFromSupabase() {
   const { data, error } = await supabaseClient
@@ -820,8 +830,8 @@ function getPickMatch() {
   const now = new Date();
 
   return getMensMatches()
-    .filter(match => new Date(match.deadline) > now)
-    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))[0];
+  .filter(match => parseLocalDeadline(match.deadline) > now)
+  .sort((a, b) => parseLocalDeadline(a.deadline) - parseLocalDeadline(b.deadline))[0];
 }
 
 function getStatsMatch() {
@@ -876,7 +886,7 @@ function formatPointClass(points) {
 
 function isDeadlinePassed() {
   if (!nextMatch) return true;
-  return new Date() > new Date(nextMatch.deadline);
+  return new Date() > parseLocalDeadline(nextMatch.deadline);
 }
 
 function fillMatchInfo() {
@@ -888,7 +898,12 @@ function fillMatchInfo() {
 
   document.getElementById("matchTitle").textContent = `${nextMatch.home} - ${nextMatch.away}`;
   document.getElementById("matchDate").textContent =
-    `${nextMatch.date} | Frist: ${nextMatch.deadline.replace("T", " kl. ")}`;
+    `${nextMatch.date} | Frist: ${
+  parseLocalDeadline(nextMatch.deadline).toLocaleTimeString("no-NO", {
+    hour:"2-digit",
+    minute:"2-digit"
+  })
+}`
 }
 
 function applyDeadlineLock() {
