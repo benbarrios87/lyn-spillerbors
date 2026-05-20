@@ -1037,13 +1037,23 @@ async function loadSeasonStats(){
       : `<div class="season-row">Ingen assist registrert ennå</div>`;
 }
 
+function parseLocalDateTime(value) {
+  if (!value) return null;
 
+  const clean = String(value)
+    .replace("Z", "")
+    .replace("+00:00", "")
+    .replace("+00", "");
+
+  return new Date(clean);
+}
+  
 function formatNiceDateTime(value) {
   if (!value) return "Ikke satt";
 
-  const d = new Date(value);
+  const d = parseLocalDateTime(value);
 
-  if (Number.isNaN(d.getTime())) {
+  if (!d || Number.isNaN(d.getTime())) {
     return String(value);
   }
 
@@ -1059,7 +1069,7 @@ function formatNiceDateTime(value) {
 function getCountdownText(value) {
   if (!value) return "Frist ikke satt";
 
-  const target = new Date(value);
+  const target = parseLocalDateTime(value);
   const now = new Date();
   const diff = target - now;
 
@@ -1097,8 +1107,11 @@ async function loadNextMatchWidget(){
     const now = new Date();
 
     const upcoming = (matches || [])
-      .filter(m => new Date(m.deadline || m.date) > now)
-      .sort((a,b) => new Date(a.deadline || a.date) - new Date(b.deadline || b.date))[0];
+      .filter(m => parseLocalDateTime(m.deadline || m.date) > now)
+.sort((a,b) =>
+  parseLocalDateTime(a.deadline || a.date) -
+  parseLocalDateTime(b.deadline || b.date)
+)[0];
 
     if (!upcoming) {
       box.innerHTML = `<div class="next-loading">Ingen kommende kamper funnet.</div>`;
