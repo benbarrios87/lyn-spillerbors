@@ -794,6 +794,16 @@ const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
   let allMatches = [];
+  function parseLocalDeadline(deadline) {
+  if (!deadline) return null;
+
+  const clean = String(deadline)
+    .replace("Z", "")
+    .replace("+00:00", "")
+    .replace("+00", "");
+
+  return new Date(clean);
+}
 
 async function loadMatchesFromSupabase() {
   const response = await fetch(
@@ -923,7 +933,7 @@ function getMatchData(matchId) {
 
 function isTipLocked(matchData) {
   if (!matchData || !matchData.deadline) return true;
-  return new Date() > new Date(matchData.deadline);
+  return new Date() > parseLocalDeadline(matchData.deadline);
 }
 
 function formatDate(dateString) {
@@ -932,7 +942,7 @@ function formatDate(dateString) {
 }
 
 function formatDeadline(deadline) {
-  const d = new Date(deadline);
+  const d = parseLocalDeadline(deadline);
   return d.toLocaleString("no-NO", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
 }
 
@@ -940,7 +950,7 @@ function getOpenMatchesByTeam(team, limit = 3) {
   return allMatches
     .filter(m => getMatchTeam(m) === team)
     .filter(m => !isTipLocked(m))
-    .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
+    .sort((a,b) => parseLocalDeadline(a.deadline) - parseLocalDeadline(b.deadline))
     .slice(0, limit);
 }
 
