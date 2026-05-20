@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -323,6 +324,15 @@ main {
   100% { transform:translateX(-100%); }
 }
 
+.profile-link {
+  color:white;
+  text-decoration:none;
+}
+
+.profile-link:hover {
+  text-decoration:underline;
+}
+    
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -336,6 +346,25 @@ main {
   h1 {
     font-size:36px;
   }
+}
+  .site-footer {
+  margin:10px auto 30px;
+  padding:18px 20px;
+  text-align:center;
+  font-size:14px;
+  line-height:1.7;
+  color:rgba(255,255,255,0.72);
+  max-width:900px;
+}
+
+.site-footer a {
+  color:var(--gold);
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.site-footer a:hover {
+  text-decoration:underline;
 }
 </style>
 </head>
@@ -384,48 +413,40 @@ main {
 
 </main>
 
+<footer class="site-footer">
+  Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
+  Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
+</footer>
+
+
 <script>
-  const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let allMatches = [];
+
+async function loadMatchesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .eq("active", true)
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error(error);
+    allMatches = [];
+    return [];
+  }
+
+  allMatches = data || [];
+  return allMatches;
+}
+
 const AWAY_FANS_PLAYER = "Bortefeltet";
 const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
 const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
-
-const matchesData = [
-  { id:"13.04 Haugesund hjemme", date:"2026-04-13", home:"Lyn", away:"Haugesund", deadline:"2026-04-13T18:00:00", actual:null },
-  { id:"21.04 Sogndal borte", date:"2026-04-21", home:"Sogndal", away:"Lyn", deadline:"2026-04-21T18:00:00", actual:null },
-  { id:"27.04 Sandnes Ulf hjemme", date:"2026-04-27", home:"Lyn", away:"Sandnes Ulf", deadline:"2026-04-27T18:00:00", actual:null },
-  { id:"30.04 Moss borte", date:"2026-04-30", home:"Moss", away:"Lyn", deadline:"2026-04-30T18:00:00", actual:null },
-  { id:"01.05 Lyn - Stabæk", date:"2026-05-01", home:"Lyn", away:"Stabæk", deadline:"2026-05-01T18:00:00", actual:{ home:0, away:4 } },
-  { id:"10.05 Raufoss - Lyn", date:"2026-05-10", home:"Raufoss", away:"Lyn", deadline:"2026-05-10T18:00:00", actual:null },
-  { id:"16.05 Lyn - Kongsvinger", date:"2026-05-16", home:"Lyn", away:"Kongsvinger", deadline:"2026-05-16T18:00:00", actual:null },
-  { id:"20.05 Egersund - Lyn", date:"2026-05-20", home:"Egersund", away:"Lyn", deadline:"2026-05-20T18:00:00", actual:null },
-  { id:"25.05 Lyn - Strømmen", date:"2026-05-25", home:"Lyn", away:"Strømmen", deadline:"2026-05-25T18:00:00", actual:null },
-  { id:"31.05 Odd - Lyn", date:"2026-05-31", home:"Odd", away:"Lyn", deadline:"2026-05-31T18:00:00", actual:null },
-  { id:"14.06 Lyn - Bryne", date:"2026-06-14", home:"Lyn", away:"Bryne", deadline:"2026-06-14T18:00:00", actual:null },
-  { id:"19.06 Ranheim - Lyn", date:"2026-06-19", home:"Ranheim", away:"Lyn", deadline:"2026-06-19T18:00:00", actual:null },
-  { id:"27.06 Lyn - Hødd", date:"2026-06-27", home:"Lyn", away:"Hødd", deadline:"2026-06-27T18:00:00", actual:null },
-  { id:"02.07 Lyn - Åsane", date:"2026-07-02", home:"Lyn", away:"Åsane", deadline:"2026-07-02T18:00:00", actual:null },
-  { id:"26.07 Strømsgodset - Lyn", date:"2026-07-26", home:"Strømsgodset", away:"Lyn", deadline:"2026-07-26T18:00:00", actual:null },
-  { id:"02.08 Lyn - Sogndal", date:"2026-08-02", home:"Lyn", away:"Sogndal", deadline:"2026-08-02T18:00:00", actual:null },
-  { id:"09.08 Stabæk - Lyn", date:"2026-08-09", home:"Stabæk", away:"Lyn", deadline:"2026-08-09T18:00:00", actual:null },
-  { id:"16.08 Lyn - Odd", date:"2026-08-16", home:"Lyn", away:"Odd", deadline:"2026-08-16T18:00:00", actual:null },
-  { id:"26.08 Åsane - Lyn", date:"2026-08-26", home:"Åsane", away:"Lyn", deadline:"2026-08-26T18:00:00", actual:null },
-  { id:"30.08 Kongsvinger - Lyn", date:"2026-08-30", home:"Kongsvinger", away:"Lyn", deadline:"2026-08-30T18:00:00", actual:null },
-  { id:"06.09 Lyn - Egersund", date:"2026-09-06", home:"Lyn", away:"Egersund", deadline:"2026-09-06T18:00:00", actual:null },
-  { id:"13.09 Hødd - Lyn", date:"2026-09-13", home:"Hødd", away:"Lyn", deadline:"2026-09-13T18:00:00", actual:null },
-  { id:"20.09 Lyn - Ranheim", date:"2026-09-20", home:"Lyn", away:"Ranheim", deadline:"2026-09-20T18:00:00", actual:null },
-  { id:"04.10 Bryne - Lyn", date:"2026-10-04", home:"Bryne", away:"Lyn", deadline:"2026-10-04T18:00:00", actual:null },
-  { id:"11.10 Lyn - Strømsgodset", date:"2026-10-11", home:"Lyn", away:"Strømsgodset", deadline:"2026-10-11T18:00:00", actual:null },
-  { id:"14.10 Haugesund - Lyn", date:"2026-10-14", home:"Haugesund", away:"Lyn", deadline:"2026-10-14T18:00:00", actual:null },
-  { id:"18.10 Lyn - Moss", date:"2026-10-18", home:"Lyn", away:"Moss", deadline:"2026-10-18T18:00:00", actual:null },
-  { id:"25.10 Sandnes Ulf - Lyn", date:"2026-10-25", home:"Sandnes Ulf", away:"Lyn", deadline:"2026-10-25T18:00:00", actual:null },
-  { id:"01.11 Lyn - Raufoss", date:"2026-11-01", home:"Lyn", away:"Raufoss", deadline:"2026-11-01T18:00:00", actual:null },
-  { id:"08.11 Strømmen - Lyn", date:"2026-11-08", home:"Strømmen", away:"Lyn", deadline:"2026-11-08T18:00:00", actual:null }
-];
 
 const players = [
   { name:"Alexander Pedersen", short:"Pedersen", position:"KEEPER" },
@@ -478,13 +499,47 @@ function getOutcome(home, away) {
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
-  if (tipHome === actualHome && tipAway === actualAway) return 3;
-  if (getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway)) return 1;
+  const exact = tipHome === actualHome && tipAway === actualAway;
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
   return 0;
 }
 
 function getMatchData(matchId) {
-  return matchesData.find(m => m.id === matchId) || null;
+  return allMatches.find(m => m.id === matchId) || null;
+}
+
+function getActualScore(match) {
+  if (!match) return null;
+
+  if (
+    match.actual_home !== undefined &&
+    match.actual_home !== null &&
+    match.actual_away !== undefined &&
+    match.actual_away !== null
+  ) {
+    return {
+      home:Number(match.actual_home),
+      away:Number(match.actual_away)
+    };
+  }
+
+  if (
+    match.actual &&
+    match.actual.home !== undefined &&
+    match.actual.away !== undefined
+  ) {
+    return {
+      home:Number(match.actual.home),
+      away:Number(match.actual.away)
+    };
+  }
+
+  return null;
 }
 
 function formatDate(dateString) {
@@ -523,7 +578,7 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
   if (stat.red_card) points -= 3;
   if (stat.rating >= 7.5) points += 1;
   if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
-  if (isCaptain) points += 2;
+  if (isCaptain) points = Math.round(points * 1.5);
 
   return points;
 }
@@ -560,26 +615,42 @@ function buildPredictions(votes) {
 }
 
 function awardFantasyTierPoints(rows) {
-  const sorted = [...rows].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter));
+  const sorted = [...rows].sort((a,b) =>
+    b.raw - a.raw
+  );
+
   const n = sorted.length;
   if (n === 0) return [];
 
-  const topCut = Math.ceil(n / 3);
-  const midCut = Math.ceil((n * 2) / 3);
+  const q1 = Math.ceil(n / 4);
+  const q2 = Math.ceil(n / 2);
+  const q3 = Math.ceil((n * 3) / 4);
+
+  const eliteCutoff = sorted[q1 - 1]?.raw ?? -999;
+  const strongCutoff = sorted[q2 - 1]?.raw ?? -999;
+  const mediumCutoff = sorted[q3 - 1]?.raw ?? -999;
 
   return sorted.map((row, index) => {
     let tier = "Bunn";
     let points = 0;
 
-    if (index < topCut) {
+    if (row.raw >= eliteCutoff) {
       tier = "Elite";
+      points = 5;
+    } else if (row.raw >= strongCutoff) {
+      tier = "Sterk";
       points = 3;
-    } else if (index < midCut) {
-      tier = "Mid";
+    } else if (row.raw >= mediumCutoff) {
+      tier = "Med";
       points = 1;
     }
 
-    return { ...row, tier, tierPoints:points, rank:index + 1 };
+    return {
+      ...row,
+      tier,
+      tierPoints:points,
+      rank:index + 1
+    };
   });
 }
 
@@ -593,8 +664,11 @@ function ensureUser(users, voter) {
       fantasyRounds:0,
       tipRounds:0,
       eliteFantasy:0,
+      strongFantasy:0,
+      mediumFantasy:0,
       perfectTips:0,
       correctOutcomes:0,
+      correctDiffs:0,
       rawFantasy:0,
       rawTips:0
     };
@@ -609,9 +683,11 @@ function buildTipRounds(allVotes) {
 
   predictions.forEach(p => {
     const match = getMatchData(p.match_id);
-    if (!match || !match.actual) return;
+    const actual = getActualScore(match);
 
-    const raw = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+    if (!match || !actual) return;
+
+    const raw = scorePrediction(p.home, p.away, actual.home, actual.away);
 
     if (!byMatch[p.match_id]) byMatch[p.match_id] = [];
 
@@ -686,14 +762,18 @@ function buildFantasyRounds(picks, stats, allVotes) {
     });
   });
 
-  return Object.keys(byMatch).map(matchId => ({
-    match_id:matchId,
-    type:"fantasy",
-    rows:awardFantasyTierPoints(byMatch[matchId])
-  }));
+  return Object.keys(byMatch)
+    .filter(matchId => {
+      return byMatch[matchId].some(row => row.raw !== 0);
+    })
+    .map(matchId => ({
+      match_id:matchId,
+      type:"fantasy",
+      rows:awardFantasyTierPoints(byMatch[matchId])
+    }));
 }
   
-  function combineLeague(fantasyRounds, tipRounds) {
+function combineLeague(fantasyRounds, tipRounds) {
   const users = {};
   const roundMap = {};
 
@@ -706,13 +786,14 @@ function buildFantasyRounds(picks, stats, allVotes) {
 
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
+
       user.fantasy += row.tierPoints;
       user.rawFantasy += row.raw;
       user.fantasyRounds += 1;
 
-      if (row.tierPoints === 3) {
-        user.eliteFantasy += 1;
-      }
+      if (row.tierPoints === 5) user.eliteFantasy += 1;
+      if (row.tierPoints === 3) user.strongFantasy += 1;
+      if (row.tierPoints === 1) user.mediumFantasy += 1;
     });
   });
 
@@ -725,17 +806,14 @@ function buildFantasyRounds(picks, stats, allVotes) {
 
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
+
       user.tipping += row.tipPoints;
       user.rawTips += row.raw;
       user.tipRounds += 1;
 
-      if (row.raw === 3) {
-        user.perfectTips += 1;
-      }
-
-      if (row.raw === 1) {
-        user.correctOutcomes += 1;
-      }
+      if (row.raw === 3) user.perfectTips += 1;
+      if (row.raw === 2) user.correctDiffs += 1;
+      if (row.raw === 1) user.correctOutcomes += 1;
     });
   });
 
@@ -812,7 +890,9 @@ function renderLeagueTable(league) {
             <tr>
               <td>${index + 1}</td>
               <td>
-                <strong>${row.voter}</strong><br>
+                <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+                  <strong>${row.voter}</strong>
+                </a><br>
                 ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
                 ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
               </td>
@@ -854,7 +934,8 @@ function renderAwards(league) {
 
   const fantasyKings = [...league].sort((a,b) =>
     b.fantasy - a.fantasy ||
-    b.eliteFantasy - a.eliteFantasy
+    b.eliteFantasy - a.eliteFantasy ||
+    b.strongFantasy - a.strongFantasy
   );
 
   const tipKings = [...league].sort((a,b) =>
@@ -893,7 +974,7 @@ function renderAwards(league) {
         ${renderMiniRanking(fantasyKings.map(u => ({
           label:u.voter,
           score:u.fantasy,
-          sub:`${u.eliteFantasy} elite runder · ${u.fantasyRounds} runder`
+          sub:`${u.eliteFantasy} elite · ${u.strongFantasy} sterke · ${u.fantasyRounds} runder`
         })), 6)}
       </div>
 
@@ -902,7 +983,7 @@ function renderAwards(league) {
         ${renderMiniRanking(tipKings.map(u => ({
           label:u.voter,
           score:u.tipping,
-          sub:`${u.perfectTips} helt riktige · ${u.correctOutcomes} riktige utfall`
+          sub:`${u.perfectTips} helt riktige · ${u.correctDiffs || 0} målforskjell · ${u.correctOutcomes} riktige utfall`
         })), 6)}
       </div>
 
@@ -953,7 +1034,7 @@ function renderRounds(rounds) {
             <div class="result-row">
               <div>
                 <strong>Fantasy elite</strong><br>
-                <span class="small">${round.fantasy.filter(r => r.tierPoints === 3).map(r => r.voter).join(", ") || "Ingen"}</span>
+                <span class="small">${round.fantasy.filter(r => r.tierPoints === 5).map(r => r.voter).join(", ") || "Ingen"}</span>
               </div>
               <div class="result-score">${fantasyWinner ? fantasyWinner.raw : "–"}</div>
             </div>
@@ -973,6 +1054,8 @@ function renderRounds(rounds) {
 }
 
 async function loadLynCentral() {
+  await loadMatchesFromSupabase();
+
   const allVotes = await fetchVotes();
 
   const { data:picks, error:picksError } = await supabaseClient
@@ -1038,6 +1121,8 @@ async function loadLynCentral() {
         <br>
         3 poeng for helt riktig resultat
         <br>
+        2 poeng for riktig utfall og riktig målforskjell
+        <br>
         1 poeng for riktig utfall
         <br>
         0 poeng for bom
@@ -1045,13 +1130,18 @@ async function loadLynCentral() {
         <br><br>
 
         <strong>⭐ Lyn Fantasy</strong><br>
-        Fantasy har ofte mye høyere råpoeng, så fantasy gjøres om til ligapoeng per kamp:
+        Fantasy har høyere råpoeng enn tipping, så fantasy gjøres om til ligapoeng per kamp.
+        For å balansere at Tippetips nå også kan inneholde både herre og kvinnekamper, deles fantasy inn i fjerdedeler:
+
+        <br><br>
+
+        🔥 Øverste fjerdedel får 5 poeng
         <br>
-        🔥 Øverste tredjedel får 3 poeng
+        ⭐ Andre fjerdedel får 3 poeng
         <br>
-        ⚪ Midterste tredjedel får 1 poeng
+        ⚪ Tredje fjerdedel får 1 poeng
         <br>
-        💀 Nederste tredjedel får 0 poeng
+        💀 Nederste fjerdedel får 0 poeng
 
         <br><br>
 
@@ -1064,9 +1154,9 @@ async function loadLynCentral() {
       <span>
         ${leader ? `🔥 ${leader.voter} leder Lynligaen med ${leader.total} poeng` : "Lynligaen venter på data"}
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Tippetips teller med vanlige 3, 1 og 0 poeng
+        Tippetips teller med 3, 2, 1 og 0 poeng
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Fantasy deles i tredjedeler
+        Fantasy deles i fjerdedeler: 5, 3, 1 og 0 poeng
         &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         Sammenlagt kårer den ultimate Lynbørs-nerden
       </span>
@@ -1080,7 +1170,52 @@ async function loadLynCentral() {
 
 loadLynCentral();
 </script>
+  
+<script>
+(function trackVisit(){
 
-<script defer src="/_vercel/analytics/script.js"></script>
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
+    return;
+  }
+
+  const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
+
+  let sessionId = localStorage.getItem("lyncentral_session_id");
+
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("lyncentral_session_id", sessionId);
+  }
+
+  const width = window.innerWidth;
+
+  const device =
+    width < 700
+      ? "mobil"
+      : width < 1100
+      ? "tablet"
+      : "desktop";
+
+  fetch(SUPABASE_URL + "/rest/v1/site_visits", {
+    method:"POST",
+    headers:{
+      "apikey":SUPABASE_KEY,
+      "Authorization":"Bearer " + SUPABASE_KEY,
+      "Content-Type":"application/json",
+      "Prefer":"return=minimal"
+    },
+    body:JSON.stringify({
+      page:document.title || "Ukjent side",
+      path:location.pathname,
+      referrer:document.referrer || "",
+      user_agent:navigator.userAgent,
+      device:device,
+      session_id:sessionId
+    })
+  });
+})();
+</script>
+
 </body>
 </html>
