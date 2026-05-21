@@ -681,7 +681,7 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
     if (position === "KEEPER") points += stat.goals * 10;
   }
 
-  points += (stat.assists || 0) * 3;
+  points += (stat.assists || 0) * 4;
 
   if (stat.clean_sheet) {
     if (position === "MID") points += 1;
