@@ -441,7 +441,8 @@ button:hover {
 }
 
 
-.bors-live-card {
+/* NY FOLKETS BØRS */
+.match-summary-card {
   overflow:hidden;
   padding:0;
   border:none;
@@ -489,7 +490,7 @@ button:hover {
   letter-spacing:0.8px;
 }
 
-.match-title {
+.match-title-big {
   position:relative;
   z-index:2;
   margin-top:12px;
@@ -498,7 +499,7 @@ button:hover {
   line-height:1.05;
 }
 
-.match-score {
+.match-score-big {
   position:relative;
   z-index:2;
   margin-top:8px;
@@ -541,25 +542,6 @@ button:hover {
   display:block;
   color:#ffd166;
   font-size:24px;
-}
-
-.match-controls {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-  margin-top:18px;
-}
-
-@media (min-width:760px) {
-  .match-controls {
-    grid-template-columns:1fr auto;
-    align-items:end;
-  }
-
-  .match-controls button {
-    width:auto;
-    min-width:170px;
-  }
 }
 
 .visual-ranking {
@@ -653,7 +635,9 @@ button:hover {
   transform:translateY(6%);
 }
 
-.bors-info { min-width:0; }
+.bors-info {
+  min-width:0;
+}
 
 .bors-name {
   font-weight:900;
@@ -683,7 +667,9 @@ button:hover {
   letter-spacing:-1px;
 }
 
-.bors-card.first .bors-score { color:#9a6700; }
+.bors-card.first .bors-score {
+  color:#9a6700;
+}
 
 .bors-meta {
   color:var(--muted);
@@ -701,8 +687,15 @@ button:hover {
   color:var(--blue);
 }
 
-.bors-trend.up { background:#ecfdf3; color:var(--green); }
-.bors-trend.down { background:#fff1f2; color:var(--darkred); }
+.bors-trend.up {
+  background:#ecfdf3;
+  color:var(--green);
+}
+
+.bors-trend.down {
+  background:#fff1f2;
+  color:var(--darkred);
+}
 
 .badge {
   display:inline-block;
@@ -748,8 +741,6 @@ button:hover {
   color:var(--red);
 }
 
-.submit-section { margin-top:22px; }
-
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -784,10 +775,21 @@ button:hover {
     border-radius:22px;
   }
 
-  .match-title { font-size:30px; }
-  .match-score { font-size:31px; }
-  .quick-pill strong { font-size:21px; }
-  .visual-ranking { grid-template-columns:1fr; }
+  .match-title-big {
+    font-size:30px;
+  }
+
+  .match-score-big {
+    font-size:31px;
+  }
+
+  .quick-pill strong {
+    font-size:21px;
+  }
+
+  .visual-ranking {
+    grid-template-columns:1fr;
+  }
 
   .bors-card {
     padding:14px;
@@ -799,8 +801,13 @@ button:hover {
     height:72px;
   }
 
-  .bors-name { font-size:19px; }
-  .bors-score { font-size:32px; }
+  .bors-name {
+    font-size:19px;
+  }
+
+  .bors-score {
+    font-size:32px;
+  }
 }
   .site-footer {
   margin:40px auto 10px;
@@ -840,49 +847,15 @@ button:hover {
   <p>Supporternes spillerbørs. 100% subjektivt. Heldigvis.</p>
 </header>
 
-
 <main>
 
-<h2 class="section-title">1. Folkets børs</h2>
-
-<div class="box bors-live-card">
-  <div id="matchExperience">
-    <div class="warning">Laster siste kamp...</div>
-  </div>
-</div>
+<h2 class="section-title">1. Send inn børs</h2>
 
 <div class="box">
-  <div class="match-controls">
-    <div>
-      <label>Se annen kamp</label>
-      <select id="match"></select>
-    </div>
-    <button onclick="loadMatchExperience()">Vis kamp</button>
-  </div>
+  <label>Velg kamp</label>
+  <select id="match"></select>
 </div>
-
-<h2 class="section-title">2. Børsstats</h2>
-
-<div class="box blue">
-  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. Bortefeltet holdes utenfor spillerstats.</p>
-  <div class="button-row" style="margin-bottom:14px;">
-    <button onclick="loadSeasonResults()">Sesongsnitt</button>
-    <button onclick="loadSuperbenVsRest()">superben vs resten</button>
-    <button onclick="location.href='/lynligaen.html'">Lynligaen</button>
-  </div>
-  <div id="results" style="margin-top:16px;"></div>
-  <div id="statsCenter" style="margin-top:18px;">
-    <div class="small">Laster stats...</div>
-  </div>
-</div>
-
-<h2 class="section-title submit-section">3. Send inn børs</h2>
-
-<div class="box">
-  <div class="notice">
-    Velg kamp, skriv forumbruker og gi karakterer. La felt stå tomt hvis spilleren ikke skal vurderes.
-  </div>
-
+ <div class="box">
   <label>Navn / forumbruker</label>
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
@@ -890,7 +863,7 @@ button:hover {
 
 <div class="box">
   <h2>Spillerbørs</h2>
-  <p>Kun hele tall fra 1 til 10.</p>
+  <p>La felt stå tomt hvis spilleren ikke skal vurderes. Kun hele tall fra 1 til 10.</p>
   <div class="grid" id="players"></div>
 </div>
 
@@ -905,13 +878,32 @@ button:hover {
   <button onclick="sendVote()">Send inn børs</button>
 </div>
 
+<h2 class="section-title">2. Folkets børs for valgt kamp</h2>
+
+<div class="box blue">
+  <div class="button-row">
+    <button onclick="loadSeasonResults()">Vis sesongsnitt</button>
+    <button onclick="loadSuperbenVsRest()">superben vs resten</button>
+    <button onclick="location.href='/lynligaen.html'">Lynligaen</button>
+  </div>
+  <div id="results" style="margin-top:16px;"></div>
+</div>
+
+<h2 class="section-title">3. Børsstats</h2>
+
+<div class="box blue">
+  <p class="small">Oppdateres automatisk fra alle lagrede spillerstemmer. Bortefeltet holdes utenfor spillerstats.</p>
+  <div id="statsCenter">
+    <div class="small">Laster stats...</div>
+  </div>
+</div>
+
 <footer class="site-footer">
   Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
   Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
 </footer>
 
 </main>
-
 
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
@@ -1025,6 +1017,55 @@ function getPlayerFullName(playerNameOrShort) {
   return found ? found.name : value;
 }
 
+function getPlayerMeta(playerNameOrShort) {
+  const value = String(playerNameOrShort || "").trim();
+  return players.find(p =>
+    p.short.toLowerCase() === value.toLowerCase() ||
+    p.name.toLowerCase() === value.toLowerCase()
+  ) || { name:value, short:value, img:"lyn-logo.png" };
+}
+
+function getActualScore(match) {
+  if (!match) return null;
+
+  if (
+    match.actual_home !== undefined &&
+    match.actual_home !== null &&
+    match.actual_away !== undefined &&
+    match.actual_away !== null
+  ) {
+    return {
+      home:Number(match.actual_home),
+      away:Number(match.actual_away)
+    };
+  }
+
+  if (
+    match.actual &&
+    match.actual.home !== undefined &&
+    match.actual.away !== undefined
+  ) {
+    return {
+      home:Number(match.actual.home),
+      away:Number(match.actual.away)
+    };
+  }
+
+  return null;
+}
+
+function formatMatchDate(dateString) {
+  if (!dateString) return "";
+  const d = new Date(dateString + "T12:00:00");
+  if (Number.isNaN(d.getTime())) return String(dateString);
+
+  return d.toLocaleDateString("no-NO", {
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric"
+  });
+}
+
 function playerLink(playerNameOrShort, displayText = null) {
   const fullName = getPlayerFullName(playerNameOrShort);
   const text = displayText || playerNameOrShort;
@@ -1066,9 +1107,10 @@ function fillMatchSelect() {
     .forEach(match => {
       const actual = getActualScore(match);
       const score = actual ? ` · ${actual.home}-${actual.away}` : "";
+
       matchSelect.innerHTML += `
         <option value="${escapeHTML(match.id)}">
-          ${formatMatchDate(match.date)} · ${escapeHTML(match.home || "")} - ${escapeHTML(match.away || "")}${score}
+          ${formatMatchDate(match.date)} · ${escapeHTML(match.home || "Lyn")} - ${escapeHTML(match.away || "Motstander")}${score}
         </option>
       `;
     });
@@ -1123,55 +1165,6 @@ function getMatchIndex(matchId) {
 
 function getMatchData(matchId) {
   return allMatches.find(m => m.id === matchId) || null;
-}
-
-function getActualScore(match) {
-  if (!match) return null;
-
-  if (
-    match.actual_home !== undefined &&
-    match.actual_home !== null &&
-    match.actual_away !== undefined &&
-    match.actual_away !== null
-  ) {
-    return {
-      home:Number(match.actual_home),
-      away:Number(match.actual_away)
-    };
-  }
-
-  if (
-    match.actual &&
-    match.actual.home !== undefined &&
-    match.actual.away !== undefined
-  ) {
-    return {
-      home:Number(match.actual.home),
-      away:Number(match.actual.away)
-    };
-  }
-
-  return null;
-}
-
-function formatMatchDate(dateString) {
-  if (!dateString) return "";
-  const d = new Date(dateString + "T12:00:00");
-  if (Number.isNaN(d.getTime())) return String(dateString);
-
-  return d.toLocaleDateString("no-NO", {
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  });
-}
-
-function getPlayerMeta(playerNameOrShort) {
-  const value = String(playerNameOrShort || "").trim();
-  return players.find(p =>
-    p.short.toLowerCase() === value.toLowerCase() ||
-    p.name.toLowerCase() === value.toLowerCase()
-  ) || { name:value, short:value, img:"lyn-logo.png" };
 }
   
 function setDefaultMatch() {
@@ -1287,11 +1280,9 @@ async function sendVote() {
   players.forEach(p => document.getElementById(p.short).value = "");
   document.getElementById("awayFans").value = "";
   
-  loadMatchExperience();
-  loadStatsCenter();
+  loadResults();
+loadStatsCenter();
 }
-
-matchSelect.addEventListener("change", loadMatchExperience);
 
 async function init() {
   await loadMatchesFromSupabase();
@@ -1300,7 +1291,7 @@ async function init() {
 
   setDefaultMatch();
 
-  await loadMatchExperience();
+  await loadResults();
   await loadStatsCenter();
 }
 
@@ -1373,7 +1364,6 @@ function renderMiniRanking(items, limit = 5, showMedals = true, linkType = "play
 
   return html;
 }
-
 
 function getSeasonAverageMap(allVotes) {
   const seasonStats = buildStats(allVotes.filter(isPlayerVote));
@@ -1458,33 +1448,31 @@ function renderVoterChips(playerVotes) {
   `;
 }
 
-async function loadMatchExperience() {
+async function loadResults() {
   const selectedMatchId = document.getElementById("match").value;
-  const match = getMatchData(selectedMatchId);
-  const box = document.getElementById("matchExperience");
+  const matchData = getMatchData(selectedMatchId);
+  const data = await getVotesForSelectedMatch();
+  const allVotes = await fetchVotes();
+  const playerVotes = data.filter(isPlayerVote);
+  const awayVotes = data.filter(isAwayFansVote);
 
-  if (!selectedMatchId || !match) {
-    box.innerHTML = `<div class="warning">Fant ikke kampdata.</div>`;
+  if (!matchData) {
+    document.getElementById("results").innerHTML = `<div class="warning">Fant ikke kampdata.</div>`;
     return;
   }
 
-  const data = await getVotesForSelectedMatch();
-  const allVotes = await fetchVotes();
-
-  const playerVotes = data.filter(isPlayerVote);
-  const awayVotes = data.filter(isAwayFansVote);
   const ranking = buildStats(playerVotes);
   const best = ranking[0];
-  const actual = getActualScore(match);
+  const actual = getActualScore(matchData);
   const seasonAverageMap = getSeasonAverageMap(allVotes);
   const voters = new Set(playerVotes.map(v => cleanVoterName(v.voter)).filter(Boolean));
   const ratedPlayers = ranking.length;
-
   const averageOfAverages = ranking.length
     ? ranking.reduce((sum, row) => sum + row.avg, 0) / ranking.length
     : 0;
 
   let awayHtml = "";
+
   if (awayVotes.length > 0) {
     const away = buildStats(awayVotes)[0];
     awayHtml = `
@@ -1495,33 +1483,21 @@ async function loadMatchExperience() {
     `;
   }
 
-  box.innerHTML = `
+  document.getElementById("results").innerHTML = `
     <div class="match-hero">
       <div class="match-kicker">Folkets børs</div>
-      <div class="match-title">${escapeHTML(match.home || "Lyn")} – ${escapeHTML(match.away || "Motstander")}</div>
-      <div class="match-score">${actual ? `${actual.home}–${actual.away}` : "Resultat ikke satt"}</div>
+      <div class="match-title-big">${escapeHTML(matchData.home || "Lyn")} – ${escapeHTML(matchData.away || "Motstander")}</div>
+      <div class="match-score-big">${actual ? `${actual.home}–${actual.away}` : "Resultat ikke satt"}</div>
       <div class="match-sub">
-        ${formatMatchDate(match.date)}
+        ${formatMatchDate(matchData.date)}
         ${best ? ` · Banens beste: ${getPlayerFullName(best.player)} ${best.avg.toFixed(2)}` : ""}
       </div>
 
       <div class="match-quick-stats">
-        <div class="quick-pill">
-          <strong>${voters.size}</strong>
-          <span>supportere</span>
-        </div>
-        <div class="quick-pill">
-          <strong>${ratedPlayers}</strong>
-          <span>spillere vurdert</span>
-        </div>
-        <div class="quick-pill">
-          <strong>${best ? best.avg.toFixed(2) : "–"}</strong>
-          <span>høyeste snitt</span>
-        </div>
-        <div class="quick-pill">
-          <strong>${ranking.length ? averageOfAverages.toFixed(2) : "–"}</strong>
-          <span>kampsnitt</span>
-        </div>
+        <div class="quick-pill"><strong>${voters.size}</strong><span>supportere</span></div>
+        <div class="quick-pill"><strong>${ratedPlayers}</strong><span>spillere vurdert</span></div>
+        <div class="quick-pill"><strong>${best ? best.avg.toFixed(2) : "–"}</strong><span>høyeste snitt</span></div>
+        <div class="quick-pill"><strong>${ranking.length ? averageOfAverages.toFixed(2) : "–"}</strong><span>kampsnitt</span></div>
       </div>
     </div>
 
@@ -1529,44 +1505,6 @@ async function loadMatchExperience() {
     ${awayHtml}
     ${renderVoterChips(playerVotes)}
   `;
-
-  document.getElementById("results").innerHTML = "";
-}
-
-async function loadResults() {
-  const data = await getVotesForSelectedMatch();
-  const playerVotes = data.filter(isPlayerVote);
-  const awayVotes = data.filter(isAwayFansVote);
-
-  if (playerVotes.length === 0 && awayVotes.length === 0) {
-    document.getElementById("results").innerHTML = "<p>Ingen stemmer på denne kampen enda.</p>";
-    return;
-  }
-
-  let html = "";
-
-  if (playerVotes.length > 0) {
-    const ranking = buildStats(playerVotes);
-    const best = ranking[0];
-    html += `<div class="bb">🔥 Banens beste: ${playerLink(best.player)} med ${best.avg.toFixed(2)}</div>`;
-    html += renderMiniRanking(ranking.map(r => ({
-      player:r.player,
-      score:r.avg.toFixed(2),
-      sub:`${r.count} stemmer`
-    })), 99, true, "player");
-  }
-
-  if (awayVotes.length > 0) {
-    const away = buildStats(awayVotes)[0];
-    html += `
-      <div class="away-box">
-        🏟️ Motstanderfans: ${away.avg.toFixed(2)}<br>
-        <span class="small">${away.count} stemmer på motstandernes tribuneliv</span>
-      </div>
-    `;
-  }
-
-  document.getElementById("results").innerHTML = html;
 }
 
 async function loadSeasonResults() {
@@ -1948,8 +1886,11 @@ async function init() {
 
   setDefaultMatch();
 
+  await loadResults();
   await loadStatsCenter();
 }
+
+matchSelect.addEventListener("change", loadResults);
 
 init();
 </script>
