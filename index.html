@@ -681,7 +681,7 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
     if (position === "KEEPER") points += stat.goals * 10;
   }
 
-  points += (stat.assists || 0) * 4;
+  points += (stat.assists || 0) * 3;
 
   if (stat.clean_sheet) {
     if (position === "MID") points += 1;
@@ -1010,7 +1010,7 @@ async function loadSeasonStats(){
   const topAssist = Object.entries(assists)
     .filter(p => p[1] > 0)
     .sort((a,b) => b[1] - a[1])
-    .slice(0,3);
+    .slice(0,4);
 
   document.getElementById("topScorers").innerHTML =
     topGoals.length
