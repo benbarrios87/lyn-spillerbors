@@ -1187,10 +1187,21 @@ function showTeam(team) {
   const output = document.getElementById("output");
   output.style.display = "block";
 
-  const p1 = calculatePoints(team.player1, false);
-  const p2 = calculatePoints(team.player2, false);
-  const cap = calculatePoints(team.captain, true);
-  const total = p1.total + p2.total + cap.total;
+const showPoints = statsMatch && team.match_id === statsMatch.id;
+
+const p1 = showPoints
+  ? calculatePoints(team.player1, false)
+  : { total:0, lines:["Poeng kommer etter kamp"] };
+
+const p2 = showPoints
+  ? calculatePoints(team.player2, false)
+  : { total:0, lines:["Poeng kommer etter kamp"] };
+
+const cap = showPoints
+  ? calculatePoints(team.captain, true)
+  : { total:0, lines:["Poeng kommer etter kamp"] };
+
+const total = p1.total + p2.total + cap.total;
 
   output.innerHTML = `
     <div class="team-total-card">
