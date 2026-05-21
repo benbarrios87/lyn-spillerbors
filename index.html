@@ -1152,10 +1152,9 @@ async function loadNextMatchWidget(){
       </div>
 
       <div class="next-meta">
-        📅 Kamp: ${formatNiceDateTime(upcoming.date)}<br>
-        ⏰ Deadline: ${formatNiceDateTime(upcoming.deadline)}<br>
-        🔥 ${getCountdownText(upcoming.deadline || upcoming.date)}
-      </div>
+  ⏰ Kampstart og frist: ${formatNiceDateTime(upcoming.deadline || upcoming.date)}<br>
+  🔥 ${getCountdownText(upcoming.deadline || upcoming.date)}
+</div>
 
       <div class="next-stats">
         <div class="next-pill">⚽ ${uniqueTipsters.size} tips levert</div>
