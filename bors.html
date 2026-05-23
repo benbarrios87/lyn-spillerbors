@@ -19,6 +19,7 @@
   --ink:#111827;
   --muted:#6b7280;
   --line:#e5e7eb;
+  --gold:#ffd166;
 }
 
 body {
@@ -1334,14 +1335,6 @@ async function sendVote() {
   
   loadResults();
 loadStatsCenter();
-}
-
-  fillMatchSelect();
-
-  setDefaultMatch();
-
-  await loadResults();
-  await loadStatsCenter();
 }
 
 async function fetchVotes(query = "") {
