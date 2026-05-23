@@ -828,11 +828,48 @@ button:hover {
 .site-footer a:hover {
   text-decoration:underline;
 }
+  .success-toast {
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:white;
+  color:var(--blue);
+  border:2px solid var(--gold);
+  border-radius:18px;
+  padding:12px 14px;
+  box-shadow:0 14px 35px rgba(0,0,0,0.28);
+  transform:translateY(140%);
+  opacity:0;
+  transition:0.35s ease;
+  z-index:99999;
+}
+
+.success-toast.show {
+  transform:translateY(0);
+  opacity:1;
+}
+
+.success-toast img {
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:14px;
+}
   
 </style>
 </head>
-
+  
 <body>
+    <div id="successToast" class="success-toast">
+  <img src="bilder/jess.jpg" alt="">
+  <div>
+    <strong>Levert!</strong><br>
+    Pedersen godkjenner.
+  </div>
+</div>
 
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
@@ -1091,6 +1128,21 @@ function userLink(username, displayText = null) {
     </a>
   `;
 }
+  function showSuccessToast(text = "Pedersen godkjenner.") {
+  const toast = document.getElementById("successToast");
+  if (!toast) return;
+
+  toast.querySelector("div").innerHTML = `
+    <strong>Levert!</strong><br>
+    ${text}
+  `;
+
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3200);
+}
 
 function renderLinkedName(value, linkType = "player") {
   if (linkType === "user") return userLink(value);
@@ -1275,7 +1327,7 @@ async function sendVote() {
     ratings:rows.length
   });
 
-  alert("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert.");
+  showSuccessToast("Børsen er sendt! Hvis du hadde stemt før på samme kamp, ble det gamle oppdatert. Pedersen er enig med valgene dine ");
 
   players.forEach(p => document.getElementById(p.short).value = "");
   document.getElementById("awayFans").value = "";
@@ -1283,9 +1335,6 @@ async function sendVote() {
   loadResults();
 loadStatsCenter();
 }
-
-async function init() {
-  await loadMatchesFromSupabase();
 
   fillMatchSelect();
 
