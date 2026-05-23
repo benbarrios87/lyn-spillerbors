@@ -382,13 +382,6 @@ h1 {
   color:#ffd166;
 }
 
-.footer {
-  margin-top:36px;
-  font-size:13px;
-  opacity:0.75;
-  color:white;
-  text-shadow:0 2px 8px rgba(0,0,0,0.5);
-}
 
 @media (max-width:700px) {
   body {
@@ -488,6 +481,41 @@ h1 {
     grid-template-columns:1fr;
   }
 }
+  .footer {
+  margin-top:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  font-size:13px;
+  opacity:0.82;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  flex-wrap:wrap;
+}
+
+.footer-heart img {
+  width:65px;
+  height:65px;
+  object-fit:cover;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.18);
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+}
+
+.footer-text {
+  max-width:520px;
+  line-height:1.5;
+}
+
+.footer a {
+  color:#ffd166;
+  text-decoration:none;
+}
+
+.footer a:hover {
+  text-decoration:underline;
+}
 </style>
 </head>
 
@@ -575,9 +603,18 @@ h1 {
     </div>
   </div>
 
-  <div class="footer">
-    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til 40001410. Send meg mail på benbarrios87@gmail.com om du ønsker kontakt.
+ <div class="footer">
+  <div class="footer-heart">
+    <img src="hjerte.jpg" alt="Hjerte">
   </div>
+
+  <div class="footer-text">
+    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.<br>
+    Send meg mail på
+    <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>
+    om du ønsker kontakt.
+  </div>
+</div>
 
 </div>
 
