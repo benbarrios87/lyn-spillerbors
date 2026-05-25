@@ -25,10 +25,10 @@ const challenge = {
 };
 
 document.getElementById("info").innerHTML = `
-  <p>${challenge.title}</p>
-  <p>${challenge.date}</p>
-  <p>${challenge.result}</p>
-  <p>${challenge.formation}</p>
+  <div>${challenge.title}</div>
+  <div>${challenge.date}</div>
+  <div>${challenge.result}</div>
+  <div>${challenge.formation}</div>
 `;
 
 let guessed = [];
@@ -45,15 +45,64 @@ function normalize(str) {
 
 }
 
+function renderPitch() {
+
+  const pitch =
+    document.getElementById("pitch");
+
+  pitch.innerHTML =
+    challenge.lineup.map(player => {
+
+      const isGuessed =
+        guessed.includes(player);
+
+      return `
+        <div class="
+          player
+          ${isGuessed ? "correct" : "empty"}
+        ">
+          ${isGuessed ? player : "?"}
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+function renderLives() {
+
+  document.getElementById(
+    "lives"
+  ).innerText =
+    "❤️".repeat(lives);
+
+}
+
+function endGame(text) {
+
+  document.getElementById(
+    "message"
+  ).innerText = text;
+
+  document.getElementById(
+    "guessInput"
+  ).disabled = true;
+
+}
+
 function submitGuess() {
 
   const input =
-    document.getElementById("guessInput");
+    document.getElementById(
+      "guessInput"
+    );
 
   const guess =
     normalize(input.value);
 
   input.value = "";
+
+  if(!guess) return;
 
   const found =
     challenge.lineup.find(player => {
@@ -73,15 +122,38 @@ function submitGuess() {
 
     });
 
-  if(found && !guessed.includes(found)) {
+  if(found) {
+
+    if(guessed.includes(found)) {
+
+      document.getElementById(
+        "message"
+      ).innerText =
+        "⚠️ Allerede gjettet";
+
+      return;
+
+    }
 
     guessed.push(found);
 
-    renderPlayers();
+    renderPitch();
 
     document.getElementById(
       "message"
-    ).innerText = "✅ Riktig!";
+    ).innerText =
+      "✅ Riktig!";
+
+    if(
+      guessed.length ===
+      challenge.lineup.length
+    ) {
+
+      endGame(
+        "🏆 DU KLARTE DAGENS LYN XI"
+      );
+
+    }
 
   }
 
@@ -93,33 +165,29 @@ function submitGuess() {
 
     document.getElementById(
       "message"
-    ).innerText = "❌ Feil";
+    ).innerText =
+      "❌ Feil";
+
+    if(lives <= 0) {
+
+      endGame(
+        "💀 Game over"
+      );
+
+    }
 
   }
 
 }
 
-function renderPlayers() {
+document
+  .getElementById("guessInput")
+  .addEventListener("keydown", e => {
 
-  const div =
-    document.getElementById(
-      "guessedPlayers"
-    );
+    if(e.key === "Enter") {
+      submitGuess();
+    }
 
-  div.innerHTML =
-    guessed.map(player => `
-      <div class="player">
-        ${player}
-      </div>
-    `).join("");
+});
 
-}
-
-function renderLives() {
-
-  document.getElementById(
-    "lives"
-  ).innerText =
-    "❤️".repeat(lives);
-
-}
+renderPitch();
