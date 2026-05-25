@@ -2380,7 +2380,7 @@ mensPicks.forEach(pick => {
 )
     .sort((a,b) => b.total - a.total);
 
-  const differentialKing = differentials[0];
+  const littleUsedKing = differentials[0];
 
   const overrated = Object.entries(playerTotals)
     .map(([player, total]) => ({
@@ -2455,11 +2455,19 @@ mensPicks.forEach(pick => {
       </div>
 
       <div class="stat-card">
-        <h3>🧠 Differensial-konge</h3>
-        <div class="result-row">
-          <div>${differentialKing ? playerChip(differentialKing.player) : "Ikke klart"}</div>
-          <div class="result-score">${differentialKing ? differentialKing.total : "–"}</div>
-        </div>
+        <h3>🧠 Lite brukt</h3>
+<div class="result-row">
+  <div>
+    ${littleUsedKing ? playerChip(littleUsedKing.player) : "Ikke klart"}
+  </div>
+  <div class="result-score">
+    ${littleUsedKing ? littleUsedKing.picks + " valg" : "–"}
+  </div>
+</div>
+
+<div class="small" style="margin-top:8px;">
+  Spillere med lav eierandel som fortsatt leverer.
+</div>
       </div>
 
       <div class="stat-card">
