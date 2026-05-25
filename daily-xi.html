@@ -1,15 +1,33 @@
-<h1>Daily Lyn XI</h1>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Lyn XI</title>
+  <link rel="stylesheet" href="daily-xi.css">
+</head>
 
-<div id="info"></div>
+<body>
 
-<div id="lives">❤️❤️❤️</div>
+  <div class="container">
 
-<input id="guessInput" placeholder="Skriv spiller..." />
+    <h1>⚽ Daily Lyn XI</h1>
 
-<button onclick="submitGuess()">
-Gjett
-</button>
+    <div id="info"></div>
 
-<div id="guessedPlayers"></div>
+    <div id="lives">❤️❤️❤️</div>
 
-<div id="message"></div>
+    <input id="guessInput" type="text" placeholder="Skriv spiller...">
+
+    <button onclick="submitGuess()">Gjett</button>
+
+    <div id="message"></div>
+
+    <div id="guessedPlayers"></div>
+
+  </div>
+
+  <script src="daily-xi.js"></script>
+
+</body>
+</html>
