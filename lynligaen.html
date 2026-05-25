@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -15,11 +16,16 @@
   --gold:#ffd166;
   --green:#28d17c;
   --dark:#050814;
-  --panel:rgba(8,15,32,0.82);
+  --panel:rgba(8,15,32,0.84);
   --glass:rgba(255,255,255,0.1);
   --line:rgba(255,255,255,0.18);
   --muted:rgba(255,255,255,0.72);
+  --danger:#ff6b6b;
 }
+
+* { box-sizing:border-box; }
+
+html { scroll-behavior:smooth; }
 
 body {
   margin:0;
@@ -33,9 +39,10 @@ body::before {
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at top left, rgba(215,25,32,0.28), transparent 30%),
-    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 24%),
-    rgba(3,7,18,0.82);
+    radial-gradient(circle at top left, rgba(215,25,32,0.34), transparent 30%),
+    radial-gradient(circle at top right, rgba(255,209,102,0.18), transparent 26%),
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 22%),
+    rgba(3,7,18,0.84);
   z-index:-1;
 }
 
@@ -57,11 +64,11 @@ body::before {
 
 header {
   text-align:center;
-  padding:56px 20px 30px;
+  padding:56px 20px 22px;
 }
 
 .logo-wrap {
-  width:170px;
+  width:160px;
   margin:0 auto 12px;
 }
 
@@ -83,7 +90,8 @@ header {
 
 h1 {
   margin:14px 0 6px;
-  font-size:44px;
+  font-size:46px;
+  line-height:1.05;
 }
 
 header p {
@@ -94,14 +102,9 @@ header p {
 }
 
 main {
-  max-width:1150px;
+  max-width:1160px;
   margin:auto;
-  padding:15px 16px 70px;
-}
-
-.section-title {
-  margin:34px 0 12px;
-  font-size:27px;
+  padding:8px 16px 76px;
 }
 
 .box {
@@ -114,6 +117,11 @@ main {
   backdrop-filter:blur(8px);
 }
 
+.section-title {
+  margin:0 0 14px;
+  font-size:27px;
+}
+
 .hero-grid {
   display:grid;
   grid-template-columns:1fr;
@@ -121,16 +129,28 @@ main {
 }
 
 @media (min-width:800px) {
-  .hero-grid {
-    grid-template-columns:repeat(4, 1fr);
-  }
+  .hero-grid { grid-template-columns:repeat(4, 1fr); }
 }
 
 .hero-stat {
-  background:linear-gradient(135deg, rgba(215,25,32,0.35), rgba(19,41,75,0.88));
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg, rgba(215,25,32,0.35), rgba(19,41,75,0.92));
   border:1px solid rgba(255,255,255,0.18);
   border-radius:20px;
   padding:16px;
+  min-height:112px;
+}
+
+.hero-stat::after {
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  right:-35px;
+  top:-35px;
+  background:rgba(255,255,255,0.08);
 }
 
 .hero-stat h3 {
@@ -142,16 +162,95 @@ main {
 .hero-stat .big {
   font-size:32px;
   font-weight:bold;
+  word-break:break-word;
 }
 
-.explain-box {
-  margin-top:16px;
-  background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.18);
-  border-radius:20px;
-  padding:18px;
-  line-height:1.7;
+.hero-stat .delta {
+  margin-top:6px;
+  font-size:13px;
+  color:var(--muted);
 }
+
+.studio-card {
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:900px) {
+  .studio-card { grid-template-columns:1.2fr 0.8fr; }
+}
+
+.headline-card {
+  background:
+    linear-gradient(135deg, rgba(255,209,102,0.16), rgba(215,25,32,0.18)),
+    rgba(255,255,255,0.08);
+  border:1px solid rgba(255,209,102,0.34);
+  border-radius:22px;
+  padding:18px;
+}
+
+.headline-card h2 {
+  margin:0 0 8px;
+  font-size:27px;
+}
+
+.headline-card .lead {
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.quick-stack {
+  display:grid;
+  gap:10px;
+}
+
+.quick-item {
+  background:rgba(255,255,255,0.09);
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:18px;
+  padding:13px;
+}
+
+.quick-item strong { color:white; }
+
+.nav-tabs {
+  position:sticky;
+  top:0;
+  z-index:999;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:0 auto 18px;
+  padding:10px 8px;
+  background:rgba(3,7,18,0.78);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:999px;
+  max-width:760px;
+}
+
+.tab-btn {
+  width:auto;
+  margin:0;
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.1);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.tab-btn.active {
+  background:var(--red);
+  box-shadow:0 0 20px rgba(215,25,32,0.22);
+}
+
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
 
 .podium {
   display:grid;
@@ -166,9 +265,7 @@ main {
     align-items:end;
   }
 
-  .podium-card.first {
-    transform:translateY(-10px);
-  }
+  .podium-card.first { transform:translateY(-10px); }
 }
 
 .podium-card {
@@ -183,25 +280,13 @@ main {
   border-color:rgba(255,209,102,0.9);
   box-shadow:0 0 30px rgba(255,209,102,0.16);
   background:
-    linear-gradient(135deg, rgba(255,209,102,0.17), rgba(215,25,32,0.16)),
+    linear-gradient(135deg, rgba(255,209,102,0.18), rgba(215,25,32,0.16)),
     rgba(255,255,255,0.1);
 }
 
-.medal-big {
-  font-size:36px;
-}
-
-.podium-name {
-  margin-top:6px;
-  font-size:22px;
-  font-weight:bold;
-}
-
-.podium-score {
-  margin-top:8px;
-  font-size:38px;
-  font-weight:bold;
-}
+.medal-big { font-size:36px; }
+.podium-name { margin-top:6px; font-size:22px; font-weight:bold; }
+.podium-score { margin-top:8px; font-size:38px; font-weight:bold; }
 
 .stats-grid {
   display:grid;
@@ -210,9 +295,7 @@ main {
 }
 
 @media (min-width:850px) {
-  .stats-grid {
-    grid-template-columns:1fr 1fr;
-  }
+  .stats-grid { grid-template-columns:1fr 1fr; }
 }
 
 .stat-card {
@@ -222,9 +305,14 @@ main {
   padding:16px;
 }
 
-.stat-card h3 {
-  margin-top:0;
+.stat-card.featured {
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.18), rgba(255,209,102,0.11)),
+    rgba(255,255,255,0.09);
+  border-color:rgba(255,209,102,0.32);
 }
+
+.stat-card h3 { margin-top:0; }
 
 .result-row {
   display:grid;
@@ -240,20 +328,15 @@ main {
   color:var(--gold);
 }
 
-.small {
-  color:var(--muted);
-  font-size:13px;
-}
+.small { color:var(--muted); font-size:13px; }
 
-.table-wrap {
-  overflow-x:auto;
-}
+.table-wrap { overflow-x:auto; }
 
 .league-table {
   width:100%;
   border-collapse:collapse;
   margin-top:12px;
-  min-width:680px;
+  min-width:760px;
 }
 
 .league-table th,
@@ -272,6 +355,54 @@ main {
 .league-table td:last-child {
   text-align:right;
   font-weight:bold;
+}
+
+.mobile-league { display:none; }
+
+.league-card {
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:18px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.league-card-top {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+}
+
+.rank-pill {
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+  font-weight:bold;
+}
+
+.rank-pill.top {
+  background:rgba(255,209,102,0.22);
+  border-color:rgba(255,209,102,0.62);
+}
+
+.split-row {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+  margin-top:12px;
+}
+
+.split-mini {
+  border-radius:14px;
+  background:rgba(0,0,0,0.22);
+  padding:9px;
+  text-align:center;
 }
 
 .badge {
@@ -295,12 +426,52 @@ main {
   color:#bfdbfe;
 }
 
+.badge.green {
+  background:rgba(40,209,124,0.15);
+  border:1px solid rgba(40,209,124,0.54);
+  color:#b9f6d3;
+}
+
+.badge.red {
+  background:rgba(255,107,107,0.15);
+  border:1px solid rgba(255,107,107,0.54);
+  color:#ffd1d1;
+}
+
 .warning {
   background:rgba(255,247,237,0.12);
   border:1px solid rgba(253,186,116,0.45);
   color:#fed7aa;
   padding:12px;
   border-radius:14px;
+}
+
+.rules-toggle {
+  margin-top:14px;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.rules-toggle summary {
+  cursor:pointer;
+  list-style:none;
+  padding:16px 18px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:20px;
+  font-weight:bold;
+}
+
+.rules-toggle summary::-webkit-details-marker { display:none; }
+.rules-toggle summary::after { content:"+"; float:right; color:var(--gold); font-size:22px; }
+.rules-toggle[open] summary::after { content:"–"; }
+
+.rules-body {
+  margin-top:10px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.08);
+  line-height:1.65;
 }
 
 .ticker {
@@ -315,7 +486,7 @@ main {
 .ticker span {
   display:inline-block;
   padding-left:100%;
-  animation:ticker 24s linear infinite;
+  animation:ticker 30s linear infinite;
 }
 
 @keyframes ticker {
@@ -326,27 +497,15 @@ main {
 .profile-link {
   color:white;
   text-decoration:none;
+  font-weight:bold;
 }
 
-.profile-link:hover {
-  text-decoration:underline;
-}
-    
-@media (max-width:620px) {
-  .menu-btn {
-    position:static;
-    margin:14px 0 0 14px;
-  }
+.profile-link:hover { text-decoration:underline; }
 
-  header {
-    padding-top:24px;
-  }
+.round-card h3 { margin-bottom:8px; }
+.round-meta { margin-bottom:12px; color:var(--muted); }
 
-  h1 {
-    font-size:36px;
-  }
-}
-  .site-footer {
+.site-footer {
   margin:10px auto 30px;
   padding:18px 20px;
   text-align:center;
@@ -362,8 +521,24 @@ main {
   font-weight:bold;
 }
 
-.site-footer a:hover {
-  text-decoration:underline;
+.site-footer a:hover { text-decoration:underline; }
+
+@media (max-width:720px) {
+  .menu-btn {
+    position:static;
+    margin:14px 0 0 14px;
+  }
+
+  header { padding-top:24px; }
+  h1 { font-size:36px; }
+  .logo-wrap { width:130px; }
+  main { padding-left:12px; padding-right:12px; }
+  .box { padding:16px; border-radius:20px; }
+  .nav-tabs { border-radius:22px; justify-content:flex-start; overflow-x:auto; flex-wrap:nowrap; }
+  .tab-btn { white-space:nowrap; }
+  .desktop-table { display:none; }
+  .mobile-league { display:block; }
+  .split-row { grid-template-columns:1fr 1fr 1fr; }
 }
 </style>
 </head>
@@ -389,26 +564,54 @@ main {
   </div>
 </div>
 
-<div class="box">
-  <h2 class="section-title">🏆 Total liga</h2>
-  <div id="leagueTable">
-    <div class="small">Laster tabell...</div>
-  </div>
-</div>
+<nav class="nav-tabs" aria-label="Lynligaen navigasjon">
+  <button class="tab-btn active" data-tab="tab-overview">Studio</button>
+  <button class="tab-btn" data-tab="tab-table">Tabell</button>
+  <button class="tab-btn" data-tab="tab-awards">Awards</button>
+  <button class="tab-btn" data-tab="tab-rounds">Runder</button>
+  <button class="tab-btn" data-tab="tab-rules">Regler</button>
+</nav>
 
-<div class="box">
-  <h2 class="section-title">📺 Central Awards</h2>
-  <div id="awards">
-    <div class="small">Laster awards...</div>
+<section id="tab-overview" class="tab-panel active">
+  <div class="box">
+    <h2 class="section-title">🏟️ Studio</h2>
+    <div id="studioPanel"><div class="small">Laster studio...</div></div>
   </div>
-</div>
+</section>
 
-<div class="box">
-  <h2 class="section-title">📊 Runder</h2>
-  <div id="rounds">
-    <div class="small">Laster runder...</div>
+<section id="tab-table" class="tab-panel">
+  <div class="box">
+    <h2 class="section-title">🏆 Total liga</h2>
+    <div id="leagueTable">
+      <div class="small">Laster tabell...</div>
+    </div>
   </div>
-</div>
+</section>
+
+<section id="tab-awards" class="tab-panel">
+  <div class="box">
+    <h2 class="section-title">📺 Central Awards</h2>
+    <div id="awards">
+      <div class="small">Laster awards...</div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-rounds" class="tab-panel">
+  <div class="box">
+    <h2 class="section-title">📊 Runder</h2>
+    <div id="rounds">
+      <div class="small">Laster runder...</div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-rules" class="tab-panel">
+  <div class="box">
+    <h2 class="section-title">📘 Regler og poeng</h2>
+    <div id="rulesPanel"></div>
+  </div>
+</section>
 
 </main>
 
@@ -453,8 +656,29 @@ const players = [
   { name:"Magnus Aadland", short:"Aadland", position:"MID" }
 ];
 
+function setupTabs() {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+      btn.classList.add("active");
+      const panel = document.getElementById(target);
+      if (panel) panel.classList.add("active");
+    });
+  });
+}
+
 function cleanVoterName(name) {
   return (name || "").trim().toLowerCase();
+}
+
+function displayUser(name) {
+  return String(name || "").trim() || "ukjent";
+}
+
+function profileLink(user) {
+  return `<a href="profil.html?user=${encodeURIComponent(user)}" class="profile-link">${displayUser(user)}</a>`;
 }
 
 function isRealMatch(v) {
@@ -494,7 +718,14 @@ function getMatchData(matchId) {
   return matchesData.find(m => m.id === matchId) || null;
 }
 
+function getMatchTitle(matchId) {
+  const match = getMatchData(matchId);
+  if (!match) return matchId;
+  return `${match.home} - ${match.away}`;
+}
+
 function formatDate(dateString) {
+  if (!dateString) return "";
   const d = new Date(dateString + "T12:00:00");
   return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
 }
@@ -567,10 +798,7 @@ function buildPredictions(votes) {
 }
 
 function awardFantasyTierPoints(rows) {
-  const sorted = [...rows].sort((a,b) =>
-    b.raw - a.raw
-  );
-
+  const sorted = [...rows].sort((a,b) => b.raw - a.raw);
   const n = sorted.length;
   if (n === 0) return [];
 
@@ -597,12 +825,7 @@ function awardFantasyTierPoints(rows) {
       points = 1;
     }
 
-    return {
-      ...row,
-      tier,
-      tierPoints:points,
-      rank:index + 1
-    };
+    return { ...row, tier, tierPoints:points, rank:index + 1 };
   });
 }
 
@@ -622,7 +845,10 @@ function ensureUser(users, voter) {
       correctOutcomes:0,
       correctDiffs:0,
       rawFantasy:0,
-      rawTips:0
+      rawTips:0,
+      bestFantasyRound:0,
+      bestTipRound:0,
+      lastRoundTotal:0
     };
   }
 
@@ -654,10 +880,7 @@ function buildTipRounds(allVotes) {
   return Object.keys(byMatch).map(matchId => ({
     match_id:matchId,
     type:"tips",
-    rows:byMatch[matchId].sort((a,b) =>
-      b.raw - a.raw ||
-      a.voter.localeCompare(b.voter)
-    )
+    rows:byMatch[matchId].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter))
   }));
 }
 
@@ -685,10 +908,7 @@ function buildFantasyRounds(picks, stats, allVotes) {
     const ratingData = ratingMaps[row.match_id] && ratingMaps[row.match_id][row.player];
     const rating = ratingData ? ratingData.total / ratingData.count : 0;
 
-    statsByMatch[row.match_id][row.player] = {
-      ...row,
-      rating
-    };
+    statsByMatch[row.match_id][row.player] = { ...row, rating };
   });
 
   const byMatch = {};
@@ -713,9 +933,7 @@ function buildFantasyRounds(picks, stats, allVotes) {
   });
 
   return Object.keys(byMatch)
-    .filter(matchId => {
-      return byMatch[matchId].some(row => row.raw !== 0);
-    })
+    .filter(matchId => byMatch[matchId].some(row => row.raw !== 0))
     .map(matchId => ({
       match_id:matchId,
       type:"fantasy",
@@ -728,10 +946,7 @@ function combineLeague(fantasyRounds, tipRounds) {
   const roundMap = {};
 
   fantasyRounds.forEach(round => {
-    if (!roundMap[round.match_id]) {
-      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
-    }
-
+    if (!roundMap[round.match_id]) roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
     roundMap[round.match_id].fantasy = round.rows;
 
     round.rows.forEach(row => {
@@ -740,6 +955,7 @@ function combineLeague(fantasyRounds, tipRounds) {
       user.fantasy += row.tierPoints;
       user.rawFantasy += row.raw;
       user.fantasyRounds += 1;
+      user.bestFantasyRound = Math.max(user.bestFantasyRound, row.raw);
 
       if (row.tierPoints === 5) user.eliteFantasy += 1;
       if (row.tierPoints === 3) user.strongFantasy += 1;
@@ -748,10 +964,7 @@ function combineLeague(fantasyRounds, tipRounds) {
   });
 
   tipRounds.forEach(round => {
-    if (!roundMap[round.match_id]) {
-      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
-    }
-
+    if (!roundMap[round.match_id]) roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
     roundMap[round.match_id].tips = round.rows;
 
     round.rows.forEach(row => {
@@ -760,12 +973,31 @@ function combineLeague(fantasyRounds, tipRounds) {
       user.tipping += row.tipPoints;
       user.rawTips += row.raw;
       user.tipRounds += 1;
+      user.bestTipRound = Math.max(user.bestTipRound, row.raw);
 
       if (row.raw === 3) user.perfectTips += 1;
       if (row.raw === 2) user.correctDiffs += 1;
       if (row.raw === 1) user.correctOutcomes += 1;
     });
   });
+
+  const rounds = Object.values(roundMap).sort((a,b) => {
+    const aMatch = getMatchData(a.match_id);
+    const bMatch = getMatchData(b.match_id);
+    return new Date(aMatch?.date || "2099-01-01") - new Date(bMatch?.date || "2099-01-01");
+  });
+
+  const latestRound = rounds[rounds.length - 1];
+  if (latestRound) {
+    latestRound.fantasy.forEach(row => {
+      const user = ensureUser(users, row.voter);
+      user.lastRoundTotal += row.tierPoints;
+    });
+    latestRound.tips.forEach(row => {
+      const user = ensureUser(users, row.voter);
+      user.lastRoundTotal += row.tipPoints;
+    });
+  }
 
   Object.values(users).forEach(user => {
     user.total = user.fantasy + user.tipping;
@@ -777,12 +1009,6 @@ function combineLeague(fantasyRounds, tipRounds) {
     b.tipping - a.tipping ||
     a.voter.localeCompare(b.voter)
   );
-
-  const rounds = Object.values(roundMap).sort((a,b) => {
-    const aMatch = getMatchData(a.match_id);
-    const bMatch = getMatchData(b.match_id);
-    return new Date(aMatch?.date || "2099-01-01") - new Date(bMatch?.date || "2099-01-01");
-  });
 
   return { league, rounds };
 }
@@ -798,9 +1024,9 @@ function renderPodium(league) {
     return `
       <div class="podium-card ${extraClass}">
         <div class="medal-big">${medal}</div>
-        <div class="podium-name">${row.voter}</div>
+        <div class="podium-name">${profileLink(row.voter)}</div>
         <div class="podium-score">${row.total}</div>
-        <div class="small">Lynliga poeng</div>
+        <div class="small">Lynliga-poeng</div>
         <div class="small">Fantasy ${row.fantasy} · Tipp ${row.tipping}</div>
       </div>
     `;
@@ -815,6 +1041,14 @@ function renderPodium(league) {
   `;
 }
 
+function getBadges(row) {
+  return `
+    ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
+    ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
+    ${row.lastRoundTotal > 0 ? `<span class="badge green">Siste +${row.lastRoundTotal}</span>` : ""}
+  `;
+}
+
 function renderLeagueTable(league) {
   if (!league.length) {
     return `<div class="warning">Ingen ligaresultater ennå. Når det finnes fantasy eller ferdig scoret tipping, dukker tabellen opp her.</div>`;
@@ -823,7 +1057,7 @@ function renderLeagueTable(league) {
   return `
     ${renderPodium(league)}
 
-    <div class="table-wrap">
+    <div class="desktop-table table-wrap">
       <table class="league-table">
         <thead>
           <tr>
@@ -831,6 +1065,7 @@ function renderLeagueTable(league) {
             <th>Bruker</th>
             <th>Fantasy</th>
             <th>Tipp</th>
+            <th>Siste</th>
             <th>Runder</th>
             <th>Total</th>
           </tr>
@@ -840,20 +1075,38 @@ function renderLeagueTable(league) {
             <tr>
               <td>${index + 1}</td>
               <td>
-                <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
-                  <strong>${row.voter}</strong>
-                </a><br>
-                ${row.eliteFantasy > 0 ? `<span class="badge gold">Fantasy elite x${row.eliteFantasy}</span>` : ""}
-                ${row.perfectTips > 0 ? `<span class="badge blue">Orakel x${row.perfectTips}</span>` : ""}
+                ${profileLink(row.voter)}<br>
+                ${getBadges(row)}
               </td>
               <td>${row.fantasy}</td>
               <td>${row.tipping}</td>
+              <td>${row.lastRoundTotal ? "+" + row.lastRoundTotal : "–"}</td>
               <td><span class="small">F ${row.fantasyRounds} · T ${row.tipRounds}</span></td>
               <td>${row.total}</td>
             </tr>
           `).join("")}
         </tbody>
       </table>
+    </div>
+
+    <div class="mobile-league">
+      ${league.map((row, index) => `
+        <div class="league-card">
+          <div class="league-card-top">
+            <div class="rank-pill ${index < 3 ? "top" : ""}">${index + 1}</div>
+            <div>
+              ${profileLink(row.voter)}<br>
+              ${getBadges(row)}
+            </div>
+            <div class="result-score">${row.total}</div>
+          </div>
+          <div class="split-row">
+            <div class="split-mini"><div class="small">Fantasy</div><strong>${row.fantasy}</strong></div>
+            <div class="split-mini"><div class="small">Tipp</div><strong>${row.tipping}</strong></div>
+            <div class="split-mini"><div class="small">Siste</div><strong>${row.lastRoundTotal ? "+" + row.lastRoundTotal : "–"}</strong></div>
+          </div>
+        </div>
+      `).join("")}
     </div>
   `;
 }
@@ -867,7 +1120,7 @@ function renderMiniRanking(items, limit = 5) {
     <div class="result-row">
       <div>
         ${index < 3 ? `<span class="medal">${medals[index]}</span>` : ""}
-        <strong>${row.label}</strong><br>
+        ${row.user ? profileLink(row.label) : `<strong>${row.label}</strong>`}<br>
         <span class="small">${row.sub || ""}</span>
       </div>
       <div class="result-score">${row.score}</div>
@@ -878,29 +1131,11 @@ function renderMiniRanking(items, limit = 5) {
 function renderAwards(league) {
   if (!league.length) return `<div class="warning">Ingen awards ennå.</div>`;
 
-  const mostComplete = [...league].sort((a,b) =>
-    (b.fantasy + b.tipping) - (a.fantasy + a.tipping)
-  );
-
-  const fantasyKings = [...league].sort((a,b) =>
-    b.fantasy - a.fantasy ||
-    b.eliteFantasy - a.eliteFantasy ||
-    b.strongFantasy - a.strongFantasy
-  );
-
-  const tipKings = [...league].sort((a,b) =>
-    b.tipping - a.tipping ||
-    b.perfectTips - a.perfectTips
-  );
-
-  const oracle = [...league].sort((a,b) =>
-    b.perfectTips - a.perfectTips ||
-    b.tipping - a.tipping
-  );
-
-  const grinders = [...league].sort((a,b) =>
-    (b.fantasyRounds + b.tipRounds) - (a.fantasyRounds + a.tipRounds)
-  );
+  const mostComplete = [...league].sort((a,b) => b.total - a.total);
+  const fantasyKings = [...league].sort((a,b) => b.fantasy - a.fantasy || b.eliteFantasy - a.eliteFantasy || b.strongFantasy - a.strongFantasy);
+  const tipKings = [...league].sort((a,b) => b.tipping - a.tipping || b.perfectTips - a.perfectTips);
+  const oracle = [...league].sort((a,b) => b.perfectTips - a.perfectTips || b.tipping - a.tipping);
+  const grinders = [...league].sort((a,b) => (b.fantasyRounds + b.tipRounds) - (a.fantasyRounds + a.tipRounds));
 
   const balanced = [...league].filter(u => u.fantasy > 0 && u.tipping > 0).sort((a,b) => {
     const aBalance = Math.abs(a.fantasy - a.tipping);
@@ -908,21 +1143,35 @@ function renderAwards(league) {
     return aBalance - bBalance || b.total - a.total;
   });
 
+  const lastRoundHeroes = [...league].filter(u => u.lastRoundTotal > 0).sort((a,b) => b.lastRoundTotal - a.lastRoundTotal || b.total - a.total);
+
   return `
     <div class="stats-grid">
-      <div class="stat-card">
+      <div class="stat-card featured">
+        <h3>🔥 Siste rundes klatrere</h3>
+        ${renderMiniRanking(lastRoundHeroes.map(u => ({
+          label:u.voter,
+          user:true,
+          score:"+" + u.lastRoundTotal,
+          sub:`Total ${u.total} · Fantasy ${u.fantasy} · Tipp ${u.tipping}`
+        })), 6)}
+      </div>
+
+      <div class="stat-card featured">
         <h3>👑 Mest komplett manager</h3>
         ${renderMiniRanking(mostComplete.map(u => ({
           label:u.voter,
+          user:true,
           score:u.total,
           sub:`Fantasy ${u.fantasy} · Tipp ${u.tipping}`
         })), 6)}
       </div>
 
       <div class="stat-card">
-        <h3>⚽ Fantasy sjefen</h3>
+        <h3>⚽ Fantasy-sjefen</h3>
         ${renderMiniRanking(fantasyKings.map(u => ({
           label:u.voter,
+          user:true,
           score:u.fantasy,
           sub:`${u.eliteFantasy} elite · ${u.strongFantasy} sterke · ${u.fantasyRounds} runder`
         })), 6)}
@@ -932,6 +1181,7 @@ function renderAwards(league) {
         <h3>🎯 Tippekongen</h3>
         ${renderMiniRanking(tipKings.map(u => ({
           label:u.voter,
+          user:true,
           score:u.tipping,
           sub:`${u.perfectTips} helt riktige · ${u.correctDiffs || 0} målforskjell · ${u.correctOutcomes} riktige utfall`
         })), 6)}
@@ -941,6 +1191,7 @@ function renderAwards(league) {
         <h3>🔮 Orakelet</h3>
         ${renderMiniRanking(oracle.filter(u => u.perfectTips > 0).map(u => ({
           label:u.voter,
+          user:true,
           score:u.perfectTips,
           sub:`Helt riktige resultater`
         })), 6)}
@@ -950,6 +1201,7 @@ function renderAwards(league) {
         <h3>⚖️ Mest balansert</h3>
         ${renderMiniRanking(balanced.map(u => ({
           label:u.voter,
+          user:true,
           score:u.total,
           sub:`Fantasy ${u.fantasy} · Tipp ${u.tipping}`
         })), 6)}
@@ -959,6 +1211,7 @@ function renderAwards(league) {
         <h3>🏅 Mest aktiv</h3>
         ${renderMiniRanking(grinders.map(u => ({
           label:u.voter,
+          user:true,
           score:u.fantasyRounds + u.tipRounds,
           sub:`Fantasy ${u.fantasyRounds} · Tipp ${u.tipRounds}`
         })), 6)}
@@ -970,16 +1223,20 @@ function renderAwards(league) {
 function renderRounds(rounds) {
   if (!rounds.length) return `<div class="warning">Ingen runder klare ennå.</div>`;
 
+  const latestFirst = [...rounds].reverse();
+
   return `
     <div class="stats-grid">
-      ${rounds.map(round => {
+      ${latestFirst.map(round => {
         const match = getMatchData(round.match_id);
         const fantasyWinner = [...round.fantasy].sort((a,b) => b.raw - a.raw)[0];
         const tipWinner = [...round.tips].sort((a,b) => b.raw - a.raw)[0];
+        const actualText = match && match.actual ? `Resultat ${match.actual.home}-${match.actual.away}` : "Resultat ikke registrert";
 
         return `
-          <div class="stat-card">
-            <h3>${match ? formatDate(match.date) : ""} ${round.match_id}</h3>
+          <div class="stat-card round-card">
+            <h3>${match ? formatDate(match.date) + " · " + match.home + " - " + match.away : round.match_id}</h3>
+            <div class="round-meta">${actualText}</div>
 
             <div class="result-row">
               <div>
@@ -992,13 +1249,118 @@ function renderRounds(rounds) {
             <div class="result-row">
               <div>
                 <strong>Tippevinner</strong><br>
-                <span class="small">${tipWinner ? tipWinner.voter : "Ingen scoret tips ennå"}</span>
+                <span class="small">${tipWinner ? tipWinner.voter + " · " + tipWinner.home + "-" + tipWinner.away : "Ingen scoret tips ennå"}</span>
               </div>
               <div class="result-score">${tipWinner ? tipWinner.raw : "–"}</div>
             </div>
           </div>
         `;
       }).join("")}
+    </div>
+  `;
+}
+
+function getSavedUser() {
+  return (
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("lynbors_voter") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    ""
+  ).trim().toLowerCase();
+}
+
+function renderPersonalPosition(league) {
+  const saved = getSavedUser();
+  if (!saved) return "";
+
+  const index = league.findIndex(row => cleanVoterName(row.voter) === saved);
+  if (index === -1) return "";
+
+  const user = league[index];
+  const leader = league[0];
+  const gap = leader && leader.voter !== user.voter ? leader.total - user.total : 0;
+
+  return `
+    <div class="quick-item">
+      <strong>👀 Din plassering</strong><br>
+      <span class="small">Du ligger på ${index + 1}. plass med ${user.total} poeng${gap ? ` · ${gap} bak leder` : " · du leder faktisk greia"}.</span>
+    </div>
+  `;
+}
+
+function renderRulesPanel() {
+  return `
+    <details class="rules-toggle" open>
+      <summary>Hvordan fungerer Lynligaen?</summary>
+      <div class="rules-body">
+        Lynligaen er <strong>sammenlagttabellen</strong> for <strong>Tippetips</strong> og <strong>Lyn Fantasy</strong>.
+        <br><br>
+        <strong>🎯 Tippetips</strong><br>
+        3 poeng for helt riktig resultat<br>
+        2 poeng for riktig utfall og riktig målforskjell<br>
+        1 poeng for riktig utfall<br>
+        0 poeng for bom
+        <br><br>
+        <strong>⭐ Lyn Fantasy</strong><br>
+        Fantasy har høyere råpoeng enn tipping, så fantasy gjøres om til ligapoeng per kamp:
+        <br><br>
+        🔥 Øverste fjerdedel får 5 poeng<br>
+        ⭐ Andre fjerdedel får 3 poeng<br>
+        ⚪ Tredje fjerdedel får 1 poeng<br>
+        💀 Nederste fjerdedel får 0 poeng
+        <br><br>
+        <strong>Totalen:</strong> Tippetips + Fantasy = Lynligaen.
+      </div>
+    </details>
+  `;
+}
+
+function buildTickerItems(league, rounds) {
+  if (!league.length) return ["Lynligaen venter på data"];
+
+  const leader = league[0];
+  const tipKing = [...league].sort((a,b) => b.tipping - a.tipping || b.perfectTips - a.perfectTips)[0];
+  const fantasyKing = [...league].sort((a,b) => b.fantasy - a.fantasy || b.eliteFantasy - a.eliteFantasy)[0];
+  const lastHero = [...league].sort((a,b) => b.lastRoundTotal - a.lastRoundTotal)[0];
+  const latestRound = rounds[rounds.length - 1];
+  const latestMatch = latestRound ? getMatchTitle(latestRound.match_id) : "siste runde";
+
+  return [
+    `🔥 ${leader.voter} leder Lynligaen med ${leader.total} poeng`,
+    `⚽ ${fantasyKing ? fantasyKing.voter + " er fantasy-sjefen med " + fantasyKing.fantasy + " poeng" : "Fantasy venter på data"}`,
+    `🎯 ${tipKing ? tipKing.voter + " topper tipping med " + tipKing.tipping + " poeng" : "Tipping venter på data"}`,
+    `🚀 ${lastHero && lastHero.lastRoundTotal ? lastHero.voter + " tok " + lastHero.lastRoundTotal + " poeng i " + latestMatch : "Neste runde kan snu alt"}`,
+    "Lynligaen kårer den ultimate Lynbørs-nerden"
+  ];
+}
+
+function renderStudio(league, rounds) {
+  if (!league.length) return `<div class="warning">Ingen ligaresultater ennå.</div>`;
+
+  const leader = league[0];
+  const chaser = league[1];
+  const tipKing = [...league].sort((a,b) => b.tipping - a.tipping || b.perfectTips - a.perfectTips)[0];
+  const fantasyKing = [...league].sort((a,b) => b.fantasy - a.fantasy || b.eliteFantasy - a.eliteFantasy)[0];
+  const lastHero = [...league].filter(u => u.lastRoundTotal > 0).sort((a,b) => b.lastRoundTotal - a.lastRoundTotal)[0];
+
+  return `
+    ${renderPodium(league)}
+
+    <div class="studio-card">
+      <div class="headline-card">
+        <h2>🔥 ${leader.voter} sitter i førersetet</h2>
+        <div class="lead">
+          ${chaser ? `${chaser.voter} jager på ${chaser.total} poeng. Avstanden er ${leader.total - chaser.total} poeng.` : "Ingen reell jakt ennå, men det kommer."}
+        </div>
+      </div>
+
+      <div class="quick-stack">
+        ${renderPersonalPosition(league)}
+        <div class="quick-item"><strong>⚽ Fantasy-form</strong><br><span class="small">${fantasyKing ? `${fantasyKing.voter} leder fantasy med ${fantasyKing.fantasy} ligapoeng.` : "Ingen fantasydata ennå."}</span></div>
+        <div class="quick-item"><strong>🎯 Tippestatus</strong><br><span class="small">${tipKing ? `${tipKing.voter} leder tipping med ${tipKing.tipping} poeng.` : "Ingen tippetall ennå."}</span></div>
+        <div class="quick-item"><strong>🚀 Siste runde</strong><br><span class="small">${lastHero ? `${lastHero.voter} tok +${lastHero.lastRoundTotal} sist.` : "Ingen siste-runde-poeng ennå."}</span></div>
+      </div>
     </div>
   `;
 }
@@ -1028,94 +1390,48 @@ async function loadLynCentral() {
   const totalTipPredictions = buildPredictions(allVotes).length;
   const totalVotes = allVotes.filter(isPlayerVote).length;
   const leader = league[0];
+  const tickerItems = buildTickerItems(league, rounds);
 
   document.getElementById("overview").innerHTML = `
     <div class="hero-grid">
       <div class="hero-stat">
         <h3>Ligaleder</h3>
         <div class="big">${leader ? leader.voter : "–"}</div>
-        <div class="small">${leader ? leader.total + " poeng" : "Ingen data ennå"}</div>
+        <div class="delta">${leader ? leader.total + " poeng" : "Ingen data ennå"}</div>
       </div>
 
       <div class="hero-stat">
         <h3>Fantasy picks</h3>
         <div class="big">${totalFantasyPicks}</div>
-        <div class="small">${fantasyRounds.length} fantasyrunder</div>
+        <div class="delta">${fantasyRounds.length} fantasyrunder</div>
       </div>
 
       <div class="hero-stat">
         <h3>Kuponger</h3>
         <div class="big">${totalTipPredictions}</div>
-        <div class="small">${tipRounds.length} scorede tipperunder</div>
+        <div class="delta">${tipRounds.length} scorede tipperunder</div>
       </div>
 
       <div class="hero-stat">
         <h3>Børsstemmer</h3>
         <div class="big">${totalVotes}</div>
-        <div class="small">spillerstemmer totalt</div>
-      </div>
-    </div>
-
-    <div class="explain-box">
-      <h3>🏆 Slik fungerer Lynligaen</h3>
-
-      <div>
-        Lynligaen er <strong>sammenlagttabellen</strong> for <strong>Tippetips</strong> og <strong>Lyn Fantasy</strong>.
-
-        <br><br>
-
-        <strong>🎯 Tippetips</strong><br>
-        Her brukes de vanlige tippepoengene:
-        <br>
-        3 poeng for helt riktig resultat
-        <br>
-        2 poeng for riktig utfall og riktig målforskjell
-        <br>
-        1 poeng for riktig utfall
-        <br>
-        0 poeng for bom
-
-        <br><br>
-
-        <strong>⭐ Lyn Fantasy</strong><br>
-        Fantasy har høyere råpoeng enn tipping, så fantasy gjøres om til ligapoeng per kamp.
-        For å balansere at Tippetips nå også kan inneholde både herre og kvinnekamper, deles fantasy inn i fjerdedeler:
-
-        <br><br>
-
-        🔥 Øverste fjerdedel får 5 poeng
-        <br>
-        ⭐ Andre fjerdedel får 3 poeng
-        <br>
-        ⚪ Tredje fjerdedel får 1 poeng
-        <br>
-        💀 Nederste fjerdedel får 0 poeng
-
-        <br><br>
-
-        <strong>Totalen:</strong><br>
-        Tippetips + Fantasy = Lynligaen.
+        <div class="delta">spillerstemmer totalt</div>
       </div>
     </div>
 
     <div class="ticker">
-      <span>
-        ${leader ? `🔥 ${leader.voter} leder Lynligaen med ${leader.total} poeng` : "Lynligaen venter på data"}
-        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Tippetips teller med 3, 2, 1 og 0 poeng
-        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Fantasy deles i fjerdedeler: 5, 3, 1 og 0 poeng
-        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-        Sammenlagt kårer den ultimate Lynbørs-nerden
-      </span>
+      <span>${tickerItems.join(" &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; ")}</span>
     </div>
   `;
 
+  document.getElementById("studioPanel").innerHTML = renderStudio(league, rounds);
   document.getElementById("leagueTable").innerHTML = renderLeagueTable(league);
   document.getElementById("awards").innerHTML = renderAwards(league);
   document.getElementById("rounds").innerHTML = renderRounds(rounds);
+  document.getElementById("rulesPanel").innerHTML = renderRulesPanel();
 }
 
+setupTabs();
 loadLynCentral();
 </script>
   
