@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -504,6 +505,144 @@ label {
   font-weight:bold;
 }
 
+.table-panel {
+  margin-top:24px;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.18);
+  box-shadow:0 12px 30px rgba(0,0,0,0.25);
+}
+
+.table-panel-header {
+  padding:18px 20px;
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-end;
+}
+
+.table-panel-header h3 {
+  margin:0;
+  font-size:24px;
+}
+
+.table-panel-header p {
+  margin:5px 0 0;
+  opacity:0.78;
+  font-size:14px;
+}
+
+.table-badge {
+  display:inline-block;
+  white-space:nowrap;
+  padding:7px 11px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:bold;
+  border:1px solid rgba(255,255,255,0.22);
+  background:rgba(255,255,255,0.11);
+}
+
+.round-table-wrap {
+  background:
+    linear-gradient(135deg, rgba(215,25,32,0.22), rgba(19,41,75,0.78)),
+    rgba(0,0,0,0.36);
+}
+
+.season-table-wrap {
+  background:
+    linear-gradient(135deg, rgba(255,209,102,0.14), rgba(19,41,75,0.82)),
+    rgba(0,0,0,0.42);
+  border-color:rgba(255,209,102,0.28);
+}
+
+.round-table-wrap .fantasy-table,
+.season-table-wrap .fantasy-table {
+  margin-top:0;
+}
+
+.round-table-wrap .fantasy-table th,
+.season-table-wrap .fantasy-table th {
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.7px;
+  opacity:0.72;
+}
+
+.round-rank,
+.season-rank {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  font-weight:bold;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+}
+
+.round-rank.top {
+  background:rgba(215,25,32,0.75);
+  box-shadow:0 0 18px rgba(215,25,32,0.28);
+}
+
+.season-rank.top {
+  background:rgba(255,209,102,0.24);
+  border-color:rgba(255,209,102,0.65);
+  box-shadow:0 0 18px rgba(255,209,102,0.16);
+}
+
+.user-main {
+  font-weight:bold;
+}
+
+.user-sub {
+  font-size:12px;
+  opacity:0.72;
+  margin-top:3px;
+}
+
+.round-team {
+  line-height:1.45;
+}
+
+.round-points {
+  font-size:22px;
+  font-weight:bold;
+}
+
+.season-total {
+  font-size:22px;
+  font-weight:bold;
+  color:var(--gold);
+}
+
+.season-avg {
+  font-size:18px;
+  font-weight:bold;
+}
+
+@media (max-width:620px) {
+  .table-panel-header {
+    display:block;
+  }
+
+  .table-badge {
+    margin-top:10px;
+  }
+
+  .round-table-wrap .fantasy-table th:nth-child(3),
+  .round-table-wrap .fantasy-table td:nth-child(3) {
+    display:none;
+  }
+
+  .season-table-wrap .fantasy-table th:nth-child(3),
+  .season-table-wrap .fantasy-table td:nth-child(3) {
+    display:table-cell;
+  }
+}
+
 .round-players {
   display:grid;
   grid-template-columns:1fr;
@@ -561,6 +700,288 @@ label {
   text-decoration:underline;
 }
   
+
+/* NY FANTASY UX */
+.quick-actions {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:22px;
+}
+@media (min-width:760px) {
+  .quick-actions { grid-template-columns:repeat(3, 1fr); }
+}
+.quick-action {
+  display:block;
+  color:white;
+  text-decoration:none;
+  background:rgba(255,255,255,0.11);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:18px;
+  padding:15px;
+  font-weight:bold;
+}
+.quick-action span {
+  display:block;
+  margin-top:6px;
+  font-size:13px;
+  opacity:0.76;
+  font-weight:normal;
+}
+.pick-shell {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+}
+@media (min-width:900px) {
+  .pick-shell { grid-template-columns:1fr 320px; align-items:start; }
+}
+.builder-panel {
+  position:sticky;
+  top:18px;
+  background:rgba(0,0,0,0.48);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:22px;
+  padding:18px;
+}
+.builder-slot {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:10px;
+}
+.builder-slot img {
+  width:42px;
+  height:42px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+}
+.slot-label {
+  font-size:12px;
+  opacity:0.72;
+}
+.slot-name {
+  font-weight:bold;
+}
+.slot-empty {
+  opacity:0.55;
+}
+.clear-slot {
+  width:auto;
+  margin:0;
+  padding:7px 9px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.12);
+}
+.progress-wrap {
+  margin-top:14px;
+}
+.progress-line {
+  height:9px;
+  background:rgba(255,255,255,0.14);
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress-fill {
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, var(--red), var(--gold));
+  border-radius:999px;
+  transition:0.25s;
+}
+.progress-text {
+  margin-top:7px;
+  font-size:13px;
+  opacity:0.82;
+}
+.hidden-selects { display:none; }
+.player-toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:18px 0 8px;
+}
+.filter-btn {
+  width:auto;
+  margin:0;
+  padding:9px 13px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.16);
+}
+.filter-btn.active {
+  background:var(--red);
+}
+.player-card-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+@media (min-width:680px) {
+  .player-card-grid { grid-template-columns:1fr 1fr; }
+}
+@media (min-width:1040px) {
+  .player-card-grid { grid-template-columns:1fr 1fr 1fr; }
+}
+.pick-card {
+  position:relative;
+  overflow:hidden;
+  min-height:245px;
+  background:linear-gradient(145deg, rgba(255,255,255,0.12), rgba(0,0,0,0.35));
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:22px;
+  padding:14px;
+  box-shadow:0 8px 22px rgba(0,0,0,0.25);
+}
+.pick-card.selected { border-color:rgba(40,209,124,0.85); box-shadow:0 0 20px rgba(40,209,124,0.14); }
+.pick-card.captain { border-color:rgba(255,209,102,0.95); box-shadow:0 0 26px rgba(255,209,102,0.22); }
+.pick-card-img {
+  width:92px;
+  height:92px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+  border:2px solid rgba(255,255,255,0.42);
+}
+.pick-card-top {
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.pick-card-name {
+  font-size:21px;
+  font-weight:bold;
+}
+.pick-meta {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:10px;
+}
+.meta-pill {
+  display:inline-block;
+  font-size:12px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.14);
+}
+.card-actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:14px;
+}
+.card-actions button {
+  margin:0;
+  padding:10px;
+  font-size:14px;
+}
+.card-actions .captain-btn {
+  background:rgba(255,209,102,0.94);
+  color:#1b1300;
+}
+.card-actions .ghost-btn {
+  background:rgba(255,255,255,0.13);
+  border:1px solid rgba(255,255,255,0.18);
+}
+.draft-help {
+  margin-top:10px;
+  font-size:14px;
+  opacity:0.78;
+  line-height:1.45;
+}
+.sticky-team-mobile {
+  display:none;
+}
+.success-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.78);
+  z-index:10000;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+}
+.success-box {
+  max-width:460px;
+  width:100%;
+  text-align:center;
+  background:linear-gradient(135deg, rgba(215,25,32,0.88), rgba(19,41,75,0.96));
+  border:1px solid rgba(255,255,255,0.24);
+  border-radius:28px;
+  padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.55);
+}
+.success-box img {
+  width:128px;
+  height:128px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+  border:3px solid rgba(255,255,255,0.52);
+}
+.success-title {
+  font-size:30px;
+  font-weight:bold;
+  margin-top:15px;
+}
+.success-text {
+  opacity:0.9;
+  line-height:1.5;
+  margin-top:8px;
+}
+.success-close {
+  margin-top:18px;
+}
+.tabs {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:14px 0 8px;
+}
+.tab-btn {
+  width:auto;
+  margin:0;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+}
+.tab-btn.active { background:var(--red); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+@media (max-width:760px) {
+  .builder-panel { position:static; }
+  .sticky-team-mobile {
+    display:block;
+    position:fixed;
+    left:10px;
+    right:10px;
+    bottom:10px;
+    z-index:9998;
+    background:rgba(5,7,13,0.94);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:18px;
+    padding:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.45);
+  }
+  .sticky-team-mobile .mini-team {
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+    align-items:center;
+    font-size:13px;
+  }
+  .sticky-team-mobile button { margin:0; padding:10px; }
+  .container { padding-bottom:130px; }
+}
+
 @media (max-width:620px) {
   .menu-btn {
     position:static;
@@ -617,6 +1038,11 @@ label {
     <div class="hero-kicker">Lyn Fantasy</div>
     <h1>Bygg laget. Velg kaptein. Klatre på tabellen.</h1>
     <p>Velg 2 Lyn-spillere og én kaptein før kamp. Mål, assist, clean sheet, røde kort og børsbonus avgjør runden.</p>
+    <div class="quick-actions">
+      <a class="quick-action" href="#velg-lag">⚡ Sett laget<span>Bygg laget med spillerkort, bilder og kapteinvalg.</span></a>
+      <a class="quick-action" href="#rundestats">🏆 Se runden<span>Rundeleder, MVP og fantasyspillere.</span></a>
+      <a class="quick-action" href="#sesongstats">📈 Sesongstats<span>Tabell, favoritter og differensialer.</span></a>
+    </div>
   </div>
 
   <h2 class="section-title">1. Neste runde</h2>
@@ -668,40 +1094,48 @@ label {
   </div>
 </details>
 
-  <h2 class="section-title">3. Velg lag</h2>
+  <h2 class="section-title" id="velg-lag">3. Velg lag</h2>
 
   <div class="card">
-    <h2>Ditt lag</h2>
+    <h2>Bygg fantasy-laget ditt</h2>
+    <p class="small">Velg to spillere og én kaptein. Kortene viser posisjon, forrige fantasy-score og hvor populære valgene er.</p>
 
     <div id="lockMessage"></div>
 
     <label for="username">Forumbrukernavn</label>
     <input id="username" placeholder="Forumbrukernavn">
 
-    <label for="player1">Spiller 1</label>
-    <div class="select-row">
-      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
+    <div class="hidden-selects">
       <select id="player1"></select>
-    </div>
-
-    <label for="player2">Spiller 2</label>
-    <div class="select-row">
-      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
       <select id="player2"></select>
-    </div>
-
-    <label for="captain">Kaptein ⭐</label>
-    <div class="select-row">
-      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
       <select id="captain"></select>
+      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
+      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
+      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
     </div>
 
-    <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
+    <div class="pick-shell">
+      <div>
+        <div class="player-toolbar" id="playerFilters"></div>
+        <div id="playerCardGrid" class="player-card-grid"></div>
+      </div>
+
+      <aside class="builder-panel">
+        <h3 style="margin-top:0;">Laget ditt</h3>
+        <div id="teamBuilderSlots"></div>
+        <div class="progress-wrap">
+          <div class="progress-line"><div id="pickProgress" class="progress-fill"></div></div>
+          <div id="pickProgressText" class="progress-text"></div>
+        </div>
+        <div class="draft-help" id="draftHelp">Tips: Trykk «Velg» på to spillere og «Kaptein» på én annen spiller.</div>
+        <button id="saveBtn" onclick="saveTeam()">Lagre fantasy-lag</button>
+      </aside>
+    </div>
 
     <div id="output" class="result" style="display:none;"></div>
   </div>
 
-  <h2 class="section-title">4. Fantasy-stats</h2>
+  <h2 class="section-title" id="rundestats">4. Fantasy-stats</h2>
 
   <div class="card">
     <h2>Fantasy leaderboard</h2>
@@ -710,7 +1144,7 @@ label {
     </div>
   </div>
 
-  <h2 class="section-title">5. Fantasy Central</h2>
+  <h2 class="section-title" id="sesongstats">5. Fantasy Central</h2>
 
   <div class="card">
     <h2>Sesongstats</h2>
@@ -720,6 +1154,18 @@ label {
   </div>
 
 </div>
+
+<div id="stickyTeamMobile" class="sticky-team-mobile"></div>
+
+<div id="successOverlay" class="success-overlay">
+  <div class="success-box">
+    <img id="successImage" src="bilder/lyn-logo.png" alt="">
+    <div class="success-title">Lagret!</div>
+    <div id="successText" class="success-text"></div>
+    <button class="success-close" onclick="closeSuccessOverlay()">Nydelig</button>
+  </div>
+</div>
+
 <footer class="site-footer">
   Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
   Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
@@ -786,6 +1232,9 @@ let matchStats = {};
   let allMatches = [];
 let nextMatch = null;
 let statsMatch = null;
+let activePositionFilter = "ALLE";
+let currentPickCounts = {};
+let currentCaptainCounts = {};
   function parseLocalDeadline(deadline) {
   if (!deadline) return null;
 
@@ -859,6 +1308,273 @@ function getPlayerImage(playerName) {
   return player ? player.image : "bilder/lyn-logo.png";
 }
   
+
+function getSelectedTeamFromInputs() {
+  return {
+    username: document.getElementById("username") ? document.getElementById("username").value.trim() : "",
+    player1: document.getElementById("player1") ? document.getElementById("player1").value : "",
+    player2: document.getElementById("player2") ? document.getElementById("player2").value : "",
+    captain: document.getElementById("captain") ? document.getElementById("captain").value : ""
+  };
+}
+
+function getPlayerLastPoints(playerName) {
+  if (!statsMatch || !matchStats[playerName]) return null;
+  return calculatePoints(playerName, false).total;
+}
+
+function getOwnershipText(playerName) {
+  const picks = currentPickCounts[playerName] || 0;
+  const caps = currentCaptainCounts[playerName] || 0;
+  if (!picks && !caps) return "Differensial";
+  if (caps) return `${caps} kapteinvalg`;
+  return `${picks} valg`;
+}
+
+function renderPlayerFilters() {
+  const box = document.getElementById("playerFilters");
+  if (!box) return;
+
+  const filters = [
+    { key:"ALLE", label:"Alle" },
+    { key:"KEEPER", label:"Keeper" },
+    { key:"FORS", label:"Forsvar" },
+    { key:"MID", label:"Midtbane" },
+    { key:"ANG", label:"Angrep" }
+  ];
+
+  box.innerHTML = filters.map(filter => `
+    <button type="button" class="filter-btn ${activePositionFilter === filter.key ? "active" : ""}" onclick="setPlayerFilter('${filter.key}')">
+      ${filter.label}
+    </button>
+  `).join("");
+}
+
+function setPlayerFilter(filter) {
+  activePositionFilter = filter;
+  renderPlayerFilters();
+  renderPlayerCards();
+}
+
+function chooseRegularPlayer(playerName) {
+  if (isDeadlinePassed()) return;
+
+  const player1 = document.getElementById("player1");
+  const player2 = document.getElementById("player2");
+  const captain = document.getElementById("captain");
+
+  if (player1.value === playerName) {
+    player1.value = "";
+  } else if (player2.value === playerName) {
+    player2.value = "";
+  } else if (!player1.value) {
+    player1.value = playerName;
+  } else if (!player2.value) {
+    player2.value = playerName;
+  } else {
+    player2.value = playerName;
+  }
+
+  if (captain.value === player1.value || captain.value === player2.value) {
+    captain.value = "";
+  }
+
+  updatePlayerImages();
+  updateTeamBuilder();
+  renderPlayerCards();
+}
+
+function chooseCaptain(playerName) {
+  if (isDeadlinePassed()) return;
+
+  const player1 = document.getElementById("player1");
+  const player2 = document.getElementById("player2");
+  const captain = document.getElementById("captain");
+
+  if (player1.value === playerName) player1.value = "";
+  if (player2.value === playerName) player2.value = "";
+
+  captain.value = captain.value === playerName ? "" : playerName;
+
+  updatePlayerImages();
+  updateTeamBuilder();
+  renderPlayerCards();
+}
+
+function clearPickSlot(slot) {
+  if (isDeadlinePassed()) return;
+  document.getElementById(slot).value = "";
+  updatePlayerImages();
+  updateTeamBuilder();
+  renderPlayerCards();
+}
+
+function renderPlayerCards() {
+  const grid = document.getElementById("playerCardGrid");
+  if (!grid) return;
+
+  const team = getSelectedTeamFromInputs();
+  const selectedRegulars = [team.player1, team.player2].filter(Boolean);
+
+  const visiblePlayers = players.filter(player => {
+    return activePositionFilter === "ALLE" || player.position === activePositionFilter;
+  });
+
+  grid.innerHTML = visiblePlayers.map(player => {
+    const isSelected = selectedRegulars.includes(player.name);
+    const isCaptain = team.captain === player.name;
+    const lastPoints = getPlayerLastPoints(player.name);
+    const stat = matchStats[player.name];
+    const ratingText = stat && stat.rating ? `Børs ${stat.rating.toFixed(1)}` : "Børs –";
+    const pointsText = lastPoints === null ? "Sist –" : `Sist ${lastPoints}p`;
+
+    return `
+      <div class="pick-card ${isSelected ? "selected" : ""} ${isCaptain ? "captain" : ""}">
+        <div class="pick-card-top">
+          <img class="pick-card-img" src="${player.image}" alt="${player.name}" onerror="this.src='bilder/lyn-logo.png'">
+          <div>
+            <div class="pick-card-name">${isCaptain ? "⭐ " : ""}${player.name}</div>
+            <div class="position-tag">${player.position}</div>
+          </div>
+        </div>
+        <div class="pick-meta">
+          <span class="meta-pill">${pointsText}</span>
+          <span class="meta-pill">${ratingText}</span>
+          <span class="meta-pill">${getOwnershipText(player.name)}</span>
+        </div>
+        <div class="draft-help">
+          ${getTinyPlayerHint(player.name, lastPoints, stat)}
+        </div>
+        <div class="card-actions">
+          <button type="button" class="${isSelected ? "ghost-btn" : ""}" onclick="chooseRegularPlayer('${player.name.replace(/'/g,"\\'")}')">
+            ${isSelected ? "Valgt ✓" : "Velg"}
+          </button>
+          <button type="button" class="captain-btn" onclick="chooseCaptain('${player.name.replace(/'/g,"\\'")}')">
+            ${isCaptain ? "Kaptein ✓" : "Kaptein ⭐"}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function getTinyPlayerHint(playerName, lastPoints, stat) {
+  if (lastPoints === null) return "Ingen registrerte fantasyhendelser ennå.";
+  if (lastPoints >= 8) return "🔥 Varm spiller. Dette lukter selvtillit.";
+  if (lastPoints > 0) return "📈 Kan være et solid valg denne runden.";
+  if (stat && stat.rating > 0 && stat.rating <= 4.5) return "😬 Lav børs sist. Modig valg.";
+  return "👀 Differensialpotensial hvis magefølelsen treffer.";
+}
+
+function updateTeamBuilder() {
+  const box = document.getElementById("teamBuilderSlots");
+  if (!box) return;
+
+  const team = getSelectedTeamFromInputs();
+  const slots = [
+    { id:"player1", label:"Spiller 1", value:team.player1 },
+    { id:"player2", label:"Spiller 2", value:team.player2 },
+    { id:"captain", label:"Kaptein ⭐", value:team.captain }
+  ];
+
+  box.innerHTML = slots.map(slot => {
+    const value = slot.value;
+    return `
+      <div class="builder-slot">
+        <img src="${value ? getPlayerImage(value) : "bilder/lyn-logo.png"}" alt="" onerror="this.src='bilder/lyn-logo.png'">
+        <div>
+          <div class="slot-label">${slot.label}</div>
+          <div class="slot-name ${value ? "" : "slot-empty"}">${value || "Ikke valgt"}</div>
+        </div>
+        <button type="button" class="clear-slot" onclick="clearPickSlot('${slot.id}')">×</button>
+      </div>
+    `;
+  }).join("");
+
+  const count = [team.player1, team.player2, team.captain].filter(Boolean).length;
+  const progress = Math.round((count / 3) * 100);
+  const progressFill = document.getElementById("pickProgress");
+  const progressText = document.getElementById("pickProgressText");
+
+  if (progressFill) progressFill.style.width = progress + "%";
+  if (progressText) {
+    progressText.textContent = count === 3
+      ? "Laget er klart. Nå er det bare å trykke lagre."
+      : `${count}/3 valgt. Du mangler ${3 - count} valg.`;
+  }
+
+  renderStickyTeamMobile();
+}
+
+function renderStickyTeamMobile() {
+  const box = document.getElementById("stickyTeamMobile");
+  if (!box) return;
+
+  const team = getSelectedTeamFromInputs();
+  const compact = [team.player1 || "Spiller 1", team.player2 || "Spiller 2", team.captain ? "⭐ " + team.captain : "Kaptein"].join(" · ");
+
+  box.innerHTML = `
+    <div class="mini-team">
+      <div><strong>Laget ditt</strong><br>${compact}</div>
+      <button onclick="saveTeam()">Lagre</button>
+    </div>
+  `;
+}
+
+function showSuccessOverlay(team) {
+  const overlay = document.getElementById("successOverlay");
+  if (!overlay) return;
+
+  const hype = [
+    "Pedersen nikker anerkjennende.",
+    "Dette laget har enten geni eller kaos skrevet over seg.",
+    "Kapteinsvalget er registrert. Nå er det bare å late som det var nøye analysert.",
+    "Bold pick. Forumet følger med.",
+    "Laget er inne. Nå starter ventingen på målpoeng og børsbonus."
+  ];
+
+  document.getElementById("successImage").src = getPlayerImage(team.captain || team.player1 || team.player2);
+  document.getElementById("successText").innerHTML = `
+    <strong>${team.username}</strong><br>
+    ${team.player1}, ${team.player2} og ⭐ ${team.captain}<br><br>
+    ${hype[Math.floor(Math.random() * hype.length)]}
+  `;
+
+  overlay.style.display = "flex";
+}
+
+function closeSuccessOverlay() {
+  const overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function updateCurrentPickCounts(picks) {
+  currentPickCounts = {};
+  currentCaptainCounts = {};
+
+  (picks || []).forEach(pick => {
+    [pick.player1, pick.player2, pick.captain].forEach(player => {
+      currentPickCounts[player] = (currentPickCounts[player] || 0) + 1;
+    });
+    currentCaptainCounts[pick.captain] = (currentCaptainCounts[pick.captain] || 0) + 1;
+  });
+
+  renderPlayerCards();
+}
+
+function setupTabs() {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+      btn.classList.add("active");
+      const panel = document.getElementById(target);
+      if (panel) panel.classList.add("active");
+    });
+  });
+}
+
 function playerLink(playerName) {
   return `
     <a href="spiller.html?player=${encodeURIComponent(playerName)}" class="player-link">
@@ -949,6 +1665,10 @@ function fillSelects() {
       select.innerHTML += `<option value="${player.name}">${player.name} (${player.position})</option>`;
     });
   });
+
+  renderPlayerFilters();
+  renderPlayerCards();
+  updateTeamBuilder();
 }
 
 function updatePlayerImages() {
@@ -1157,7 +1877,7 @@ trackEvent("fantasy_saved", {
   captain:captain
 });
   
-  alert("Fantasy-laget er lagret!");
+  showSuccessOverlay(team);
   showTeam(team);
   loadFantasyStats();
   loadSeasonFantasyStats();
@@ -1235,6 +1955,8 @@ function loadSavedTeam() {
   document.getElementById("player2").value = team.player2;
   document.getElementById("captain").value = team.captain;
 
+  updateTeamBuilder();
+  renderPlayerCards();
   showTeam(team);
 }
 
@@ -1319,6 +2041,8 @@ async function loadFantasyStats() {
     document.getElementById("fantasyStats").innerHTML = "Klarte ikke å laste fantasy.";
     return;
   }
+
+  updateCurrentPickCounts(picks || []);
 
   if (!picks || picks.length === 0) {
     document.getElementById("fantasyStats").innerHTML = "Ingen fantasy-lag sendt inn ennå.";
@@ -1411,30 +2135,43 @@ const leaderboard = mensPicks.map(pick => {
 
     ${renderRoundPlayers()}
 
-    <table class="fantasy-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Bruker</th>
-          <th>Lag</th>
-          <th>Poeng</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${leaderboard.map((row, index) => `
+    <div class="table-panel round-table-wrap">
+      <div class="table-panel-header">
+        <div>
+          <h3>⚡ Rundens fantasykamp</h3>
+          <p>Kun poeng fra denne kampen. Her er det kortvarig ære, kaos og dårlige kapteinsvalg.</p>
+        </div>
+        <div class="table-badge">${leaderboard.length} lag levert</div>
+      </div>
+
+      <table class="fantasy-table">
+        <thead>
           <tr>
-            <td>${index + 1}</td>
-            <td>
-  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
-    ${row.voter}
-  </a>
-</td>
-            <td>${playerLink(row.player1)}, ${playerLink(row.player2)}, ⭐ ${playerLink(row.captain)}</td>
-            <td>${row.total}</td>
+            <th>#</th>
+            <th>Bruker</th>
+            <th>Lag denne runden</th>
+            <th>Runde</th>
           </tr>
-        `).join("")}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${leaderboard.map((row, index) => `
+            <tr>
+              <td><span class="round-rank ${index < 3 ? "top" : ""}">${index + 1}</span></td>
+              <td>
+                <div class="user-main">
+                  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+                    ${row.voter}
+                  </a>
+                </div>
+                <div class="user-sub">${index === 0 ? "Rundens konge" : index < 3 ? "På pallen" : "Jakter topp 3"}</div>
+              </td>
+              <td class="round-team">${playerLink(row.player1)}, ${playerLink(row.player2)}, ⭐ ${playerLink(row.captain)}</td>
+              <td><span class="round-points ${formatPointClass(row.total)}">${row.total}</span></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
@@ -1748,31 +2485,45 @@ mensPicks.forEach(pick => {
       </div>
     </div>
 
-    <h3>Sesongtabell</h3>
-    <table class="fantasy-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Bruker</th>
-          <th>Runder</th>
-          <th>Poeng</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${seasonTable.map((row, index) => `
+    <div class="table-panel season-table-wrap">
+      <div class="table-panel-header">
+        <div>
+          <h3>👑 Sesongtabellen</h3>
+          <p>Sammenlagt alle runder. Her teller både stabilitet, oppmøte og noen små genistreker.</p>
+        </div>
+        <div class="table-badge">${seasonTable.length} managere</div>
+      </div>
+
+      <table class="fantasy-table">
+        <thead>
           <tr>
-            <td>${index + 1}</td>
-          <td>
-  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
-    ${row.voter}
-  </a>
-</td>
-            <td>${row.rounds}</td>
-            <td>${row.total}</td>
+            <th>#</th>
+            <th>Bruker</th>
+            <th>Runder</th>
+            <th>Snitt</th>
+            <th>Total</th>
           </tr>
-        `).join("")}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${seasonTable.map((row, index) => `
+            <tr>
+              <td><span class="season-rank ${index < 3 ? "top" : ""}">${index + 1}</span></td>
+              <td>
+                <div class="user-main">
+                  <a href="profil.html?user=${encodeURIComponent(row.voter)}" class="profile-link">
+                    ${row.voter}
+                  </a>
+                </div>
+                <div class="user-sub">${index === 0 ? "Leder Lyn Fantasy" : `${seasonTable[0] ? seasonTable[0].total - row.total : 0} bak leder`}</div>
+              </td>
+              <td>${row.rounds}</td>
+              <td><span class="season-avg">${row.rounds ? (row.total / row.rounds).toFixed(1) : "0.0"}</span></td>
+              <td><span class="season-total">${row.total}</span></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
@@ -1786,14 +2537,22 @@ async function init() {
   fillSelects();
 
   ["player1", "player2", "captain"].forEach(id => {
-    document.getElementById(id).addEventListener("change", updatePlayerImages);
+    document.getElementById(id).addEventListener("change", () => {
+      updatePlayerImages();
+      updateTeamBuilder();
+      renderPlayerCards();
+    });
   });
+
+  document.getElementById("username").addEventListener("input", updateTeamBuilder);
 
   await loadMatchStats();
   await loadBorsRatings();
 
   loadSavedTeam();
   updatePlayerImages();
+  updateTeamBuilder();
+  renderPlayerCards();
   applyDeadlineLock();
   loadFantasyStats();
   loadSeasonFantasyStats();
