@@ -1,24 +1,351 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daily Lyn Challenge</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(238,245,255,0.96)),
+    url("bakgrunn.jpg.webp") center/cover fixed;
+  color:#13294b;
+}
+
+.wrapper{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+.hero{
+  text-align:center;
+  padding:40px 20px 20px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:42px;
+}
+
+.hero p{
+  opacity:0.8;
+}
+
+.challenge-box{
+  background:white;
+  border-radius:28px;
+  padding:24px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+
+.challenge-title{
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.challenge-sub{
+  color:#666;
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.card{
+  background:#f8fafc;
+  border:2px solid #dbe3ef;
+  border-radius:16px;
+  padding:18px 10px;
+  text-align:center;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.15s;
+  user-select:none;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+}
+
+.card.selected{
+  background:#13294b;
+  color:white;
+  border-color:#13294b;
+}
+
+.card.solved{
+  color:white;
+  border:none;
+}
+
+.controls{
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+}
+
+button{
+  flex:1;
+  border:none;
+  border-radius:14px;
+  padding:14px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.submit-btn{
+  background:#d71920;
+  color:white;
+}
+
+.clear-btn{
+  background:#e5e7eb;
+}
+
+.message{
+  margin-top:16px;
+  font-weight:bold;
+  min-height:24px;
+}
+
+.group-reveal{
+  margin-bottom:14px;
+  padding:16px;
+  border-radius:18px;
+  color:white;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.streak{
+  background:#13294b;
+  color:white;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:bold;
+}
+
+.counter{
+  color:#666;
+  font-size:14px;
+}
+
+@media(max-width:700px){
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hero h1{
+    font-size:32px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="hero">
+    <h1>🧠 Daily Lyn Challenge</h1>
+    <p>Ny challenge hver dag.</p>
+  </div>
+
+  <div class="challenge-box">
+
+    <div class="topbar">
+      <div class="streak" id="streakBox">🔥 Streak: 1</div>
+      <div class="counter">412 supportere prøvd dagens</div>
+    </div>
+
+    <div class="challenge-title">
+      Lyn Connections
+    </div>
+
+    <div class="challenge-sub">
+      Finn 4 grupper med 4 riktige.
+    </div>
+
+    <div id="solvedGroups"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="controls">
+      <button class="clear-btn" onclick="clearSelection()">
+        Fjern valg
+      </button>
+
+      <button class="submit-btn" onclick="submitGuess()">
+        Sjekk gruppe
+      </button>
+    </div>
+
+    <div class="message" id="message"></div>
+
+  </div>
+
+</div>
+
+<script>
 
 const todaysChallenge = {
-  type: "connections",
-  title: "Daily Lyn Challenge #1",
-
   groups: [
     {
       category: "Nåværende Lyn-spillere",
+      color:"#027a48",
       answers: ["Hellum", "Pedersen", "Sell", "Midtskogen"]
     },
     {
       category: "Tidligere Oslo-klubber",
+      color:"#7c3aed",
       answers: ["KFUM", "Skeid", "VIF", "Grorud"]
     },
     {
       category: "Lyn-årstall",
+      color:"#b45309",
       answers: ["2008", "2023", "1994", "1968"]
     },
     {
       category: "Supporterrelatert",
+      color:"#d71920",
       answers: ["Bastionen", "Bislett", "Østblokka", "Klanen"]
     }
   ]
 };
+
+const allAnswers = todaysChallenge.groups
+  .flatMap(g => g.answers)
+  .sort(() => Math.random() - 0.5);
+
+const grid = document.getElementById("grid");
+const message = document.getElementById("message");
+const solvedGroups = document.getElementById("solvedGroups");
+
+let selected = [];
+let solved = [];
+
+function renderGrid(){
+
+  grid.innerHTML = "";
+
+  allAnswers.forEach(answer => {
+
+    if(solved.includes(answer)) return;
+
+    const card = document.createElement("div");
+
+    card.className = "card";
+
+    if(selected.includes(answer)){
+      card.classList.add("selected");
+    }
+
+    card.innerText = answer;
+
+    card.onclick = () => toggleCard(answer);
+
+    grid.appendChild(card);
+
+  });
+
+}
+
+function toggleCard(answer){
+
+  if(selected.includes(answer)){
+    selected = selected.filter(a => a !== answer);
+  } else {
+
+    if(selected.length >= 4) return;
+
+    selected.push(answer);
+  }
+
+  renderGrid();
+
+}
+
+function clearSelection(){
+  selected = [];
+  renderGrid();
+}
+
+function arraysEqual(a,b){
+  return a.sort().join("|") === b.sort().join("|");
+}
+
+function submitGuess(){
+
+  if(selected.length !== 4){
+    message.innerText = "Velg 4 først 😄";
+    return;
+  }
+
+  const correctGroup = todaysChallenge.groups.find(group =>
+    arraysEqual(group.answers, selected)
+  );
+
+  if(correctGroup){
+
+    message.innerText = "🔥 Riktig!";
+
+    solved.push(...correctGroup.answers);
+
+    const reveal = document.createElement("div");
+
+    reveal.className = "group-reveal";
+
+    reveal.style.background = correctGroup.color;
+
+    reveal.innerHTML = `
+      <strong>${correctGroup.category}</strong><br>
+      ${correctGroup.answers.join(", ")}
+    `;
+
+    solvedGroups.appendChild(reveal);
+
+    selected = [];
+
+    renderGrid();
+
+    if(solved.length === 16){
+
+      message.innerText = "🏆 Du løste dagens challenge!";
+
+    }
+
+  } else {
+
+    message.innerText = "❌ Nope. Prøv igjen 😄";
+
+  }
+
+}
+
+renderGrid();
+
+</script>
+
+</body>
+</html>
