@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -62,6 +60,72 @@ h1 {
   text-shadow:0 2px 10px rgba(0,0,0,0.55);
 }
 
+.identity-box {
+  margin:22px auto 0;
+  max-width:680px;
+  padding:15px;
+  border-radius:20px;
+  background:rgba(0,0,0,0.58);
+  border:1px solid rgba(255,255,255,0.14);
+  color:white;
+  box-shadow:0 8px 22px rgba(0,0,0,0.28);
+  text-align:left;
+}
+
+.identity-top {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.identity-label {
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  opacity:0.75;
+  font-weight:bold;
+}
+
+.identity-status {
+  color:var(--gold);
+  font-size:13px;
+  font-weight:bold;
+  text-align:right;
+}
+
+.identity-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+}
+
+.identity-row input {
+  width:100%;
+  box-sizing:border-box;
+  border:none;
+  border-radius:13px;
+  padding:13px 14px;
+  font-size:16px;
+  background:rgba(255,255,255,0.12);
+  color:white;
+  outline:none;
+}
+
+.identity-row input::placeholder {
+  color:rgba(255,255,255,0.5);
+}
+
+.identity-row button {
+  border:none;
+  border-radius:13px;
+  padding:0 18px;
+  background:var(--gold);
+  color:#1b1300;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 .next-match-widget {
   margin:24px auto 0;
@@ -179,6 +243,68 @@ h1 {
   text-align:center;
 }
 
+.my-deliveries {
+  margin:18px auto 0;
+  max-width:680px;
+  background:rgba(0,0,0,0.62);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:22px;
+  padding:17px;
+  color:white;
+  text-align:left;
+  box-shadow:0 10px 24px rgba(0,0,0,0.3);
+}
+
+.my-deliveries-title {
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  opacity:0.72;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.delivery-row {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:10px 0;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.delivery-row:first-of-type {
+  border-top:none;
+}
+
+.delivery-icon {
+  font-size:22px;
+}
+
+.delivery-main {
+  font-size:18px;
+  font-weight:900;
+}
+
+.delivery-sub {
+  margin-top:3px;
+  font-size:13px;
+  opacity:0.72;
+}
+
+.delivery-action {
+  color:var(--gold);
+  font-weight:bold;
+  text-decoration:none;
+  white-space:nowrap;
+  font-size:13px;
+}
+
+.delivery-empty {
+  opacity:0.78;
+  line-height:1.45;
+}
+
 .grid {
   margin-top:40px;
   display:grid;
@@ -210,6 +336,31 @@ h1 {
     linear-gradient(135deg,#d71920,#ff3942);
 }
 
+.card.fantasy-feature-card {
+  border-color:rgba(255,209,102,0.65);
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.42),
+    0 0 24px rgba(255,209,102,0.16);
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
+    linear-gradient(135deg,#13294b,#d71920);
+}
+
+.card.fantasy-feature-card::before {
+  content:"HOT";
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:3;
+  background:var(--gold);
+  color:#16100a;
+  font-size:12px;
+  font-weight:900;
+  padding:5px 9px;
+  border-radius:999px;
+  letter-spacing:0.6px;
+}
+
 .card:hover {
   transform:translateY(-4px);
   box-shadow:0 18px 36px rgba(0,0,0,0.46);
@@ -236,7 +387,7 @@ h1 {
 }
 
 .card:hover .card-player {
-  transform:scale(1.06);
+  transform:scale(1.08) translateY(-2px);
 }
 
 .card-title {
@@ -384,231 +535,6 @@ h1 {
   color:#ffd166;
 }
 
-
-
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(10px); }
-  to { opacity:1; transform:translateY(0); }
-}
-
-.next-match-widget,
-.throne-card,
-.season-card,
-.player-of-year-card {
-  animation:fadeInUp 0.5s ease both;
-}
-
-.card.fantasy-feature-card {
-  border-color:rgba(255,209,102,0.65);
-  box-shadow:
-    0 12px 32px rgba(0,0,0,0.42),
-    0 0 24px rgba(255,209,102,0.16);
-  background:
-    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
-    linear-gradient(135deg,#13294b,#d71920);
-}
-
-.card.fantasy-feature-card::before {
-  content:"HOT";
-  position:absolute;
-  top:14px;
-  right:18px;
-  z-index:3;
-  background:var(--gold);
-  color:#16100a;
-  font-size:12px;
-  font-weight:900;
-  padding:5px 9px;
-  border-radius:999px;
-  letter-spacing:0.6px;
-}
-
-.card:hover .card-player {
-  transform:scale(1.08) translateY(-2px);
-}
-
-
-.my-deliveries-card {
-  margin:22px auto 0;
-  max-width:720px;
-  background:rgba(0,0,0,0.62);
-  color:white;
-  border:1px solid rgba(255,255,255,0.16);
-  border-radius:22px;
-  padding:16px;
-  text-align:left;
-  box-shadow:0 10px 26px rgba(0,0,0,0.30);
-  backdrop-filter:blur(5px);
-}
-
-.deliveries-head {
-  display:flex;
-  justify-content:space-between;
-  gap:14px;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.deliveries-kicker {
-  font-size:12px;
-  opacity:0.72;
-  text-transform:uppercase;
-  letter-spacing:0.7px;
-  font-weight:bold;
-}
-
-.deliveries-title {
-  margin-top:3px;
-  font-size:20px;
-  font-weight:900;
-  color:var(--gold);
-}
-
-.deliveries-edit {
-  width:auto;
-  border:none;
-  border-radius:999px;
-  padding:9px 12px;
-  background:rgba(255,209,102,0.95);
-  color:#17110a;
-  font-weight:900;
-  cursor:pointer;
-  white-space:nowrap;
-}
-
-.deliveries-content {
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-}
-
-.delivery-row {
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:10px;
-  align-items:center;
-  background:rgba(255,255,255,0.09);
-  border:1px solid rgba(255,255,255,0.10);
-  border-radius:15px;
-  padding:11px 12px;
-}
-
-.delivery-icon {
-  font-size:20px;
-}
-
-.delivery-main {
-  font-weight:900;
-  line-height:1.25;
-}
-
-.delivery-sub {
-  margin-top:2px;
-  font-size:12px;
-  opacity:0.72;
-}
-
-.delivery-status {
-  color:var(--gold);
-  font-weight:900;
-  font-size:13px;
-  white-space:nowrap;
-}
-
-.delivery-empty {
-  opacity:0.82;
-}
-
-@media (max-width:700px) {
-  .deliveries-head {
-    align-items:flex-start;
-  }
-
-  .deliveries-title {
-    font-size:18px;
-  }
-
-  .delivery-row {
-    grid-template-columns:auto 1fr;
-  }
-
-  .delivery-status {
-    grid-column:2;
-  }
-}
-
-.player-of-year-card {
-  animation:fadeInUp 0.5s ease both;
-}
-
-.card.fantasy-feature-card {
-  border-color:rgba(255,209,102,0.65);
-  box-shadow:
-    0 12px 32px rgba(0,0,0,0.42),
-    0 0 24px rgba(255,209,102,0.16);
-  background:
-    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
-    linear-gradient(135deg,#13294b,#d71920);
-}
-
-.card.fantasy-feature-card::before {
-  content:"HOT";
-  position:absolute;
-  top:14px;
-  right:18px;
-  z-index:3;
-  background:var(--gold);
-  color:#16100a;
-  font-size:12px;
-  font-weight:900;
-  padding:5px 9px;
-  border-radius:999px;
-  letter-spacing:0.6px;
-}
-
-.card:hover .card-player {
-  transform:scale(1.08) translateY(-2px);
-}
-
-.hook-line {
-  margin:22px auto 0;
-  max-width:720px;
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-
-@media (min-width:720px) {
-  .hook-line {
-    grid-template-columns:repeat(3,1fr);
-  }
-}
-
-.hook-pill {
-  background:rgba(0,0,0,0.58);
-  color:white;
-  border:1px solid rgba(255,255,255,0.14);
-  border-radius:16px;
-  padding:12px 14px;
-  text-align:left;
-  box-shadow:0 8px 20px rgba(0,0,0,0.24);
-}
-
-.hook-label {
-  font-size:12px;
-  opacity:0.72;
-  text-transform:uppercase;
-  letter-spacing:0.6px;
-  font-weight:bold;
-}
-
-.hook-value {
-  margin-top:4px;
-  font-size:17px;
-  font-weight:900;
-  color:var(--gold);
-}
-
 .player-of-year-card {
   margin-top:26px;
   background:
@@ -678,6 +604,56 @@ h1 {
   padding:14px;
 }
 
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.next-match-widget,
+.throne-card,
+.season-card,
+.player-of-year-card,
+.identity-box,
+.my-deliveries {
+  animation:fadeInUp 0.5s ease both;
+}
+
+.footer {
+  margin-top:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  font-size:13px;
+  opacity:0.82;
+  color:white;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  flex-wrap:wrap;
+}
+
+.footer-heart img {
+  width:68px;
+  height:68px;
+  object-fit:cover;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.18);
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+}
+
+.footer-text {
+  max-width:520px;
+  line-height:1.5;
+}
+
+.footer a {
+  color:#ffd166;
+  text-decoration:none;
+}
+
+.footer a:hover {
+  text-decoration:underline;
+}
+
 @media (max-width:700px) {
   body {
     justify-content:flex-start;
@@ -700,6 +676,14 @@ h1 {
     font-size:15px;
   }
 
+  .identity-row {
+    grid-template-columns:1fr;
+  }
+
+  .identity-row button {
+    padding:13px;
+  }
+
   .next-match-widget {
     padding:22px;
     border-radius:24px;
@@ -719,6 +703,14 @@ h1 {
 
   .next-btn {
     width:100%;
+  }
+
+  .delivery-row {
+    grid-template-columns:auto 1fr;
+  }
+
+  .delivery-action {
+    grid-column:2;
   }
 
   .grid {
@@ -775,41 +767,14 @@ h1 {
   .season-grid {
     grid-template-columns:1fr;
   }
-}
-  .footer {
-  margin-top:36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  font-size:13px;
-  opacity:0.82;
-  color:white;
-  text-shadow:0 2px 8px rgba(0,0,0,0.5);
-  flex-wrap:wrap;
-}
 
-.footer-heart img {
-  width:68px;
-  height:68px;
-  object-fit:cover;
-  border-radius:50%;
-  border:2px solid rgba(255,255,255,0.18);
-  box-shadow:0 4px 14px rgba(0,0,0,0.35);
-}
+  .player-of-year-head {
+    display:block;
+  }
 
-.footer-text {
-  max-width:520px;
-  line-height:1.5;
-}
-
-.footer a {
-  color:#ffd166;
-  text-decoration:none;
-}
-
-.footer a:hover {
-  text-decoration:underline;
+  .player-of-year-formula {
+    margin-top:10px;
+  }
 }
 </style>
 </head>
@@ -826,21 +791,24 @@ h1 {
     Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
   </div>
 
+  <div class="identity-box">
+    <div class="identity-top">
+      <div class="identity-label">Ditt forumnavn</div>
+      <div id="identityStatus" class="identity-status">Ikke satt</div>
+    </div>
+    <div class="identity-row">
+      <input id="forumNameInput" type="text" placeholder="f.eks superben" maxlength="30">
+      <button type="button" onclick="saveForumName()">Lagre</button>
+    </div>
+  </div>
+
   <div id="nextMatchWidget" class="next-match-widget">
     <div class="next-loading">Laster neste kamp...</div>
   </div>
 
-  <div id="myDeliveries" class="my-deliveries-card">
-    <div class="deliveries-head">
-      <div>
-        <div class="deliveries-kicker">Mine leveringer</div>
-        <div class="deliveries-title">Laster dine tips...</div>
-      </div>
-      <button class="deliveries-edit" onclick="location.href='tippetips.html'">Endre</button>
-    </div>
-    <div id="myDeliveriesContent" class="deliveries-content">
-      <div class="delivery-row">Henter lagret forumnavn og leveringer...</div>
-    </div>
+  <div id="myDeliveries" class="my-deliveries">
+    <div class="my-deliveries-title">Mine leveringer</div>
+    <div class="delivery-empty">Skriv forumnavnet ditt over, så vises tips og fantasy-lag for neste kamp her.</div>
   </div>
 
   <div class="grid">
@@ -981,8 +949,53 @@ const players = [
   { name:"Magnus Aadland", short:"Aadland", position:"MID" }
 ];
 
+let currentUpcomingMatch = null;
+
 function cleanVoterName(name) {
   return (name || "").trim().toLowerCase();
+}
+
+function getStoredForumName() {
+  return (
+    localStorage.getItem("lynbors_voter") ||
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    localStorage.getItem("forumName") ||
+    ""
+  ).trim();
+}
+
+function setStoredForumName(name) {
+  const trimmed = (name || "").trim();
+  localStorage.setItem("lynbors_voter", trimmed);
+  localStorage.setItem("lynBorsUsername", trimmed);
+  localStorage.setItem("username", trimmed);
+  localStorage.setItem("voter", trimmed);
+  localStorage.setItem("forumName", trimmed);
+}
+
+function saveForumName() {
+  const input = document.getElementById("forumNameInput");
+  const value = input ? input.value.trim() : "";
+
+  if (!value) {
+    alert("Skriv inn forumnavnet ditt først.");
+    return;
+  }
+
+  setStoredForumName(value);
+  renderIdentity();
+  loadNextMatchWidget();
+}
+
+function renderIdentity() {
+  const input = document.getElementById("forumNameInput");
+  const status = document.getElementById("identityStatus");
+  const name = getStoredForumName();
+
+  if (input && name) input.value = name;
+  if (status) status.textContent = name ? `Lagret som ${name}` : "Ikke satt";
 }
 
 function isRealMatch(v) {
@@ -1299,150 +1312,6 @@ function combineLeague(fantasyRounds, tipRounds) {
   return { league };
 }
 
-
-
-function getSavedUserNameForDeliveries() {
-  return (
-    localStorage.getItem("lynbors_voter") ||
-    localStorage.getItem("lynBorsUsername") ||
-    localStorage.getItem("username") ||
-    localStorage.getItem("voter") ||
-    ""
-  ).trim();
-}
-
-function setDeliveryEditTarget(match) {
-  const btn = document.querySelector(".deliveries-edit");
-  if (!btn) return;
-
-  if (match && match.team !== "women") {
-    btn.onclick = () => location.href = "fantasy.html";
-    btn.textContent = "Endre";
-    return;
-  }
-
-  btn.onclick = () => location.href = "tippetips.html";
-  btn.textContent = "Endre";
-}
-
-function renderMyDeliveries(match, tip, fantasyPick, voterName) {
-  const card = document.getElementById("myDeliveries");
-  const content = document.getElementById("myDeliveriesContent");
-  if (!card || !content) return;
-
-  setDeliveryEditTarget(match);
-
-  const title = card.querySelector(".deliveries-title");
-  if (title) {
-    title.textContent = voterName
-      ? `For ${voterName}`
-      : "Skriv forumnavn én gang, så husker siden deg";
-  }
-
-  if (!match) {
-    content.innerHTML = `<div class="delivery-row delivery-empty">Ingen kommende kamp å vise.</div>`;
-    return;
-  }
-
-  if (!voterName) {
-    content.innerHTML = `
-      <div class="delivery-row delivery-empty">
-        <div class="delivery-icon">👤</div>
-        <div>
-          <div class="delivery-main">Ingen lagret bruker ennå</div>
-          <div class="delivery-sub">Lever tips eller fantasy med forumnavnet ditt, så vises det her neste gang.</div>
-        </div>
-        <div class="delivery-status">–</div>
-      </div>
-    `;
-    return;
-  }
-
-  const rows = [];
-
-  if (tip) {
-    rows.push(`
-      <div class="delivery-row">
-        <div class="delivery-icon">⚽</div>
-        <div>
-          <div class="delivery-main">${match.home} ${tip.home}–${tip.away} ${match.away}</div>
-          <div class="delivery-sub">Tippetips for neste kamp</div>
-        </div>
-        <div class="delivery-status">Levert</div>
-      </div>
-    `);
-  } else {
-    rows.push(`
-      <div class="delivery-row delivery-empty">
-        <div class="delivery-icon">⚽</div>
-        <div>
-          <div class="delivery-main">Ingen tips levert ennå</div>
-          <div class="delivery-sub">${match.home} – ${match.away}</div>
-        </div>
-        <div class="delivery-status">Åpen</div>
-      </div>
-    `);
-  }
-
-  if (fantasyPick && match.team !== "women") {
-    rows.push(`
-      <div class="delivery-row">
-        <div class="delivery-icon">⭐</div>
-        <div>
-          <div class="delivery-main">${fantasyPick.player1} · ${fantasyPick.player2} · ⭐ ${fantasyPick.captain}</div>
-          <div class="delivery-sub">Fantasy-lag for neste kamp</div>
-        </div>
-        <div class="delivery-status">Levert</div>
-      </div>
-    `);
-  } else if (match.team !== "women") {
-    rows.push(`
-      <div class="delivery-row delivery-empty">
-        <div class="delivery-icon">⭐</div>
-        <div>
-          <div class="delivery-main">Ingen fantasy-lag levert ennå</div>
-          <div class="delivery-sub">Velg to spillere og én kaptein</div>
-        </div>
-        <div class="delivery-status">Åpen</div>
-      </div>
-    `);
-  }
-
-  content.innerHTML = rows.join("");
-}
-
-async function loadMyDeliveriesForMatch(match) {
-  if (!match) {
-    renderMyDeliveries(null, null, null, "");
-    return;
-  }
-
-  const voterName = getSavedUserNameForDeliveries();
-  const voterKey = cleanVoterName(voterName);
-
-  if (!voterKey) {
-    renderMyDeliveries(match, null, null, "");
-    return;
-  }
-
-  const allVotes = await fetchVotes("?match_id=eq." + encodeURIComponent(match.id) + "&voter=eq." + encodeURIComponent(voterKey));
-  const tip = buildPredictions(allVotes).find(p => p.match_id === match.id && cleanVoterName(p.voter) === voterKey) || null;
-
-  let fantasyPick = null;
-
-  if (match.team !== "women") {
-    const { data:fantasyRows } = await supabaseClient
-      .from("fantasy_picks")
-      .select("player1,player2,captain,voter")
-      .eq("match_id", match.id)
-      .eq("voter", voterKey);
-
-    fantasyPick = fantasyRows && fantasyRows.length ? fantasyRows[0] : null;
-  }
-
-  renderMyDeliveries(match, tip, fantasyPick, voterName);
-}
-
 async function loadThroneLeader(){
   try {
     const allVotes = await fetchVotes();
@@ -1477,7 +1346,6 @@ async function loadThroneLeader(){
 
     document.getElementById("thronePoints").innerHTML =
       `${leader.total} poeng totalt · Fantasy ${leader.fantasy} · Tipp ${leader.tipping}`;
-
 
   } catch (err) {
     console.error(err);
@@ -1596,6 +1464,65 @@ function getMatchTeamLabel(match) {
   return "Lyn herrer";
 }
 
+function renderMyDeliveries(match, myPrediction, myFantasyPick) {
+  const box = document.getElementById("myDeliveries");
+  if (!box) return;
+
+  const storedName = getStoredForumName();
+
+  if (!storedName) {
+    box.innerHTML = `
+      <div class="my-deliveries-title">Mine leveringer</div>
+      <div class="delivery-empty">Skriv forumnavnet ditt over, så vises tips og fantasy-lag for neste kamp her.</div>
+    `;
+    return;
+  }
+
+  const rows = [];
+
+  if (myPrediction) {
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⚽</div>
+        <div>
+          <div class="delivery-main">${match.home} ${myPrediction.home}–${myPrediction.away} ${match.away}</div>
+          <div class="delivery-sub">Tippetips levert</div>
+        </div>
+        <a class="delivery-action" href="tippetips.html">Endre</a>
+      </div>
+    `);
+  } else {
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⚽</div>
+        <div>
+          <div class="delivery-main">Ikke levert tips ennå</div>
+          <div class="delivery-sub">Fristen er åpen</div>
+        </div>
+        <a class="delivery-action" href="tippetips.html">Lever</a>
+      </div>
+    `);
+  }
+
+  if (myFantasyPick) {
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⭐</div>
+        <div>
+          <div class="delivery-main">${myFantasyPick.player1} · ${myFantasyPick.player2} · ⭐ ${myFantasyPick.captain}</div>
+          <div class="delivery-sub">Fantasy-lag levert</div>
+        </div>
+        <a class="delivery-action" href="fantasy.html">Endre</a>
+      </div>
+    `);
+  }
+
+  box.innerHTML = `
+    <div class="my-deliveries-title">Mine leveringer · ${storedName}</div>
+    ${rows.join("")}
+  `;
+}
+
 async function loadNextMatchWidget(){
   const box = document.getElementById("nextMatchWidget");
   if (!box) return;
@@ -1613,14 +1540,16 @@ async function loadNextMatchWidget(){
 
     const upcoming = (matches || [])
       .filter(m => parseLocalDateTime(m.deadline || m.date) > now)
-.sort((a,b) =>
-  parseLocalDateTime(a.deadline || a.date) -
-  parseLocalDateTime(b.deadline || b.date)
-)[0];
+      .sort((a,b) =>
+        parseLocalDateTime(a.deadline || a.date) -
+        parseLocalDateTime(b.deadline || b.date)
+      )[0];
+
+    currentUpcomingMatch = upcoming || null;
 
     if (!upcoming) {
       box.innerHTML = `<div class="next-loading">Ingen kommende kamper funnet.</div>`;
-      loadMyDeliveriesForMatch(null);
+      renderMyDeliveries(null, null, null);
       return;
     }
 
@@ -1633,24 +1562,34 @@ async function loadNextMatchWidget(){
       predictions.map(p => cleanVoterName(p.voter))
     );
 
+    const storedName = cleanVoterName(getStoredForumName());
+    const myPrediction = storedName
+      ? predictions.find(p => cleanVoterName(p.voter) === storedName)
+      : null;
+
     const fantasyEnabled = upcoming.team !== "women";
 
     let fantasyUsers = new Set();
+    let myFantasyPick = null;
 
     if (fantasyEnabled) {
       const { data:fantasyPicks } = await supabaseClient
         .from("fantasy_picks")
-        .select("voter")
+        .select("voter,player1,player2,captain")
         .eq("match_id", upcoming.id);
 
       fantasyUsers = new Set(
         (fantasyPicks || []).map(p => cleanVoterName(p.voter))
       );
+
+      myFantasyPick = storedName
+        ? (fantasyPicks || []).find(p => cleanVoterName(p.voter) === storedName)
+        : null;
     }
 
-    loadMyDeliveriesForMatch(upcoming);
+    renderMyDeliveries(upcoming, myPrediction, myFantasyPick);
 
-    const teamExtraText = fantasyEnabled ? "Tips og fantasy" : "Kun tippetips";
+    const teamExtraText = fantasyEnabled ? "Tips og fantasy" : "Tippetips";
 
     box.innerHTML = `
       <div class="next-kicker">Neste kamp · ${getMatchTeamLabel(upcoming)} · ${teamExtraText}</div>
@@ -1660,9 +1599,9 @@ async function loadNextMatchWidget(){
       </div>
 
       <div class="next-meta">
-  ⏰ Kampstart og frist: ${formatNiceDateTime(upcoming.deadline || upcoming.date)}<br>
-  🔥 ${getCountdownText(upcoming.deadline || upcoming.date)}
-</div>
+        ⏰ Kampstart og frist: ${formatNiceDateTime(upcoming.deadline || upcoming.date)}<br>
+        🔥 ${getCountdownText(upcoming.deadline || upcoming.date)}
+      </div>
 
       <div class="next-stats">
         <div class="next-pill">⚽ ${uniqueTipsters.size} tips levert</div>
@@ -1679,7 +1618,6 @@ async function loadNextMatchWidget(){
     box.innerHTML = `<div class="next-loading">Klarte ikke å laste neste kamp.</div>`;
   }
 }
-
 
 async function loadPlayerOfYear(){
   const box = document.getElementById("playerOfYear");
@@ -1778,10 +1716,15 @@ async function loadPlayerOfYear(){
   }
 }
 
-loadSeasonStats();
-loadThroneLeader();
-loadNextMatchWidget();
-loadPlayerOfYear();
+function init() {
+  renderIdentity();
+  loadSeasonStats();
+  loadThroneLeader();
+  loadNextMatchWidget();
+  loadPlayerOfYear();
+}
+
+init();
 </script>
 
 <script>
