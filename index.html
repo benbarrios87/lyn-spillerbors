@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -383,6 +384,156 @@ h1 {
 }
 
 
+
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.next-match-widget,
+.throne-card,
+.season-card,
+.player-of-year-card {
+  animation:fadeInUp 0.5s ease both;
+}
+
+.card.fantasy-feature-card {
+  border-color:rgba(255,209,102,0.65);
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.42),
+    0 0 24px rgba(255,209,102,0.16);
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
+    linear-gradient(135deg,#13294b,#d71920);
+}
+
+.card.fantasy-feature-card::before {
+  content:"HOT";
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:3;
+  background:var(--gold);
+  color:#16100a;
+  font-size:12px;
+  font-weight:900;
+  padding:5px 9px;
+  border-radius:999px;
+  letter-spacing:0.6px;
+}
+
+.card:hover .card-player {
+  transform:scale(1.08) translateY(-2px);
+}
+
+.hook-line {
+  margin:22px auto 0;
+  max-width:720px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+@media (min-width:720px) {
+  .hook-line {
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+.hook-pill {
+  background:rgba(0,0,0,0.58);
+  color:white;
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:16px;
+  padding:12px 14px;
+  text-align:left;
+  box-shadow:0 8px 20px rgba(0,0,0,0.24);
+}
+
+.hook-label {
+  font-size:12px;
+  opacity:0.72;
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  font-weight:bold;
+}
+
+.hook-value {
+  margin-top:4px;
+  font-size:17px;
+  font-weight:900;
+  color:var(--gold);
+}
+
+.player-of-year-card {
+  margin-top:26px;
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.18), transparent 34%),
+    linear-gradient(135deg, rgba(19,41,75,0.92), rgba(0,0,0,0.72));
+  border:1px solid rgba(255,209,102,0.45);
+  border-radius:24px;
+  padding:22px;
+  color:white;
+  text-align:left;
+  box-shadow:0 14px 34px rgba(0,0,0,0.36);
+}
+
+.player-of-year-head {
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+
+.player-of-year-title {
+  font-size:24px;
+  font-weight:900;
+}
+
+.player-of-year-formula {
+  max-width:420px;
+  font-size:13px;
+  line-height:1.45;
+  opacity:0.86;
+}
+
+.player-year-row {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,0.12);
+}
+
+.player-year-medal {
+  font-size:24px;
+}
+
+.player-year-name {
+  font-size:18px;
+  font-weight:900;
+}
+
+.player-year-sub {
+  margin-top:3px;
+  font-size:13px;
+  opacity:0.72;
+}
+
+.player-year-score {
+  font-size:28px;
+  color:var(--gold);
+  font-weight:900;
+}
+
+.player-year-loading {
+  opacity:0.78;
+  text-align:center;
+  padding:14px;
+}
+
 @media (max-width:700px) {
   body {
     justify-content:flex-start;
@@ -535,6 +686,21 @@ h1 {
     <div class="next-loading">Laster neste kamp...</div>
   </div>
 
+  <div id="hookLine" class="hook-line">
+    <div class="hook-pill">
+      <div class="hook-label">Lynligaen</div>
+      <div class="hook-value">Laster leder...</div>
+    </div>
+    <div class="hook-pill">
+      <div class="hook-label">Neste kamp</div>
+      <div class="hook-value">Laster aktivitet...</div>
+    </div>
+    <div class="hook-pill">
+      <div class="hook-label">Fantasy</div>
+      <div class="hook-value">Laster kaptein...</div>
+    </div>
+  </div>
+
   <div class="grid">
 
     <div class="card" onclick="location.href='bors.html'">
@@ -553,7 +719,7 @@ h1 {
       </div>
     </div>
 
-    <div class="card" onclick="location.href='fantasy.html'">
+    <div class="card fantasy-feature-card" onclick="location.href='fantasy.html'">
       <img src="bilder/fantasy-Photoroom.png" class="card-player fantasy-player" alt="">
       <div class="card-title">Lyn Fantasy</div>
       <div class="card-text">
@@ -600,6 +766,21 @@ h1 {
         <div id="topAssists"></div>
       </div>
 
+    </div>
+  </div>
+
+  <div class="player-of-year-card">
+    <div class="player-of-year-head">
+      <div>
+        <div class="player-of-year-title">🏆 Årets Lynspiller så langt</div>
+        <div class="player-year-sub">En litt morsommere total enn bare børs.</div>
+      </div>
+      <div class="player-of-year-formula">
+        Formelen: <strong>børs rundes ned til nærmeste hele tall</strong>. Mål gir <strong>+1</strong>, assist gir <strong>+1</strong>, og clean sheet gir <strong>+1</strong>.
+      </div>
+    </div>
+    <div id="playerOfYear">
+      <div class="player-year-loading">Laster topp 3...</div>
     </div>
   </div>
 
@@ -976,6 +1157,29 @@ function combineLeague(fantasyRounds, tipRounds) {
   return { league };
 }
 
+
+function updateHookLine(type, text) {
+  const box = document.getElementById("hookLine");
+  if (!box) return;
+
+  const cards = box.querySelectorAll(".hook-value");
+  const indexMap = { league:0, activity:1, fantasy:2 };
+  const index = indexMap[type];
+
+  if (cards[index]) cards[index].innerHTML = text;
+}
+
+function getMostCommonCaptain(picks) {
+  const counts = {};
+
+  (picks || []).forEach(pick => {
+    if (!pick.captain) return;
+    counts[pick.captain] = (counts[pick.captain] || 0) + 1;
+  });
+
+  return Object.entries(counts).sort((a,b) => b[1] - a[1])[0] || null;
+}
+
 async function loadThroneLeader(){
   try {
     const allVotes = await fetchVotes();
@@ -999,6 +1203,7 @@ async function loadThroneLeader(){
         `<a href="lynligaen.html">Ingen leder ennå</a>`;
       document.getElementById("thronePoints").innerHTML =
         `Sammenlagt for fantasy og tipping`;
+      updateHookLine("league", "Ingen leder ennå");
       return;
     }
 
@@ -1010,6 +1215,8 @@ async function loadThroneLeader(){
 
     document.getElementById("thronePoints").innerHTML =
       `${leader.total} poeng totalt · Fantasy ${leader.fantasy} · Tipp ${leader.tipping}`;
+
+    updateHookLine("league", `👑 ${leader.voter} · ${leader.total}p`);
 
   } catch (err) {
     console.error(err);
@@ -1177,7 +1384,14 @@ async function loadNextMatchWidget(){
       fantasyUsers = new Set(
         (fantasyPicks || []).map(p => cleanVoterName(p.voter))
       );
+
+      const topCaptain = getMostCommonCaptain(fantasyPicks || []);
+      updateHookLine("fantasy", topCaptain ? `⭐ ${topCaptain[0]} · ${topCaptain[1]} kaptein` : "Ingen kapteinvalg ennå");
+    } else {
+      updateHookLine("fantasy", "Kun tippetips denne kampen");
     }
+
+    updateHookLine("activity", `🔥 ${uniqueTipsters.size} tips${fantasyEnabled ? ` · ${fantasyUsers.size} fantasy` : ""}`);
 
     const teamExtraText = fantasyEnabled ? "Tips og fantasy" : "Kun tippetips";
 
@@ -1209,9 +1423,108 @@ async function loadNextMatchWidget(){
   }
 }
 
+
+async function loadPlayerOfYear(){
+  const box = document.getElementById("playerOfYear");
+  if (!box) return;
+
+  try {
+    const [{ data:statsRows, error:statsError }, allVotes] = await Promise.all([
+      supabaseClient.from("fantasy_stats").select("*"),
+      fetchVotes()
+    ]);
+
+    if (statsError) throw statsError;
+
+    const ratingMap = {};
+
+    allVotes.filter(isPlayerVote).forEach(vote => {
+      if (!ratingMap[vote.match_id]) ratingMap[vote.match_id] = {};
+      if (!ratingMap[vote.match_id][vote.player]) {
+        ratingMap[vote.match_id][vote.player] = { total:0, count:0 };
+      }
+
+      ratingMap[vote.match_id][vote.player].total += Number(vote.rating || 0);
+      ratingMap[vote.match_id][vote.player].count += 1;
+    });
+
+    const totals = {};
+
+    (statsRows || []).forEach(row => {
+      if (!row.player || row.match_id === "TEST") return;
+
+      const ratingData = ratingMap[row.match_id] && ratingMap[row.match_id][row.player];
+      const avgRating = ratingData && ratingData.count
+        ? ratingData.total / ratingData.count
+        : 0;
+
+      const borsPoints = Math.floor(avgRating);
+      const goalPoints = row.goals || 0;
+      const assistPoints = row.assists || 0;
+      const cleanSheetPoints = row.clean_sheet ? 1 : 0;
+      const total = borsPoints + goalPoints + assistPoints + cleanSheetPoints;
+
+      if (!totals[row.player]) {
+        totals[row.player] = {
+          player:row.player,
+          total:0,
+          bors:0,
+          goals:0,
+          assists:0,
+          cleanSheets:0,
+          matches:0
+        };
+      }
+
+      totals[row.player].total += total;
+      totals[row.player].bors += borsPoints;
+      totals[row.player].goals += goalPoints;
+      totals[row.player].assists += assistPoints;
+      totals[row.player].cleanSheets += cleanSheetPoints;
+      totals[row.player].matches += 1;
+    });
+
+    const top = Object.values(totals)
+      .filter(row => row.total > 0)
+      .sort((a,b) =>
+        b.total - a.total ||
+        b.bors - a.bors ||
+        b.goals - a.goals ||
+        a.player.localeCompare(b.player)
+      )
+      .slice(0,3);
+
+    if (!top.length) {
+      box.innerHTML = `<div class="player-year-loading">Ingen data nok ennå.</div>`;
+      return;
+    }
+
+    const medals = ["🥇", "🥈", "🥉"];
+
+    box.innerHTML = top.map((row, index) => `
+      <div class="player-year-row">
+        <div class="player-year-medal">${medals[index]}</div>
+        <div>
+          <a class="season-link player-year-name" href="spiller.html?player=${encodeURIComponent(row.player)}">
+            ${row.player}
+          </a>
+          <div class="player-year-sub">
+            Børs ${row.bors} · Mål ${row.goals} · Assist ${row.assists} · CS ${row.cleanSheets}
+          </div>
+        </div>
+        <div class="player-year-score">${row.total}</div>
+      </div>
+    `).join("");
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = `<div class="player-year-loading">Klarte ikke å laste årets spiller.</div>`;
+  }
+}
+
 loadSeasonStats();
 loadThroneLeader();
 loadNextMatchWidget();
+loadPlayerOfYear();
 </script>
 
 <script>
