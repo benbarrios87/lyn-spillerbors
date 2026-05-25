@@ -1634,17 +1634,21 @@ function applyDeadlineLock() {
 
 function getSavedUsername() {
   return (
+    localStorage.getItem("lynbors_voter") ||
     localStorage.getItem("lynBorsUsername") ||
     localStorage.getItem("username") ||
     localStorage.getItem("voter") ||
+    localStorage.getItem("forumName") ||
     ""
   );
 }
 
 function saveUsernameEverywhere(username) {
+  localStorage.setItem("lynbors_voter", username);
   localStorage.setItem("lynBorsUsername", username);
   localStorage.setItem("username", username);
   localStorage.setItem("voter", username);
+  localStorage.setItem("forumName", username);
 }
 
 function fillSelects() {
