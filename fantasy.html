@@ -2374,7 +2374,8 @@ mensPicks.forEach(pick => {
       avg:(playerGames[player] || 0) ? total / playerGames[player] : 0
     }))
     .filter(row =>
-  row.picks <= 3 &&
+  row.picks > 0 &&
+  row.picks <= Math.max(3, Math.floor(mensPicks.length * 0.25)) &&
   row.games >= 3 &&
   row.total >= 10
 )
@@ -2454,14 +2455,21 @@ mensPicks.forEach(pick => {
         </div>
       </div>
 
-      <div class="stat-card">
-        <h3>🧠 Lite brukt</h3>
-<div class="result-row">
-  <div>
-    ${littleUsedKing ? playerChip(littleUsedKing.player) : "Ikke klart"}
+     <div class="stat-card">
+  <h3>🧠 Smart valg</h3>
+
+  <div class="result-row">
+    <div>
+      ${differentialKing ? playerChip(differentialKing.player) : "Ikke klart"}
+    </div>
+
+    <div class="result-score">
+      ${differentialKing ? differentialKing.avg.toFixed(1) : "–"}
+    </div>
   </div>
-  <div class="result-score">
-    ${littleUsedKing ? littleUsedKing.picks + " valg" : "–"}
+
+  <div class="small" style="margin-top:8px;">
+    Høyt fantasy-snitt uten å være det mest åpenbare valget.
   </div>
 </div>
 
