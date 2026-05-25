@@ -284,7 +284,7 @@ button {
   border:3px solid;
   box-shadow:0 8px 22px rgba(19,41,75,0.08);
   position:relative;
-  overflow:hidden;
+  overflow:visible;
 }
 
 .coupon-group.men {
@@ -592,6 +592,7 @@ padding-right:120px;
 
 .coupon-group {
   overflow:visible;
+  position:relative;
 }
 
 .coupon-group .group-title,
@@ -601,25 +602,27 @@ padding-right:120px;
 }
 
 .coupon-pointer {
-  bottom:-4px;
-  opacity:0.22;
+  position:absolute;
+  bottom:-10px;
+  opacity:0.28;
   z-index:1;
+  pointer-events:none;
 }
 
 /* HERRE */
 .coupon-group.men .coupon-pointer {
-  left:-8px;
+  left:-55px;
   right:auto;
-  height:110px;
-  transform:rotate(-4deg);
+  height:170px;
+  transform:rotate(-6deg);
 }
 
 /* KVINNER */
 .coupon-group.women .coupon-pointer {
-  right:-8px;
+  right:-55px;
   left:auto;
-  height:110px;
-  transform:scaleX(-1) rotate(-4deg);
+  height:170px;
+  transform:scaleX(-1) rotate(-6deg);
 }
   
 @media (max-width:620px) {
