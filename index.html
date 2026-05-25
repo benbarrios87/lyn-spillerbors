@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -426,6 +427,149 @@ h1 {
   transform:scale(1.08) translateY(-2px);
 }
 
+
+.my-deliveries-card {
+  margin:22px auto 0;
+  max-width:720px;
+  background:rgba(0,0,0,0.62);
+  color:white;
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:22px;
+  padding:16px;
+  text-align:left;
+  box-shadow:0 10px 26px rgba(0,0,0,0.30);
+  backdrop-filter:blur(5px);
+}
+
+.deliveries-head {
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.deliveries-kicker {
+  font-size:12px;
+  opacity:0.72;
+  text-transform:uppercase;
+  letter-spacing:0.7px;
+  font-weight:bold;
+}
+
+.deliveries-title {
+  margin-top:3px;
+  font-size:20px;
+  font-weight:900;
+  color:var(--gold);
+}
+
+.deliveries-edit {
+  width:auto;
+  border:none;
+  border-radius:999px;
+  padding:9px 12px;
+  background:rgba(255,209,102,0.95);
+  color:#17110a;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.deliveries-content {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.delivery-row {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+  background:rgba(255,255,255,0.09);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:15px;
+  padding:11px 12px;
+}
+
+.delivery-icon {
+  font-size:20px;
+}
+
+.delivery-main {
+  font-weight:900;
+  line-height:1.25;
+}
+
+.delivery-sub {
+  margin-top:2px;
+  font-size:12px;
+  opacity:0.72;
+}
+
+.delivery-status {
+  color:var(--gold);
+  font-weight:900;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.delivery-empty {
+  opacity:0.82;
+}
+
+@media (max-width:700px) {
+  .deliveries-head {
+    align-items:flex-start;
+  }
+
+  .deliveries-title {
+    font-size:18px;
+  }
+
+  .delivery-row {
+    grid-template-columns:auto 1fr;
+  }
+
+  .delivery-status {
+    grid-column:2;
+  }
+}
+
+.player-of-year-card {
+  animation:fadeInUp 0.5s ease both;
+}
+
+.card.fantasy-feature-card {
+  border-color:rgba(255,209,102,0.65);
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.42),
+    0 0 24px rgba(255,209,102,0.16);
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
+    linear-gradient(135deg,#13294b,#d71920);
+}
+
+.card.fantasy-feature-card::before {
+  content:"HOT";
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:3;
+  background:var(--gold);
+  color:#16100a;
+  font-size:12px;
+  font-weight:900;
+  padding:5px 9px;
+  border-radius:999px;
+  letter-spacing:0.6px;
+}
+
+.card:hover .card-player {
+  transform:scale(1.08) translateY(-2px);
+}
+
 .hook-line {
   margin:22px auto 0;
   max-width:720px;
@@ -686,18 +830,16 @@ h1 {
     <div class="next-loading">Laster neste kamp...</div>
   </div>
 
-  <div id="hookLine" class="hook-line">
-    <div class="hook-pill">
-      <div class="hook-label">Lynligaen</div>
-      <div class="hook-value">Laster leder...</div>
+  <div id="myDeliveries" class="my-deliveries-card">
+    <div class="deliveries-head">
+      <div>
+        <div class="deliveries-kicker">Mine leveringer</div>
+        <div class="deliveries-title">Laster dine tips...</div>
+      </div>
+      <button class="deliveries-edit" onclick="location.href='tippetips.html'">Endre</button>
     </div>
-    <div class="hook-pill">
-      <div class="hook-label">Neste kamp</div>
-      <div class="hook-value">Laster aktivitet...</div>
-    </div>
-    <div class="hook-pill">
-      <div class="hook-label">Fantasy</div>
-      <div class="hook-value">Laster kaptein...</div>
+    <div id="myDeliveriesContent" class="deliveries-content">
+      <div class="delivery-row">Henter lagret forumnavn og leveringer...</div>
     </div>
   </div>
 
@@ -909,8 +1051,8 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
 
   if (stat.penalty_save && position === "KEEPER") points += 5;
   if (stat.red_card) points -= 3;
-  if (stat.rating >= 7.5) points += 1;
-  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+  if (stat.rating >= 7.0) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.0) points -= 1;
   if (isCaptain) points = Math.round(points * 1.5);
 
   return points;
@@ -1158,26 +1300,147 @@ function combineLeague(fantasyRounds, tipRounds) {
 }
 
 
-function updateHookLine(type, text) {
-  const box = document.getElementById("hookLine");
-  if (!box) return;
 
-  const cards = box.querySelectorAll(".hook-value");
-  const indexMap = { league:0, activity:1, fantasy:2 };
-  const index = indexMap[type];
-
-  if (cards[index]) cards[index].innerHTML = text;
+function getSavedUserNameForDeliveries() {
+  return (
+    localStorage.getItem("lynbors_voter") ||
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    ""
+  ).trim();
 }
 
-function getMostCommonCaptain(picks) {
-  const counts = {};
+function setDeliveryEditTarget(match) {
+  const btn = document.querySelector(".deliveries-edit");
+  if (!btn) return;
 
-  (picks || []).forEach(pick => {
-    if (!pick.captain) return;
-    counts[pick.captain] = (counts[pick.captain] || 0) + 1;
-  });
+  if (match && match.team !== "women") {
+    btn.onclick = () => location.href = "fantasy.html";
+    btn.textContent = "Endre";
+    return;
+  }
 
-  return Object.entries(counts).sort((a,b) => b[1] - a[1])[0] || null;
+  btn.onclick = () => location.href = "tippetips.html";
+  btn.textContent = "Endre";
+}
+
+function renderMyDeliveries(match, tip, fantasyPick, voterName) {
+  const card = document.getElementById("myDeliveries");
+  const content = document.getElementById("myDeliveriesContent");
+  if (!card || !content) return;
+
+  setDeliveryEditTarget(match);
+
+  const title = card.querySelector(".deliveries-title");
+  if (title) {
+    title.textContent = voterName
+      ? `For ${voterName}`
+      : "Skriv forumnavn én gang, så husker siden deg";
+  }
+
+  if (!match) {
+    content.innerHTML = `<div class="delivery-row delivery-empty">Ingen kommende kamp å vise.</div>`;
+    return;
+  }
+
+  if (!voterName) {
+    content.innerHTML = `
+      <div class="delivery-row delivery-empty">
+        <div class="delivery-icon">👤</div>
+        <div>
+          <div class="delivery-main">Ingen lagret bruker ennå</div>
+          <div class="delivery-sub">Lever tips eller fantasy med forumnavnet ditt, så vises det her neste gang.</div>
+        </div>
+        <div class="delivery-status">–</div>
+      </div>
+    `;
+    return;
+  }
+
+  const rows = [];
+
+  if (tip) {
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⚽</div>
+        <div>
+          <div class="delivery-main">${match.home} ${tip.home}–${tip.away} ${match.away}</div>
+          <div class="delivery-sub">Tippetips for neste kamp</div>
+        </div>
+        <div class="delivery-status">Levert</div>
+      </div>
+    `);
+  } else {
+    rows.push(`
+      <div class="delivery-row delivery-empty">
+        <div class="delivery-icon">⚽</div>
+        <div>
+          <div class="delivery-main">Ingen tips levert ennå</div>
+          <div class="delivery-sub">${match.home} – ${match.away}</div>
+        </div>
+        <div class="delivery-status">Åpen</div>
+      </div>
+    `);
+  }
+
+  if (fantasyPick && match.team !== "women") {
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⭐</div>
+        <div>
+          <div class="delivery-main">${fantasyPick.player1} · ${fantasyPick.player2} · ⭐ ${fantasyPick.captain}</div>
+          <div class="delivery-sub">Fantasy-lag for neste kamp</div>
+        </div>
+        <div class="delivery-status">Levert</div>
+      </div>
+    `);
+  } else if (match.team !== "women") {
+    rows.push(`
+      <div class="delivery-row delivery-empty">
+        <div class="delivery-icon">⭐</div>
+        <div>
+          <div class="delivery-main">Ingen fantasy-lag levert ennå</div>
+          <div class="delivery-sub">Velg to spillere og én kaptein</div>
+        </div>
+        <div class="delivery-status">Åpen</div>
+      </div>
+    `);
+  }
+
+  content.innerHTML = rows.join("");
+}
+
+async function loadMyDeliveriesForMatch(match) {
+  if (!match) {
+    renderMyDeliveries(null, null, null, "");
+    return;
+  }
+
+  const voterName = getSavedUserNameForDeliveries();
+  const voterKey = cleanVoterName(voterName);
+
+  if (!voterKey) {
+    renderMyDeliveries(match, null, null, "");
+    return;
+  }
+
+  const allVotes = await fetchVotes("?match_id=eq." + encodeURIComponent(match.id) + "&voter=eq." + encodeURIComponent(voterKey));
+  const tip = buildPredictions(allVotes).find(p => p.match_id === match.id && cleanVoterName(p.voter) === voterKey) || null;
+
+  let fantasyPick = null;
+
+  if (match.team !== "women") {
+    const { data:fantasyRows } = await supabaseClient
+      .from("fantasy_picks")
+      .select("player1,player2,captain,voter")
+      .eq("match_id", match.id)
+      .eq("voter", voterKey);
+
+    fantasyPick = fantasyRows && fantasyRows.length ? fantasyRows[0] : null;
+  }
+
+  renderMyDeliveries(match, tip, fantasyPick, voterName);
 }
 
 async function loadThroneLeader(){
@@ -1203,7 +1466,6 @@ async function loadThroneLeader(){
         `<a href="lynligaen.html">Ingen leder ennå</a>`;
       document.getElementById("thronePoints").innerHTML =
         `Sammenlagt for fantasy og tipping`;
-      updateHookLine("league", "Ingen leder ennå");
       return;
     }
 
@@ -1216,7 +1478,6 @@ async function loadThroneLeader(){
     document.getElementById("thronePoints").innerHTML =
       `${leader.total} poeng totalt · Fantasy ${leader.fantasy} · Tipp ${leader.tipping}`;
 
-    updateHookLine("league", `👑 ${leader.voter} · ${leader.total}p`);
 
   } catch (err) {
     console.error(err);
@@ -1359,6 +1620,7 @@ async function loadNextMatchWidget(){
 
     if (!upcoming) {
       box.innerHTML = `<div class="next-loading">Ingen kommende kamper funnet.</div>`;
+      loadMyDeliveriesForMatch(null);
       return;
     }
 
@@ -1378,20 +1640,15 @@ async function loadNextMatchWidget(){
     if (fantasyEnabled) {
       const { data:fantasyPicks } = await supabaseClient
         .from("fantasy_picks")
-.select("voter,captain")
-.eq("match_id", upcoming.id);
+        .select("voter")
+        .eq("match_id", upcoming.id);
 
       fantasyUsers = new Set(
         (fantasyPicks || []).map(p => cleanVoterName(p.voter))
       );
-
-      const topCaptain = getMostCommonCaptain(fantasyPicks || []);
-      updateHookLine("fantasy", topCaptain ? `⭐ ${topCaptain[0]} · ${topCaptain[1]} kaptein` : "Ingen kapteinvalg ennå");
-    } else {
-      updateHookLine("fantasy", "Kun tippetips denne kampen");
     }
 
-    updateHookLine("activity", `🔥 ${uniqueTipsters.size} tips${fantasyEnabled ? ` · ${fantasyUsers.size} fantasy` : ""}`);
+    loadMyDeliveriesForMatch(upcoming);
 
     const teamExtraText = fantasyEnabled ? "Tips og fantasy" : "Kun tippetips";
 
