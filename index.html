@@ -1378,8 +1378,8 @@ async function loadNextMatchWidget(){
     if (fantasyEnabled) {
       const { data:fantasyPicks } = await supabaseClient
         .from("fantasy_picks")
-        .select("voter")
-        .eq("match_id", upcoming.id);
+.select("voter,captain")
+.eq("match_id", upcoming.id);
 
       fantasyUsers = new Set(
         (fantasyPicks || []).map(p => cleanVoterName(p.voter))
