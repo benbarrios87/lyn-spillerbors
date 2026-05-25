@@ -1074,7 +1074,7 @@ label {
 
       <div class="rule-pill">
         <strong>Børsbonus:</strong><br>
-        7.5 børssnitt eller høyere gir +1. 4.5 børssnitt eller lavere gir −1.
+        7.0 børssnitt eller høyere gir +1. 4.0 børssnitt eller lavere gir −1.
       </div>
 
       <div class="rule-pill">
@@ -1781,12 +1781,12 @@ function calculatePointsFromStat(playerName, stat, isCaptain) {
     lines.push("Rødt kort: −3");
   }
 
-  if (stat.rating >= 7.5) {
+  if (stat.rating >= 7.0) {
     points += 1;
     lines.push(`Børsbonus: +1 (${stat.rating.toFixed(1)})`);
   }
 
-  if (stat.rating > 0 && stat.rating <= 4.5) {
+  if (stat.rating > 0 && stat.rating <= 4.0) {
     points -= 1;
     lines.push(`Børsbonus: −1 (${stat.rating.toFixed(1)})`);
   }
