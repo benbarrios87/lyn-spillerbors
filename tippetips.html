@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -509,7 +510,7 @@ padding-right:120px;
   gap:14px;
 }
 
- (min-width:850px) {
+@media (min-width:850px) {
   .stats-grid {
     grid-template-columns:1fr 1fr;
   }
@@ -720,6 +721,252 @@ padding-right:120px;
     font-size:28px;
   }
   }
+
+/* UX OPPGRADERING */
+.app-tabs {
+  max-width:1000px;
+  margin:0 auto 16px;
+  padding:0 15px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+@media (min-width:760px) {
+  .app-tabs {
+    grid-template-columns:repeat(3, 1fr);
+  }
+}
+
+.app-tab {
+  background:#fffdf7;
+  color:var(--blue);
+  border:2px solid var(--line);
+  box-shadow:0 4px 12px rgba(19,41,75,0.08);
+  border-radius:999px;
+  padding:12px 14px;
+}
+
+.app-tab.active {
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+
+.app-panel {
+  display:none;
+}
+
+.app-panel.active {
+  display:block;
+}
+
+.progress-box {
+  margin:14px 0 4px;
+  background:#fffdf7;
+  border:2px dashed var(--line);
+  border-radius:16px;
+  padding:13px;
+}
+
+.progress-line {
+  height:10px;
+  background:#e5d4b5;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progress-fill {
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, var(--blue), var(--red));
+  border-radius:999px;
+  transition:0.25s;
+}
+
+.submit-summary {
+  margin-top:8px;
+  font-size:13px;
+  color:var(--muted);
+  font-family:Arial, sans-serif;
+}
+
+.success-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  background:rgba(19,41,75,0.78);
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+}
+
+.success-box {
+  width:100%;
+  max-width:460px;
+  background:var(--paper2);
+  border:3px dashed var(--blue);
+  border-radius:26px;
+  padding:25px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  position:relative;
+}
+
+.success-box::after {
+  content:"LEVERT";
+  position:absolute;
+  right:18px;
+  top:14px;
+  color:rgba(215,25,32,0.2);
+  font-weight:bold;
+  transform:rotate(9deg);
+  font-size:28px;
+}
+
+.success-box img {
+  width:135px;
+  height:135px;
+  object-fit:cover;
+  border-radius:50%;
+  background:white;
+  border:3px solid var(--blue);
+  box-shadow:0 10px 22px rgba(19,41,75,0.22);
+}
+
+.success-title {
+  margin-top:12px;
+  color:var(--blue);
+  font-size:32px;
+  font-weight:bold;
+}
+
+.success-text {
+  margin-top:8px;
+  line-height:1.5;
+  font-family:Arial, sans-serif;
+}
+
+.success-actions {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+@media (min-width:560px) {
+  .success-actions {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+.ghost-button {
+  background:#fffdf7;
+  color:var(--blue);
+  border:2px solid var(--blue);
+}
+
+.sticky-submit {
+  display:none;
+}
+
+@media (max-width:760px) {
+  .sticky-submit {
+    display:block;
+    position:fixed;
+    left:10px;
+    right:10px;
+    bottom:10px;
+    z-index:9998;
+    background:rgba(255,248,232,0.97);
+    border:2px solid var(--blue);
+    border-radius:18px;
+    padding:10px;
+    box-shadow:0 10px 30px rgba(19,41,75,0.25);
+  }
+
+  .sticky-inner {
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+    align-items:center;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+  }
+
+  .sticky-inner button {
+    width:auto;
+    margin:0;
+    padding:10px 14px;
+  }
+
+  main {
+    padding-bottom:120px;
+  }
+}
+
+.match-pill {
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#eef5ff;
+  color:var(--blue);
+  border:1px solid #c7d2fe;
+  font-weight:bold;
+}
+
+.results-header {
+  background:#fffdf7;
+  border:2px dashed var(--line);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.podium-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+@media (min-width:760px) {
+  .podium-grid {
+    grid-template-columns:1fr 1.12fr 1fr;
+    align-items:end;
+  }
+
+  .podium-card.first {
+    transform:translateY(-8px);
+  }
+}
+
+.podium-card {
+  background:#fffdf7;
+  border:2px dashed var(--line);
+  border-radius:18px;
+  padding:15px;
+  text-align:center;
+}
+
+.podium-card.first {
+  border-color:var(--red);
+  box-shadow:0 8px 20px rgba(215,25,32,0.12);
+}
+
+.podium-card .podium-medal {
+  font-size:30px;
+}
+
+.podium-card .podium-score {
+  font-size:28px;
+  font-weight:bold;
+  color:var(--blue);
+  margin-top:8px;
+}
+
 </style>
 </head>
 
@@ -738,8 +985,15 @@ padding-right:120px;
   </div>
 </header>
 
+<nav class="app-tabs">
+  <button class="app-tab active" data-panel="panel-submit" onclick="showPanel('panel-submit')">Lever kupong</button>
+  <button class="app-tab" data-panel="panel-results" onclick="showPanel('panel-results')">Se tips</button>
+  <button class="app-tab" data-panel="panel-stats" onclick="showPanel('panel-stats')">Tabell og stats</button>
+</nav>
+
 <main>
 
+<section id="panel-submit" class="app-panel active">
 <h2 class="section-title">1. Lever kupong</h2>
 
 <div class="box">
@@ -769,6 +1023,12 @@ padding-right:120px;
   <input id="voter" placeholder="Skriv forumnavnet ditt" autocomplete="username">
   <div class="small">Skriv forumnavnet likt hver gang. Store og små bokstaver behandles likt.</div>
 
+  <div class="progress-box">
+    <strong>Kupongstatus</strong>
+    <div id="couponProgressText" class="submit-summary">Fyll inn ett eller flere tips.</div>
+    <div class="progress-line"><div id="couponProgressFill" class="progress-fill"></div></div>
+  </div>
+
   <div id="couponList"></div>
 
   <div style="margin-top:14px;">
@@ -776,6 +1036,9 @@ padding-right:120px;
   </div>
 </div>
 
+</section>
+
+<section id="panel-results" class="app-panel">
 <h2 class="section-title">2. Tips for valgt kamp</h2>
 
 <div class="box blue">
@@ -803,6 +1066,9 @@ padding-right:120px;
   <div id="results" style="margin-top:16px;"></div>
 </div>
 
+</section>
+
+<section id="panel-stats" class="app-panel">
 <h2 class="section-title">3. Tippestatistikk</h2>
 
 <div class="box blue">
@@ -811,7 +1077,22 @@ padding-right:120px;
   </div>
 </div>
 
+</section>
 </main>
+
+<div id="stickySubmit" class="sticky-submit"></div>
+
+<div id="successOverlay" class="success-overlay">
+  <div class="success-box">
+    <img src="bilder/jess.jpg" alt="Kupong levert" onerror="this.src='lblogoen.png'">
+    <div class="success-title">Kupong levert!</div>
+    <div id="successText" class="success-text"></div>
+    <div class="success-actions">
+      <button onclick="closeSuccessOverlay(); showPanel('panel-results'); loadMatchPredictions();">Se tipsene</button>
+      <button class="ghost-button" onclick="closeSuccessOverlay()">Nydelig</button>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
@@ -1090,6 +1371,7 @@ function renderCoupons() {
 
   if (openCouponMatches.length === 0) {
     box.innerHTML = `<div class="warning">Ingen åpne kamper å tippe på akkurat nå.</div>`;
+    updateCouponProgress();
     return;
   }
 
@@ -1100,6 +1382,7 @@ function renderCoupons() {
       "men",
       openCouponMatches
     );
+    bindCouponInputs();
     return;
   }
 
@@ -1110,6 +1393,7 @@ function renderCoupons() {
       "women",
       openCouponMatches
     );
+    bindCouponInputs();
     return;
   }
 
@@ -1129,6 +1413,8 @@ function renderCoupons() {
       "women",
       womenMatches
     );
+
+  bindCouponInputs();
 }
 
 function renderResultMatchSelect() {
@@ -1266,9 +1552,10 @@ async function sendTips() {
     filter:currentTeamFilter
   });
 
-  alert(`${savedMatches.length} kupong${savedMatches.length === 1 ? "" : "er"} levert! Gamle tips på samme kamp ble oppdatert.`);
+  showSuccessOverlay(savedMatches.length);
 
   document.querySelectorAll("#couponList input").forEach(input => input.value = "");
+  updateCouponProgress();
 
   if (savedMatches[0]) {
     document.getElementById("resultMatch").value = savedMatches[0];
@@ -1413,7 +1700,7 @@ async function loadMatchPredictions() {
   }
 
   let html = `
-    <div class="bb">Kuponger for ${match}</div>
+    <div class="bb">Kuponger for ${matchData ? matchData.home + " - " + matchData.away : match}</div>
     <p class="small">
       ${matchData ? `${getTeamLabel(getMatchTeam(matchData))} · ${matchData.home} - ${matchData.away}` : ""}
       ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
@@ -1560,6 +1847,8 @@ async function loadPredictionLeaderboard() {
   document.getElementById("results").innerHTML = `
     <div class="bb">Tippetabell · Samlet for herrer og kvinner</div>
 
+    ${renderLeaderboardPodium(rows)}
+
     <div class="stats-grid" style="margin-bottom:14px;">
       <div class="stat-card">
         <h3>Beste herretipper</h3>
@@ -1651,6 +1940,135 @@ async function loadTipStats() {
         <div class="result-row"><div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div><div class="result-score">1 p</div></div>
         <div class="result-row"><div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div><div class="result-score">0 p</div></div>
       </div>
+    </div>
+  `;
+}
+
+
+function showPanel(panelId) {
+  document.querySelectorAll(".app-panel").forEach(panel => panel.classList.remove("active"));
+  document.querySelectorAll(".app-tab").forEach(tab => tab.classList.remove("active"));
+
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add("active");
+
+  const tab = document.querySelector(`.app-tab[data-panel="${panelId}"]`);
+  if (tab) tab.classList.add("active");
+
+  if (panelId === "panel-stats") loadTipStats();
+}
+
+function countFilledCoupons() {
+  let filled = 0;
+
+  openCouponMatches.forEach(match => {
+    const homeInput = document.querySelector(`input[data-match="${match.id}"][data-side="home"]`);
+    const awayInput = document.querySelector(`input[data-match="${match.id}"][data-side="away"]`);
+
+    const home = homeInput ? homeInput.value : "";
+    const away = awayInput ? awayInput.value : "";
+
+    if (home !== "" || away !== "") filled += 1;
+  });
+
+  return filled;
+}
+
+function updateCouponProgress() {
+  const total = openCouponMatches.length || 0;
+  const filled = countFilledCoupons();
+  const percent = total ? Math.round((filled / total) * 100) : 0;
+
+  const text = document.getElementById("couponProgressText");
+  const fill = document.getElementById("couponProgressFill");
+
+  if (text) {
+    text.textContent = total
+      ? `${filled} av ${total} kuponger påbegynt. Tomme kuponger lagres ikke.`
+      : "Ingen åpne kuponger akkurat nå.";
+  }
+
+  if (fill) fill.style.width = percent + "%";
+
+  renderStickySubmit();
+}
+
+function renderStickySubmit() {
+  const box = document.getElementById("stickySubmit");
+  if (!box) return;
+
+  const total = openCouponMatches.length || 0;
+  const filled = countFilledCoupons();
+
+  box.innerHTML = `
+    <div class="sticky-inner">
+      <div><strong>Kupong</strong><br>${filled} av ${total} påbegynt</div>
+      <button onclick="sendTips()">Lever</button>
+    </div>
+  `;
+}
+
+function bindCouponInputs() {
+  document.querySelectorAll("#couponList input").forEach(input => {
+    input.addEventListener("input", updateCouponProgress);
+  });
+  updateCouponProgress();
+}
+
+function showSuccessOverlay(count) {
+  const overlay = document.getElementById("successOverlay");
+  const text = document.getElementById("successText");
+  if (!overlay || !text) return;
+
+  const lines = [
+    "Pedersen gir tommel opp. Det betyr ikke nødvendigvis at tipset er bra.",
+    "Kupongen er inne. Nå kan du late som dette var nøye analysert.",
+    "Forumet er varslet. Magefølelsen står for regningen.",
+    "Levert med selvtillit. Anger kan komme etter kampslutt.",
+    "Dette kan bli genialt. Eller veldig Lyn."
+  ];
+
+  text.innerHTML = `
+    <strong>${count} kupong${count === 1 ? "" : "er"} lagret.</strong><br>
+    Gamle tips på samme kamp ble oppdatert.<br><br>
+    ${lines[Math.floor(Math.random() * lines.length)]}
+  `;
+
+  overlay.style.display = "flex";
+}
+
+function closeSuccessOverlay() {
+  const overlay = document.getElementById("successOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+function renderLeaderboardPodium(rows) {
+  if (!rows || rows.length === 0) return "";
+
+  const first = rows[0];
+  const second = rows[1];
+  const third = rows[2];
+
+  const card = (row, medal, extraClass = "") => {
+    if (!row) return `<div></div>`;
+
+    return `
+      <div class="podium-card ${extraClass}">
+        <div class="podium-medal">${medal}</div>
+        <a href="profil.html?user=${encodeURIComponent(row.player)}" class="profile-link">
+          <strong>${row.player}</strong>
+        </a>
+        <div class="podium-score">${row.score}</div>
+        <div class="small">${row.sub || ""}</div>
+      </div>
+    `;
+  };
+
+  return `
+    <div class="podium-grid">
+      ${card(second, "🥈")}
+      ${card(first, "🥇", "first")}
+      ${card(third, "🥉")}
     </div>
   `;
 }
