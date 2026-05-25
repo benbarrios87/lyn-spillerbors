@@ -1,1 +1,16 @@
 
+<h1>Daily Lyn XI</h1>
+
+<div id="info"></div>
+
+<div id="lives">❤️❤️❤️</div>
+
+<input id="guessInput" placeholder="Skriv spiller..." />
+
+<button onclick="submitGuess()">
+Gjett
+</button>
+
+<div id="guessedPlayers"></div>
+
+<div id="message"></div>
