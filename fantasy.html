@@ -1443,8 +1443,8 @@ function renderPlayerCards() {
           <span class="meta-pill">${getOwnershipText(player.name)}</span>
         </div>
         <div class="draft-help">
-          ${getTinyPlayerHint(player.name, lastPoints, stat)}
-        </div>
+  ${getTinyPlayerHint(player.name, lastPoints, stat)}
+</div>
         <div class="card-actions">
           <button type="button" class="${isSelected ? "ghost-btn" : ""}" onclick="chooseRegularPlayer('${player.name.replace(/'/g,"\\'")}')">
             ${isSelected ? "Valgt ✓" : "Velg"}
@@ -1459,11 +1459,30 @@ function renderPlayerCards() {
 }
 
 function getTinyPlayerHint(playerName, lastPoints, stat) {
-  if (lastPoints === null) return "Ingen registrerte fantasyhendelser ennå.";
-  if (lastPoints >= 8) return "🔥 Varm spiller. Dette lukter selvtillit.";
-  if (lastPoints > 0) return "📈 Kan være et solid valg denne runden.";
-  if (stat && stat.rating > 0 && stat.rating <= 4.5) return "😬 Lav børs sist. Modig valg.";
-  return "👀 Fantasyvalg med potensial.";
+
+  const picks = currentPickCounts[playerName] || 0;
+
+  if (!stat) {
+    return "🚑 Har ikke vært involvert nok ennå.";
+  }
+
+  if (lastPoints >= 8) {
+    return "🔥 I kjempeform.";
+  }
+
+  if (lastPoints >= 4) {
+    return "📈 Leverer jevnt fantasy-poeng.";
+  }
+
+  if (stat.rating > 0 && stat.rating <= 4.5) {
+    return "😬 Svak børs sist kamp.";
+  }
+
+  if (picks <= 2 && lastPoints > 0) {
+    return "🧠 Smart outsider-valg.";
+  }
+
+  return "⚽ Fast del av fantasy-metaen.";
 }
 
 function updateTeamBuilder() {
