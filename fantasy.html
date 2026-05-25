@@ -2373,7 +2373,11 @@ mensPicks.forEach(pick => {
       picks:pickCounts[player] || 0,
       avg:(playerGames[player] || 0) ? total / playerGames[player] : 0
     }))
-    .filter(row => row.picks <= 2 && row.total > 0)
+    .filter(row =>
+  row.picks <= 3 &&
+  row.games >= 3 &&
+  row.total >= 10
+)
     .sort((a,b) => b.total - a.total);
 
   const differentialKing = differentials[0];
