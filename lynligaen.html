@@ -620,13 +620,58 @@ main {
   Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
 </footer>
 
-<script src="matches.js"></script>
-
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let matchesData = [];
+
+async function loadMatchesFromSupabase() {
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .eq("active", true)
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error("Klarte ikke å hente kamper", error);
+    matchesData = [];
+    return [];
+  }
+
+  matchesData = data || [];
+  return matchesData;
+}
+
+function getActualScore(match) {
+  if (!match) return null;
+
+  if (
+    match.actual_home !== undefined &&
+    match.actual_home !== null &&
+    match.actual_away !== undefined &&
+    match.actual_away !== null
+  ) {
+    return {
+      home:Number(match.actual_home),
+      away:Number(match.actual_away)
+    };
+  }
+
+  if (
+    match.actual &&
+    match.actual.home !== undefined &&
+    match.actual.away !== undefined
+  ) {
+    return {
+      home:Number(match.actual.home),
+      away:Number(match.actual.away)
+    };
+  }
+
+  return null;
+}
 
 const AWAY_FANS_PLAYER = "Bortefeltet";
 const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
@@ -860,12 +905,22 @@ function buildTipRounds(allVotes) {
   const byMatch = {};
 
   predictions.forEach(p => {
+
     const match = getMatchData(p.match_id);
-    if (!match || !match.actual) return;
+    const actual = getActualScore(match);
 
-    const raw = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+    if (!match || !actual) return;
 
-    if (!byMatch[p.match_id]) byMatch[p.match_id] = [];
+    const raw = scorePrediction(
+      p.home,
+      p.away,
+      actual.home,
+      actual.away
+    );
+
+    if (!byMatch[p.match_id]) {
+      byMatch[p.match_id] = [];
+    }
 
     byMatch[p.match_id].push({
       match_id:p.match_id,
@@ -875,12 +930,15 @@ function buildTipRounds(allVotes) {
       home:p.home,
       away:p.away
     });
+
   });
 
   return Object.keys(byMatch).map(matchId => ({
     match_id:matchId,
     type:"tips",
-    rows:byMatch[matchId].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter))
+    rows:byMatch[matchId].sort(
+      (a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter)
+    )
   }));
 }
 
@@ -1231,8 +1289,11 @@ function renderRounds(rounds) {
         const match = getMatchData(round.match_id);
         const fantasyWinner = [...round.fantasy].sort((a,b) => b.raw - a.raw)[0];
         const tipWinner = [...round.tips].sort((a,b) => b.raw - a.raw)[0];
-        const actualText = match && match.actual ? `Resultat ${match.actual.home}-${match.actual.away}` : "Resultat ikke registrert";
+       const actual = getActualScore(match);
 
+const actualText = actual
+  ? `Resultat ${actual.home}-${actual.away}`
+  : "Resultat ikke registrert";
         return `
           <div class="stat-card round-card">
             <h3>${match ? formatDate(match.date) + " · " + match.home + " - " + match.away : round.match_id}</h3>
@@ -1432,7 +1493,11 @@ async function loadLynCentral() {
 }
 
 setupTabs();
-loadLynCentral();
+
+(async function init() {
+  await loadMatchesFromSupabase();
+  await loadLynCentral();
+})();
 </script>
   
 <script>
