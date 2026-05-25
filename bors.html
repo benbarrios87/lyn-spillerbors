@@ -1210,13 +1210,14 @@ function userLink(username, displayText = null) {
     </a>
   `;
 }
-  function showSuccessToast(text = "Pedersen godkjenner.") {
+ function showSuccessToast(text = "Pedersen godkjenner.") {
   const toast = document.getElementById("successToast");
   if (!toast) return;
 
-  toast.querySelector(".success-content").innerHTML =
-    <strong>Levert!</strong><br>
-    ${text}
+  toast.querySelector(".success-content").innerHTML = `
+    <strong>LEVERT!</strong>
+    <div class="success-sub">Børsen er sendt 🔥</div>
+    <div class="success-small">${text}</div>
   `;
 
   toast.classList.add("show");
