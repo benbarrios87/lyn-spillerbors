@@ -1214,7 +1214,7 @@ function userLink(username, displayText = null) {
   const toast = document.getElementById("successToast");
   if (!toast) return;
 
-  toast.querySelector("div").innerHTML = `
+  toast.querySelector(".success-content").innerHTML =
     <strong>Levert!</strong><br>
     ${text}
   `;
