@@ -136,36 +136,6 @@ function renderProfile() {
     </div>
   `;
 }
-
-  document.getElementById(
-    "profileBox"
-  ).innerHTML = `
-
-    <div class="profile-name">
-      ⚽ ${username}
-    </div>
-
-    <div class="profile-stats">
-
-      <div class="profile-stat">
-        <strong>${stats.played}</strong>
-        Spill
-      </div>
-
-      <div class="profile-stat">
-        <strong>${stats.wins}</strong>
-        Seire
-      </div>
-
-      <div class="profile-stat">
-        <strong>${stats.goals}</strong>
-        Bonusmål
-      </div>
-
-    </div>
-  `;
-
-}
  
 document.getElementById("info").innerHTML = `
   <div><strong>${challenge.title}</strong></div>
