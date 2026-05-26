@@ -1,5 +1,17 @@
+const startDate =
+  new Date("2026-01-01");
+
+const today =
+  new Date();
+
+const diffDays =
+  Math.floor(
+    (today - startDate) /
+    (1000 * 60 * 60 * 24)
+  );
+
 const careerIndex =
-  new Date().getDate() % careers.length;
+  diffDays % careers.length;
 
 const career = careers[careerIndex];
 
