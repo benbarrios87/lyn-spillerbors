@@ -182,7 +182,7 @@ button:hover {
   background:linear-gradient(135deg, #064eb8, #0b63e5);
   border-color:white;
   color:white;
-  animation:pop .22s ease;
+  animation:pop .28s ease;
 }
 
 @keyframes pop {
@@ -433,5 +433,18 @@ button:hover {
 
   .hero p {
     font-size:16px;
+  }
+}
+    @keyframes pop {
+  0% {
+    transform:scale(.7);
+  }
+
+  70% {
+    transform:scale(1.08);
+  }
+
+  100% {
+    transform:scale(1);
   }
 }
