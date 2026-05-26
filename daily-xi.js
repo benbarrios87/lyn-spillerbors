@@ -1,38 +1,53 @@
-const challenge = {
-  title: "Lyn vs Fram",
-  date: "11.11.2023",
-  result: "10-1",
-  formation: "4-3-3 Attacking",
-  attendance: 2247,
-  competition: "PostNord-ligaen 2023",
+const dailyIndex =
+  new Date().getDate() % challenges.length;
 
-  lineup: [
-    { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
-    { name:"Herman Solberg Nilsen", pos:"LB", x:18, y:72 },
-    { name:"Schneider", pos:"CB", x:38, y:75 },
-    { name:"William Sell", pos:"CB", x:62, y:75 },
-    { name:"Meinseth", pos:"RB", x:82, y:72 },
+const challenge =
+  challenges[dailyIndex];
+const challenges = [
 
-    { name:"Even Bydal", pos:"DM", x:50, y:58 },
-    { name:"Henrik Elvevold", pos:"CM", x:35, y:46 },
-    { name:"Kristiansen", pos:"CM", x:65, y:46 },
+  {
+    id:"fram-2023",
 
-    { name:"Ole Breistøl", pos:"LW", x:22, y:25 },
-    { name:"Hellum", pos:"ST", x:50, y:18 },
-    { name:"Olsen", pos:"RW", x:78, y:25 }
-  ],
+    title:"Lyn vs Fram",
 
-  bonusGoalscorers: [
-    "Kristiansen",
-    "Loholt",
-    "Hellum",
-    "Henrik Elvevold",
-    "Elvevold",
-    "Laajab",
-    "Olsen"
-  ]
-};
+    competition:"PostNord-ligaen 2023",
 
+    date:"11.11.2023",
+
+    result:"10-1",
+
+    formation:"4-3-3 Attacking",
+
+    attendance:2247,
+
+    lineup:[
+      { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
+      { name:"Herman Solberg Nilsen", pos:"LB", x:18, y:72 },
+      { name:"Schneider", pos:"CB", x:38, y:75 },
+      { name:"William Sell", pos:"CB", x:62, y:75 },
+      { name:"Meinseth", pos:"RB", x:82, y:72 },
+
+      { name:"Even Bydal", pos:"DM", x:50, y:58 },
+      { name:"Henrik Elvevold", pos:"CM", x:35, y:46 },
+      { name:"Kristiansen", pos:"CM", x:65, y:46 },
+
+      { name:"Ole Breistøl", pos:"LW", x:22, y:25 },
+      { name:"Hellum", pos:"ST", x:50, y:18 },
+      { name:"Olsen", pos:"RW", x:78, y:25 }
+    ],
+
+    bonusGoalscorers:[
+      "Kristiansen",
+      "Loholt",
+      "Hellum",
+      "Henrik Elvevold",
+      "Elvevold",
+      "Laajab",
+      "Olsen"
+    ]
+  }
+
+];
 let guessed = [];
 let guessedScorers = [];
 let lives = 3;
