@@ -1,5 +1,5 @@
 
-[
+const challenges = [
   {
     id:"eik-1999-7-0",
     title:"Lyn vs Eik-Tønsberg",
