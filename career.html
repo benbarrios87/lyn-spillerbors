@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karrieregåten</title>
+
+  <link rel="stylesheet" href="career.css">
+</head>
+
+<body>
+
+  <main class="career-wrap">
+
+    <section class="career-hero">
+      <div class="game-kicker">Lyn Games · Karrieregåten</div>
+      <h1>🧩 Hvem er spilleren?</h1>
+      <p>
+        Klubbkarrieren avsløres steg for steg.
+        Jo tidligere du gjetter riktig, jo flere poeng får du.
+      </p>
+    </section>
+
+    <section class="career-card">
+      <div id="progressText"></div>
+      <div id="scoreText"></div>
+
+      <div id="careerList"></div>
+
+      <button id="revealBtn" onclick="revealNextClub()">
+        Reveal next club →
+      </button>
+
+      <div class="guess-box">
+        <input id="guessInput" type="text" placeholder="Skriv spiller...">
+        <button onclick="submitCareerGuess()">Gjett</button>
+      </div>
+
+      <div id="message"></div>
+    </section>
+
+  </main>
+
+  <script src="career-data.js"></script>
+  <script src="career.js"></script>
+
+</body>
+</html>

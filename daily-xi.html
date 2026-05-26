@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Lyn XI</title>
+
+  <link rel="stylesheet" href="daily-xi.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <section class="hero">
+  <div class="game-kicker">Lyn Games · Mandagschallenge</div>
+  <h1>⚽ Klarer du startelleveren?</h1>
+  <p>
+    Gjett spillerne som startet kampen. Du har 3 liv.
+    Målscorere gir bonus.
+  </p>
+</section>
+    <div class="profile-box" id="profileBox"></div>
+
+    <div class="match-info">
+      <div id="info"></div>
+    </div>
+
+    <div id="lives">❤️❤️❤️</div>
+
+    <div class="guess-box">
+      <input
+        id="guessInput"
+        type="text"
+        placeholder="Skriv spiller..."
+      >
+
+      <button onclick="submitGuess()">
+        Gjett
+      </button>
+    </div>
+
+    <div id="message"></div>
+    <div class="bonus-box" id="bonusBox"></div>
+
+    <div id="pitch"></div>
+
+  </div>
+
+  <script src="challenges.js"></script>
+  <script src="daily-xi.js"></script>
+
+</body>
+</html>

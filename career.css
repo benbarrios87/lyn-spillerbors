@@ -1,0 +1,262 @@
+body {
+  margin:0;
+  min-height:100vh;
+  font-family:Arial, sans-serif;
+  color:white;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,209,102,.38), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgba(11,99,229,.34), transparent 30%),
+    radial-gradient(circle at 50% 90%, rgba(215,25,32,.26), transparent 34%),
+    linear-gradient(135deg, #06111f, #102a43 55%, #090d18);
+}
+
+.career-wrap {
+  max-width:960px;
+  margin:auto;
+  padding:28px 14px 70px;
+}
+
+.career-hero {
+  text-align:center;
+  padding:32px 22px;
+  border-radius:32px;
+  background:
+    linear-gradient(135deg, rgba(11,99,229,.96), rgba(215,25,32,.82)),
+    radial-gradient(circle at top, rgba(255,255,255,.22), transparent 42%);
+  box-shadow:0 24px 60px rgba(0,0,0,.38);
+  border:1px solid rgba(255,255,255,.25);
+}
+
+.game-kicker {
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#ffd166;
+  color:#101827;
+  font-weight:900;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+}
+
+.career-hero h1 {
+  margin:16px 0 10px;
+  font-size:48px;
+  line-height:1;
+}
+
+.career-hero p {
+  max-width:610px;
+  margin:auto;
+  font-size:18px;
+  line-height:1.45;
+  color:rgba(255,255,255,.92);
+}
+
+.career-card {
+  position:relative;
+  overflow:hidden;
+  margin:24px auto 0;
+  max-width:660px;
+  padding:24px;
+  border-radius:30px;
+  background:
+    radial-gradient(circle at top left, rgba(255,209,102,.22), transparent 34%),
+    linear-gradient(135deg, rgba(11,99,229,.22), rgba(215,25,32,.18)),
+    rgba(0,0,0,.50);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 22px 55px rgba(0,0,0,.38);
+  text-align:center;
+}
+
+.career-card::before {
+  content:"";
+  position:absolute;
+  inset:-80px;
+  background:
+    linear-gradient(120deg, transparent 35%, rgba(255,255,255,.08), transparent 65%);
+  transform:rotate(8deg);
+  pointer-events:none;
+}
+
+#progressText {
+  display:inline-block;
+  margin-bottom:10px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(11,99,229,.35);
+  border:1px solid rgba(255,255,255,.18);
+  color:white;
+  font-size:14px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+}
+
+#scoreText {
+  display:inline-block;
+  margin-left:8px;
+  margin-bottom:12px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,209,102,.18);
+  border:1px solid rgba(255,209,102,.45);
+  color:#ffd166;
+  font-weight:900;
+}
+
+#careerList {
+  position:relative;
+  margin-top:10px;
+  padding-left:18px;
+}
+
+#careerList::before {
+  content:"";
+  position:absolute;
+  left:18px;
+  top:12px;
+  bottom:12px;
+  width:3px;
+  background:linear-gradient(#ffd166, #ff7a1a, #0b63e5);
+  border-radius:999px;
+}
+
+.career-row {
+  position:relative;
+  margin:14px 0 14px 18px;
+  padding:18px 20px;
+  border-radius:20px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 12px 28px rgba(0,0,0,.24);
+  text-align:left;
+  animation:fadeIn .24s ease;
+}
+
+.career-row::before {
+  content:"";
+  position:absolute;
+  left:-31px;
+  top:50%;
+  width:17px;
+  height:17px;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:#ffd166;
+  border:4px solid #102a43;
+  box-shadow:0 0 0 4px rgba(255,209,102,.24);
+}
+
+.career-years {
+  color:#ffd166;
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.4px;
+}
+
+.career-club {
+  margin-top:5px;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+
+.career-apps {
+  margin-top:5px;
+  color:rgba(255,255,255,.78);
+  font-weight:700;
+}
+
+.career-apps::before {
+  content:"🎽 ";
+}
+
+#revealBtn {
+  width:100%;
+  margin-top:18px;
+}
+
+button {
+  border:none;
+  border-radius:16px;
+  padding:15px 22px;
+  background:linear-gradient(135deg, #ffd166, #ff7a1a);
+  color:#111827;
+  font-weight:900;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(255,122,26,.22);
+}
+
+button:hover {
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+}
+
+.guess-box {
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+  padding:12px;
+  border-radius:22px;
+  background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+input {
+  flex:1;
+  padding:15px;
+  border-radius:15px;
+  border:none;
+  font-size:17px;
+  outline:none;
+}
+
+#message {
+  min-height:32px;
+  margin-top:16px;
+  color:#ffd166;
+  font-weight:900;
+  font-size:21px;
+  text-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity:0;
+    transform:translateY(10px) scale(.98);
+  }
+
+  to {
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@media(max-width:650px) {
+  .career-hero h1 {
+    font-size:34px;
+  }
+
+  .career-hero p {
+    font-size:16px;
+  }
+
+  .career-card {
+    padding:18px;
+  }
+
+  .career-club {
+    font-size:22px;
+  }
+
+  .guess-box {
+    flex-direction:column;
+  }
+
+  #scoreText {
+    margin-left:0;
+  }
+}
