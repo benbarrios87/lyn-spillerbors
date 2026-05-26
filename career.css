@@ -1,48 +1,27 @@
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karrieregåten</title>
+function submitCareerGuess() {
 
-  <link rel="stylesheet" href="career.css">
-</head>
+  if (finished) return;
 
-<body>
+  if (isCareerMatch(guessInput.value, career.answer)) {
 
-  <main class="career-wrap">
+    finished = true;
+    revealed = career.clubs.length;
 
-    <section class="career-hero">
-      <div class="game-kicker">Lyn Games · Karrieregåten</div>
-      <h1>🧩 Hvem er spilleren?</h1>
-      <p>
-        Klubbkarrieren avsløres steg for steg.
-        Jo tidligere du gjetter riktig, jo flere poeng får du.
-      </p>
-    </section>
+    renderCareer();
 
-    <section class="career-card">
-      <div id="progressText"></div>
-      <div id="scoreText"></div>
+    message.innerHTML =
+      `🏆 Riktig! ${career.answer} · ${score} poeng`;
 
-      <div id="careerList"></div>
+    return;
+  }
 
-      <button id="revealBtn" onclick="revealNextClub()">
-        Reveal next club →
-      </button>
+  message.innerHTML =
+    "❌ Feil spiller. Ny klubb avslørt.";
 
-      <div class="guess-box">
-        <input id="guessInput" type="text" placeholder="Skriv spiller...">
-        <button onclick="submitCareerGuess()">Gjett</button>
-      </div>
+  if (revealed < career.clubs.length) {
+    revealed++;
+    score -= 10;
+    renderCareer();
+  }
 
-      <div id="message"></div>
-    </section>
-
-  </main>
-
-  <script src="career-data.js"></script>
-  <script src="career.js"></script>
-
-</body>
-</html>
+}
