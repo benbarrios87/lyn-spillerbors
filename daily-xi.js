@@ -81,10 +81,7 @@ const stats = JSON.parse(
 };
 
 renderProfile();
-
-function renderProfile() {
-
-  function renderBonusBox() {
+function renderBonusBox() {
   const box = document.getElementById("bonusBox");
   if (!box) return;
 
@@ -92,6 +89,9 @@ function renderProfile() {
     box.innerHTML = "";
     return;
   }
+function renderProfile() {
+
+  
 
   const uniqueScorers = [...new Set(
     challenge.bonusGoalscorers.map(s => normalize(s))
