@@ -1,193 +1,236 @@
 const challenge = {
-
   title: "Lyn vs Fram",
-
   date: "11.11.2023",
-
   result: "10-1",
-
-  formation: "4-3-3",
+  formation: "4-3-3 Attacking",
+  attendance: 2247,
+  competition: "PostNord-ligaen 2023",
 
   lineup: [
-    "Alexander Pedersen",
-    "Herman Solberg Nilsen",
-    "Schneider",
-    "William Sell",
-    "Meinseth",
-    "Even Bydal",
-    "Henrik Elvevold",
+    { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
+    { name:"Herman Solberg Nilsen", pos:"LB", x:18, y:72 },
+    { name:"Schneider", pos:"CB", x:38, y:75 },
+    { name:"William Sell", pos:"CB", x:62, y:75 },
+    { name:"Meinseth", pos:"RB", x:82, y:72 },
+
+    { name:"Even Bydal", pos:"DM", x:50, y:58 },
+    { name:"Henrik Elvevold", pos:"CM", x:35, y:46 },
+    { name:"Kristiansen", pos:"CM", x:65, y:46 },
+
+    { name:"Ole Breistøl", pos:"LW", x:22, y:25 },
+    { name:"Hellum", pos:"ST", x:50, y:18 },
+    { name:"Olsen", pos:"RW", x:78, y:25 }
+  ],
+
+  bonusGoalscorers: [
     "Kristiansen",
-    "Ole Breistøl",
+    "Loholt",
     "Hellum",
+    "Henrik Elvevold",
+    "Elvevold",
+    "Laajab",
     "Olsen"
   ]
-
 };
 
+let guessed = [];
+let guessedScorers = [];
+let lives = 3;
+let gameOver = false;
+
 document.getElementById("info").innerHTML = `
-  <div>${challenge.title}</div>
+  <div><strong>${challenge.title}</strong></div>
+  <div>${challenge.competition}</div>
   <div>${challenge.date}</div>
-  <div>${challenge.result}</div>
-  <div>${challenge.formation}</div>
+  <div>Resultat: ${challenge.result}</div>
+  <div>Formasjon: ${challenge.formation}</div>
+  <div>Tilskuere: ${challenge.attendance.toLocaleString("no-NO")}</div>
 `;
 
-let guessed = [];
-
-let lives = 3;
-
 function normalize(str) {
-
-  return str
+  return String(str || "")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "o")
+    .replace(/å/g, "a")
     .replace(/[^a-z0-9]/g, "");
-
 }
 
-function renderPitch() {
+function lastName(fullName) {
+  return String(fullName || "").split(" ").slice(-1)[0];
+}
 
-  const pitch =
-    document.getElementById("pitch");
+function isNameMatch(guess, fullName) {
+  const g = normalize(guess);
+  const full = normalize(fullName);
+  const last = normalize(lastName(fullName));
 
-  pitch.innerHTML =
-    challenge.lineup.map(player => {
+  if (!g) return false;
 
-      const isGuessed =
-        guessed.includes(player);
+  if (g === full || g === last) return true;
 
-      return `
-        <div class="
-          player
-          ${isGuessed ? "correct" : "empty"}
-        ">
-          ${isGuessed ? player : "?"}
-        </div>
-      `;
+  if (full.includes(g) && g.length >= 5) return true;
+  if (last.includes(g) && g.length >= 4) return true;
 
-    }).join("");
+  return levenshtein(g, last) <= 1 && g.length >= 5;
+}
 
+function levenshtein(a, b) {
+  const matrix = Array.from({ length: a.length + 1 }, () => []);
+
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+
+  return matrix[a.length][b.length];
 }
 
 function renderLives() {
+  document.getElementById("lives").innerText =
+    "❤️".repeat(lives) + "🖤".repeat(3 - lives);
+}
 
-  document.getElementById(
-    "lives"
-  ).innerText =
-    "❤️".repeat(lives);
+function renderPitch() {
+  const pitch = document.getElementById("pitch");
 
+  pitch.innerHTML = `
+    <div class="pitch-line"></div>
+    <div class="box-top"></div>
+    <div class="box-bottom"></div>
+  `;
+
+  challenge.lineup.forEach(player => {
+    const div = document.createElement("div");
+    const isGuessed = guessed.includes(player.name);
+
+    div.className = `player ${isGuessed ? "correct" : "empty"}`;
+    div.style.left = player.x + "%";
+    div.style.top = player.y + "%";
+    div.innerText = isGuessed ? player.name : player.pos;
+
+    pitch.appendChild(div);
+  });
+
+  renderGuessedList();
+}
+
+function renderGuessedList() {
+  let existing = document.querySelector(".guessed-list");
+  if (existing) existing.remove();
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "guessed-list";
+
+  wrapper.innerHTML = `
+    <h3>Gjettede spillere (${guessed.length}/11)</h3>
+    <div class="guessed-grid">
+      ${guessed.length ? guessed.map(p => `<div>${p}</div>`).join("") : "<div>Ingen ennå</div>"}
+    </div>
+
+    <div class="hint">
+      Tips: Etternavn holder. Små skrivefeil tåles.
+      ${challenge.bonusGoalscorers.length ? "<br>Bonus: målscorere kan også treffes." : ""}
+    </div>
+  `;
+
+  document.querySelector(".container").appendChild(wrapper);
+}
+
+function setMessage(text) {
+  document.getElementById("message").innerText = text;
 }
 
 function endGame(text) {
-
-  document.getElementById(
-    "message"
-  ).innerText = text;
-
-  document.getElementById(
-    "guessInput"
-  ).disabled = true;
-
+  gameOver = true;
+  setMessage(text);
+  document.getElementById("guessInput").disabled = true;
 }
 
 function submitGuess() {
+  if (gameOver) return;
 
-  const input =
-    document.getElementById(
-      "guessInput"
-    );
-
-  const guess =
-    normalize(input.value);
+  const input = document.getElementById("guessInput");
+  const rawGuess = input.value.trim();
 
   input.value = "";
+  input.focus();
 
-  if(!guess) return;
+  if (!rawGuess) return;
 
-  const found =
-    challenge.lineup.find(player => {
+  const foundPlayer = challenge.lineup.find(player =>
+    isNameMatch(rawGuess, player.name)
+  );
 
-      const full =
-        normalize(player);
-
-      const last =
-        normalize(
-          player.split(" ").slice(-1)[0]
-        );
-
-      return (
-        guess === full ||
-        guess === last
-      );
-
-    });
-
-  if(found) {
-
-    if(guessed.includes(found)) {
-
-      document.getElementById(
-        "message"
-      ).innerText =
-        "⚠️ Allerede gjettet";
-
+  if (foundPlayer) {
+    if (guessed.includes(foundPlayer.name)) {
+      setMessage("⚠️ Allerede gjettet");
       return;
-
     }
 
-    guessed.push(found);
-
+    guessed.push(foundPlayer.name);
     renderPitch();
+    setMessage(`✅ Riktig! ${foundPlayer.name}`);
 
-    document.getElementById(
-      "message"
-    ).innerText =
-      "✅ Riktig!";
-
-    if(
-      guessed.length ===
-      challenge.lineup.length
-    ) {
-
-      endGame(
-        "🏆 DU KLARTE DAGENS LYN XI"
-      );
-
+    if (guessed.length === challenge.lineup.length) {
+      endGame("🏆 DU KLARTE DAGENS LYN XI");
     }
 
+    return;
   }
 
-  else {
+  const foundScorer = challenge.bonusGoalscorers.find(scorer =>
+    isNameMatch(rawGuess, scorer)
+  );
 
-    lives--;
+  if (foundScorer) {
+    const key = normalize(foundScorer);
 
-    renderLives();
-
-    document.getElementById(
-      "message"
-    ).innerText =
-      "❌ Feil";
-
-    if(lives <= 0) {
-
-      endGame(
-        "💀 Game over"
-      );
-
+    if (guessedScorers.includes(key)) {
+      setMessage("⚠️ Målscorer allerede tatt");
+      return;
     }
 
+    guessedScorers.push(key);
+    setMessage(`⭐ Bonusmålscorer! ${foundScorer}`);
+    return;
   }
 
+  lives--;
+  renderLives();
+
+  if (lives <= 0) {
+    endGame("💀 Game over");
+    revealAnswers();
+  } else {
+    setMessage(`❌ Feil. ${lives} liv igjen`);
+  }
 }
 
-document
-  .getElementById("guessInput")
-  .addEventListener("keydown", e => {
-
-    if(e.key === "Enter") {
-      submitGuess();
+function revealAnswers() {
+  challenge.lineup.forEach(player => {
+    if (!guessed.includes(player.name)) {
+      guessed.push(player.name);
     }
+  });
 
+  renderPitch();
+}
+
+document.getElementById("guessInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") submitGuess();
 });
 
+renderLives();
 renderPitch();
+document.getElementById("guessInput").focus();
