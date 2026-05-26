@@ -53,6 +53,66 @@ let guessed = [];
 let guessedScorers = [];
 let lives = 3;
 let gameOver = false;
+let username =
+  localStorage.getItem("dailyXiUsername");
+
+if(!username) {
+
+  username =
+    prompt("Velg brukernavn");
+
+  if(!username) {
+    username = "Lyn-supporter";
+  }
+
+  localStorage.setItem(
+    "dailyXiUsername",
+    username
+  );
+
+}
+
+const stats = JSON.parse(
+  localStorage.getItem("dailyXiStats")
+) || {
+  played:0,
+  wins:0,
+  goals:0
+};
+
+renderProfile();
+
+function renderProfile() {
+
+  document.getElementById(
+    "profileBox"
+  ).innerHTML = `
+
+    <div class="profile-name">
+      ⚽ ${username}
+    </div>
+
+    <div class="profile-stats">
+
+      <div class="profile-stat">
+        <strong>${stats.played}</strong>
+        Spill
+      </div>
+
+      <div class="profile-stat">
+        <strong>${stats.wins}</strong>
+        Seire
+      </div>
+
+      <div class="profile-stat">
+        <strong>${stats.goals}</strong>
+        Bonusmål
+      </div>
+
+    </div>
+  `;
+
+}
  
 document.getElementById("info").innerHTML = `
   <div><strong>${challenge.title}</strong></div>
@@ -199,6 +259,15 @@ function submitGuess() {
     setMessage(`✅ Riktig! ${foundPlayer.name}`);
 
     if (guessed.length === challenge.lineup.length) {
+      stats.played++;
+stats.wins++;
+
+localStorage.setItem(
+  "dailyXiStats",
+  JSON.stringify(stats)
+);
+
+renderProfile();
       endGame("🏆 DU KLARTE DAGENS LYN XI");
     }
 
@@ -218,6 +287,14 @@ function submitGuess() {
     }
 
     guessedScorers.push(key);
+    stats.goals++;
+
+localStorage.setItem(
+  "dailyXiStats",
+  JSON.stringify(stats)
+);
+
+renderProfile();
     setMessage(`⭐ Bonusmålscorer! ${foundScorer}`);
     return;
   }
@@ -226,6 +303,14 @@ function submitGuess() {
   renderLives();
 
   if (lives <= 0) {
+    stats.played++;
+
+localStorage.setItem(
+  "dailyXiStats",
+  JSON.stringify(stats)
+);
+
+renderProfile();
     endGame("💀 Game over");
     revealAnswers();
   } else {
