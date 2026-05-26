@@ -244,6 +244,30 @@ function endGame(text) {
   setMessage(text);
   document.getElementById("guessInput").disabled = true;
 }
+function checkBonusScorer(rawGuess) {
+  if (!challenge.bonusGoalscorers.length) return false;
+  if (guessedScorers.length > 0) return false;
+
+  const foundScorer = challenge.bonusGoalscorers.find(scorer =>
+    isNameMatch(rawGuess, scorer)
+  );
+
+  if (!foundScorer) return false;
+
+  guessedScorers.push(normalize(foundScorer));
+
+  stats.goals++;
+
+  localStorage.setItem(
+    "dailyXiStats",
+    JSON.stringify(stats)
+  );
+
+  renderProfile();
+  renderBonusBox();
+
+  return foundScorer;
+}
 
 function submitGuess() {
   if (gameOver) return;
@@ -267,8 +291,16 @@ function submitGuess() {
     }
 
     guessed.push(foundPlayer.name);
-    renderPitch();
-    setMessage(`✅ Riktig! ${foundPlayer.name}`);
+
+const bonusHit = checkBonusScorer(rawGuess);
+
+renderPitch();
+
+setMessage(
+  bonusHit
+    ? `✅ Riktig! ${foundPlayer.name} ⭐ Bonusmålscorer!`
+    : `✅ Riktig! ${foundPlayer.name}`
+);
 
     if (guessed.length === challenge.lineup.length) {
       stats.played++;
@@ -286,17 +318,12 @@ renderProfile();
     return;
   }
 
-  const foundScorer = challenge.bonusGoalscorers.find(scorer =>
-    isNameMatch(rawGuess, scorer)
-  );
+  const bonusHit = checkBonusScorer(rawGuess);
 
-  if (foundScorer) {
-    const key = normalize(foundScorer);
-
-    if (guessedScorers.includes(key)) {
-      setMessage("⚠️ Målscorer allerede tatt");
-      return;
-    }
+if (bonusHit) {
+  setMessage(`⭐ Bonusmålscorer! ${bonusHit}`);
+  return;
+}
 
     guessedScorers.push(key);
     stats.goals++;
