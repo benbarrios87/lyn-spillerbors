@@ -132,15 +132,23 @@ function submitCareerGuess() {
   if (isCareerMatch(guessInput.value, career.answer)) {
 
     finished = true;
+    revealed = career.clubs.length;
+
+    renderCareer();
 
     message.innerHTML =
-      `🏆 Riktig! ${career.answer}`;
+      `🏆 Riktig! ${career.answer} · ${score} poeng`;
 
-  } else {
+    return;
+  }
 
-    message.innerHTML =
-      "❌ Feil spiller";
+  message.innerHTML =
+    "❌ Feil spiller. Ny klubb avslørt.";
 
+  if (revealed < career.clubs.length) {
+    revealed++;
+    score -= 10;
+    renderCareer();
   }
 
 }
