@@ -243,5 +243,42 @@ button:hover {
   .box-bottom {
     width:190px;
     height:74px;
-  }
+  
+.profile-box {
+  max-width:520px;
+  margin:0 auto 18px;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  background:rgba(0,0,0,.42);
+
+  border:1px solid rgba(255,255,255,.14);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+
+  flex-wrap:wrap;
+}
+
+.profile-name {
+  font-size:20px;
+  font-weight:900;
+}
+
+.profile-stats {
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+
+  color:rgba(255,255,255,.85);
+}
+
+.profile-stat strong {
+  display:block;
+  font-size:20px;
+  color:white;
 }
