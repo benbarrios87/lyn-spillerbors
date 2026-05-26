@@ -71,12 +71,23 @@ function revealNextClub() {
 
   if (revealed < career.clubs.length) {
 
-    revealed++;
-    score -= 10;
+  revealed++;
+  score -= 10;
 
-    renderCareer();
+  renderCareer();
 
-  }
+} else {
+
+  finished = true;
+
+  revealed = career.clubs.length;
+
+  renderCareer();
+
+  message.innerHTML =
+    `💀 Ingen flere klubber! Det var ${career.answer}`;
+
+}
 
 }
 function normalize(str) {
