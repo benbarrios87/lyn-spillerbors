@@ -314,3 +314,8 @@ button:hover {
   background:#ffd166;
   color:#111827;
 }
+    .bonus-help {
+  margin:-4px 0 12px;
+  color:rgba(255,255,255,.72);
+  font-size:14px;
+}
