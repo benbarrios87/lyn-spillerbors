@@ -1,1 +1,42 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyn Wordle</title>
 
+  <link rel="stylesheet" href="wordle.css">
+</head>
+
+<body>
+
+  <main class="wordle-wrap">
+
+    <section class="wordle-hero">
+      <div class="game-kicker">Lyn Games · Wordle</div>
+      <h1>🔤 Gjett Lyn-spilleren</h1>
+      <p>
+        Gjett etternavnet til dagens tidligere Lyn-spiller.
+        Grønne bokstaver er riktig plass, gule finnes i navnet.
+      </p>
+    </section>
+
+    <section class="game-card">
+      <div id="status"></div>
+      <div id="board"></div>
+
+      <div class="guess-box">
+        <input id="guessInput" type="text" placeholder="Skriv etternavn...">
+        <button onclick="submitGuess()">Gjett</button>
+      </div>
+
+      <div id="message"></div>
+    </section>
+
+  </main>
+
+  <script src="wordle-players.js"></script>
+  <script src="wordle.js"></script>
+
+</body>
+</html>
