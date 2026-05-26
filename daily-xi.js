@@ -91,23 +91,12 @@ function renderBonusBox() {
     return;
   }
 
-  const uniqueScorers = [...new Set(
-    challenge.bonusGoalscorers.map(s => normalize(s))
-  )];
+  const foundBonus = guessedScorers.length > 0;
 
   box.innerHTML = `
-    <h3>⭐ Bonusmålscorere (${guessedScorers.length}/${uniqueScorers.length})</h3>
-
-    <div class="bonus-grid">
-      ${uniqueScorers.map(key => {
-        const found = guessedScorers.includes(key);
-
-        return `
-          <div class="bonus-chip ${found ? "found" : ""}">
-            ${found ? "✅ Funnet" : "?"}
-          </div>
-        `;
-      }).join("")}
+    <h3>⭐ Bonusmålscorer</h3>
+    <div class="bonus-chip ${foundBonus ? "found" : ""}">
+      ${foundBonus ? "✅ Bonus tatt!" : "Gjett én målscorer fra kampen"}
     </div>
   `;
 }
@@ -311,6 +300,7 @@ renderProfile();
 
     guessedScorers.push(key);
     stats.goals++;
+    renderBonusBox();
 
 localStorage.setItem(
   "dailyXiStats",
