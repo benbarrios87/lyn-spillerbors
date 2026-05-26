@@ -81,6 +81,7 @@ const stats = JSON.parse(
 };
 
 renderProfile();
+
 function renderBonusBox() {
   const box = document.getElementById("bonusBox");
   if (!box) return;
@@ -89,9 +90,6 @@ function renderBonusBox() {
     box.innerHTML = "";
     return;
   }
-function renderProfile() {
-
-  
 
   const uniqueScorers = [...new Set(
     challenge.bonusGoalscorers.map(s => normalize(s))
@@ -110,6 +108,31 @@ function renderProfile() {
           </div>
         `;
       }).join("")}
+    </div>
+  `;
+}
+
+function renderProfile() {
+  document.getElementById("profileBox").innerHTML = `
+    <div class="profile-name">
+      ⚽ ${username}
+    </div>
+
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <strong>${stats.played}</strong>
+        Spill
+      </div>
+
+      <div class="profile-stat">
+        <strong>${stats.wins}</strong>
+        Seire
+      </div>
+
+      <div class="profile-stat">
+        <strong>${stats.goals}</strong>
+        Bonusmål
+      </div>
     </div>
   `;
 }
