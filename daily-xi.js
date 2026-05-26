@@ -325,19 +325,6 @@ if (bonusHit) {
   return;
 }
 
-    guessedScorers.push(key);
-    stats.goals++;
-    renderBonusBox();
-
-localStorage.setItem(
-  "dailyXiStats",
-  JSON.stringify(stats)
-);
-
-renderProfile();
-    setMessage(`⭐ Bonusmålscorer! ${foundScorer}`);
-    return;
-  }
 
   lives--;
   renderLives();
