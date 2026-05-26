@@ -84,6 +84,36 @@ renderProfile();
 
 function renderProfile() {
 
+  function renderBonusBox() {
+  const box = document.getElementById("bonusBox");
+  if (!box) return;
+
+  if (!challenge.bonusGoalscorers.length) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const uniqueScorers = [...new Set(
+    challenge.bonusGoalscorers.map(s => normalize(s))
+  )];
+
+  box.innerHTML = `
+    <h3>⭐ Bonusmålscorere (${guessedScorers.length}/${uniqueScorers.length})</h3>
+
+    <div class="bonus-grid">
+      ${uniqueScorers.map(key => {
+        const found = guessedScorers.includes(key);
+
+        return `
+          <div class="bonus-chip ${found ? "found" : ""}">
+            ${found ? "✅ Funnet" : "?"}
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
   document.getElementById(
     "profileBox"
   ).innerHTML = `
