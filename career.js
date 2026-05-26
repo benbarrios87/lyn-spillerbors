@@ -89,26 +89,47 @@ function normalize(str) {
     .replace(/å/g, "a")
     .replace(/[^a-z0-9]/g, "");
 }
+function levenshtein(a, b) {
+  const matrix = Array.from({ length: a.length + 1 }, () => []);
+
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+
+  return matrix[a.length][b.length];
+}
+
+function isCareerMatch(guessValue, answerValue) {
+  const guess = normalize(guessValue);
+  const answer = normalize(answerValue);
+  const last = normalize(answerValue.split(" ").slice(-1)[0]);
+
+  if (!guess) return false;
+
+  return (
+    guess === answer ||
+    guess === last ||
+    answer.includes(guess) && guess.length >= 5 ||
+    last.includes(guess) && guess.length >= 4 ||
+    levenshtein(guess, last) <= 1 && guess.length >= 5 ||
+    levenshtein(guess, answer) <= 2 && guess.length >= 7
+  );
+}
 
 function submitCareerGuess() {
 
   if (finished) return;
 
-  const guess =
-  normalize(guessInput.value);
-
-const correct =
-  normalize(career.answer);
-
-const last =
-  normalize(
-    career.answer.split(" ").slice(-1)[0]
-  );
-
-if (
-  guess === correct ||
-  guess === last
-) {
+  if (isCareerMatch(guessInput.value, career.answer)) {
 
     finished = true;
 
@@ -123,5 +144,9 @@ if (
   }
 
 }
-
+guessInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    submitCareerGuess();
+  }
+});
 renderCareer();
