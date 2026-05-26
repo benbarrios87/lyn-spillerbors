@@ -282,3 +282,35 @@ button:hover {
   font-size:20px;
   color:white;
 }
+    .bonus-box {
+  width:min(92vw, 620px);
+  margin:14px auto 18px;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(255,209,102,.12);
+  border:1px solid rgba(255,209,102,.38);
+  box-shadow:0 10px 25px rgba(0,0,0,.22);
+}
+
+.bonus-box h3 {
+  margin:0 0 10px;
+}
+
+.bonus-grid {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+}
+
+.bonus-chip {
+  padding:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  font-weight:bold;
+}
+
+.bonus-chip.found {
+  background:#ffd166;
+  color:#111827;
+}
