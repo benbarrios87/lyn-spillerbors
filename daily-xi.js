@@ -1,8 +1,4 @@
-const dailyIndex =
-  new Date().getDate() % challenges.length;
 
-const challenge =
-  challenges[dailyIndex];
 const challenges = [
 
   {
@@ -48,11 +44,16 @@ const challenges = [
   }
 
 ];
+
+const dailyIndex =
+  new Date().getDate() % challenges.length;
+const challenge =
+  challenges[dailyIndex];
 let guessed = [];
 let guessedScorers = [];
 let lives = 3;
 let gameOver = false;
-
+ 
 document.getElementById("info").innerHTML = `
   <div><strong>${challenge.title}</strong></div>
   <div>${challenge.competition}</div>
