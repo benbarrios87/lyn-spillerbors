@@ -83,7 +83,10 @@ const stats = JSON.parse(
 renderProfile();
 
 function renderBonusBox() {
-  const box = document.getElementById("bonusBox");
+
+  const box =
+    document.getElementById("bonusBox");
+
   if (!box) return;
 
   if (!challenge.bonusGoalscorers.length) {
@@ -91,12 +94,36 @@ function renderBonusBox() {
     return;
   }
 
-  const foundBonus = guessedScorers.length > 0;
+  const uniqueScorers =
+    [...new Set(challenge.bonusGoalscorers)];
 
   box.innerHTML = `
-    <h3>⭐ Bonusmålscorer</h3>
-    <div class="bonus-chip ${foundBonus ? "found" : ""}">
-      ${foundBonus ? "✅ Bonus tatt!" : "Gjett én målscorer fra kampen"}
+
+    <h3>
+      ⭐ Målscorere
+      (${guessedScorers.length}/${uniqueScorers.length})
+    </h3>
+
+    <div class="bonus-grid">
+
+      ${uniqueScorers.map(name => {
+
+        const found =
+          guessedScorers.includes(
+            normalize(name)
+          );
+
+        return `
+          <div class="
+            bonus-chip
+            ${found ? "found" : ""}
+          ">
+            ${found ? "⚽ " + name : "⚽ ?"}
+          </div>
+        `;
+
+      }).join("")}
+
     </div>
   `;
 }
@@ -246,13 +273,20 @@ function endGame(text) {
 }
 function checkBonusScorer(rawGuess) {
   if (!challenge.bonusGoalscorers.length) return false;
-  if (guessedScorers.length > 0) return false;
+  
 
   const foundScorer = challenge.bonusGoalscorers.find(scorer =>
     isNameMatch(rawGuess, scorer)
   );
 
   if (!foundScorer) return false;
+  if (
+  guessedScorers.includes(
+    normalize(foundScorer)
+  )
+) {
+  return false;
+}
 
   guessedScorers.push(normalize(foundScorer));
 
