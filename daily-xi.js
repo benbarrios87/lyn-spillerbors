@@ -364,4 +364,6 @@ document.getElementById("guessInput").addEventListener("keydown", e => {
 
 renderLives();
 renderPitch();
+renderBonusBox();
+
 document.getElementById("guessInput").focus();
