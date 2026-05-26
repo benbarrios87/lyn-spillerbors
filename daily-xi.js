@@ -99,10 +99,14 @@ function renderBonusBox() {
 
   box.innerHTML = `
 
-    <h3>
-      ⭐ Målscorere
-      (${guessedScorers.length}/${uniqueScorers.length})
-    </h3>
+   <h3>
+  ⭐ Målscorere
+  (${guessedScorers.length}/${uniqueScorers.length})
+</h3>
+
+<div class="bonus-help">
+  Målscorere kan også være innbyttere.
+</div>
 
     <div class="bonus-grid">
 
