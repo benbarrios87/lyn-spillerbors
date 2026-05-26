@@ -79,20 +79,36 @@ function revealNextClub() {
   }
 
 }
+function normalize(str) {
+  return String(str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "o")
+    .replace(/å/g, "a")
+    .replace(/[^a-z0-9]/g, "");
+}
 
 function submitCareerGuess() {
 
   if (finished) return;
 
   const guess =
-    guessInput.value
-      .trim()
-      .toLowerCase();
+  normalize(guessInput.value);
 
-  const correct =
-    career.answer.toLowerCase();
+const correct =
+  normalize(career.answer);
 
-  if (guess === correct) {
+const last =
+  normalize(
+    career.answer.split(" ").slice(-1)[0]
+  );
+
+if (
+  guess === correct ||
+  guess === last
+) {
 
     finished = true;
 
