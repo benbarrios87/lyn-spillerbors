@@ -273,7 +273,7 @@
       { name:"Ole Bjørn Sundgot", pos:"ST", x:58, y:20 }
     ],
     bonusGoalscorers:["Per Egil Swift"]
-  }
+  },
 
   {
   id:"fram-2023-10-1",
@@ -398,7 +398,7 @@
     { name:"Moses Ukoni Mawa", pos:"LW", x:22, y:25 }
   ],
   bonusGoalscorers:["Birger Rasmussen"]
-}
+},
 {
   id:"alta-2010-2-0",
   title:"Siste kamp før konkursen: Alta vs Lyn",
@@ -425,7 +425,7 @@
     { name:"Alexander Hassum", pos:"LW", x:22, y:25 }
   ],
   bonusGoalscorers:[]
-}
+},
 {
   id:"ovrevoll-hosle-2011-13-0",
   title:"Øvrevoll Hosle vs Lyn",
@@ -465,7 +465,7 @@
     "Sverre Wegge Gundhus",
     "Axel Pedersen"
   ]
-}
+},
 {
   id:"first-after-bankruptcy-2010",
   title:"Første kamp etter konkursen: Christianssand vs Lyn",
@@ -501,7 +501,7 @@
     "Jon Christian Wilmann",
     "Philip Rynning Coker"
   ]
-}
+},
 {
   id:"vinderen-2010-5-2",
   title:"Lyn vs Vinderen",
@@ -536,7 +536,7 @@
     "Jo Tessem",
     "Stefan Ohma Kaklidakis"
   ]
-}
+},
 {
   id:"cupfinale-2004",
   title:"Cupfinalen 2004: Brann vs Lyn",
@@ -567,7 +567,7 @@
   bonusGoalscorers:[
     "Peter Markstedt"
   ]
-}
+},
 {
   id:"first-division-return-2009",
   title:"Tilbake i 1. divisjon: Lyn vs Manglerud Star",
@@ -600,7 +600,8 @@
     "Kim Holmen",
     "Diego Guastavino",
     "Erling Knudtzon"
-  ]
+      ]
 }
 
+];
   
