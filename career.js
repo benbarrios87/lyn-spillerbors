@@ -157,10 +157,21 @@ function submitCareerGuess() {
     "❌ Feil spiller. Ny klubb avslørt.";
 
   if (revealed < career.clubs.length) {
-    revealed++;
-    score -= 10;
-    renderCareer();
-  }
+
+  revealed++;
+  score -= 10;
+  renderCareer();
+
+} else {
+
+  finished = true;
+  revealed = career.clubs.length;
+  renderCareer();
+
+  message.innerHTML =
+    `💀 Ingen flere klubber! Det var ${career.answer}`;
+
+}
 
 }
 guessInput.addEventListener("keydown", e => {
