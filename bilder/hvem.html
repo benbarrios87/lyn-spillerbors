@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hvem er dette?</title>
+
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .player-image {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #222;
+      color: white;
+    }
+
+    button:hover {
+      background: #333;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #hint {
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Hvem er dette?</h1>
+
+<img id="playerImage" class="player-image">
+
+<div class="answers" id="answers"></div>
+
+<div id="result"></div>
+<div id="hint"></div>
+
+<script>
+
+const players = [
+
+{
+  name: "Ronny Johnsen",
+  image: "bilder/johnsen.webp",
+  difficulty: "L",
+  position: "Forsvar",
+  year: "1993",
+  funHint: "Vant Champions League med Manchester United"
+},
+
+{
+  name: "Ståle Stensaas",
+  image: "bilder/stensaas.webp",
+  difficulty: "M",
+  position: "Venstreback",
+  year: "2007",
+  funHint: "Dro fra Lyn til Gent i 2005"
+},
+
+{
+  name: "Keijo Huusko",
+  image: "bilder/huusko.jpg",
+  difficulty: "V",
+  position: "Spiss",
+  year: "2005",
+  funHint: "Finsk spiss med 8 landskamper"
+}
+
+];
+
+let currentPlayer = players[Math.floor(Math.random() * players.length)];
+
+document.getElementById("playerImage").src = currentPlayer.image;
+
+const wrongAnswers = players
+  .filter(p => p.name !== currentPlayer.name)
+  .sort(() => 0.5 - Math.random())
+  .slice(0, 3)
+  .map(p => p.name);
+
+const allAnswers = [...wrongAnswers, currentPlayer.name]
+  .sort(() => 0.5 - Math.random());
+
+const answersDiv = document.getElementById("answers");
+
+allAnswers.forEach(answer => {
+
+  const btn = document.createElement("button");
+  btn.innerText = answer;
+
+  btn.onclick = () => {
+
+    if(answer === currentPlayer.name) {
+      document.getElementById("result").innerText = "Riktig!";
+    } else {
+      document.getElementById("result").innerText =
+        "Feil! Det var " + currentPlayer.name;
+    }
+
+    document.getElementById("hint").innerText =
+      currentPlayer.funHint;
+
+  };
+
+  answersDiv.appendChild(btn);
+
+});
+
+</script>
+
+</body>
+</html>
