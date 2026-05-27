@@ -1143,11 +1143,9 @@ async function loadMatchesFromSupabase() {
   allMatches = await response.json();
   return allMatches;
 }
-  console.log("ALLE KAMPER", allMatches);
 
-console.log("DAMEKAMPER", allMatches.filter(m => m.team === "women"));
+ async function trackEvent(eventType, data = {}) {
 
-async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
     return;
   }
@@ -1169,9 +1167,14 @@ async function trackEvent(eventType, data = {}) {
         details:data
       })
     });
+
   } catch(err) {
+
     console.log("trackEvent feil", err);
+
   }
+
+}
 }
 
 function cleanVoterName(name) {
