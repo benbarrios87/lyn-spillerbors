@@ -625,17 +625,25 @@ async function loadProfile(){
 
   userPredictions.forEach(p => {
     const match = getMatchData(p.match_id);
-    if (!match || !match.actual) return;
+if (!match) return;
 
-    const points = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+const actualHome =
+  match.actual_home ?? match.actual?.home;
 
-    tipHistory.push({
-      match_id:p.match_id,
-      label:`${formatDate(match.date)} ${match.home} - ${match.away}`,
-      tip:`${p.home}-${p.away}`,
-      actual:`${match.actual.home}-${match.actual.away}`,
-      points
-    });
+const actualAway =
+  match.actual_away ?? match.actual?.away;
+
+if (actualHome === null || actualAway === null || actualHome === undefined || actualAway === undefined) return;
+
+const points = scorePrediction(p.home, p.away, actualHome, actualAway);
+
+tipHistory.push({
+  match_id:p.match_id,
+  label:`${formatDate(match.date)} ${match.home} - ${match.away}`,
+  tip:`${p.home}-${p.away}`,
+  actual:`${actualHome}-${actualAway}`,
+  points
+});
   });
 
   const totalFantasyRaw = fantasyHistory.reduce((sum,r) => sum + r.total, 0);
