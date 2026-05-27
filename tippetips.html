@@ -1842,6 +1842,18 @@ async function loadPredictionLeaderboard() {
   const rows = buildPredictionLeaderboardRows(allVotes, "all");
   const menRows = buildPredictionLeaderboardRows(allVotes, "men");
   const womenRows = buildPredictionLeaderboardRows(allVotes, "women");
+  console.log("WOMEN MATCHES", allMatches.filter(m => m.team === "women"));
+
+console.log("WOMEN PREDICTIONS", buildPredictions(allVotes).filter(p => {
+  const m = getMatchData(p.match_id);
+  return m && m.team === "women";
+}));
+
+console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
+  m.team === "women" &&
+  m.actual_home !== null &&
+  m.actual_away !== null
+));
 
   if (rows.length === 0) {
     document.getElementById("results").innerHTML =
