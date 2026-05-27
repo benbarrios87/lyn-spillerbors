@@ -1052,9 +1052,22 @@ function getOutcome(home, away) {
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
-  const exact = tipHome === actualHome && tipAway === actualAway;
-  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
-  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
+  tipHome = Number(tipHome);
+  tipAway = Number(tipAway);
+  actualHome = Number(actualHome);
+  actualAway = Number(actualAway);
+
+  const exact =
+    tipHome === actualHome &&
+    tipAway === actualAway;
+
+  const sameOutcome =
+    getOutcome(tipHome, tipAway) ===
+    getOutcome(actualHome, actualAway);
+
+  const sameGoalDiff =
+    (tipHome - tipAway) ===
+    (actualHome - actualAway);
 
   if (exact) return 3;
   if (sameOutcome && sameGoalDiff) return 2;
