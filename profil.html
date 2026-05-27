@@ -315,8 +315,19 @@ async function loadMatchesFromSupabase(){
   matchesData = data || [];
 }
 
+function normalizeMatchId(id){
+  return String(id || "")
+    .trim()
+    .replace(/\s*-\s*/g, " - ")
+    .replace(/\s+/g, " ");
+}
+
 function getMatchData(matchId){
-  return matchesData.find(m => m.id === matchId) || null;
+  const wanted = normalizeMatchId(matchId);
+
+  return matchesData.find(m =>
+    normalizeMatchId(m.id) === wanted
+  ) || null;
 }
 
 function formatDate(dateString){
