@@ -255,8 +255,6 @@ th:last-child{
 
 </main>
 
-<script src="matches.js"></script>
-
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -300,6 +298,23 @@ function cleanVoterName(name){
   return (name || "").trim().toLowerCase();
 }
 
+let matchesData = [];
+
+async function loadMatchesFromSupabase(){
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .order("date", { ascending:true });
+
+  if (error) {
+    console.error("Klarte ikke hente kamper", error);
+    matchesData = [];
+    return;
+  }
+
+  matchesData = data || [];
+}
+
 function getMatchData(matchId){
   return matchesData.find(m => m.id === matchId) || null;
 }
@@ -321,6 +336,12 @@ function getOutcome(home, away){
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway){
+
+  tipHome = Number(tipHome);
+  tipAway = Number(tipAway);
+  actualHome = Number(actualHome);
+  actualAway = Number(actualAway);
+
   const exact = tipHome === actualHome && tipAway === actualAway;
   const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
   const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
@@ -839,7 +860,12 @@ tipHistory.push({
   `;
 }
 
-loadProfile();
+async function init(){
+  await loadMatchesFromSupabase();
+  await loadProfile();
+}
+
+init();
   </script>
   
 <script>
