@@ -1742,8 +1742,8 @@ const total =
 
       totals[row.player].bors = avgRating.toFixed(1);
 
-totals[row.player].goals += goalPoints;
-totals[row.player].assists += assistPoints;
+totals[row.player].goals += (row.goals || 0);
+totals[row.player].assists += (row.assists || 0);
 totals[row.player].cleanSheets += cleanSheetPoints;
 
 totals[row.player].total =
@@ -1782,7 +1782,7 @@ totals[row.player].total =
             Børs ${row.bors} · Mål ${row.goals} · Assist ${row.assists} · CS ${row.cleanSheets}
           </div>
         </div>
-        <div class="player-year-score">${row.total}</div>
+        <div class="player-year-score">${Math.round(row.total)}</div>
       </div>
     `).join("");
   } catch (err) {
