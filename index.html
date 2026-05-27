@@ -1717,43 +1717,44 @@ async function loadPlayerOfYear(){
         ? ratingData.total / ratingData.count
         : 0;
 
-const borsPoints = avgRating * 10;
-const goalPoints = (row.goals || 0) * 2;
-const assistPoints = (row.assists || 0) * 1.5;
-const cleanSheetPoints = row.clean_sheet ? 1 : 0;
+if (!totals[row.player]) {
+  totals[row.player] = {
+    player: row.player,
+    ratingTotal: 0,
+    ratingCount: 0,
+    total: 0,
+    bors: 0,
+    goals: 0,
+    assists: 0,
+    cleanSheets: 0
+  };
+}
 
-const total =
-  borsPoints +
-  goalPoints +
-  assistPoints +
-  cleanSheetPoints;
+if (avgRating > 0) {
+  totals[row.player].ratingTotal += avgRating;
+  totals[row.player].ratingCount += 1;
+}
 
-      if (!totals[row.player]) {
-        totals[row.player] = {
-          player:row.player,
-          total:0,
-          bors:0,
-          goals:0,
-          assists:0,
-          cleanSheets:0,
-          matches:0
-        };
-      }
-
-      totals[row.player].bors = avgRating.toFixed(1);
-
-totals[row.player].goals += (row.goals || 0);
-totals[row.player].assists += (row.assists || 0);
-totals[row.player].cleanSheets += cleanSheetPoints;
-
-totals[row.player].total =
+totals[row.player].goals += row.goals || 0;
+totals[row.player].assists += row.assists || 0;
+totals[row.player].cleanSheets += row.clean_sheet ? 1 : 0;=
   (avgRating * 10) +
   totals[row.player].goals +
   totals[row.player].assists +
   totals[row.player].cleanSheets;
       totals[row.player].matches += 1;
     });
+Object.values(totals).forEach(p => {
+  const avg = p.ratingCount ? p.ratingTotal / p.ratingCount : 0;
 
+  p.bors = avg.toFixed(1);
+
+  p.total =
+    (avg * 10) +
+    (p.goals * 2) +
+    (p.assists * 1.5) +
+    p.cleanSheets;
+});
     const top = Object.values(totals)
       .filter(row => row.total > 0)
       .sort((a,b) =>
