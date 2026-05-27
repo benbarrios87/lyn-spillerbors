@@ -657,13 +657,15 @@ async function loadProfile(){
     const match = getMatchData(p.match_id);
 if (!match) return;
 
-const actualHome =
-  match.actual_home ?? match.actual?.home;
+const actualHome = Number(
+  match.actual_home ?? match.actual?.home
+);
 
-const actualAway =
-  match.actual_away ?? match.actual?.away;
+const actualAway = Number(
+  match.actual_away ?? match.actual?.away
+);
 
-if (actualHome === null || actualAway === null || actualHome === undefined || actualAway === undefined) return;
+if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
 const points = scorePrediction(p.home, p.away, actualHome, actualAway);
 
