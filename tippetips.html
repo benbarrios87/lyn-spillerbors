@@ -1126,7 +1126,7 @@ let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all"
 
 async function loadMatchesFromSupabase() {
   const response = await fetch(
-    SUPABASE_URL + "/rest/v1/matches?active=eq.true&order=date.asc",
+    SUPABASE_URL + "/rest/v1/matches?order=date.asc",
     {
       headers:{
         "apikey":SUPABASE_KEY,
@@ -1297,6 +1297,7 @@ function formatDeadline(deadline) {
 
 function getOpenMatchesByTeam(team, limit = 3) {
   return allMatches
+    .filter(m => m.active !== false)
     .filter(m => getMatchTeam(m) === team)
     .filter(m => !isTipLocked(m))
     .sort((a,b) => parseLocalDateTime(a.deadline) - parseLocalDateTime(b.deadline))
