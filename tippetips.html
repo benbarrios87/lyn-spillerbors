@@ -1143,6 +1143,9 @@ async function loadMatchesFromSupabase() {
   allMatches = await response.json();
   return allMatches;
 }
+  console.log("ALLE KAMPER", allMatches);
+
+console.log("DAMEKAMPER", allMatches.filter(m => m.team === "women"));
 
 async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
