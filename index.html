@@ -1780,13 +1780,17 @@ async function loadPlayerOfYear(){
   }
 }
 
-function init() {
+async function init() {
   renderIdentity();
+
+  await loadNextMatchWidget();
+
   loadSeasonStats();
   loadThroneLeader();
-  loadNextMatchWidget();
   loadPlayerOfYear();
 }
+
+init();
 
 init();
 </script>
