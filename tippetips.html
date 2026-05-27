@@ -1112,16 +1112,17 @@ const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
 let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
-  let allMatches = [];
-  function parseLocalDeadline(deadline) {
-  if (!deadline) return null;
+let allMatches = [];
 
-  const clean = String(deadline)
-    .replace("Z", "")
-    .replace("+00:00", "")
-    .replace("+00", "");
+function cleanVoterName(name) {
+  return (name || "").trim().toLowerCase();
+}
 
-  return new Date(clean);
+function parseLocalDateTime(value) {
+  if (!value) return null;
+  const clean = String(value).replace("Z", "").replace("+00:00", "").replace("+00", "");
+  const d = new Date(clean);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 async function loadMatchesFromSupabase() {
@@ -1129,35 +1130,55 @@ async function loadMatchesFromSupabase() {
     SUPABASE_URL + "/rest/v1/matches?order=date.asc",
     {
       headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
+        apikey:SUPABASE_KEY,
+        Authorization:"Bearer " + SUPABASE_KEY
       }
     }
   );
 
   if (!response.ok) {
-    console.error("Klarte ikke hente kamper");
+    console.error("Klarte ikke hente kamper", await response.text());
+    allMatches = [];
     return [];
   }
 
   allMatches = await response.json();
+  console.log("KAMPER LASTET", allMatches.length, allMatches);
+  console.log("DAMEKAMPER", allMatches.filter(m => m.team === "women"));
   return allMatches;
 }
 
- async function trackEvent(eventType, data = {}) {
+async function fetchVotes(query = "") {
+  const joiner = query ? "&" : "?";
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes" + query + joiner + "limit=5000",
+    {
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
 
-  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
-    return;
+  if (!response.ok) {
+    console.error("Klarte ikke hente votes", await response.text());
+    return [];
   }
+
+  return await response.json();
+}
+
+async function trackEvent(eventType, data = {}) {
+  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") return;
 
   try {
     await fetch(SUPABASE_URL + "/rest/v1/site_events", {
       method:"POST",
       headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY,
+        apikey:SUPABASE_KEY,
+        Authorization:"Bearer " + SUPABASE_KEY,
         "Content-Type":"application/json",
-        "Prefer":"return=minimal"
+        Prefer:"return=minimal"
       },
       body:JSON.stringify({
         event_type:eventType,
@@ -1167,18 +1188,9 @@ async function loadMatchesFromSupabase() {
         details:data
       })
     });
-
   } catch(err) {
-
     console.log("trackEvent feil", err);
-
   }
-
-}
-}
-
-function cleanVoterName(name) {
-  return (name || "").trim().toLowerCase();
 }
 
 const voterInput = document.getElementById("voter");
@@ -1192,15 +1204,13 @@ function getMatchTeam(matchData) {
 }
 
 function getTeamLabel(team) {
-  if (team === "women") return "Kvinner";
-  return "Herrer";
+  return team === "women" ? "Kvinner" : "Herrer";
 }
 
 function getTeamBadge(matchData) {
   const team = getMatchTeam(matchData);
-  const label = getTeamLabel(team);
   const cls = team === "women" ? "women" : "men";
-  return `<span class="team-badge ${cls}">${label}</span>`;
+  return `<span class="team-badge ${cls}">${getTeamLabel(team)}</span>`;
 }
 
 function matchPassesTeamFilter(matchData) {
@@ -1217,22 +1227,15 @@ function setTeamFilter(filter) {
   localStorage.setItem("lynbors_tip_team_filter", currentTeamFilter);
 
   document.querySelectorAll(".team-tab").forEach(btn => btn.classList.remove("active"));
-
   const activeTab = document.getElementById("tab-" + currentTeamFilter);
   if (activeTab) activeTab.classList.add("active");
 
   const couponTypeBox = document.getElementById("couponTypeBox");
-if (couponTypeBox) {
-  couponTypeBox.classList.remove("filter-men", "filter-women");
-
-  if (currentTeamFilter === "men") {
-    couponTypeBox.classList.add("filter-men");
+  if (couponTypeBox) {
+    couponTypeBox.classList.remove("filter-men", "filter-women");
+    if (currentTeamFilter === "men") couponTypeBox.classList.add("filter-men");
+    if (currentTeamFilter === "women") couponTypeBox.classList.add("filter-women");
   }
-
-  if (currentTeamFilter === "women") {
-    couponTypeBox.classList.add("filter-women");
-  }
-}
 
   const viewSelect = document.getElementById("viewTeamFilter");
   if (viewSelect) viewSelect.value = currentTeamFilter;
@@ -1241,7 +1244,8 @@ if (couponTypeBox) {
   renderResultMatchSelect();
   loadTipStats();
 
-  document.getElementById("results").innerHTML = "";
+  const results = document.getElementById("results");
+  if (results) results.innerHTML = "";
 }
 
 function isRealMatch(v) {
@@ -1258,41 +1262,18 @@ function getMatchData(matchId) {
 
 function isTipLocked(matchData) {
   if (!matchData || !matchData.deadline) return true;
-
   return new Date() > parseLocalDateTime(matchData.deadline);
-}
-
-function parseLocalDateTime(value) {
-  if (!value) return null;
-
-  const clean = String(value)
-    .replace("Z", "")
-    .replace("+00:00", "")
-    .replace("+00", "");
-
-  const d = new Date(clean);
-
-  if (Number.isNaN(d.getTime())) return null;
-
-  return d;
 }
 
 function formatDate(dateString) {
   const d = parseLocalDateTime(dateString);
-
   if (!d) return "Dato ikke satt";
-
-  return d.toLocaleDateString("no-NO", {
-    day:"2-digit",
-    month:"2-digit"
-  });
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
 }
 
 function formatDeadline(deadline) {
   const d = parseLocalDateTime(deadline);
-
   if (!d) return "Frist ikke satt";
-
   return d.toLocaleString("no-NO", {
     day:"2-digit",
     month:"2-digit",
@@ -1340,9 +1321,7 @@ function renderCouponCard(m, i) {
           <label>${m.home}</label>
           <input type="number" min="0" max="9" step="1" placeholder="0" data-match="${m.id}" data-side="home">
         </div>
-
         <div class="score-dash">–</div>
-
         <div>
           <label>${m.away}</label>
           <input type="number" min="0" max="9" step="1" placeholder="0" data-match="${m.id}" data-side="away">
@@ -1363,12 +1342,10 @@ function renderCouponGroup(title, subtitle, team, matches) {
   return `
     <div class="coupon-group ${cls}">
       <img src="${img}" class="coupon-pointer" alt="">
-
       <div class="group-title">
         <strong>${title}</strong>
         <span>${subtitle}</span>
       </div>
-
       <div class="coupon-list">
         ${matches.map((m, i) => renderCouponCard(m, i)).join("")}
       </div>
@@ -1387,23 +1364,13 @@ function renderCoupons() {
   }
 
   if (currentTeamFilter === "men") {
-    box.innerHTML = renderCouponGroup(
-      "Herrekuponger",
-      "De tre neste åpne kampene for Lyn herrer",
-      "men",
-      openCouponMatches
-    );
+    box.innerHTML = renderCouponGroup("Herrekuponger", "De tre neste åpne kampene for Lyn herrer", "men", openCouponMatches);
     bindCouponInputs();
     return;
   }
 
   if (currentTeamFilter === "women") {
-    box.innerHTML = renderCouponGroup(
-      "Kvinnekuponger",
-      "De tre neste åpne kampene for Lyn kvinner",
-      "women",
-      openCouponMatches
-    );
+    box.innerHTML = renderCouponGroup("Kvinnekuponger", "De tre neste åpne kampene for Lyn kvinner", "women", openCouponMatches);
     bindCouponInputs();
     return;
   }
@@ -1412,24 +1379,16 @@ function renderCoupons() {
   const womenMatches = openCouponMatches.filter(m => getMatchTeam(m) === "women");
 
   box.innerHTML =
-    renderCouponGroup(
-      "Herrekuponger",
-      "De tre neste åpne kampene for Lyn herrer",
-      "men",
-      menMatches
-    ) +
-    renderCouponGroup(
-      "Kvinnekuponger",
-      "De tre neste åpne kampene for Lyn kvinner",
-      "women",
-      womenMatches
-    );
+    renderCouponGroup("Herrekuponger", "De tre neste åpne kampene for Lyn herrer", "men", menMatches) +
+    renderCouponGroup("Kvinnekuponger", "De tre neste åpne kampene for Lyn kvinner", "women", womenMatches);
 
   bindCouponInputs();
 }
 
 function renderResultMatchSelect() {
   const select = document.getElementById("resultMatch");
+  if (!select) return;
+
   const filteredMatches = getFilteredMatches()
     .slice()
     .sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -1438,15 +1397,12 @@ function renderResultMatchSelect() {
     .map(m => `<option value="${m.id}">${formatDate(m.date)} · ${getTeamLabel(getMatchTeam(m))} · ${m.home} - ${m.away}</option>`)
     .join("");
 
-  if (openCouponMatches[0]) {
-    select.value = openCouponMatches[0].id;
-  } else if (filteredMatches[0]) {
-    select.value = filteredMatches[0].id;
-  }
+  if (openCouponMatches[0]) select.value = openCouponMatches[0].id;
+  else if (filteredMatches[0]) select.value = filteredMatches[0].id;
 }
 
 function encodeGoals(goals) {
-  return goals + 1;
+  return Number(goals) + 1;
 }
 
 function decodeGoals(value) {
@@ -1460,6 +1416,11 @@ function getOutcome(home, away) {
 }
 
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
+  tipHome = Number(tipHome);
+  tipAway = Number(tipAway);
+  actualHome = Number(actualHome);
+  actualAway = Number(actualAway);
+
   const exact = tipHome === actualHome && tipAway === actualAway;
   const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
   const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
@@ -1513,21 +1474,11 @@ async function sendTips() {
     const home = Number(homeRaw);
     const away = Number(awayRaw);
 
-    if (!validateTip(`${match.home}`, home) || !validateTip(`${match.away}`, away)) return;
+    if (!validateTip(match.home, home) || !validateTip(match.away, away)) return;
 
     rows.push(
-      {
-        match_id: match.id,
-        voter: voter,
-        player: TIP_HOME_PLAYER,
-        rating: encodeGoals(home)
-      },
-      {
-        match_id: match.id,
-        voter: voter,
-        player: TIP_AWAY_PLAYER,
-        rating: encodeGoals(away)
-      }
+      { match_id:match.id, voter, player:TIP_HOME_PLAYER, rating:encodeGoals(home) },
+      { match_id:match.id, voter, player:TIP_AWAY_PLAYER, rating:encodeGoals(away) }
     );
 
     savedMatches.push(match.id);
@@ -1543,10 +1494,10 @@ async function sendTips() {
     {
       method:"POST",
       headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY,
+        apikey:SUPABASE_KEY,
+        Authorization:"Bearer " + SUPABASE_KEY,
         "Content-Type":"application/json",
-        "Prefer":"resolution=merge-duplicates,return=minimal"
+        Prefer:"resolution=merge-duplicates,return=minimal"
       },
       body:JSON.stringify(rows)
     }
@@ -1554,11 +1505,12 @@ async function sendTips() {
 
   if (!response.ok) {
     alert("Noe gikk feil. Kupongen ble ikke sendt.");
+    console.error(await response.text());
     return;
   }
 
   trackEvent("tips_submitted", {
-    voter:voter,
+    voter,
     matches:savedMatches.length,
     filter:currentTeamFilter
   });
@@ -1568,28 +1520,11 @@ async function sendTips() {
   document.querySelectorAll("#couponList input").forEach(input => input.value = "");
   updateCouponProgress();
 
-  if (savedMatches[0]) {
-    document.getElementById("resultMatch").value = savedMatches[0];
-  }
+  if (savedMatches[0]) document.getElementById("resultMatch").value = savedMatches[0];
 
   loadMatchPredictions();
   loadPredictionLeaderboard();
   loadTipStats();
-}
-
-async function fetchVotes(query = "") {
-  const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes" + query + (query ? "&" : "?") + "limit=5000",
-    {
-      headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
-      }
-    }
-  );
-
-  if (!response.ok) return [];
-  return await response.json();
 }
 
 async function getVotesForSelectedMatch() {
@@ -1605,12 +1540,7 @@ function buildPredictions(votes) {
     const key = `${v.match_id}|||${voter}`;
 
     if (!map[key]) {
-      map[key] = {
-        match_id:v.match_id,
-        voter,
-        home:null,
-        away:null
-      };
+      map[key] = { match_id:v.match_id, voter, home:null, away:null };
     }
 
     if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
@@ -1625,8 +1555,7 @@ function filterPredictionsByCurrentTeam(predictions) {
 
   return predictions.filter(p => {
     const matchData = getMatchData(p.match_id);
-    if (!matchData) return false;
-    return getMatchTeam(matchData) === currentTeamFilter;
+    return matchData && getMatchTeam(matchData) === currentTeamFilter;
   });
 }
 
@@ -1643,14 +1572,13 @@ function renderPeoplePrediction(predictions) {
   predictions.forEach(p => {
     const result = `${p.home}-${p.away}`;
     resultCounts[result] = (resultCounts[result] || 0) + 1;
-
     homeTotal += p.home;
     awayTotal += p.away;
 
     const outcome = getOutcome(p.home, p.away);
-    if (outcome === "H") homeWins += 1;
-    if (outcome === "U") draws += 1;
-    if (outcome === "B") awayWins += 1;
+    if (outcome === "H") homeWins++;
+    if (outcome === "U") draws++;
+    if (outcome === "B") awayWins++;
   });
 
   const total = predictions.length;
@@ -1668,10 +1596,8 @@ function renderPeoplePrediction(predictions) {
       <span class="small">
         Mest tippet resultat: ${mostCommon[0]} · Snittips: ${(homeTotal / total).toFixed(1)}-${(awayTotal / total).toFixed(1)}
       </span>
-
       ${bars.map(row => {
         const percent = total ? Math.round((row.value / total) * 100) : 0;
-
         return `
           <div class="bar-row">
             <div>${row.label}</div>
@@ -1695,15 +1621,13 @@ async function loadMatchPredictions() {
   const data = await getVotesForSelectedMatch();
   const predictions = buildPredictions(data).sort((a,b) => a.voter.localeCompare(b.voter));
   const matchData = getMatchData(match);
+
   const actual =
-  matchData &&
-  matchData.actual_home !== null &&
-  matchData.actual_away !== null
-    ? {
-        home:matchData.actual_home,
-        away:matchData.actual_away
-      }
-    : null;
+    matchData &&
+    matchData.actual_home !== null &&
+    matchData.actual_away !== null
+      ? { home:matchData.actual_home, away:matchData.actual_away }
+      : null;
 
   if (!predictions || predictions.length === 0) {
     document.getElementById("results").innerHTML = "<p>Ingen tips på denne kampen enda.</p>";
@@ -1716,7 +1640,6 @@ async function loadMatchPredictions() {
       ${matchData ? `${getTeamLabel(getMatchTeam(matchData))} · ${matchData.home} - ${matchData.away}` : ""}
       ${actual ? ` · Resultat: ${actual.home}-${actual.away}` : " · Resultat ikke lagt inn enda"}
     </p>
-
     ${renderPeoplePrediction(predictions)}
   `;
 
@@ -1753,15 +1676,14 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
 
   predictions.forEach(p => {
     const matchData = getMatchData(p.match_id);
+
     const actual =
-  matchData &&
-  matchData.actual_home !== null &&
-  matchData.actual_away !== null
-    ? {
-        home:matchData.actual_home,
-        away:matchData.actual_away
-      }
-    : null;
+      matchData &&
+      matchData.actual_home !== null &&
+      matchData.actual_away !== null
+        ? { home:matchData.actual_home, away:matchData.actual_away }
+        : null;
+
     if (!actual) return;
 
     const points = scorePrediction(p.home, p.away, actual.home, actual.away);
@@ -1780,10 +1702,10 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
     users[p.voter].points += points;
     users[p.voter].tips += 1;
 
-    if (points === 3) users[p.voter].correct += 1;
-    if (points === 2) users[p.voter].diffs += 1;
-    if (points === 1) users[p.voter].outcomes += 1;
-    if (points === 0) users[p.voter].zeroes += 1;
+    if (points === 3) users[p.voter].correct++;
+    if (points === 2) users[p.voter].diffs++;
+    if (points === 1) users[p.voter].outcomes++;
+    if (points === 0) users[p.voter].zeroes++;
   });
 
   return Object.keys(users).map(user => ({
@@ -1843,33 +1765,61 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
   }).join("");
 }
 
+function renderLeaderboardPodium(rows) {
+  if (!rows || rows.length === 0) return "";
+
+  const first = rows[0];
+  const second = rows[1];
+  const third = rows[2];
+
+  const card = (row, medal, extraClass = "") => {
+    if (!row) return `<div></div>`;
+    return `
+      <div class="podium-card ${extraClass}">
+        <div class="podium-medal">${medal}</div>
+        <a href="profil.html?user=${encodeURIComponent(row.player)}" class="profile-link">
+          <strong>${row.player}</strong>
+        </a>
+        <div class="podium-score">${row.score}</div>
+        <div class="small">${row.sub || ""}</div>
+      </div>
+    `;
+  };
+
+  return `
+    <div class="podium-grid">
+      ${card(second, "🥈")}
+      ${card(first, "🥇", "first")}
+      ${card(third, "🥉")}
+    </div>
+  `;
+}
+
 async function loadPredictionLeaderboard() {
   const allVotes = await fetchVotes();
   const rows = buildPredictionLeaderboardRows(allVotes, "all");
   const menRows = buildPredictionLeaderboardRows(allVotes, "men");
   const womenRows = buildPredictionLeaderboardRows(allVotes, "women");
+
   console.log("WOMEN MATCHES", allMatches.filter(m => m.team === "women"));
-
-console.log("WOMEN PREDICTIONS", buildPredictions(allVotes).filter(p => {
-  const m = getMatchData(p.match_id);
-  return m && m.team === "women";
-}));
-
-console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
-  m.team === "women" &&
-  m.actual_home !== null &&
-  m.actual_away !== null
-));
+  console.log("WOMEN PREDICTIONS", buildPredictions(allVotes).filter(p => {
+    const m = getMatchData(p.match_id);
+    return m && m.team === "women";
+  }));
+  console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
+    m.team === "women" &&
+    m.actual_home !== null &&
+    m.actual_away !== null
+  ));
 
   if (rows.length === 0) {
     document.getElementById("results").innerHTML =
-      "<p>Ingen tippetabell enda. Resultater må legges inn i koden først.</p>";
+      "<p>Ingen tippetabell enda. Resultater må legges inn først.</p>";
     return;
   }
 
   document.getElementById("results").innerHTML = `
     <div class="bb">Tippetabell · Samlet for herrer og kvinner</div>
-
     ${renderLeaderboardPodium(rows)}
 
     <div class="stats-grid" style="margin-bottom:14px;">
@@ -1877,7 +1827,6 @@ console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
         <h3>Beste herretipper</h3>
         ${renderMiniRanking(menRows, 1, true)}
       </div>
-
       <div class="stat-card">
         <h3>Beste dametipper</h3>
         ${renderMiniRanking(womenRows, 1, true)}
@@ -1891,7 +1840,6 @@ console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
 async function loadTipStats() {
   const allVotes = await fetchVotes();
   const predictionVotes = allVotes.filter(isPredictionVote);
-
   const allPredictions = buildPredictions(predictionVotes);
   const visiblePredictions = filterPredictionsByCurrentTeam(allPredictions);
 
@@ -1903,10 +1851,8 @@ async function loadTipStats() {
   const totalTips = visiblePredictions.length;
   const uniqueUsers = new Set(visiblePredictions.map(p => p.voter)).size;
   const finishedMatches = getFilteredMatches()
-  .filter(m =>
-    m.actual_home !== null &&
-    m.actual_away !== null
-  ).length;
+    .filter(m => m.actual_home !== null && m.actual_away !== null)
+    .length;
 
   const mostActive = {};
   allPredictions.forEach(p => {
@@ -1967,7 +1913,6 @@ async function loadTipStats() {
   `;
 }
 
-
 function showPanel(panelId) {
   document.querySelectorAll(".app-panel").forEach(panel => panel.classList.remove("active"));
   document.querySelectorAll(".app-tab").forEach(tab => tab.classList.remove("active"));
@@ -1991,7 +1936,7 @@ function countFilledCoupons() {
     const home = homeInput ? homeInput.value : "";
     const away = awayInput ? awayInput.value : "";
 
-    if (home !== "" || away !== "") filled += 1;
+    if (home !== "" || away !== "") filled++;
   });
 
   return filled;
@@ -2065,40 +2010,8 @@ function closeSuccessOverlay() {
   if (overlay) overlay.style.display = "none";
 }
 
-function renderLeaderboardPodium(rows) {
-  if (!rows || rows.length === 0) return "";
-
-  const first = rows[0];
-  const second = rows[1];
-  const third = rows[2];
-
-  const card = (row, medal, extraClass = "") => {
-    if (!row) return `<div></div>`;
-
-    return `
-      <div class="podium-card ${extraClass}">
-        <div class="podium-medal">${medal}</div>
-        <a href="profil.html?user=${encodeURIComponent(row.player)}" class="profile-link">
-          <strong>${row.player}</strong>
-        </a>
-        <div class="podium-score">${row.score}</div>
-        <div class="small">${row.sub || ""}</div>
-      </div>
-    `;
-  };
-
-  return `
-    <div class="podium-grid">
-      ${card(second, "🥈")}
-      ${card(first, "🥇", "first")}
-      ${card(third, "🥉")}
-    </div>
-  `;
-}
-
 async function init() {
   await loadMatchesFromSupabase();
-
   setTeamFilter(currentTeamFilter);
 }
 
