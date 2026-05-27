@@ -604,6 +604,13 @@ async function loadProfile(){
 
   const userPicks = allPicks.filter(p => cleanVoterName(p.voter) === profileUser);
   const userPredictions = predictions.filter(p => p.voter === profileUser);
+  console.log("PROFILE", profileUser);
+console.log("ALL BRANN", predictions.filter(p =>
+  String(p.match_id).toLowerCase().includes("brann")
+));
+console.log("MY BRANN", userPredictions.filter(p =>
+  String(p.match_id).toLowerCase().includes("brann")
+));
   const userVotes = allVotes.filter(v => cleanVoterName(v.voter) === profileUser);
 
   const latestActivities = latestMatchActivity(
