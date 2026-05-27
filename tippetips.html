@@ -1145,8 +1145,14 @@ async function loadMatchesFromSupabase() {
 
 async function fetchVotes(query = "") {
   const joiner = query ? "&" : "?";
+
   const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes" + query + joiner + "limit=5000",
+    SUPABASE_URL +
+      "/rest/v1/votes" +
+      query +
+      joiner +
+      "order=created_at.desc&limit=10000",
+    
     {
       headers:{
         apikey:SUPABASE_KEY,
@@ -1671,16 +1677,17 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
   predictions.forEach(p => {
     const matchData = getMatchData(p.match_id);
 
-    const actual =
-      matchData &&
-      matchData.actual_home != null &&
-      matchData.actual_away != null
-        ? { home:matchData.actual_home, away:matchData.actual_away }
-        : null;
+    const actualHome = Number(matchData?.actual_home);
+const actualAway = Number(matchData?.actual_away);
 
-    if (!actual) return;
+if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
-    const points = scorePrediction(p.home, p.away, actual.home, actual.away);
+const points = scorePrediction(
+  p.home,
+  p.away,
+  actualHome,
+  actualAway
+);
 
     if (!users[p.voter]) {
       users[p.voter] = {
