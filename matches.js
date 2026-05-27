@@ -69,7 +69,7 @@ const matchesData = [
     home:"Egersund",
     away:"Lyn",
     deadline:"2026-05-20T18:00:00",
-    actual:null
+    actual: { home:0, away:0 }
   },
   {
     id:"25.05 Lyn - Strømmen",
@@ -78,7 +78,7 @@ const matchesData = [
     home:"Lyn",
     away:"Strømmen",
     deadline:"2026-05-25T18:00:00",
-    actual:null
+    actual:actual: { home:1, away:0 }
   },
   {
     id:"31.05 Odd - Lyn",
@@ -286,7 +286,7 @@ const matchesData = [
     home:"SK Brann",
     away:"Lyn",
     deadline:"2026-05-26T18:00:00",
-    actual:null
+    actual: { home:4, away:0 }
   },
   {
     id:"31.05 Lyn kvinner - Vålerenga",
