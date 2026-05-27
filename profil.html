@@ -321,8 +321,17 @@ function getMatchData(matchId){
 
 function formatDate(dateString){
   if (!dateString) return "";
-  const d = new Date(dateString + "T12:00:00");
-  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+
+  const d = new Date(dateString);
+
+  if (!Number.isNaN(d.getTime())) {
+    return d.toLocaleDateString("no-NO", {
+      day:"2-digit",
+      month:"2-digit"
+    });
+  }
+
+  return String(dateString).slice(0, 5);
 }
 
 function decodeGoals(value){
@@ -581,10 +590,10 @@ async function loadProfile(){
   }
 
   const [{ data:picks }, { data:stats }, { data:votes }] = await Promise.all([
-    supabaseClient.from("fantasy_picks").select("*"),
-    supabaseClient.from("fantasy_stats").select("*"),
-    supabaseClient.from("votes").select("*")
-  ]);
+  supabaseClient.from("fantasy_picks").select("*").range(0, 5000),
+  supabaseClient.from("fantasy_stats").select("*").range(0, 5000),
+  supabaseClient.from("votes").select("*").range(0, 5000)
+]);
 
   const allPicks = picks || [];
   const allStats = stats || [];
