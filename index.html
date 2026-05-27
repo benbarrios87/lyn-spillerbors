@@ -942,7 +942,6 @@ h1 {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="matches.js"></script>
 
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
@@ -1200,9 +1199,14 @@ function buildTipRounds(allVotes) {
 
   predictions.forEach(p => {
     const match = getMatchData(p.match_id);
-    if (!match || !match.actual) return;
+  if (!match) return;
 
-    const raw = scorePrediction(p.home, p.away, match.actual.home, match.actual.away);
+const actualHome = Number(match.actual_home ?? match.actual?.home);
+const actualAway = Number(match.actual_away ?? match.actual?.away);
+
+if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
+
+const raw = scorePrediction(p.home, p.away, actualHome, actualAway);
 
     if (!byMatch[p.match_id]) byMatch[p.match_id] = [];
 
