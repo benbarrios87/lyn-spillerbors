@@ -917,9 +917,12 @@ h1 {
         <div class="player-of-year-title">🏆 Årets Lynspiller så langt</div>
         <div class="player-year-sub">En litt morsommere total enn bare børs.</div>
       </div>
-      <div class="player-of-year-formula">
-       Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
-    <div id="playerOfYear">
+     <div class="player-of-year-formula">
+  Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
+</div>
+</div>
+
+<div id="playerOfYear">
       <div class="player-year-loading">Laster topp 3...</div>
     </div>
   </div>
@@ -1737,11 +1740,17 @@ const total =
         };
       }
 
-      totals[row.player].total += total;
-     totals[row.player].bors = avgRating.toFixed(1);
-      totals[row.player].goals += goalPoints;
-      totals[row.player].assists += assistPoints;
-      totals[row.player].cleanSheets += cleanSheetPoints;
+      totals[row.player].bors = avgRating.toFixed(1);
+
+totals[row.player].goals += goalPoints;
+totals[row.player].assists += assistPoints;
+totals[row.player].cleanSheets += cleanSheetPoints;
+
+totals[row.player].total =
+  (avgRating * 10) +
+  totals[row.player].goals +
+  totals[row.player].assists +
+  totals[row.player].cleanSheets;
       totals[row.player].matches += 1;
     });
 
