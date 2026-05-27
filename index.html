@@ -1079,10 +1079,11 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   return 0;
 }
 
-function getMatchData(matchId) {
-  return matchesData.find(m => m.id === matchId) || null;
-}
+let globalMatches = [];
 
+function getMatchData(matchId) {
+  return globalMatches.find(m => m.id === matchId) || null;
+}
 function fantasyPosition(playerName) {
   const p = players.find(x => x.short === playerName || x.name === playerName);
   return p ? p.position : "";
@@ -1581,11 +1582,13 @@ async function loadNextMatchWidget(){
   if (!box) return;
 
   try {
-    const { data:matches, error } = await supabaseClient
-      .from("matches")
-      .select("*")
-      .eq("active", true)
-      .order("deadline", { ascending:true });
+   const { data:matches, error } = await supabaseClient
+  .from("matches")
+  .select("*")
+  .eq("active", true)
+  .order("deadline", { ascending:true });
+
+globalMatches = matches || [];
 
     if (error) throw error;
 
