@@ -1112,9 +1112,6 @@ let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
 let allMatches = [];
 
-function cleanVoterName(name) {
-  return (name || "").trim().toLowerCase();
-}
 
 function parseLocalDateTime(value) {
   if (!value) return null;
@@ -1204,6 +1201,37 @@ function getMatchTeam(matchData) {
 function getTeamLabel(team) {
   return team === "women" ? "Kvinner" : "Herrer";
 }
+  function buildPredictions(votes) {
+  const map = {};
+
+  votes
+    .filter(isPredictionVote)
+    .filter(isRealMatch)
+    .forEach(v => {
+      const key = `${v.match_id}_${v.voter}`;
+
+      if (!map[key]) {
+        map[key] = {
+          voter: v.voter,
+          match_id: v.match_id,
+          home: null,
+          away: null
+        };
+      }
+
+      if (v.player === TIP_HOME_PLAYER) {
+        map[key].home = decodeGoals(v.rating);
+      }
+
+      if (v.player === TIP_AWAY_PLAYER) {
+        map[key].away = decodeGoals(v.rating);
+      }
+    });
+
+  return Object.values(map).filter(
+    p => p.home !== null && p.away !== null
+  );
+}
 
 function getTeamBadge(matchData) {
   const team = getMatchTeam(matchData);
@@ -1248,10 +1276,6 @@ function setTeamFilter(filter) {
 
 function isRealMatch(v) {
   return v.match_id && v.match_id !== "TEST";
-}
-
-function isPredictionVote(v) {
-  return isRealMatch(v) && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
 }
 
 function getMatchData(matchId) {
@@ -1403,16 +1427,6 @@ function encodeGoals(goals) {
   return Number(goals) + 1;
 }
 
-function decodeGoals(value) {
-  return Number(value) - 1;
-}
-
-function getOutcome(home, away) {
-  if (home > away) return "H";
-  if (home < away) return "B";
-  return "U";
-}
-
 function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   tipHome = Number(tipHome);
   tipAway = Number(tipAway);
@@ -1530,24 +1544,6 @@ async function getVotesForSelectedMatch() {
   return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
 }
 
-function buildPredictions(votes) {
-  let map = {};
-
-  votes.filter(isPredictionVote).forEach(v => {
-    const voter = cleanVoterName(v.voter);
-    const key = `${v.match_id}|||${voter}`;
-
-    if (!map[key]) {
-      map[key] = { match_id:v.match_id, voter, home:null, away:null };
-    }
-
-    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
-    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
-  });
-
-  return Object.values(map).filter(p => p.home !== null && p.away !== null);
-}
-
 function filterPredictionsByCurrentTeam(predictions) {
   if (currentTeamFilter === "all") return predictions;
 
@@ -1622,8 +1618,8 @@ async function loadMatchPredictions() {
 
   const actual =
     matchData &&
-    matchData.actual_home !== null &&
-    matchData.actual_away !== null
+    matchData.actual_home != null &&
+    matchData.actual_away != null
       ? { home:matchData.actual_home, away:matchData.actual_away }
       : null;
 
@@ -1677,8 +1673,8 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
 
     const actual =
       matchData &&
-      matchData.actual_home !== null &&
-      matchData.actual_away !== null
+      matchData.actual_home != null &&
+      matchData.actual_away != null
         ? { home:matchData.actual_home, away:matchData.actual_away }
         : null;
 
@@ -1804,11 +1800,6 @@ async function loadPredictionLeaderboard() {
     const m = getMatchData(p.match_id);
     return m && m.team === "women";
   }));
-  console.log("WOMEN SCORED MATCHES", allMatches.filter(m =>
-    m.team === "women" &&
-    m.actual_home !== null &&
-    m.actual_away !== null
-  ));
 
   if (rows.length === 0) {
     document.getElementById("results").innerHTML =
@@ -1846,8 +1837,8 @@ async function loadTipStats() {
   const totalTips = visiblePredictions.length;
   const uniqueUsers = new Set(visiblePredictions.map(p => p.voter)).size;
   const finishedMatches = getFilteredMatches()
-    .filter(m => m.actual_home !== null && m.actual_away !== null)
-    .length;
+  .filter(m => m.actual_home != null && m.actual_away != null)
+  .length;
 
   const mostActive = {};
   allPredictions.forEach(p => {
