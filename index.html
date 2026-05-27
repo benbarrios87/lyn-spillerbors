@@ -1,3 +1,286 @@
+Innlimt tekst(232).txt
+Dokument
+hvis vi tenker på ren "brukeopplevelse" på fantasy siden, hva tenker du bør gjøres her?: 
+Innlimt tekst(233).txt
+Dokument
+finner ikke 
+Innlimt tekst(234).txt
+Dokument
+sånn? 
+Innlimt tekst(235).txt
+Dokument
+sånn? 
+Innlimt tekst(236).txt
+Dokument
+sånn? 
+Innlimt tekst(237).txt
+Dokument
+Innlimt tekst(238).txt
+Dokument
+står ukjent.. 
+Innlimt tekst(239).txt
+Dokument
+sjekk  hele da! 
+Innlimt tekst(240).txt
+Dokument
+ble veldig veldig bra. Hvis du tenker hele brukeropplevelsen her da? : 
+Innlimt tekst(241).txt
+Dokument
+og til slutt, brukeropplevelse her? Hvordan bli helt optimal! 
+Innlimt tekst(242).txt
+Dokument
+og til slutt, brukeropplevelse her? Hvordan bli helt optimal!
+Innlimt tekst(243).txt
+Dokument
+til slutt her. Er kanskje ikke så ille? 
+Innlimt tekst(244).txt
+Dokument
+kan du sjekke?
+Innlimt tekst(245).txt
+Dokument
+Innlimt tekst(246).txt
+Dokument
+finner ikke: 
+Innlimt tekst(247).txt
+Dokument
+ok? 
+Innlimt tekst(248).txt
+Dokument
+ok? 
+Innlimt tekst(249).txt
+Dokument
+ok?
+Innlimt tekst(250).txt
+Dokument
+og hva gjør jeg nå på fantasy feks. 
+Innlimt tekst(251).txt
+Dokument
+her da: 
+Innlimt tekst(252).txt
+Dokument
+og til slutt her: 
+Innlimt tekst(253).txt
+Dokument
+Innlimt tekst(254).txt
+Dokument
+sånn?
+Innlimt tekst(255).txt
+Dokument
+noe har skjedd her! får ikke opp noe 
+Har du noen crazy ideer til andre funksjoner på siden? Hva kan tiltrekke lyn fans hit.. Hadde en morsom ide med en lyn games side. Og lurte på om det er noe f.eks her som hadde funka: 
+mål av jor/badou jor og Cham 
+mål av hickson og brørby 
+First Round	Thu 27/04/17	6:00 PM	A		Skeid Oslo	Skeid	3-4-3	853	2:1
+ingen mål 
+mål av kristiansen (loholt) hellum,  elvevold, laakjab og olsen 
+ok? ...
+Rediger
+Innlimt tekst(256).txt
+Dokument
+sånn
+Innlimt tekst(257).txt
+Dokument
+Innlimt tekst(258).txt
+Dokument
+sånn?
+Innlimt tekst(259).txt
+Dokument
+ingen boks...
+Innlimt tekst(260).txt
+Dokument
+noe er feil
+Innlimt tekst(261).txt
+Dokument
+lol. gjør jo det du sier, men blir fortsatt feil 
+Innlimt tekst(262).txt
+Dokument
+ble no feil 
+Innlimt tekst(263).txt
+Dokument
+sånn+
+? sånn?
+Innlimt tekst(264).txt
+Dokument
+kommer ingenting. feil her?
+Innlimt tekst(265).txt
+Dokument
+Innlimt tekst(266).txt
+Dokument
+Innlimt tekst(267).txt
+Dokument
+kommer fortsatt ingenting. ingen kamper etc.. 
+Innlimt tekst(268).txt
+Dokument
+Fint! Du kan jo droppe disse de har jeg jo allerede: 
+Innlimt tekst(269).txt
+Dokument
+ser alt ok ut? 
+Innlimt tekst(270).txt
+Dokument
+ok, jeg sjekket resultatene og det ble faktisk 4-0 helt på tampen, så jeg skulle bare fått utfall, men det gjorde nesten alle. jeg la inn på supabase. alt se ok ut der. Litt rart at det står ingenting i profilen min i tippehistorikk, eller at så få har poeng i oversikten så her er noe feil. Starter med å sende deg tippetips.html og feilsøke: 
+Innlimt tekst(271).txt
+Dokument
+sånn? Sikker? 
+Innlimt tekst(272).txt
+Dokument
+jeg har jo det? 
+jeg ha jo det?
+Innlimt tekst(273).txt
+Dokument
+kan ikke se det 
+Innlimt tekst(274).txt
+Dokument
+men er det noe feil her? Den vises ikke på tippehistorikk 
+Innlimt tekst(275).txt
+Dokument
+sånn? 
+Innlimt tekst(276).txt
+Dokument
+kan du sjekke her først
+Innlimt tekst(278).txt
+Dokument
+er det noe feil her?
+Innlimt tekst(279).txt
+Dokument
+Innlimt tekst(281).txt
+Dokument
+sånn? alt er borte 
+Innlimt tekst(282).txt
+Dokument
+Innlimt tekst(283).txt
+Dokument
+Innlimt tekst(284).txt
+Dokument
+Innlimt tekst(285).txt
+Dokument
+Innlimt tekst(286).txt
+Dokument
+Innlimt tekst(287).txt
+Dokument
+Innlimt tekst(288).txt
+Dokument
+Innlimt tekst(289).txt
+Dokument
+her da: 
+dette er det jeg har? Skjønner ikke 
+det HAR jo faktisk skjedd noe nytt: 
+Innlimt tekst(290).txt
+Dokument
+Innlimt tekst(291).txt
+Dokument
+Innlimt tekst(292).txt
+Dokument
+Innlimt tekst(293).txt
+Dokument
+du oppdager noe nytt hver gang jeg limer inn her men. 
+Innlimt tekst(294).txt
+Dokument
+Innlimt tekst(295).txt
+Dokument
+sånn?
+
+Ja. Her er den konkrete feilen som ødelegger index akkurat nå:
+
+Du har skrevet:
+
+const { data:matches, error } = await supabaseClient
+      globalMatches = matches || [];
+      .from("matches")
+
+Det er ugyldig JavaScript. Du kan ikke sette globalMatches midt inne i query-chainen.
+
+Bytt HELE denne blokka:
+
+const { data:matches, error } = await supabaseClient
+      globalMatches = matches || [];
+      .from("matches")
+      .select("*")
+      .eq("active", true)
+      .order("deadline", { ascending:true });
+
+til:
+
+const { data:matches, error } = await supabaseClient
+  .from("matches")
+  .select("*")
+  .eq("active", true)
+  .order("deadline", { ascending:true });
+
+globalMatches = matches || [];
+
+Det er derfor ting ikke lastes inn nå. Hele scriptet stopper der.
+
+const { data:matches, error } = await supabaseClient
+  .from("matches")
+  .select("*")
+  .eq("active", true)
+  .order("deadline", { ascending:true });
+
+globalMatches = matches || [];
+
+Ja. Den delen er riktig nå 👍
+
+Deploy + hard refresh.
+
+Hvis index fortsatt er rar etter det, er neste ting jeg ville fjernet denne duplikaten:
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+Du har den TO ganger på siden.
+
+Behold bare én.
+
+Innlimt tekst(296).txt
+Dokument
+
+Jeg ser én konkret ting som fortsatt kan skape store problemer på index:
+
+Denne:
+
+async function fetchVotes(query = "") {
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/votes" + query,
+
+Du mistet:
+
+limit
+order
+og ?/&-joiner-logikken
+
+Så hvis query er tom, blir requesten:
+
+/rest/v1/votes
+
+uten sortering og uten høy limit igjen.
+
+Bytt hele funksjonen til:
+
+async function fetchVotes(query = "") {
+
+  const joiner = query ? "&" : "?";
+
+  const response = await fetch(
+    SUPABASE_URL +
+      "/rest/v1/votes" +
+      query +
+      joiner +
+      "order=created_at.desc&limit=10000",
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+
+  return await response.json();
+}
+
+Det er den tydeligste gjenværende feilen jeg ser i denne fila.
+
+kan du lage ny index? den er ikke så lang. 
 <script>
 const SUPABASE_URL = "https://oqwlbdnthdbomnobxqot.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z";
@@ -518,3 +801,94 @@ function init() {
 
 init();
 </script>
+shit, nå ser jeg ingenting! 
+
+Da var den koden jeg ga for brutal. Den erstattet for mye.
+
+Gå tilbake til forrige fungerende index.html fra før “ny index”.
+
+Akkurat nå: bruk GitHub/Vercel rollback eller Undo i editor.
+
+Når du er tilbake, gjør bare én minimal endring:
+
+async function fetchVotes(query = "") {
+  const joiner = query ? "&" : "?";
+
+  const response = await fetch(
+    SUPABASE_URL +
+      "/rest/v1/votes" +
+      query +
+      joiner +
+      "order=created_at.desc&limit=10000",
+    {
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return await response.json();
+}
+
+Ikke bytt hele index.
+
+
+
+
+<div class="card" onclick="location.href='bors.html'">
+  <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Spillerbørs</div>
+  <div class="card-text">
+    Sett karakterer etter kamp og se hvem forumet kåret til banens beste.
+  </div>
+</div>
+
+<div class="card" onclick="location.href='tippetips.html'">
+  <img src="bilder/tippetips-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Tippetips</div>
+  <div class="card-text">
+    Tipp resultater gjennom sesongen og konkurrer mot resten av forumet.
+  </div>
+</div>
+
+<div class="card fantasy-feature-card" onclick="location.href='fantasy.html'">
+  <img src="bilder/fantasy-Photoroom.png" class="card-player fantasy-player" alt="">
+  <div class="card-title">Lyn Fantasy</div>
+  <div class="card-text">
+    Velg to spillere og en kaptein. Poeng basert på faktisk prestasjon på banen.
+  </div>
+</div>
+
+<div class="card" onclick="location.href='lynligaen.html'">
+  <img src="bilder/lynlaget-Photoroom.png" class="card-player" alt="">
+  <div class="card-title">Lynligaen</div>
+  <div class="card-text">
+    Sammenlagttabellen som kombinerer børs, tipping og fantasy.
+  </div>
+</div>
+<div class="throne-content">
+  <div class="throne-label">Nåværende konge av Lynligaen</div>
+
+  <div id="throneName" class="throne-name">
+    <a href="lynligaen.html">Laster leder...</a>
+  </div>
+
+  <div id="thronePoints" class="throne-points">
+    Sammenlagt for fantasy og tipping
+  </div>
+</div>
+  <div class="season-card">
+    <div class="season-title">⚽ Toppscorer</div>
+    <div id="topScorers"></div>
+  </div>
+
+  <div class="season-card">
+    <div class="season-title">🎁 Assistkonge</div>
+    <div id="topAssists"></div>
+  </div>
+
+</div>
+<script src="tips-core.js"></script>
+Lukk
