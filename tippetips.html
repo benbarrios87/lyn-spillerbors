@@ -1573,7 +1573,7 @@ async function sendTips() {
 
 async function fetchVotes(query = "") {
   const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes" + query,
+    SUPABASE_URL + "/rest/v1/votes" + query + (query ? "&" : "?") + "limit=5000",
     {
       headers:{
         "apikey":SUPABASE_KEY,
