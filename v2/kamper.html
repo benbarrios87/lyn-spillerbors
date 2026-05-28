@@ -1,1 +1,141 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Lynbørs 2.0 • Kamper</title>
+
+  <link rel="icon" href="../lblogoen.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+  <section class="page-header">
+    <div class="badge">KAMPARKIV</div>
+
+    <h1>Kamper</h1>
+
+    <p>
+      Kommende kamper, resultater og grunnmotoren bak hele Lynbørs.
+    </p>
+  </section>
+
+  <section class="data-grid">
+
+    <div class="data-card">
+      <h2>Kommende kamper</h2>
+
+      <div id="upcomingMatches" class="match-list">
+        Laster...
+      </div>
+    </div>
+
+    <div class="data-card">
+      <h2>Siste resultater</h2>
+
+      <div id="completedMatches" class="match-list">
+        Laster...
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { fetchMatches } from "./js/matches.js";
+import { formatShortDate, getActualScore } from "./js/utils.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("kamper");
+document.getElementById("footer").innerHTML = renderFooter();
+
+const upcomingEl = document.getElementById("upcomingMatches");
+const completedEl = document.getElementById("completedMatches");
+
+async function init() {
+
+  const matches = await fetchMatches();
+
+  const upcoming = matches.filter(match =>
+    match.active === true &&
+    match.actual_home === null
+  );
+
+  const completed = matches.filter(match =>
+    match.actual_home !== null &&
+    match.actual_away !== null
+  ).reverse();
+
+  upcomingEl.innerHTML = upcoming.length
+    ? upcoming.map(match => `
+      <div class="match-item">
+
+        <div>
+          <strong>${match.home} - ${match.away}</strong>
+
+          <div class="match-meta">
+            ${formatShortDate(match.date)}
+          </div>
+
+          <div class="badge-small live">
+            Aktiv kamp
+          </div>
+        </div>
+
+        <div class="match-meta">
+          Deadline:<br>
+          ${match.deadline || "Ikke satt"}
+        </div>
+
+      </div>
+    `).join("")
+    : "Ingen kommende kamper.";
+
+  completedEl.innerHTML = completed.slice(0, 10).map(match => {
+
+    const score = getActualScore(match);
+
+    return `
+      <div class="match-item">
+
+        <div>
+          <strong>${match.home} - ${match.away}</strong>
+
+          <div class="match-meta">
+            ${formatShortDate(match.date)}
+          </div>
+
+          <div class="badge-small done">
+            Ferdigspilt
+          </div>
+        </div>
+
+        <div class="match-score">
+          ${score.home} - ${score.away}
+        </div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+init();
+
+</script>
+
+</body>
+</html>
