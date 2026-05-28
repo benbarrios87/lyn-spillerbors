@@ -100,11 +100,12 @@ const submitBtn = document.getElementById("submitBtn");
 });
 
 let activeMatch = null;
+let relevantMatches = [];
 
 async function init() {
   const matches = await fetchMatches();
 
-  const relevantMatches = matches
+  relevantMatches = matches
     .filter(match => match.active === true || match.actual_home !== null)
     .reverse();
 
@@ -113,15 +114,6 @@ async function init() {
       ${match.home} - ${match.away}
     </option>
   `).join("");
-
-  matchSelectEl.addEventListener("change", () => {
-    activeMatch = relevantMatches.find(match =>
-      match.id === matchSelectEl.value
-    );
-
-    renderActiveMatch();
-    loadExistingVotes(usernameEl.value.trim());
-  });
 
   activeMatch = relevantMatches[0];
 
@@ -258,7 +250,16 @@ init();
 
   document.getElementById("matchSelect").value =
     activeMatch.id;
+   document.getElementById("matchSelect").addEventListener("change", event => {
+  activeMatch = relevantMatches.find(match =>
+    match.id === event.target.value
+  );
+
+  renderActiveMatch();
+  loadExistingVotes(usernameEl.value.trim());
+});
 }
+  
   async function loadExistingVotes(voter) {
 
   if (!voter || !activeMatch) return;
