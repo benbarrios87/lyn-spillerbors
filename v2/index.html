@@ -35,7 +35,7 @@ import { formatDate } from "./js/utils.js";
 
 import {
   fetchVotes,
-  getSeasonRanking
+  buildMVPRanking
 } from "./js/ratings.js";
 
 const statusEl = document.getElementById("status");
@@ -46,21 +46,29 @@ async function init() {
   const matches = await fetchMatches({ activeOnly: true });
 
   const votes = await fetchVotes();
+  const { data: fantasyStats } = await window.supabase
+  .createClient(
+    "https://oqwlbdnthdbomnobxqot.supabase.co",
+    "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z"
+  )
+  .from("fantasy_stats")
+  .select("*");
 
-  const ranking = getSeasonRanking(votes, {
-    minVotes: 5
-  });
+  const ranking = buildMVPRanking(
+  votes,
+  fantasyStats || []
+);
 
   statusEl.innerHTML = `
     <strong>Supabase OK.</strong><br>
     Fant ${matches.length} aktive kamper.<br><br>
 
     <strong>Årets spiller akkurat nå:</strong><br>
-    ${
-      ranking[0]
-        ? `${ranking[0].player} (${ranking[0].average})`
-        : "Ingen data"
-    }
+${
+  ranking[0]
+    ? `${ranking[0].player} (${ranking[0].mvpScore})`
+    : "Ingen data"
+}
   `;
 
   matchesEl.innerHTML = matches.slice(0, 8).map(match => `
