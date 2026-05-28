@@ -1,96 +1,238 @@
 export const players = [
-
   {
     id: "pedersen",
     name: "Alexander Pedersen",
     short: "Pedersen",
     image: "../bilder/pedersen.png",
     position: "KEEPER",
-    aliases: [
-      "Pedersen",
-      "Alexander Pedersen"
-    ]
+    aliases: ["Pedersen", "Alexander Pedersen"]
+  },
+  {
+    id: "trige",
+    name: "Mats Trige",
+    short: "Trige",
+    image: "../bilder/trige.png",
+    position: "KEEPER",
+    aliases: ["Trige", "Mats Trige"]
   },
 
   {
-    id: "hellum",
-    name: "Andreas Hellum",
-    short: "Hellum",
-    image: "../bilder/hellum.png",
-    position: "ANG",
-    aliases: [
-      "Hellum",
-      "Andreas Hellum"
-    ]
+    id: "sah",
+    name: "Sander Amble Haugen",
+    short: "SAH",
+    image: "../bilder/sah.png",
+    position: "FORS",
+    aliases: ["SAH", "Sander Amble Haugen"]
   },
-
   {
-    id: "monglo",
-    name: "Isaac Monglo",
-    short: "Monglo",
-    image: "../bilder/monglo.png",
-    position: "MID",
-    aliases: [
-      "Monglo",
-      "Isaac Monglo"
-    ]
+    id: "sell",
+    name: "William Sell",
+    short: "Sell",
+    image: "../bilder/sell.png",
+    position: "FORS",
+    aliases: ["Sell", "William Sell"]
   },
-
-  {
-    id: "mj",
-    name: "Matias Johansen",
-    short: "MJ",
-    image: "../bilder/mj.png",
-    position: "ANG",
-    aliases: [
-      "MJ",
-      "Matias Johansen"
-    ]
-  },
-
   {
     id: "midtskogen",
     name: "Ådne Midtskogen",
     short: "Midtskogen",
     image: "../bilder/midtskogen.png",
     position: "FORS",
-    aliases: [
-      "Midtskogen",
-      "Ådne Midtskogen"
-    ]
-  }
+    aliases: ["Midtskogen", "Ådne Midtskogen"]
+  },
+  {
+    id: "hsn",
+    name: "Herman Solberg Nilsen",
+    short: "HSN",
+    image: "../bilder/hsn.png",
+    position: "FORS",
+    aliases: ["HSN", "Herman Solberg Nilsen"]
+  },
+  {
+    id: "barnett",
+    name: "Isaac Barnett",
+    short: "Barnett",
+    image: "../bilder/barnett.png",
+    position: "FORS",
+    aliases: ["Barnett", "Isaac Barnett"]
+  },
+  {
+    id: "vik",
+    name: "Isak Vik",
+    short: "Vik",
+    image: "../bilder/vik.png",
+    position: "FORS",
+    aliases: ["Vik", "Isak Vik"]
+  },
+  {
+    id: "gueye",
+    name: "Ousmane Gueye",
+    short: "Gueye",
+    image: "../bilder/gueye.png",
+    position: "FORS",
+    aliases: ["Gueye", "Ousmane Gueye"]
+  },
 
+  {
+    id: "fredriksen",
+    name: "Didrik Fredriksen",
+    short: "Fredriksen",
+    image: "../bilder/fredriksen.png",
+    position: "MID",
+    aliases: ["Fredriksen", "Didrik Fredriksen"]
+  },
+  {
+    id: "isufi",
+    name: "Eron Isufi",
+    short: "Isufi",
+    image: "../bilder/isufi.png",
+    position: "MID",
+    aliases: ["Isufi", "Eron Isufi"]
+  },
+  {
+    id: "skaug",
+    name: "Julius Skaug",
+    short: "Skaug",
+    image: "../bilder/skaug.png",
+    position: "MID",
+    aliases: ["Skaug", "Julius Skaug"]
+  },
+  {
+    id: "kurtovic",
+    name: "William Kurtovic",
+    short: "Kurtovic",
+    image: "../bilder/kurtovic.png",
+    position: "MID",
+    aliases: ["Kurtovic", "William Kurtovic"]
+  },
+  {
+    id: "monglo",
+    name: "Isaac Monglo",
+    short: "Monglo",
+    image: "../bilder/monglo.png",
+    position: "MID",
+    aliases: ["Monglo", "Isaac Monglo"]
+  },
+  {
+    id: "waehler",
+    name: "William Wæhler",
+    short: "Wæhler",
+    image: "../bilder/wæhler.png",
+    position: "MID",
+    aliases: ["Wæhler", "Wæhler", "William Wæhler", "Waehler", "William Waehler"]
+  },
+  {
+    id: "andersen",
+    name: "Marcus Andersen",
+    short: "Andersen",
+    image: "../bilder/andersen.png",
+    position: "MID",
+    aliases: ["Andersen", "Marcus Andersen"]
+  },
+  {
+    id: "aadland",
+    name: "Magnus Aadland",
+    short: "Aadland",
+    image: "../bilder/aadland.png",
+    position: "MID",
+    aliases: ["Aadland", "Magnus Aadland", "Ådland", "Magnus Ådland"]
+  },
+
+  {
+    id: "abo",
+    name: "Anders Bjørntvedt Olsen",
+    short: "ABO",
+    image: "../bilder/abo.png",
+    position: "ANG",
+    aliases: ["ABO", "Anders Bjørntvedt Olsen"]
+  },
+  {
+    id: "mj",
+    name: "Matias Johansen",
+    short: "MJ",
+    image: "../bilder/mj.png",
+    position: "ANG",
+    aliases: ["MJ", "Matias Johansen"]
+  },
+  {
+    id: "hellum",
+    name: "Andreas Hellum",
+    short: "Hellum",
+    image: "../bilder/hellum.png",
+    position: "ANG",
+    aliases: ["Hellum", "Andreas Hellum"]
+  },
+  {
+    id: "sawaneh",
+    name: "Ibrahim Sawaneh",
+    short: "Sawaneh",
+    image: "../bilder/sawaneh.png",
+    position: "ANG",
+    aliases: ["Sawaneh", "Ibrahim Sawaneh"]
+  },
+  {
+    id: "sock",
+    name: "Fallou Sock",
+    short: "Sock",
+    image: "../bilder/sock.png",
+    position: "ANG",
+    aliases: ["Sock", "Fallou Sock"]
+  }
 ];
 
-export function normalizeName(value) {
+function normalize(value) {
   return String(value || "")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .replaceAll("å", "a")
+    .replaceAll("ø", "o")
+    .replaceAll("æ", "ae")
+    .replaceAll("ü", "u")
+    .replaceAll("é", "e");
 }
 
-export function findPlayer(name) {
+export function findPlayer(value) {
+  const wanted = normalize(value);
 
-  const wanted = normalizeName(name);
+  return players.find(player => {
+    if (normalize(player.id) === wanted) return true;
+    if (normalize(player.short) === wanted) return true;
+    if (normalize(player.name) === wanted) return true;
 
-  return players.find(player =>
-    player.aliases.some(alias =>
-      normalizeName(alias) === wanted
-    )
-  ) || null;
+    return player.aliases.some(alias =>
+      normalize(alias) === wanted
+    );
+  }) || null;
 }
 
-export function getPlayerImage(name) {
-  return findPlayer(name)?.image || "../lblogoen.png";
+export function getPlayer(value) {
+  return findPlayer(value);
 }
 
-export function getPlayerPosition(name) {
-  return findPlayer(name)?.position || "";
+export function getPlayerId(value) {
+  return findPlayer(value)?.id || null;
 }
 
-export function getPlayerDisplayName(name) {
-  return findPlayer(name)?.name || name;
+export function getPlayerShort(value) {
+  return findPlayer(value)?.short || value;
 }
 
-export function getPlayerId(name) {
-  return findPlayer(name)?.id || null;
+export function getPlayerDisplayName(value) {
+  return findPlayer(value)?.name || value;
+}
+
+export function getPlayerImage(value) {
+  return findPlayer(value)?.image || "../lblogoen.png";
+}
+
+export function getPlayerPosition(value) {
+  return findPlayer(value)?.position || "";
+}
+
+export function getAllPlayers() {
+  return players;
+}
+
+export function getPlayersByPosition(position) {
+  return players.filter(player => player.position === position);
 }
