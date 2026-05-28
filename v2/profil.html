@@ -206,9 +206,12 @@ async function init() {
           >
 
           <div>
-            <strong>
-              ${getPlayerDisplayName(player.player)}
-            </strong>
+            <a
+  href="spiller.html?player=${encodeURIComponent(player.player)}"
+  class="player-link"
+>
+  ${getPlayerDisplayName(player.player)}
+</a>
 
             <div class="match-meta">
               ${player.votes} stemmer
@@ -238,9 +241,12 @@ async function init() {
 
           <div>
 
-            <strong>
-              ${getPlayerDisplayName(vote.player)}
-            </strong>
+            <a
+  href="spiller.html?player=${encodeURIComponent(vote.player)}"
+  class="player-link"
+>
+  ${getPlayerDisplayName(vote.player)}
+</a>
 
             <div class="match-meta">
               ${vote.match_id}
@@ -340,6 +346,14 @@ init();
   background:white;
 
   border:2px solid rgba(255,255,255,0.18);
+}
+   .player-link {
+  color:white;
+  text-decoration:none;
+}
+
+.player-link:hover {
+  color:var(--gold);
 }
 
 @media(max-width:700px) {
