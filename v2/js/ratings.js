@@ -2,6 +2,7 @@ import { supabaseClient } from "./supabase.js";
 import { TABLES, SPECIAL_PLAYERS } from "./config.js";
 import { cleanName, normalizeMatchId } from "./utils.js";
 import { findMatch } from "./matches.js";
+import { getPlayerPosition } from "./players.js";
 
 export async function fetchVotes() {
   const { data, error } = await supabaseClient
@@ -217,18 +218,22 @@ function sum(numbers) {
   return numbers.reduce((total, number) => total + Number(number || 0), 0);
 }
 export function calculateMVPScore(playerStats, fantasyStats = {}) {
-
   const fantasy = fantasyStats[playerStats.player] || {};
 
   const goals = Number(fantasy.goals || 0);
   const assists = Number(fantasy.assists || 0);
   const cleanSheets = Number(fantasy.clean_sheets || 0);
 
+  const position = getPlayerPosition(playerStats.player);
+  const cleanSheetBonus = ["KEEPER", "FORS"].includes(position)
+    ? cleanSheets * 1
+    : 0;
+
   return round(
     (playerStats.average * 10) +
     (goals * 2) +
     (assists * 1.5) +
-    (cleanSheets * 1)
+    cleanSheetBonus
   , 2);
 }
 
