@@ -117,7 +117,15 @@ const displayName = getPlayerDisplayName(player.player);
 
               <div class="player-text">
                 <strong>${index + 1}. ${displayName}</strong>
-                <div class="match-meta">${player.votes} stemmer</div>
+                <div class="match-meta">
+  <a
+    href="profil.html?user=${encodeURIComponent("superben")}"
+    class="user-link"
+  >
+    superben
+  </a>
+  • ${player.votes} stemmer
+</div>
               </div>
             </div>
 
@@ -145,6 +153,14 @@ init();
 
 .select option {
   color:#111;
+}
+  .user-link {
+  color:var(--muted);
+  text-decoration:none;
+}
+
+.user-link:hover {
+  color:var(--gold);
 }
 
 .big-score {
