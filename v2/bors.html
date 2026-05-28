@@ -107,11 +107,11 @@ function renderMatch(matchId) {
         <a href="spiller.html?player=${encodeURIComponent(player.player)}" class="player-card-link">
           <div class="rating-row ${index === 0 ? "winner" : ""}">
             <div class="player-info">
-              <img
-                src="../bilder/${imageName}.png"
-                class="player-avatar"
-                onerror="this.src='../lblogoen.png'"
-              >
+             <img
+  src="../bilder/${imageName}.png"
+  style="width:42px;height:42px;max-width:42px;max-height:42px;object-fit:cover;object-position:center top;border-radius:10px;display:block;background:white;"
+  onerror="this.src='../lblogoen.png'"
+>
 
               <div>
                 <strong>${index + 1}. ${player.player}</strong>
