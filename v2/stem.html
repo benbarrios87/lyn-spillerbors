@@ -48,6 +48,10 @@
       Laster spillere...
     </div>
 
+    <div id="voteProgress" class="vote-progress">
+  0 spillere vurdert
+</div>
+
   </section>
 
   <section class="submit-wrap">
@@ -98,6 +102,8 @@ const voteGridEl = document.getElementById("voteGrid");
 const usernameEl = document.getElementById("username");
 
 const submitBtn = document.getElementById("submitBtn");
+
+const voteProgressEl = document.getElementById("voteProgress");
 
 let matches = [];
 let activeMatch = null;
@@ -209,7 +215,22 @@ usernameEl.addEventListener("input", () => {
     usernameEl.value.trim()
   );
 });
+  
+function updateProgress() {
+  const selected = [...document.querySelectorAll(".rating-select")]
+    .filter(select => select.value)
+    .length;
 
+  voteProgressEl.textContent =
+    `${selected} spillere vurdert`;
+}
+
+document.addEventListener("change", event => {
+  if (event.target.classList.contains("rating-select")) {
+    updateProgress();
+  }
+});
+  
 async function loadExistingVotes(voter) {
 
   if (!voter || !activeMatch) return;
@@ -238,6 +259,8 @@ async function loadExistingVotes(voter) {
         select.value = existing.rating;
       }
     });
+
+  updateProgress();
 }
 
 submitBtn.addEventListener("click", submitVotes);
