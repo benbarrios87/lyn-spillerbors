@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Lynbørs 2.0 • Stem</title>
 
   <link rel="icon" href="../lblogoen.png">
-
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
 
@@ -22,51 +20,45 @@
 
   <section class="page-header">
     <div class="badge">NY STEMMING</div>
-
     <h1>Spillerbørs</h1>
-
-    <p>
-      Lynbørs 2.0 stemmesystem.
-    </p>
+    <p>Velg kamp, skriv brukernavn og sett børsen. Gamle stemmer lastes automatisk hvis de finnes.</p>
   </section>
 
   <section class="data-card">
-
     <h2>Velg kamp</h2>
-
     <select id="matchSelect" class="match-select"></select>
-
     <div id="matchInfo"></div>
-
   </section>
 
   <section class="data-card">
+    <div class="section-head">
+      <h2>Dine karakterer</h2>
+      <div id="voteProgress" class="vote-progress">0 spillere vurdert</div>
+    </div>
 
-    <h2>Dine karakterer</h2>
+    <div id="loadStatus" class="load-status"></div>
 
     <div class="vote-grid" id="voteGrid">
       Laster spillere...
     </div>
-
-    <div id="voteProgress" class="vote-progress">
-  0 spillere vurdert
-</div>
-
   </section>
 
   <section class="submit-wrap">
-
     <input
       type="text"
       id="username"
       placeholder="Ditt navn"
       class="name-input"
+      autocomplete="nickname"
     >
 
-    <button id="submitBtn" class="submit-btn">
-      Send børs
+    <button id="clearBtn" class="clear-btn" type="button">
+      Nullstill
     </button>
 
+    <button id="submitBtn" class="submit-btn" type="button">
+      Send børs
+    </button>
   </section>
 
 </main>
@@ -74,50 +66,46 @@
 <div id="footer"></div>
 
 <script type="module">
-
 import { renderNavbar, renderFooter } from "./js/layout.js";
-
 import { fetchMatches } from "./js/matches.js";
-
-import {
-  players,
-  getPlayerDisplayName
-} from "./js/players.js";
-
+import { players, getPlayerDisplayName } from "./js/players.js";
 import { supabaseClient } from "./js/supabase.js";
 
-  console.log("STEM.HTML SCRIPT KJØRER");
-
-document.getElementById("navbar").innerHTML =
-  renderNavbar("stem");
-
-document.getElementById("footer").innerHTML =
-  renderFooter();
+document.getElementById("navbar").innerHTML = renderNavbar("stem");
+document.getElementById("footer").innerHTML = renderFooter();
 
 const matchSelectEl = document.getElementById("matchSelect");
 const matchInfoEl = document.getElementById("matchInfo");
-
 const voteGridEl = document.getElementById("voteGrid");
-
-const usernameEl = document.getElementById("username");
-
-const submitBtn = document.getElementById("submitBtn");
-
 const voteProgressEl = document.getElementById("voteProgress");
+const loadStatusEl = document.getElementById("loadStatus");
+const usernameEl = document.getElementById("username");
+const submitBtn = document.getElementById("submitBtn");
+const clearBtn = document.getElementById("clearBtn");
 
-let matches = [];
+let relevantMatches = [];
 let activeMatch = null;
 
+const TIP_PLAYERS = [
+  "TIP_HOME_GOALS",
+  "TIP_AWAY_GOALS"
+];
+
 async function init() {
+  const savedName = localStorage.getItem("lynbors-voter-name");
+  if (savedName) usernameEl.value = savedName;
 
-  matches = await fetchMatches();
+  const matches = await fetchMatches();
 
-  const relevantMatches = matches
-    .filter(match =>
-      match.active === true ||
-      match.actual_home !== null
-    )
+  relevantMatches = matches
+    .filter(match => match.active === true || match.actual_home !== null)
     .reverse();
+
+  if (!relevantMatches.length) {
+    matchSelectEl.innerHTML = `<option>Ingen kamper funnet</option>`;
+    voteGridEl.innerHTML = `<div class="match-meta">Ingen kamper tilgjengelig.</div>`;
+    return;
+  }
 
   matchSelectEl.innerHTML = relevantMatches.map(match => `
     <option value="${match.id}">
@@ -128,145 +116,168 @@ async function init() {
   activeMatch = relevantMatches[0];
 
   renderMatchInfo();
-
   renderVoteGrid();
+  await loadExistingVotes(usernameEl.value.trim());
 
-  matchSelectEl.addEventListener("change", () => {
-
-    activeMatch = relevantMatches.find(match =>
-      match.id === matchSelectEl.value
-    );
-
+  matchSelectEl.addEventListener("change", async () => {
+    activeMatch = relevantMatches.find(match => match.id === matchSelectEl.value);
     renderMatchInfo();
+    clearRatings();
+    await loadExistingVotes(usernameEl.value.trim());
+  });
 
-    loadExistingVotes(
-      usernameEl.value.trim()
-    );
+  usernameEl.addEventListener("input", debounce(async () => {
+    const voter = usernameEl.value.trim();
+    localStorage.setItem("lynbors-voter-name", voter);
+    clearRatings();
+    await loadExistingVotes(voter);
+  }, 350));
+
+  submitBtn.addEventListener("click", submitVotes);
+
+  clearBtn.addEventListener("click", () => {
+    clearRatings();
+    setStatus("Skjema nullstilt.", "neutral");
   });
 }
 
 function renderMatchInfo() {
-
   if (!activeMatch) return;
+
+  const resultText =
+    activeMatch.actual_home !== null && activeMatch.actual_away !== null
+      ? `${activeMatch.actual_home} - ${activeMatch.actual_away}`
+      : "Ikke spilt";
 
   matchInfoEl.innerHTML = `
     <div class="active-match-box">
-
-      <strong>
-        ${activeMatch.home} - ${activeMatch.away}
-      </strong>
-
-      <div class="match-meta">
-        Deadline:
-        ${activeMatch.deadline || "Ikke satt"}
+      <div>
+        <strong>${activeMatch.home} - ${activeMatch.away}</strong>
+        <div class="match-meta">
+          Deadline: ${activeMatch.deadline || "Ikke satt"}
+        </div>
       </div>
 
+      <div class="match-result">
+        ${resultText}
+      </div>
     </div>
   `;
 }
 
 function renderVoteGrid() {
-
   voteGridEl.innerHTML = players.map(player => `
     <div class="vote-card">
-
       <div class="vote-player">
-
         <img
           src="${player.image}"
           class="vote-avatar"
+          onerror="this.src='../lblogoen.png'"
         >
 
         <div>
-
-          <strong>
-            ${getPlayerDisplayName(player.name)}
-          </strong>
-
-          <div class="match-meta">
-            ${player.position}
-          </div>
-
+          <strong>${getPlayerDisplayName(player.name)}</strong>
+          <div class="match-meta">${player.position}</div>
         </div>
-
       </div>
 
-      <select
-        class="rating-select"
-        data-player="${player.short}"
-      >
-
-        <option value="">-</option>
-
-        ${Array.from({ length:10 }, (_, i) => `
-          <option value="${i + 1}">
-            ${i + 1}
-          </option>
-        `).join("")}
-
-      </select>
-
+      <div class="rating-buttons" data-player="${player.short}">
+        ${Array.from({ length: 10 }, (_, i) => {
+          const value = i + 1;
+          return `
+            <button
+              class="rating-btn"
+              data-value="${value}"
+              type="button"
+            >
+              ${value}
+            </button>
+          `;
+        }).join("")}
+      </div>
     </div>
   `).join("");
-}
 
-usernameEl.addEventListener("input", () => {
-  loadExistingVotes(
-    usernameEl.value.trim()
-  );
-});
-  
-function updateProgress() {
-  const selected = [...document.querySelectorAll(".rating-select")]
-    .filter(select => select.value)
-    .length;
-
-  voteProgressEl.textContent =
-    `${selected} spillere vurdert`;
-}
-
-document.addEventListener("change", event => {
-  if (event.target.classList.contains("rating-select")) {
-    updateProgress();
-  }
-});
-  
-async function loadExistingVotes(voter) {
-
-  if (!voter || !activeMatch) return;
-
- const { data } = await supabaseClient
-  .from("votes")
-  .select("*")
-  .eq("match_id", activeMatch.id)
-  .eq("voter", voter);
-
-  document.querySelectorAll(".rating-select")
-    .forEach(select => {
-      select.value = "";
-    });
-
-  if (!data?.length) return;
-
-  document.querySelectorAll(".rating-select")
-    .forEach(select => {
-
-      const existing = data.find(v =>
-        v.player === select.dataset.player
-      );
-
-      if (existing) {
-        select.value = existing.rating;
-      }
-    });
-
+  setupRatingButtons();
   updateProgress();
 }
 
-submitBtn.addEventListener("click", submitVotes);
+function setupRatingButtons() {
+  document.querySelectorAll(".rating-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const wrapper = button.closest(".rating-buttons");
+      const value = button.dataset.value;
+
+      if (wrapper.dataset.rating === value) {
+        wrapper.dataset.rating = "";
+        button.classList.remove("active");
+      } else {
+        wrapper.querySelectorAll(".rating-btn").forEach(btn => {
+          btn.classList.remove("active");
+        });
+
+        wrapper.dataset.rating = value;
+        button.classList.add("active");
+      }
+
+      updateProgress();
+    });
+  });
+}
+
+async function loadExistingVotes(voter) {
+  if (!voter || !activeMatch) {
+    setStatus("Skriv inn brukernavn for å hente gamle stemmer.", "neutral");
+    return;
+  }
+
+  setStatus("Sjekker gamle stemmer...", "neutral");
+
+  const { data, error } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .eq("match_id", activeMatch.id)
+    .eq("voter", voter);
+
+  if (error) {
+    console.error(error);
+    setStatus("Klarte ikke hente gamle stemmer.", "bad");
+    return;
+  }
+
+  clearRatings(false);
+
+  const playerVotes = (data || []).filter(vote =>
+    !TIP_PLAYERS.includes(vote.player)
+  );
+
+  if (!playerVotes.length) {
+    setStatus("Ingen gamle spillerstemmer funnet for denne brukeren/kampen.", "neutral");
+    updateProgress();
+    return;
+  }
+
+  document.querySelectorAll(".rating-buttons").forEach(wrapper => {
+    const existing = playerVotes.find(vote =>
+      vote.player === wrapper.dataset.player
+    );
+
+    if (!existing) return;
+
+    wrapper.dataset.rating = String(existing.rating);
+
+    const activeButton = wrapper.querySelector(
+      `.rating-btn[data-value="${existing.rating}"]`
+    );
+
+    if (activeButton) activeButton.classList.add("active");
+  });
+
+  setStatus(`Fant ${playerVotes.length} gamle stemmer.`, "good");
+  updateProgress();
+}
 
 async function submitVotes() {
-
   const voter = usernameEl.value.trim();
 
   if (!voter) {
@@ -274,22 +285,19 @@ async function submitVotes() {
     return;
   }
 
-  const ratings = [];
+  if (!activeMatch) {
+    alert("Ingen kamp valgt.");
+    return;
+  }
 
-  document.querySelectorAll(".rating-select")
-    .forEach(select => {
-
-      const value = Number(select.value);
-
-      if (!value) return;
-
-      ratings.push({
-        match_id: activeMatch.id,
-        voter,
-        player: select.dataset.player,
-        rating: value
-      });
-    });
+  const ratings = [...document.querySelectorAll(".rating-buttons")]
+    .map(wrapper => ({
+      match_id: activeMatch.id,
+      voter,
+      player: wrapper.dataset.player,
+      rating: Number(wrapper.dataset.rating)
+    }))
+    .filter(row => row.rating);
 
   if (!ratings.length) {
     alert("Ingen karakterer valgt.");
@@ -297,61 +305,153 @@ async function submitVotes() {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = "Sender...";
+  submitBtn.textContent = "Lagrer...";
+  setStatus("Lagrer børs...", "neutral");
 
-  await supabaseClient
-  .from("votes")
-  .delete()
-  .eq("match_id", activeMatch.id)
-  .eq("voter", voter)
-  .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
-
-  const { error } = await supabaseClient
+  const { error: deleteError } = await supabaseClient
     .from("votes")
-    .insert(ratings);
+    .delete()
+    .eq("match_id", activeMatch.id)
+    .eq("voter", voter)
+    .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
 
-  if (error) {
-
-    console.error(error);
-
-    alert("Noe gikk galt.");
-
+  if (deleteError) {
+    console.error(deleteError);
+    alert("Klarte ikke slette gamle spillerstemmer.");
     submitBtn.disabled = false;
     submitBtn.textContent = "Send børs";
-
+    setStatus("Noe gikk galt ved lagring.", "bad");
     return;
   }
 
-  alert("Børs lagret 😄");
+  const { error: insertError } = await supabaseClient
+    .from("votes")
+    .insert(ratings);
 
+  if (insertError) {
+    console.error(insertError);
+    alert("Noe gikk galt ved lagring.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Send børs";
+    setStatus("Noe gikk galt ved lagring.", "bad");
+    return;
+  }
+
+  localStorage.setItem("lynbors-voter-name", voter);
+
+  submitBtn.disabled = false;
   submitBtn.textContent = "Lagret!";
+  setStatus(`Børs lagret med ${ratings.length} spillere.`, "good");
+
+  setTimeout(() => {
+    submitBtn.textContent = "Send børs";
+  }, 1800);
+}
+
+function clearRatings(showStatus = true) {
+  document.querySelectorAll(".rating-buttons").forEach(wrapper => {
+    wrapper.dataset.rating = "";
+    wrapper.querySelectorAll(".rating-btn").forEach(button => {
+      button.classList.remove("active");
+    });
+  });
+
+  updateProgress();
+
+  if (showStatus) {
+    setStatus("", "neutral");
+  }
+}
+
+function updateProgress() {
+  const selected = [...document.querySelectorAll(".rating-buttons")]
+    .filter(wrapper => Number(wrapper.dataset.rating))
+    .length;
+
+  const total = document.querySelectorAll(".rating-buttons").length;
+
+  voteProgressEl.textContent =
+    `${selected} av ${total} spillere vurdert`;
+}
+
+function setStatus(message, type = "neutral") {
+  loadStatusEl.textContent = message;
+  loadStatusEl.className = `load-status ${type}`;
+}
+
+function debounce(fn, delay = 300) {
+  let timeout;
+
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
 }
 
 init();
-
 </script>
 
 <style>
-
 .match-select {
   width:100%;
-
   padding:14px;
-
   border:none;
   border-radius:14px;
-
   font-size:16px;
 }
 
 .active-match-box {
   margin-top:14px;
-
   padding:18px;
-
   border-radius:18px;
-
   background:rgba(255,255,255,0.05);
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+}
+
+.match-result {
+  font-size:28px;
+  font-weight:bold;
+  color:var(--gold);
+  white-space:nowrap;
+}
+
+.section-head {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.section-head h2 {
+  margin:0;
+}
+
+.vote-progress {
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  color:var(--muted);
+  font-size:13px;
+  font-weight:bold;
+}
+
+.load-status {
+  min-height:22px;
+  margin-bottom:12px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.load-status.good {
+  color:#bbf7d0;
+}
+
+.load-status.bad {
+  color:#fecaca;
 }
 
 .vote-grid {
@@ -361,16 +461,12 @@ init();
 }
 
 .vote-card {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
+  display:grid;
+  grid-template-columns:1fr auto;
   gap:14px;
-
+  align-items:center;
   padding:14px;
-
   border-radius:18px;
-
   background:rgba(255,255,255,0.05);
 }
 
@@ -378,86 +474,110 @@ init();
   display:flex;
   align-items:center;
   gap:12px;
+  min-width:0;
 }
 
 .vote-avatar {
   width:52px;
   height:52px;
-
+  min-width:52px;
   object-fit:cover;
   object-position:center top;
-
   border-radius:12px;
-
   background:white;
 }
 
-.rating-select {
-  padding:12px;
+.rating-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  justify-content:flex-end;
+}
 
+.rating-btn {
+  width:34px;
+  height:34px;
   border:none;
-  border-radius:12px;
-
-  font-size:16px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.10);
+  color:white;
+  cursor:pointer;
   font-weight:bold;
+}
+
+.rating-btn:hover {
+  background:rgba(255,255,255,0.20);
+}
+
+.rating-btn.active {
+  background:var(--gold);
+  color:black;
 }
 
 .submit-wrap {
   position:sticky;
   bottom:0;
-
+  z-index:20;
   display:flex;
   gap:12px;
-
   margin-top:22px;
-
   padding:18px;
-
   border-radius:22px;
-
   background:rgba(5,8,20,0.92);
-
   backdrop-filter:blur(10px);
-
   border:1px solid rgba(255,255,255,0.10);
 }
 
 .name-input {
   flex:1;
-
   padding:14px;
-
   border:none;
   border-radius:14px;
-
   font-size:16px;
 }
 
-.submit-btn {
+.submit-btn,
+.clear-btn {
   padding:14px 22px;
-
   border:none;
   border-radius:14px;
-
-  background:var(--gold);
-
   font-weight:bold;
   cursor:pointer;
 }
 
-@media(max-width:700px) {
+.submit-btn {
+  background:var(--gold);
+  color:black;
+}
+
+.clear-btn {
+  background:rgba(255,255,255,0.10);
+  color:white;
+}
+
+@media(max-width:800px) {
+  .vote-card {
+    grid-template-columns:1fr;
+  }
+
+  .rating-buttons {
+    justify-content:flex-start;
+  }
 
   .submit-wrap {
     flex-direction:column;
   }
 
-  .vote-card {
+  .active-match-box {
     flex-direction:column;
     align-items:flex-start;
   }
 
+  .section-head {
+    flex-direction:column;
+    align-items:flex-start;
+  }
 }
-
 </style>
 
 </body>
