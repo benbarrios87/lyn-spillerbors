@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lynbørs 2.0 • Profil</title>
+
+  <link rel="icon" href="../lblogoen.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+  <section class="player-hero" id="profileHero">
+    Laster profil...
+  </section>
+
+  <section class="data-grid">
+
+    <div class="data-card">
+      <h2>Stemmeprofil</h2>
+
+      <div id="profileStats">
+        Laster...
+      </div>
+    </div>
+
+    <div class="data-card">
+      <h2>Favorittspillere</h2>
+
+      <div id="favoritePlayers">
+        Laster...
+      </div>
+    </div>
+
+  </section>
+
+  <section class="data-card">
+    <h2>Siste stemmer</h2>
+
+    <div id="recentVotes">
+      Laster...
+    </div>
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+
+import {
+  fetchVotes,
+  getPlayerVotes
+} from "./js/ratings.js";
+
+import {
+  getPlayerDisplayName,
+  getPlayerImage
+} from "./js/players.js";
+
+document.getElementById("navbar").innerHTML =
+  renderNavbar();
+
+document.getElementById("footer").innerHTML =
+  renderFooter();
+
+const params = new URLSearchParams(window.location.search);
+
+const username = params.get("user");
+
+const heroEl = document.getElementById("profileHero");
+const statsEl = document.getElementById("profileStats");
+const favoritesEl = document.getElementById("favoritePlayers");
+const recentEl = document.getElementById("recentVotes");
+
+function clean(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+async function init() {
+
+  const votes = await fetchVotes();
+
+  const userVotes = getPlayerVotes(votes)
+    .filter(vote =>
+      clean(vote.voter) === clean(username)
+    );
+
+  if (!userVotes.length) {
+
+    heroEl.innerHTML = `
+      <div class="data-card">
+        Fant ikke bruker.
+      </div>
+    `;
+
+    return;
+  }
+
+  const ratings = userVotes.map(v =>
+    Number(v.rating)
+  ).filter(v => !Number.isNaN(v));
+
+  const average =
+    ratings.reduce((a, b) => a + b, 0) / ratings.length;
+
+  const playerMap = {};
+
+  userVotes.forEach(vote => {
+
+    const player = vote.player;
+
+    if (!playerMap[player]) {
+      playerMap[player] = {
+        player,
+        votes:0,
+        total:0
+      };
+    }
+
+    playerMap[player].votes += 1;
+    playerMap[player].total += Number(vote.rating || 0);
+  });
+
+  const favorites = Object.values(playerMap)
+    .map(player => ({
+      ...player,
+      average: player.total / player.votes
+    }))
+    .sort((a, b) => b.average - a.average);
+
+  heroEl.innerHTML = `
+    <div class="player-hero-card">
+
+      <img
+        src="../lblogoen.png"
+        class="hero-avatar"
+      >
+
+      <div>
+
+        <div class="badge">
+          SUPPORTERPROFIL
+        </div>
+
+        <h1>${username}</h1>
+
+        <div class="hero-rating">
+          ${average.toFixed(2)}
+        </div>
+
+        <div class="match-meta">
+          ${userVotes.length} stemmer avgitt
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  statsEl.innerHTML = `
+    <div class="stat-grid">
+
+      <div class="mini-stat">
+        <span>Snittkarakter</span>
+        <strong>${average.toFixed(2)}</strong>
+      </div>
+
+      <div class="mini-stat">
+        <span>Stemmer</span>
+        <strong>${userVotes.length}</strong>
+      </div>
+
+      <div class="mini-stat">
+        <span>Favoritt</span>
+        <strong>
+          ${favorites[0]?.player || "-"}
+        </strong>
+      </div>
+
+    </div>
+  `;
+
+  favoritesEl.innerHTML = favorites
+    .slice(0, 5)
+    .map(player => `
+      <div class="match-row">
+
+        <div class="player-info">
+
+          <img
+            src="${getPlayerImage(player.player)}"
+            class="mini-avatar"
+          >
+
+          <div>
+            <strong>
+              ${getPlayerDisplayName(player.player)}
+            </strong>
+
+            <div class="match-meta">
+              ${player.votes} stemmer
+            </div>
+          </div>
+
+        </div>
+
+        <div class="rating-score">
+          ${player.average.toFixed(2)}
+        </div>
+
+      </div>
+    `).join("");
+
+  recentEl.innerHTML = userVotes
+    .slice(0, 15)
+    .map(vote => `
+      <div class="match-row">
+
+        <div class="player-info">
+
+          <img
+            src="${getPlayerImage(vote.player)}"
+            class="mini-avatar"
+          >
+
+          <div>
+
+            <strong>
+              ${getPlayerDisplayName(vote.player)}
+            </strong>
+
+            <div class="match-meta">
+              ${vote.match_id}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="rating-score">
+          ${vote.rating}
+        </div>
+
+      </div>
+    `).join("");
+}
+
+init();
+
+</script>
+
+<style>
+
+.player-hero {
+  margin-bottom:24px;
+}
+
+.player-hero-card {
+  display:flex;
+  align-items:center;
+  gap:24px;
+
+  padding:26px;
+
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:0 12px 35px rgba(0,0,0,0.32);
+}
+
+.hero-avatar {
+  width:100px;
+  height:100px;
+
+  border-radius:22px;
+
+  object-fit:cover;
+
+  background:white;
+
+  border:3px solid rgba(255,255,255,0.18);
+}
+
+.hero-rating {
+  margin-top:8px;
+
+  font-size:52px;
+  font-weight:bold;
+
+  color:var(--gold);
+}
+
+.stat-grid {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:14px;
+}
+
+.mini-stat {
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
+}
+
+.mini-stat span {
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+}
+
+.mini-stat strong {
+  font-size:26px;
+}
+
+.mini-avatar {
+  width:42px;
+  height:42px;
+
+  min-width:42px;
+
+  object-fit:cover;
+  object-position:center top;
+
+  border-radius:10px;
+
+  background:white;
+
+  border:2px solid rgba(255,255,255,0.18);
+}
+
+@media(max-width:700px) {
+
+  .player-hero-card {
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .hero-rating {
+    font-size:42px;
+  }
+
+  .stat-grid {
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+
+</body>
+</html>
