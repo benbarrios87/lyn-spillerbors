@@ -11,6 +11,7 @@ export function renderNavbar(active = "") {
   <a href="kamper.html" class="${active === "kamper" ? "active" : ""}">Kamper</a>
   <a href="bors.html" class="${active === "bors" ? "active" : ""}">Børs</a>
   <a href="stats.html" class="${active === "stats" ? "active" : ""}">Stats</a>
+  <a href="stem.html" class="${active === "stem" ? "active" : ""}">Stem</a>
 </nav>
 
         <a href="kamper.html" class="${active === "kamper" ? "active" : ""}">
