@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lynbørs 2.0 • Stats</title>
+
+  <link rel="icon" href="../lblogoen.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+  <section class="page-header">
+    <div class="badge">STATSCENTER</div>
+
+    <h1>Lynbørs Stats</h1>
+
+    <p>
+      Første versjon av den nye statsmotoren i Lynbørs 2.0.
+    </p>
+  </section>
+
+  <section class="data-card">
+
+    <h2>🏆 MVP-ranking</h2>
+
+    <p class="match-meta">
+      Formel:
+      børs × 10 + mål × 2 + assist × 1.5 + clean sheet (kun keeper/forsvar)
+    </p>
+
+    <div class="table-wrap">
+
+      <table class="stats-table">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Spiller</th>
+            <th>Børs</th>
+            <th>Mål</th>
+            <th>Assist</th>
+            <th>CS</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody id="mvpTable">
+          <tr>
+            <td colspan="7">Laster...</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+
+import {
+  fetchVotes,
+  buildMVPRanking
+} from "./js/ratings.js";
+
+document.getElementById("navbar").innerHTML =
+  renderNavbar();
+
+document.getElementById("footer").innerHTML =
+  renderFooter();
+
+const tableEl = document.getElementById("mvpTable");
+
+async function init() {
+
+  const votes = await fetchVotes();
+
+  const { data: fantasyStats } = await window.supabase
+    .createClient(
+      "https://oqwlbdnthdbomnobxqot.supabase.co",
+      "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z"
+    )
+    .from("fantasy_stats")
+    .select("*");
+
+  const ranking = buildMVPRanking(
+    votes,
+    fantasyStats || []
+  );
+
+  const fantasyTotals = {};
+
+  (fantasyStats || []).forEach(row => {
+
+    const player = String(row.player || "").trim();
+
+    if (!fantasyTotals[player]) {
+      fantasyTotals[player] = {
+        goals:0,
+        assists:0,
+        cs:0
+      };
+    }
+
+    fantasyTotals[player].goals += Number(row.goals || 0);
+    fantasyTotals[player].assists += Number(row.assists || 0);
+
+    if (row.clean_sheet) {
+      fantasyTotals[player].cs += 1;
+    }
+  });
+
+  tableEl.innerHTML = ranking.slice(0, 20).map((player, index) => {
+
+    const fantasy = fantasyTotals[player.player] || {
+      goals:0,
+      assists:0,
+      cs:0
+    };
+
+    return `
+      <tr>
+
+        <td>${index + 1}</td>
+
+        <td>
+          <strong>${player.player}</strong>
+        </td>
+
+        <td>${player.average}</td>
+
+        <td>${fantasy.goals}</td>
+
+        <td>${fantasy.assists}</td>
+
+        <td>${fantasy.cs}</td>
+
+        <td>
+          <strong>${player.mvpScore}</strong>
+        </td>
+
+      </tr>
+    `;
+  }).join("");
+}
+
+init();
+
+</script>
+
+<style>
+
+.table-wrap {
+  overflow-x:auto;
+}
+
+.stats-table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+.stats-table th,
+.stats-table td {
+  padding:12px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  text-align:left;
+}
+
+.stats-table th {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.stats-table td:last-child,
+.stats-table th:last-child {
+  text-align:right;
+}
+
+.stats-table tr:hover {
+  background:rgba(255,255,255,0.04);
+}
+
+</style>
+
+</body>
+</html>
