@@ -106,7 +106,9 @@ async function init() {
     activeOnly:true
   });
 
-  activeMatch = matches[0];
+  activeMatch = matches.find(match =>
+  match.id === "brann-h-2026"
+) || matches[0];
 
   if (!activeMatch) {
 
