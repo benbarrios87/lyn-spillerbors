@@ -33,7 +33,13 @@
   <section class="data-card">
     <div class="section-head">
       <h2>Dine karakterer</h2>
-      <div id="voteProgress" class="vote-progress">0 spillere vurdert</div>
+      <div id="voteProgress" class="vote-progress">0 av 0 spillere vurdert</div>
+    </div>
+
+    <div class="quick-actions">
+      <button type="button" class="quick-btn" data-fill="5">Alle 5</button>
+      <button type="button" class="quick-btn" data-fill="6">Alle 6</button>
+      <button type="button" class="quick-btn" data-fill="7">Alle 7</button>
     </div>
 
     <div id="loadStatus" class="load-status"></div>
@@ -85,10 +91,25 @@ const clearBtn = document.getElementById("clearBtn");
 
 let relevantMatches = [];
 let activeMatch = null;
+let votingClosed = false;
 
 const TIP_PLAYERS = [
   "TIP_HOME_GOALS",
   "TIP_AWAY_GOALS"
+];
+
+const POSITION_LABELS = {
+  KEEPER: "Keeper",
+  FORS: "Forsvar",
+  MID: "Midtbane",
+  ANG: "Angrep"
+};
+
+const POSITION_ORDER = [
+  "KEEPER",
+  "FORS",
+  "MID",
+  "ANG"
 ];
 
 async function init() {
@@ -107,22 +128,27 @@ async function init() {
     return;
   }
 
-  matchSelectEl.innerHTML = relevantMatches.map(match => `
-    <option value="${match.id}">
-      ${match.home} - ${match.away}
-    </option>
-  `).join("");
+  matchSelectEl.innerHTML = relevantMatches.map(match => {
+    const label = match.active ? " • åpen" : "";
+    return `
+      <option value="${match.id}">
+        ${match.home} - ${match.away}${label}
+      </option>
+    `;
+  }).join("");
 
   activeMatch = relevantMatches[0];
 
   renderMatchInfo();
   renderVoteGrid();
+  restoreDraft();
   await loadExistingVotes(usernameEl.value.trim());
 
   matchSelectEl.addEventListener("change", async () => {
     activeMatch = relevantMatches.find(match => match.id === matchSelectEl.value);
     renderMatchInfo();
-    clearRatings();
+    renderVoteGrid();
+    restoreDraft();
     await loadExistingVotes(usernameEl.value.trim());
   });
 
@@ -130,6 +156,7 @@ async function init() {
     const voter = usernameEl.value.trim();
     localStorage.setItem("lynbors-voter-name", voter);
     clearRatings();
+    restoreDraft();
     await loadExistingVotes(voter);
   }, 350));
 
@@ -137,24 +164,46 @@ async function init() {
 
   clearBtn.addEventListener("click", () => {
     clearRatings();
+    clearDraft();
     setStatus("Skjema nullstilt.", "neutral");
+  });
+
+  document.querySelectorAll(".quick-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      if (votingClosed) return;
+      fillAllRatings(Number(button.dataset.fill));
+    });
   });
 }
 
 function renderMatchInfo() {
   if (!activeMatch) return;
 
+  votingClosed = isVotingClosed(activeMatch);
+
   const resultText =
     activeMatch.actual_home !== null && activeMatch.actual_away !== null
       ? `${activeMatch.actual_home} - ${activeMatch.actual_away}`
       : "Ikke spilt";
 
+  const statusText = votingClosed
+    ? "Stengt"
+    : "Åpen for stemming";
+
+  const statusClass = votingClosed
+    ? "closed"
+    : "open";
+
   matchInfoEl.innerHTML = `
     <div class="active-match-box">
       <div>
-        <strong>${activeMatch.home} - ${activeMatch.away}</strong>
+        <div class="match-title-row">
+          <strong>${activeMatch.home} - ${activeMatch.away}</strong>
+          <span class="match-status ${statusClass}">${statusText}</span>
+        </div>
+
         <div class="match-meta">
-          Deadline: ${activeMatch.deadline || "Ikke satt"}
+          Deadline: ${formatDeadline(activeMatch.deadline)}
         </div>
       </div>
 
@@ -163,40 +212,58 @@ function renderMatchInfo() {
       </div>
     </div>
   `;
+
+  submitBtn.disabled = votingClosed;
+  submitBtn.textContent = votingClosed ? "Stengt" : "Send børs";
 }
 
 function renderVoteGrid() {
-  voteGridEl.innerHTML = players.map(player => `
-    <div class="vote-card">
-      <div class="vote-player">
-        <img
-          src="${player.image}"
-          class="vote-avatar"
-          onerror="this.src='../lblogoen.png'"
-        >
+  const groupedHtml = POSITION_ORDER.map(position => {
+    const group = players.filter(player => player.position === position);
 
-        <div>
-          <strong>${getPlayerDisplayName(player.name)}</strong>
-          <div class="match-meta">${player.position}</div>
-        </div>
-      </div>
+    if (!group.length) return "";
 
-      <div class="rating-buttons" data-player="${player.short}">
-        ${Array.from({ length: 10 }, (_, i) => {
-          const value = i + 1;
-          return `
-            <button
-              class="rating-btn"
-              data-value="${value}"
-              type="button"
-            >
-              ${value}
-            </button>
-          `;
-        }).join("")}
+    return `
+      <div class="position-group">
+        <div class="position-title">${POSITION_LABELS[position] || position}</div>
+
+        ${group.map(player => `
+          <div class="vote-card">
+            <div class="vote-player">
+              <img
+                src="${player.image}"
+                class="vote-avatar"
+                onerror="this.src='../lblogoen.png'"
+              >
+
+              <div>
+                <strong>${getPlayerDisplayName(player.name)}</strong>
+                <div class="match-meta">${player.short}</div>
+              </div>
+            </div>
+
+            <div class="rating-buttons" data-player="${player.short}">
+              ${Array.from({ length: 10 }, (_, i) => {
+                const value = i + 1;
+                return `
+                  <button
+                    class="rating-btn"
+                    data-value="${value}"
+                    type="button"
+                    ${votingClosed ? "disabled" : ""}
+                  >
+                    ${value}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `).join("")}
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
+
+  voteGridEl.innerHTML = groupedHtml || `<div class="match-meta">Ingen spillere funnet.</div>`;
 
   setupRatingButtons();
   updateProgress();
@@ -205,6 +272,8 @@ function renderVoteGrid() {
 function setupRatingButtons() {
   document.querySelectorAll(".rating-btn").forEach(button => {
     button.addEventListener("click", () => {
+      if (votingClosed) return;
+
       const wrapper = button.closest(".rating-buttons");
       const value = button.dataset.value;
 
@@ -221,6 +290,7 @@ function setupRatingButtons() {
       }
 
       updateProgress();
+      saveDraft();
     });
   });
 }
@@ -245,8 +315,6 @@ async function loadExistingVotes(voter) {
     return;
   }
 
-  clearRatings(false);
-
   const playerVotes = (data || []).filter(vote =>
     !TIP_PLAYERS.includes(vote.player)
   );
@@ -257,6 +325,8 @@ async function loadExistingVotes(voter) {
     return;
   }
 
+  clearRatings(false);
+
   document.querySelectorAll(".rating-buttons").forEach(wrapper => {
     const existing = playerVotes.find(vote =>
       vote.player === wrapper.dataset.player
@@ -264,17 +334,12 @@ async function loadExistingVotes(voter) {
 
     if (!existing) return;
 
-    wrapper.dataset.rating = String(existing.rating);
-
-    const activeButton = wrapper.querySelector(
-      `.rating-btn[data-value="${existing.rating}"]`
-    );
-
-    if (activeButton) activeButton.classList.add("active");
+    setRating(wrapper, existing.rating);
   });
 
   setStatus(`Fant ${playerVotes.length} gamle stemmer.`, "good");
   updateProgress();
+  saveDraft();
 }
 
 async function submitVotes() {
@@ -287,6 +352,11 @@ async function submitVotes() {
 
   if (!activeMatch) {
     alert("Ingen kamp valgt.");
+    return;
+  }
+
+  if (votingClosed) {
+    alert("Stemmegivning er stengt for denne kampen.");
     return;
   }
 
@@ -338,14 +408,36 @@ async function submitVotes() {
   }
 
   localStorage.setItem("lynbors-voter-name", voter);
+  clearDraft();
 
   submitBtn.disabled = false;
   submitBtn.textContent = "Lagret!";
-  setStatus(`Børs lagret med ${ratings.length} spillere.`, "good");
+  setStatus(`Børs lagret med ${ratings.length} spillere. Jess!`, "good");
 
   setTimeout(() => {
     submitBtn.textContent = "Send børs";
   }, 1800);
+}
+
+function setRating(wrapper, value) {
+  wrapper.dataset.rating = String(value);
+
+  wrapper.querySelectorAll(".rating-btn").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.value === String(value)
+    );
+  });
+}
+
+function fillAllRatings(value) {
+  document.querySelectorAll(".rating-buttons").forEach(wrapper => {
+    setRating(wrapper, value);
+  });
+
+  updateProgress();
+  saveDraft();
+  setStatus(`Alle spillere satt til ${value}.`, "neutral");
 }
 
 function clearRatings(showStatus = true) {
@@ -377,6 +469,79 @@ function updateProgress() {
 function setStatus(message, type = "neutral") {
   loadStatusEl.textContent = message;
   loadStatusEl.className = `load-status ${type}`;
+}
+
+function getDraftKey() {
+  const voter = usernameEl.value.trim() || "anonymous";
+  const matchId = activeMatch?.id || "no-match";
+  return `lynbors-draft-${matchId}-${voter}`;
+}
+
+function saveDraft() {
+  if (!activeMatch) return;
+
+  const draft = [...document.querySelectorAll(".rating-buttons")]
+    .map(wrapper => ({
+      player: wrapper.dataset.player,
+      rating: Number(wrapper.dataset.rating)
+    }))
+    .filter(row => row.rating);
+
+  localStorage.setItem(getDraftKey(), JSON.stringify(draft));
+}
+
+function restoreDraft() {
+  if (!activeMatch) return;
+
+  const raw = localStorage.getItem(getDraftKey());
+  if (!raw) return;
+
+  let draft = [];
+
+  try {
+    draft = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  document.querySelectorAll(".rating-buttons").forEach(wrapper => {
+    const saved = draft.find(row => row.player === wrapper.dataset.player);
+    if (saved) setRating(wrapper, saved.rating);
+  });
+
+  updateProgress();
+
+  if (draft.length) {
+    setStatus(`Fant lokalt utkast med ${draft.length} spillere.`, "neutral");
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(getDraftKey());
+}
+
+function isVotingClosed(match) {
+  if (!match?.deadline) return false;
+
+  const deadline = new Date(match.deadline);
+  if (Number.isNaN(deadline.getTime())) return false;
+
+  return new Date() > deadline;
+}
+
+function formatDeadline(deadline) {
+  if (!deadline) return "Ikke satt";
+
+  const date = new Date(deadline);
+  if (Number.isNaN(date.getTime())) return deadline;
+
+  return date.toLocaleString("no-NO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
 }
 
 function debounce(fn, delay = 300) {
@@ -411,6 +576,30 @@ init();
   align-items:center;
 }
 
+.match-title-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.match-status {
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.match-status.open {
+  background:rgba(34,197,94,0.18);
+  color:#bbf7d0;
+}
+
+.match-status.closed {
+  background:rgba(239,68,68,0.18);
+  color:#fecaca;
+}
+
 .match-result {
   font-size:28px;
   font-weight:bold;
@@ -439,6 +628,27 @@ init();
   font-weight:bold;
 }
 
+.quick-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.quick-btn {
+  border:none;
+  border-radius:999px;
+  padding:8px 12px;
+  background:rgba(255,255,255,0.10);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.quick-btn:hover {
+  background:rgba(255,255,255,0.18);
+}
+
 .load-status {
   min-height:22px;
   margin-bottom:12px;
@@ -457,7 +667,21 @@ init();
 .vote-grid {
   display:grid;
   grid-template-columns:1fr;
-  gap:14px;
+  gap:18px;
+}
+
+.position-group {
+  display:grid;
+  gap:12px;
+}
+
+.position-title {
+  margin-top:4px;
+  color:var(--gold);
+  font-weight:bold;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  font-size:13px;
 }
 
 .vote-card {
@@ -514,6 +738,11 @@ init();
   color:black;
 }
 
+.rating-btn:disabled {
+  opacity:0.35;
+  cursor:not-allowed;
+}
+
 .submit-wrap {
   position:sticky;
   bottom:0;
@@ -550,6 +779,11 @@ init();
   color:black;
 }
 
+.submit-btn:disabled {
+  opacity:0.55;
+  cursor:not-allowed;
+}
+
 .clear-btn {
   background:rgba(255,255,255,0.10);
   color:white;
@@ -564,6 +798,11 @@ init();
     justify-content:flex-start;
   }
 
+  .rating-btn {
+    width:38px;
+    height:38px;
+  }
+
   .submit-wrap {
     flex-direction:column;
   }
@@ -576,6 +815,10 @@ init();
   .section-head {
     flex-direction:column;
     align-items:flex-start;
+  }
+
+  .match-result {
+    font-size:24px;
   }
 }
 </style>
