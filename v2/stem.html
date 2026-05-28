@@ -215,10 +215,11 @@ async function loadExistingVotes(voter) {
   if (!voter || !activeMatch) return;
 
   const { data } = await supabaseClient
-    .from("votes")
-    .select("*")
-    .eq("match_id", activeMatch.id)
-    .eq("voter", voter);
+  .from("votes")
+  .delete()
+  .eq("match_id", activeMatch.id)
+  .eq("voter", voter)
+  .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
 
   document.querySelectorAll(".rating-select")
     .forEach(select => {
