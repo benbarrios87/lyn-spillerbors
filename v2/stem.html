@@ -270,6 +270,14 @@ init();
     .eq("match_id", activeMatch.id)
     .eq("voter", voter);
 
+    console.log("Bruker:", voter);
+console.log("Kamp:", activeMatch.id);
+console.log("Fant gamle stemmer:", data);
+console.log(
+  "Dropdown players:",
+  [...document.querySelectorAll(".rating-select")].map(s => s.dataset.player)
+);
+
   if (!data?.length) return;
 
   document.querySelectorAll(".rating-select")
