@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lynbørs 2.0 • Stem</title>
+
+  <link rel="icon" href="../lblogoen.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+  <section class="page-header">
+    <div class="badge">NY STEMMING</div>
+
+    <h1>Spillerbørs</h1>
+
+    <p>
+      Første versjon av nytt stemmeskjema i Lynbørs 2.0.
+    </p>
+  </section>
+
+  <section class="data-card">
+
+    <h2>Aktiv kamp</h2>
+
+    <div id="activeMatch">
+      Laster...
+    </div>
+
+  </section>
+
+  <section class="data-card">
+
+    <h2>Dine karakterer</h2>
+
+    <div class="vote-grid" id="voteGrid">
+      Laster spillere...
+    </div>
+
+  </section>
+
+  <section class="submit-wrap">
+
+    <input
+      type="text"
+      id="username"
+      placeholder="Ditt navn"
+      class="name-input"
+    >
+
+    <button id="submitBtn" class="submit-btn">
+      Send børs
+    </button>
+
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+
+import { fetchMatches } from "./js/matches.js";
+
+import {
+  players,
+  getPlayerDisplayName,
+  getPlayerImage
+} from "./js/players.js";
+
+import { supabaseClient } from "./js/supabase.js";
+
+document.getElementById("navbar").innerHTML =
+  renderNavbar();
+
+document.getElementById("footer").innerHTML =
+  renderFooter();
+
+const activeMatchEl = document.getElementById("activeMatch");
+const voteGridEl = document.getElementById("voteGrid");
+
+const usernameEl = document.getElementById("username");
+const submitBtn = document.getElementById("submitBtn");
+
+let activeMatch = null;
+
+async function init() {
+
+  const matches = await fetchMatches({
+    activeOnly:true
+  });
+
+  activeMatch = matches[0];
+
+  if (!activeMatch) {
+
+    activeMatchEl.innerHTML = `
+      Ingen aktiv kamp.
+    `;
+
+    return;
+  }
+
+  activeMatchEl.innerHTML = `
+    <div class="active-match-box">
+
+      <strong>
+        ${activeMatch.home} - ${activeMatch.away}
+      </strong>
+
+      <div class="match-meta">
+        Deadline: ${activeMatch.deadline || "Ikke satt"}
+      </div>
+
+    </div>
+  `;
+
+  voteGridEl.innerHTML = players.map(player => `
+    <div class="vote-card">
+
+      <div class="vote-player">
+
+        <img
+          src="${player.image}"
+          class="vote-avatar"
+        >
+
+        <div>
+
+          <strong>
+            ${getPlayerDisplayName(player.name)}
+          </strong>
+
+          <div class="match-meta">
+            ${player.position}
+          </div>
+
+        </div>
+
+      </div>
+
+      <select class="rating-select" data-player="${player.name}">
+
+        <option value="">-</option>
+
+        ${Array.from({ length:10 }, (_, i) => `
+          <option value="${i + 1}">
+            ${i + 1}
+          </option>
+        `).join("")}
+
+      </select>
+
+    </div>
+  `).join("");
+}
+
+submitBtn.addEventListener("click", submitVotes);
+
+async function submitVotes() {
+
+  const voter = usernameEl.value.trim();
+
+  if (!voter) {
+    alert("Skriv inn navn.");
+    return;
+  }
+
+  const ratings = [];
+
+  document.querySelectorAll(".rating-select")
+    .forEach(select => {
+
+      const value = Number(select.value);
+
+      if (!value) return;
+
+      ratings.push({
+        match_id: activeMatch.id,
+        voter,
+        player: select.dataset.player,
+        rating: value
+      });
+    });
+
+  if (!ratings.length) {
+    alert("Ingen karakterer valgt.");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Sender...";
+
+  const { error } = await supabaseClient
+    .from("votes")
+    .insert(ratings);
+
+  if (error) {
+
+    console.error(error);
+
+    alert("Noe gikk galt.");
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Send børs";
+
+    return;
+  }
+
+  alert("Børs sendt 😄");
+
+  submitBtn.textContent = "Sendt!";
+}
+
+init();
+
+</script>
+
+<style>
+
+.vote-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+.vote-card {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:14px;
+
+  padding:14px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.05);
+}
+
+.vote-player {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.vote-avatar {
+  width:52px;
+  height:52px;
+
+  object-fit:cover;
+  object-position:center top;
+
+  border-radius:12px;
+
+  background:white;
+}
+
+.rating-select {
+  padding:12px;
+  border-radius:12px;
+  border:none;
+
+  background:white;
+
+  font-size:16px;
+  font-weight:bold;
+}
+
+.submit-wrap {
+  position:sticky;
+  bottom:0;
+
+  display:flex;
+  gap:12px;
+
+  margin-top:22px;
+
+  padding:18px;
+
+  border-radius:22px;
+
+  background:rgba(5,8,20,0.92);
+  backdrop-filter:blur(10px);
+
+  border:1px solid rgba(255,255,255,0.10);
+}
+
+.name-input {
+  flex:1;
+
+  padding:14px;
+
+  border:none;
+  border-radius:14px;
+
+  font-size:16px;
+}
+
+.submit-btn {
+  padding:14px 22px;
+
+  border:none;
+  border-radius:14px;
+
+  background:var(--gold);
+
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.active-match-box {
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.05);
+}
+
+@media(max-width:700px) {
+
+  .submit-wrap {
+    flex-direction:column;
+  }
+
+  .vote-card {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+}
+
+</style>
+
+</body>
+</html>
