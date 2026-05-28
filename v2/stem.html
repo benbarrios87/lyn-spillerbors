@@ -204,6 +204,35 @@ async function submitVotes() {
   submitBtn.disabled = true;
   submitBtn.textContent = "Sender...";
 
+  // Finn eksisterende stemmer
+  const { data: existingVotes } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .eq("match_id", activeMatch.id)
+    .eq("voter", voter);
+
+  // Slett gamle spillerstemmer
+  if (existingVotes?.length) {
+
+    const playerVotes = existingVotes.filter(v =>
+      ![
+        "TIP_HOME_GOALS",
+        "TIP_AWAY_GOALS"
+      ].includes(v.player)
+    );
+
+    if (playerVotes.length) {
+
+      await supabaseClient
+        .from("votes")
+        .delete()
+        .eq("match_id", activeMatch.id)
+        .eq("voter", voter)
+        .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
+    }
+  }
+
+  // Sett inn nye stemmer
   const { error } = await supabaseClient
     .from("votes")
     .insert(ratings);
@@ -220,9 +249,9 @@ async function submitVotes() {
     return;
   }
 
-  alert("Børs sendt 😄");
+  alert("Børs oppdatert 😄");
 
-  submitBtn.textContent = "Sendt!";
+  submitBtn.textContent = "Oppdatert!";
 }
 
 init();
