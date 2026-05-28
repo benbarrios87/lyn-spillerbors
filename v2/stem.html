@@ -94,6 +94,9 @@ const voteGridEl = document.getElementById("voteGrid");
 
 const usernameEl = document.getElementById("username");
 const submitBtn = document.getElementById("submitBtn");
+  usernameEl.addEventListener("change", () => {
+  loadExistingVotes(usernameEl.value.trim());
+});
 
 let activeMatch = null;
 
@@ -255,6 +258,30 @@ async function submitVotes() {
 }
 
 init();
+  async function loadExistingVotes(voter) {
+
+  if (!voter || !activeMatch) return;
+
+  const { data } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .eq("match_id", activeMatch.id)
+    .eq("voter", voter);
+
+  if (!data?.length) return;
+
+  document.querySelectorAll(".rating-select")
+    .forEach(select => {
+
+      const existing = data.find(v =>
+        v.player === select.dataset.player
+      );
+
+      if (existing) {
+        select.value = existing.rating;
+      }
+    });
+}
 
 </script>
 
