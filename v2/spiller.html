@@ -1,1 +1,296 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Lynbørs 2.0 • Spiller</title>
+
+  <link rel="icon" href="../lblogoen.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+  <section class="player-hero" id="playerHero">
+    Laster spiller...
+  </section>
+
+  <section class="data-grid">
+
+    <div class="data-card">
+      <h2>Sesongstatistikk</h2>
+
+      <div id="seasonStats">
+        Laster...
+      </div>
+    </div>
+
+    <div class="data-card">
+      <h2>Beste kamper</h2>
+
+      <div id="bestMatches">
+        Laster...
+      </div>
+    </div>
+
+  </section>
+
+  <section class="data-card">
+    <h2>Kamp for kamp</h2>
+
+    <div id="matchList">
+      Laster...
+    </div>
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+
+import {
+  fetchVotes,
+  buildPlayerRatingStats
+} from "./js/ratings.js";
+
+import {
+  formatShortDate
+} from "./js/utils.js";
+
+document.getElementById("navbar").innerHTML =
+  renderNavbar();
+
+document.getElementById("footer").innerHTML =
+  renderFooter();
+
+const params = new URLSearchParams(window.location.search);
+
+const playerName = params.get("player");
+
+const heroEl = document.getElementById("playerHero");
+const statsEl = document.getElementById("seasonStats");
+const bestEl = document.getElementById("bestMatches");
+const matchListEl = document.getElementById("matchList");
+
+function imageSlug(name) {
+  return String(name || "")
+    .trim()
+    .toLowerCase()
+    .replaceAll("æ", "ae")
+    .replaceAll("ø", "o")
+    .replaceAll("å", "a");
+}
+
+async function init() {
+
+  const votes = await fetchVotes();
+
+  const stats = buildPlayerRatingStats(votes);
+
+  const player = stats[playerName];
+
+  if (!player) {
+
+    heroEl.innerHTML = `
+      <div class="data-card">
+        Fant ikke spiller.
+      </div>
+    `;
+
+    return;
+  }
+
+  const matches = Object.values(player.matches)
+    .sort((a, b) => b.average - a.average);
+
+  heroEl.innerHTML = `
+    <div class="player-hero-card">
+
+      <img
+        src="../bilder/${imageSlug(player.player)}.png"
+        class="hero-avatar"
+        onerror="this.src='../lblogoen.png'"
+      >
+
+      <div>
+
+        <div class="badge">
+          SPILLERPROFIL
+        </div>
+
+        <h1>${player.player}</h1>
+
+        <div class="hero-rating">
+          ${player.average}
+        </div>
+
+        <div class="match-meta">
+          ${player.votes} stemmer totalt
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  statsEl.innerHTML = `
+    <div class="stat-grid">
+
+      <div class="mini-stat">
+        <span>Snitt</span>
+        <strong>${player.average}</strong>
+      </div>
+
+      <div class="mini-stat">
+        <span>Stemmer</span>
+        <strong>${player.votes}</strong>
+      </div>
+
+      <div class="mini-stat">
+        <span>Kamper</span>
+        <strong>${matches.length}</strong>
+      </div>
+
+    </div>
+  `;
+
+  bestEl.innerHTML = matches.slice(0, 5).map(match => `
+    <div class="match-row">
+
+      <div>
+        <strong>${match.match_id}</strong>
+      </div>
+
+      <div class="rating-score">
+        ${match.average}
+      </div>
+
+    </div>
+  `).join("");
+
+  matchListEl.innerHTML = matches.map(match => `
+    <div class="match-row">
+
+      <div>
+        <strong>${match.match_id}</strong>
+
+        <div class="match-meta">
+          ${match.votes} stemmer
+        </div>
+      </div>
+
+      <div class="rating-score">
+        ${match.average}
+      </div>
+
+    </div>
+  `).join("");
+}
+
+init();
+
+</script>
+
+<style>
+
+.player-hero {
+  margin-bottom:24px;
+}
+
+.player-hero-card {
+  display:flex;
+  align-items:center;
+  gap:24px;
+
+  padding:26px;
+
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:0 12px 35px rgba(0,0,0,0.32);
+}
+
+.hero-avatar {
+  width:120px;
+  height:120px;
+
+  border-radius:24px;
+
+  object-fit:cover;
+  object-position:center top;
+
+  background:white;
+
+  border:3px solid rgba(255,255,255,0.18);
+}
+
+.hero-rating {
+  margin-top:8px;
+
+  font-size:52px;
+  font-weight:bold;
+
+  color:var(--gold);
+}
+
+.stat-grid {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:14px;
+}
+
+.mini-stat {
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
+}
+
+.mini-stat span {
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+}
+
+.mini-stat strong {
+  font-size:30px;
+}
+
+@media(max-width:700px) {
+
+  .player-hero-card {
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .hero-avatar {
+    width:92px;
+    height:92px;
+  }
+
+  .hero-rating {
+    font-size:42px;
+  }
+
+  .stat-grid {
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+
+</body>
+</html>
