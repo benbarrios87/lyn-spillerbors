@@ -216,3 +216,55 @@ export function round(number, decimals = 2) {
 function sum(numbers) {
   return numbers.reduce((total, number) => total + Number(number || 0), 0);
 }
+export function calculateMVPScore(playerStats, fantasyStats = {}) {
+
+  const fantasy = fantasyStats[playerStats.player] || {};
+
+  const goals = Number(fantasy.goals || 0);
+  const assists = Number(fantasy.assists || 0);
+  const cleanSheets = Number(fantasy.clean_sheets || 0);
+
+  return round(
+    (playerStats.average * 10) +
+    (goals * 2) +
+    (assists * 1.5) +
+    (cleanSheets * 1)
+  , 2);
+}
+
+export function buildMVPRanking(votes, fantasyStatsRows = []) {
+
+  const ranking = getSeasonRanking(votes, {
+    minVotes: 5
+  });
+
+  const fantasyTotals = {};
+
+  fantasyStatsRows.forEach(row => {
+
+    const player = String(row.player || "").trim();
+
+    if (!player) return;
+
+    if (!fantasyTotals[player]) {
+      fantasyTotals[player] = {
+        goals: 0,
+        assists: 0,
+        clean_sheets: 0
+      };
+    }
+
+    fantasyTotals[player].goals += Number(row.goals || 0);
+    fantasyTotals[player].assists += Number(row.assists || 0);
+
+    if (row.clean_sheet) {
+      fantasyTotals[player].clean_sheets += 1;
+    }
+  });
+
+  return ranking.map(playerStats => ({
+    ...playerStats,
+    mvpScore: calculateMVPScore(playerStats, fantasyTotals)
+  }))
+  .sort((a, b) => b.mvpScore - a.mvpScore);
+}
