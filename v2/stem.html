@@ -130,7 +130,7 @@ async function init() {
         </div>
       </div>
 
-      <select class="rating-select" data-player="${player.name}">
+      <select class="rating-select" data-player="${player.short}">
         <option value="">-</option>
         ${Array.from({ length:10 }, (_, i) => `
           <option value="${i + 1}">${i + 1}</option>
