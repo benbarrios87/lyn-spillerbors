@@ -46,6 +46,11 @@ import { fetchMatches, findMatch } from "./js/matches.js";
 import { formatShortDate, getActualScore } from "./js/utils.js";
 
 import {
+  getPlayerImage,
+  getPlayerDisplayName
+} from "./js/players.js";
+
+import {
   fetchVotes,
   getMatchRanking
 } from "./js/ratings.js";
@@ -81,15 +86,6 @@ async function init() {
   }
 }
 
-function imageSlug(name) {
-  return String(name || "")
-    .trim()
-    .toLowerCase()
-    .replaceAll("æ", "ae")
-    .replaceAll("ø", "o")
-    .replaceAll("å", "a");
-}
-
 function renderMatch(matchId) {
   const match = findMatch(matchId);
   const score = getActualScore(match);
@@ -106,20 +102,21 @@ function renderMatch(matchId) {
 
   rankingEl.innerHTML = ranking.length
     ? ranking.map((player, index) => {
-      const imageName = imageSlug(player.player);
+      const image = getPlayerImage(player.player);
+const displayName = getPlayerDisplayName(player.player);
 
       return `
         <a href="spiller.html?player=${encodeURIComponent(player.player)}" class="player-card-link">
           <div class="rating-row ${index === 0 ? "winner" : ""}">
             <div class="player-info">
               <img
-                src="../bilder/${imageName}.png"
+  src="${image}"
                 class="player-avatar"
                 onerror="this.src='../lblogoen.png'"
               >
 
               <div class="player-text">
-                <strong>${index + 1}. ${player.player}</strong>
+                <strong>${index + 1}. ${displayName}</strong>
                 <div class="match-meta">${player.votes} stemmer</div>
               </div>
             </div>
