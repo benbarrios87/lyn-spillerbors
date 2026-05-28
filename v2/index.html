@@ -29,32 +29,55 @@
   </main>
 
   <script type="module">
-    import { fetchMatches } from "./js/matches.js";
-    import { formatDate } from "./js/utils.js";
 
-    const statusEl = document.getElementById("status");
-    const matchesEl = document.getElementById("matches");
+import { fetchMatches } from "./js/matches.js";
+import { formatDate } from "./js/utils.js";
 
-    async function init() {
-      const matches = await fetchMatches({ activeOnly: true });
+import {
+  fetchVotes,
+  getSeasonRanking
+} from "./js/ratings.js";
 
-      statusEl.innerHTML = `
-        <strong>Supabase OK.</strong><br>
-        Fant ${matches.length} aktive kamper.
-      `;
+const statusEl = document.getElementById("status");
+const matchesEl = document.getElementById("matches");
 
-      matchesEl.innerHTML = matches.slice(0, 8).map(match => `
-        <div class="match-row">
-          <div>
-            <strong>${match.id}</strong><br>
-            <span>${match.home} - ${match.away}</span>
-          </div>
-          <div>${formatDate(match.date)}</div>
-        </div>
-      `).join("");
+async function init() {
+
+  const matches = await fetchMatches({ activeOnly: true });
+
+  const votes = await fetchVotes();
+
+  const ranking = getSeasonRanking(votes, {
+    minVotes: 5
+  });
+
+  statusEl.innerHTML = `
+    <strong>Supabase OK.</strong><br>
+    Fant ${matches.length} aktive kamper.<br><br>
+
+    <strong>Årets spiller akkurat nå:</strong><br>
+    ${
+      ranking[0]
+        ? `${ranking[0].player} (${ranking[0].average})`
+        : "Ingen data"
     }
+  `;
 
-    init();
+  matchesEl.innerHTML = matches.slice(0, 8).map(match => `
+    <div class="match-row">
+      <div>
+        <strong>${match.id}</strong><br>
+        <span>${match.home} - ${match.away}</span>
+      </div>
+
+      <div>${formatDate(match.date)}</div>
+    </div>
+  `).join("");
+}
+
+init();
+
+</script>
   </script>
 </body>
 </html>
