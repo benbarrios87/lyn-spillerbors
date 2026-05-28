@@ -214,12 +214,11 @@ async function loadExistingVotes(voter) {
 
   if (!voter || !activeMatch) return;
 
-  const { data } = await supabaseClient
+ const { data } = await supabaseClient
   .from("votes")
-  .delete()
+  .select("*")
   .eq("match_id", activeMatch.id)
-  .eq("voter", voter)
-  .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
+  .eq("voter", voter);
 
   document.querySelectorAll(".rating-select")
     .forEach(select => {
@@ -278,10 +277,11 @@ async function submitVotes() {
   submitBtn.textContent = "Sender...";
 
   await supabaseClient
-    .from("votes")
-    .delete()
-    .eq("match_id", activeMatch.id)
-    .eq("voter", voter);
+  .from("votes")
+  .delete()
+  .eq("match_id", activeMatch.id)
+  .eq("voter", voter)
+  .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
 
   const { error } = await supabaseClient
     .from("votes")
