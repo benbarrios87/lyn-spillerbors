@@ -95,7 +95,7 @@ const voteGridEl = document.getElementById("voteGrid");
 
 const usernameEl = document.getElementById("username");
 const submitBtn = document.getElementById("submitBtn");
-  usernameEl.addEventListener("change", () => {
+  usernameEl.addEventListener("input", () => {
   loadExistingVotes(usernameEl.value.trim());
 });
 
