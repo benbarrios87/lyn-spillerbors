@@ -95,9 +95,6 @@ const voteGridEl = document.getElementById("voteGrid");
 
 const usernameEl = document.getElementById("username");
 const submitBtn = document.getElementById("submitBtn");
-  usernameEl.addEventListener("input", () => {
-  loadExistingVotes(usernameEl.value.trim());
-});
 
 let activeMatch = null;
 let relevantMatches = [];
@@ -225,6 +222,10 @@ async function submitVotes() {
 
   submitBtn.textContent = "Oppdatert!";
 }
+usernameEl.addEventListener("input", () => {
+  console.log("Navn skrevet:", usernameEl.value);
+  loadExistingVotes(usernameEl.value.trim());
+});
 
 init();
  function renderActiveMatch() {
