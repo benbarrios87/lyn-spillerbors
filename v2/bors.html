@@ -95,19 +95,233 @@ function renderMatch(matchId) {
     </div>
   `;
 
-  rankingEl.innerHTML = ranking.length
-    ? ranking.map((player, index) => `
-      <div class="rating-row ${index === 0 ? "winner" : ""}">
-        <div>
-          <strong>${index + 1}. ${player.player}</strong>
-          <div class="match-meta">${player.votes} stemmer</div>
+   rankingEl.innerHTML = ranking.length
+    ? ranking.map((player, index) => {
+      const imageName = player.player
+        .toLowerCase()
+        .replaceAll("æ", "ae")
+        .replaceAll("ø", "o")
+        .replaceAll("å", "a");
+
+      return `
+        <a href="spiller.html?player=${encodeURIComponent(player.player)}" class="player-card-link">
+          <div class="rating-row ${index === 0 ? "winner" : ""}">
+            <div class="player-info">
+              <img
+                src="../bilder/${imageName}.png"
+                class="player-avatar"
+                onerror="this.src='../lblogoen.png'"
+              >
+
+              <div>
+                <strong>${index + 1}. ${player.player}</strong>
+                <div class="match-meta">${player.votes} stemmer</div>
+              </div>
+            </div>
+
+            <div class="rating-score">${player.average}</div>
+          </div>
+        </a>
+      `;
+    }).join("")
+    : `<div class="match-meta">Ingen stemmer registrert.</div>`;
+}
+
+init();
+</script>
+
+<style>
+.select {
+  width:100%;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.10);
+  color:white;
+  font-size:16px;
+}
+
+.select option {
+  color:#111;
+}
+
+.big-score {
+  margin-top:12px;
+  font-size:42px;
+  font-weight:bold;
+  color:var(--gold);
+}
+
+.rating-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+}
+
+.rating-row:last-child {
+  border-bottom:none;
+}
+
+.rating-row.winner {
+  padding:18px;
+  margin-bottom:10px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(255,209,102,0.18), rgba(215,25,32,0.12));
+  border:1px solid rgba(255,209,102,0.35);
+}
+
+.rating-score {
+  font-size:28px;
+  font-weight:bold;
+  color:var(--gold);
+}
+  <!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lynbørs 2.0 • Børs</title>
+
+  <link rel="icon" href="../lblogoen.png">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+  <section class="page-header">
+    <div class="badge">SPILLERBØRS</div>
+    <h1>Kampbørs</h1>
+    <p>Ny børs bygget på felles ratingmotor.</p>
+  </section>
+
+  <section class="data-card">
+    <h2>Velg kamp</h2>
+    <select id="matchSelect" class="select"></select>
+  </section>
+
+  <section class="data-card" id="matchSummary">
+    Laster...
+  </section>
+
+  <section class="data-card">
+    <h2>Ranking</h2>
+    <div id="ranking">Laster...</div>
+  </section>
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { fetchMatches, findMatch } from "./js/matches.js";
+import { formatShortDate, getActualScore } from "./js/utils.js";
+
+import {
+  fetchVotes,
+  getMatchRanking
+} from "./js/ratings.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("bors");
+document.getElementById("footer").innerHTML = renderFooter();
+
+const selectEl = document.getElementById("matchSelect");
+const summaryEl = document.getElementById("matchSummary");
+const rankingEl = document.getElementById("ranking");
+
+let allVotes = [];
+let allMatches = [];
+
+async function init() {
+  allMatches = await fetchMatches();
+  allVotes = await fetchVotes();
+
+  const completed = allMatches
+    .filter(match => match.actual_home !== null && match.actual_away !== null)
+    .reverse();
+
+  selectEl.innerHTML = completed.map(match => `
+    <option value="${match.id}">
+      ${formatShortDate(match.date)} • ${match.home} - ${match.away}
+    </option>
+  `).join("");
+
+  selectEl.addEventListener("change", () => renderMatch(selectEl.value));
+
+  if (completed[0]) {
+    renderMatch(completed[0].id);
+  }
+}
+
+function renderMatch(matchId) {
+  const match = findMatch(matchId);
+  const score = getActualScore(match);
+  const ranking = getMatchRanking(allVotes, matchId, { minVotes: 1 });
+
+  summaryEl.innerHTML = `
+    <h2>${match.home} - ${match.away}</h2>
+    <div class="match-meta">${formatShortDate(match.date)}</div>
+    <div class="big-score">${score.home} - ${score.away}</div>
+    <div class="badge-small done">
+      ${ranking.length} spillere med børs
+    </div>
+  `;
+
+ rankingEl.innerHTML = ranking.length
+  ? ranking.map((player, index) => {
+
+    const imageName = player.player
+      .toLowerCase()
+      .replaceAll("æ", "ae")
+      .replaceAll("ø", "o")
+      .replaceAll("å", "a");
+
+    return `
+      <a
+        href="spiller.html?player=${encodeURIComponent(player.player)}"
+        class="player-card-link"
+      >
+
+        <div class="rating-row ${index === 0 ? "winner" : ""}">
+
+          <div class="player-info">
+
+            <img
+              src="../bilder/${imageName}.png"
+              class="player-avatar"
+              onerror="this.src='../lblogoen.png'"
+            >
+
+            <div>
+              <strong>
+                ${index + 1}. ${player.player}
+              </strong>
+
+              <div class="match-meta">
+                ${player.votes} stemmer
+              </div>
+            </div>
+
+          </div>
+
+          <div class="rating-score">
+            ${player.average}
+          </div>
+
         </div>
 
-        <div class="rating-score">
-          ${player.average}
-        </div>
-      </div>
-    `).join("")
+      </a>
+    `;
+  }).join("")
+  : `<div class="match-meta">Ingen stemmer registrert.</div>`;
     : `<div class="match-meta">Ingen stemmer registrert.</div>`;
 }
 
@@ -163,6 +377,31 @@ init();
   color:var(--gold);
 }
 </style>
+  .player-card-link {
+  text-decoration:none;
+  color:white;
+}
+
+.player-info {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.player-avatar {
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:14px;
+  background:white;
+  border:2px solid rgba(255,255,255,0.18);
+}
+
+</body>
+</html>
+
+</style>
+  
 
 </body>
 </html>
