@@ -126,7 +126,7 @@ export const players = [
     name: "Marcus Andersen",
     short: "Andersen",
     image: "../bilder/andersen.png",
-    position: "MID",
+    position: "KEEPER",
     aliases: ["Andersen", "Marcus Andersen"]
   },
   {
