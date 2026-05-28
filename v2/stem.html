@@ -35,8 +35,8 @@
     <h2>Aktiv kamp</h2>
 
     <div id="activeMatch">
-      Laster...
-    </div>
+  <select id="matchSelect" class="match-select"></select>
+</div>
 
   </section>
 
@@ -90,6 +90,7 @@ document.getElementById("footer").innerHTML =
   renderFooter();
 
 const activeMatchEl = document.getElementById("activeMatch");
+const matchSelectEl = document.getElementById("matchSelect");
 const voteGridEl = document.getElementById("voteGrid");
 
 const usernameEl = document.getElementById("username");
@@ -101,74 +102,48 @@ const submitBtn = document.getElementById("submitBtn");
 let activeMatch = null;
 
 async function init() {
+  const matches = await fetchMatches();
 
-  const matches = await fetchMatches({
-    activeOnly:true
+  const relevantMatches = matches
+    .filter(match => match.active === true || match.actual_home !== null)
+    .reverse();
+
+  matchSelectEl.innerHTML = relevantMatches.map(match => `
+    <option value="${match.id}">
+      ${match.home} - ${match.away}
+    </option>
+  `).join("");
+
+  matchSelectEl.addEventListener("change", () => {
+    activeMatch = relevantMatches.find(match =>
+      match.id === matchSelectEl.value
+    );
+
+    renderActiveMatch();
+    loadExistingVotes(usernameEl.value.trim());
   });
 
-  activeMatch = matches.find(match =>
-  match.id === "brann-h-2026"
-) || matches[0];
+  activeMatch = relevantMatches[0];
 
-  if (!activeMatch) {
-
-    activeMatchEl.innerHTML = `
-      Ingen aktiv kamp.
-    `;
-
-    return;
-  }
-
-  activeMatchEl.innerHTML = `
-    <div class="active-match-box">
-
-      <strong>
-        ${activeMatch.home} - ${activeMatch.away}
-      </strong>
-
-      <div class="match-meta">
-        Deadline: ${activeMatch.deadline || "Ikke satt"}
-      </div>
-
-    </div>
-  `;
+  renderActiveMatch();
 
   voteGridEl.innerHTML = players.map(player => `
     <div class="vote-card">
-
       <div class="vote-player">
-
-        <img
-          src="${player.image}"
-          class="vote-avatar"
-        >
+        <img src="${player.image}" class="vote-avatar">
 
         <div>
-
-          <strong>
-            ${getPlayerDisplayName(player.name)}
-          </strong>
-
-          <div class="match-meta">
-            ${player.position}
-          </div>
-
+          <strong>${getPlayerDisplayName(player.name)}</strong>
+          <div class="match-meta">${player.position}</div>
         </div>
-
       </div>
 
       <select class="rating-select" data-player="${player.name}">
-
         <option value="">-</option>
-
         ${Array.from({ length:10 }, (_, i) => `
-          <option value="${i + 1}">
-            ${i + 1}
-          </option>
+          <option value="${i + 1}">${i + 1}</option>
         `).join("")}
-
       </select>
-
     </div>
   `).join("");
 }
@@ -260,6 +235,21 @@ async function submitVotes() {
 }
 
 init();
+  function renderActiveMatch() {
+  if (!activeMatch) {
+    activeMatchEl.innerHTML = "Ingen kamp funnet.";
+    return;
+  }
+
+  activeMatchEl.insertAdjacentHTML("beforeend", `
+    <div class="active-match-box" style="margin-top:12px;">
+      <strong>${activeMatch.home} - ${activeMatch.away}</strong>
+      <div class="match-meta">
+        Deadline: ${activeMatch.deadline || "Ikke satt"}
+      </div>
+    </div>
+  `);
+}
   async function loadExistingVotes(voter) {
 
   if (!voter || !activeMatch) return;
