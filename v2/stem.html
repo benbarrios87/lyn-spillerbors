@@ -235,20 +235,29 @@ async function submitVotes() {
 }
 
 init();
-  function renderActiveMatch() {
+ function renderActiveMatch() {
+
   if (!activeMatch) {
     activeMatchEl.innerHTML = "Ingen kamp funnet.";
     return;
   }
 
-  activeMatchEl.insertAdjacentHTML("beforeend", `
+  activeMatchEl.innerHTML = `
+    <select id="matchSelect" class="match-select">
+      ${document.getElementById("matchSelect").innerHTML}
+    </select>
+
     <div class="active-match-box" style="margin-top:12px;">
       <strong>${activeMatch.home} - ${activeMatch.away}</strong>
+
       <div class="match-meta">
         Deadline: ${activeMatch.deadline || "Ikke satt"}
       </div>
     </div>
-  `);
+  `;
+
+  document.getElementById("matchSelect").value =
+    activeMatch.id;
 }
   async function loadExistingVotes(voter) {
 
