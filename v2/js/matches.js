@@ -10,9 +10,11 @@ export async function fetchMatches({ activeOnly = false } = {}) {
     .select("*")
     .order("date", { ascending: true });
 
-  if (activeOnly) {
-    query = query.eq("active", true);
-  }
+if (activeOnly) {
+  query = query
+    .eq("active", true)
+    .is("actual_home", null);
+}
 
   const { data, error } = await query;
 
