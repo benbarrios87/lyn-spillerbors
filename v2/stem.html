@@ -26,17 +26,17 @@
     <h1>Spillerbørs</h1>
 
     <p>
-      Første versjon av nytt stemmeskjema i Lynbørs 2.0.
+      Lynbørs 2.0 stemmesystem.
     </p>
   </section>
 
   <section class="data-card">
 
-    <h2>Aktiv kamp</h2>
+    <h2>Velg kamp</h2>
 
-    <div id="activeMatch">
-  <select id="matchSelect" class="match-select"></select>
-</div>
+    <select id="matchSelect" class="match-select"></select>
+
+    <div id="matchInfo"></div>
 
   </section>
 
@@ -77,8 +77,7 @@ import { fetchMatches } from "./js/matches.js";
 
 import {
   players,
-  getPlayerDisplayName,
-  getPlayerImage
+  getPlayerDisplayName
 } from "./js/players.js";
 
 import { supabaseClient } from "./js/supabase.js";
@@ -89,21 +88,27 @@ document.getElementById("navbar").innerHTML =
 document.getElementById("footer").innerHTML =
   renderFooter();
 
-const activeMatchEl = document.getElementById("activeMatch");
 const matchSelectEl = document.getElementById("matchSelect");
+const matchInfoEl = document.getElementById("matchInfo");
+
 const voteGridEl = document.getElementById("voteGrid");
 
 const usernameEl = document.getElementById("username");
+
 const submitBtn = document.getElementById("submitBtn");
 
+let matches = [];
 let activeMatch = null;
-let relevantMatches = [];
 
 async function init() {
-  const matches = await fetchMatches();
 
-  relevantMatches = matches
-    .filter(match => match.active === true || match.actual_home !== null)
+  matches = await fetchMatches();
+
+  const relevantMatches = matches
+    .filter(match =>
+      match.active === true ||
+      match.actual_home !== null
+    )
     .reverse();
 
   matchSelectEl.innerHTML = relevantMatches.map(match => `
@@ -114,27 +119,123 @@ async function init() {
 
   activeMatch = relevantMatches[0];
 
-  renderActiveMatch();
+  renderMatchInfo();
+
+  renderVoteGrid();
+
+  matchSelectEl.addEventListener("change", () => {
+
+    activeMatch = relevantMatches.find(match =>
+      match.id === matchSelectEl.value
+    );
+
+    renderMatchInfo();
+
+    loadExistingVotes(
+      usernameEl.value.trim()
+    );
+  });
+}
+
+function renderMatchInfo() {
+
+  if (!activeMatch) return;
+
+  matchInfoEl.innerHTML = `
+    <div class="active-match-box">
+
+      <strong>
+        ${activeMatch.home} - ${activeMatch.away}
+      </strong>
+
+      <div class="match-meta">
+        Deadline:
+        ${activeMatch.deadline || "Ikke satt"}
+      </div>
+
+    </div>
+  `;
+}
+
+function renderVoteGrid() {
 
   voteGridEl.innerHTML = players.map(player => `
     <div class="vote-card">
+
       <div class="vote-player">
-        <img src="${player.image}" class="vote-avatar">
+
+        <img
+          src="${player.image}"
+          class="vote-avatar"
+        >
 
         <div>
-          <strong>${getPlayerDisplayName(player.name)}</strong>
-          <div class="match-meta">${player.position}</div>
+
+          <strong>
+            ${getPlayerDisplayName(player.name)}
+          </strong>
+
+          <div class="match-meta">
+            ${player.position}
+          </div>
+
         </div>
+
       </div>
 
-      <select class="rating-select" data-player="${player.short}">
+      <select
+        class="rating-select"
+        data-player="${player.short}"
+      >
+
         <option value="">-</option>
+
         ${Array.from({ length:10 }, (_, i) => `
-          <option value="${i + 1}">${i + 1}</option>
+          <option value="${i + 1}">
+            ${i + 1}
+          </option>
         `).join("")}
+
       </select>
+
     </div>
   `).join("");
+}
+
+usernameEl.addEventListener("input", () => {
+  loadExistingVotes(
+    usernameEl.value.trim()
+  );
+});
+
+async function loadExistingVotes(voter) {
+
+  if (!voter || !activeMatch) return;
+
+  const { data } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .eq("match_id", activeMatch.id)
+    .eq("voter", voter);
+
+  document.querySelectorAll(".rating-select")
+    .forEach(select => {
+      select.value = "";
+    });
+
+  if (!data?.length) return;
+
+  document.querySelectorAll(".rating-select")
+    .forEach(select => {
+
+      const existing = data.find(v =>
+        v.player === select.dataset.player
+      );
+
+      if (existing) {
+        select.value = existing.rating;
+      }
+    });
 }
 
 submitBtn.addEventListener("click", submitVotes);
@@ -173,35 +274,12 @@ async function submitVotes() {
   submitBtn.disabled = true;
   submitBtn.textContent = "Sender...";
 
-  // Finn eksisterende stemmer
-  const { data: existingVotes } = await supabaseClient
+  await supabaseClient
     .from("votes")
-    .select("*")
+    .delete()
     .eq("match_id", activeMatch.id)
     .eq("voter", voter);
 
-  // Slett gamle spillerstemmer
-  if (existingVotes?.length) {
-
-    const playerVotes = existingVotes.filter(v =>
-      ![
-        "TIP_HOME_GOALS",
-        "TIP_AWAY_GOALS"
-      ].includes(v.player)
-    );
-
-    if (playerVotes.length) {
-
-      await supabaseClient
-        .from("votes")
-        .delete()
-        .eq("match_id", activeMatch.id)
-        .eq("voter", voter)
-        .not("player", "in", '("TIP_HOME_GOALS","TIP_AWAY_GOALS")');
-    }
-  }
-
-  // Sett inn nye stemmer
   const { error } = await supabaseClient
     .from("votes")
     .insert(ratings);
@@ -218,85 +296,37 @@ async function submitVotes() {
     return;
   }
 
-  alert("Børs oppdatert 😄");
+  alert("Børs lagret 😄");
 
-  submitBtn.textContent = "Oppdatert!";
+  submitBtn.textContent = "Lagret!";
 }
-usernameEl.addEventListener("input", () => {
-  console.log("Navn skrevet:", usernameEl.value);
-  loadExistingVotes(usernameEl.value.trim());
-});
 
 init();
- function renderActiveMatch() {
-
-  if (!activeMatch) {
-    activeMatchEl.innerHTML = "Ingen kamp funnet.";
-    return;
-  }
-
-  activeMatchEl.innerHTML = `
-    <select id="matchSelect" class="match-select">
-      ${document.getElementById("matchSelect").innerHTML}
-    </select>
-
-    <div class="active-match-box" style="margin-top:12px;">
-      <strong>${activeMatch.home} - ${activeMatch.away}</strong>
-
-      <div class="match-meta">
-        Deadline: ${activeMatch.deadline || "Ikke satt"}
-      </div>
-    </div>
-  `;
-
-  document.getElementById("matchSelect").value =
-    activeMatch.id;
-   document.getElementById("matchSelect").addEventListener("change", event => {
-  activeMatch = relevantMatches.find(match =>
-    match.id === event.target.value
-  );
-
-  renderActiveMatch();
-  loadExistingVotes(usernameEl.value.trim());
-});
-}
-  
-  async function loadExistingVotes(voter) {
-
-  if (!voter || !activeMatch) return;
-
-  const { data } = await supabaseClient
-    .from("votes")
-    .select("*")
-    .eq("match_id", activeMatch.id)
-    .eq("voter", voter);
-
-    console.log("Bruker:", voter);
-console.log("Kamp:", activeMatch.id);
-console.log("Fant gamle stemmer:", data);
-console.log(
-  "Dropdown players:",
-  [...document.querySelectorAll(".rating-select")].map(s => s.dataset.player)
-);
-
-  if (!data?.length) return;
-
-  document.querySelectorAll(".rating-select")
-    .forEach(select => {
-
-      const existing = data.find(v =>
-        v.player === select.dataset.player
-      );
-
-      if (existing) {
-        select.value = existing.rating;
-      }
-    });
-}
 
 </script>
 
 <style>
+
+.match-select {
+  width:100%;
+
+  padding:14px;
+
+  border:none;
+  border-radius:14px;
+
+  font-size:16px;
+}
+
+.active-match-box {
+  margin-top:14px;
+
+  padding:18px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.05);
+}
 
 .vote-grid {
   display:grid;
@@ -338,10 +368,9 @@ console.log(
 
 .rating-select {
   padding:12px;
-  border-radius:12px;
-  border:none;
 
-  background:white;
+  border:none;
+  border-radius:12px;
 
   font-size:16px;
   font-weight:bold;
@@ -361,6 +390,7 @@ console.log(
   border-radius:22px;
 
   background:rgba(5,8,20,0.92);
+
   backdrop-filter:blur(10px);
 
   border:1px solid rgba(255,255,255,0.10);
@@ -389,12 +419,6 @@ console.log(
   cursor:pointer;
 }
 
-.active-match-box {
-  padding:18px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.05);
-}
-
 @media(max-width:700px) {
 
   .submit-wrap {
@@ -402,8 +426,8 @@ console.log(
   }
 
   .vote-card {
-    align-items:flex-start;
     flex-direction:column;
+    align-items:flex-start;
   }
 
 }
