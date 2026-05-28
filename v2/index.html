@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lynbørs 2.0</title>
+  <link rel="icon" href="../lblogoen.png">
+  <link rel="stylesheet" href="css/base.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
 
+<body>
+  <main class="wrap">
+    <img src="../lblogoen.png" class="logo" alt="Lynbørs">
+
+    <div class="badge">LYNBØRS 2.0</div>
+    <h1>Motorrommet lever</h1>
+    <p>Første test av ny struktur, Supabase-kobling og felles kampdata.</p>
+
+    <section class="card">
+      <h2>Status</h2>
+      <div id="status">Laster...</div>
+    </section>
+
+    <section class="card">
+      <h2>Neste kamper</h2>
+      <div id="matches">Laster kamper...</div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { fetchMatches } from "./js/matches.js";
+    import { formatDate } from "./js/utils.js";
+
+    const statusEl = document.getElementById("status");
+    const matchesEl = document.getElementById("matches");
+
+    async function init() {
+      const matches = await fetchMatches({ activeOnly: true });
+
+      statusEl.innerHTML = `
+        <strong>Supabase OK.</strong><br>
+        Fant ${matches.length} aktive kamper.
+      `;
+
+      matchesEl.innerHTML = matches.slice(0, 8).map(match => `
+        <div class="match-row">
+          <div>
+            <strong>${match.id}</strong><br>
+            <span>${match.home} - ${match.away}</span>
+          </div>
+          <div>${formatDate(match.date)}</div>
+        </div>
+      `).join("");
+    }
+
+    init();
+  </script>
+</body>
+</html>
