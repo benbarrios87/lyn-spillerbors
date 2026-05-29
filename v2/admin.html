@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynbørs 2.0 • Admin</title>
+
+<link rel="icon" href="../lblogoen.png">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+.admin-grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:950px){.admin-grid{grid-template-columns:1fr 1fr}}
+
+.admin-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 12px 35px rgba(0,0,0,.28);
+}
+
+.admin-card h2,.admin-card h3{margin-top:0}
+
+.form-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:750px){.form-grid{grid-template-columns:1fr 1fr}}
+
+label{display:block;margin-top:12px;font-weight:800;color:var(--muted)}
+input,select{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.94);
+  color:#111;
+  font-size:16px;
+}
+
+button{
+  border:none;
+  border-radius:14px;
+  padding:13px 15px;
+  background:var(--red);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+}
+button.secondary{background:var(--blue)}
+button.ghost{background:rgba(255,255,255,.09);border:1px solid var(--line)}
+button.danger{background:#7f1d1d}
+
+.action-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+@media(min-width:700px){.action-row{grid-template-columns:1fr 1fr}}
+
+.status{
+  display:none;
+  margin-top:14px;
+  padding:13px;
+  border-radius:14px;
+  line-height:1.45;
+}
+.status.ok{display:block;background:rgba(40,209,124,.16);border:1px solid rgba(40,209,124,.55)}
+.status.error{display:block;background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.65)}
+
+.issue-list{display:grid;gap:10px}
+.issue{
+  padding:12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+}
+.issue.good{border-color:rgba(40,209,124,.45)}
+.issue.warn{border-color:rgba(255,209,102,.55)}
+.issue.bad{border-color:rgba(255,107,107,.6)}
+
+.match-list{display:grid;gap:10px;max-height:560px;overflow:auto;padding-right:4px}
+.match-admin-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:13px;
+  border-radius:18px;
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  cursor:pointer;
+}
+.match-admin-row:hover{background:rgba(255,255,255,.11)}
+.match-admin-row.active{border-color:var(--gold);background:rgba(255,209,102,.10)}
+.match-title{font-weight:900}
+.match-meta{color:var(--muted);font-size:13px;margin-top:3px}
+
+.pill{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin-top:5px;
+  background:rgba(255,255,255,.1);
+  border:1px solid var(--line);
+}
+.pill.green{border-color:rgba(40,209,124,.5);color:#a7f3d0}
+.pill.yellow{border-color:rgba(255,209,102,.55);color:#fde68a}
+.pill.red{border-color:rgba(255,107,107,.6);color:#fecaca}
+
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+@media(min-width:750px){.summary-grid{grid-template-columns:repeat(4,1fr)}}
+.summary-box{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:13px;
+  text-align:center;
+}
+.summary-box strong{display:block;font-size:26px;color:var(--gold);margin-top:4px}
+
+.players-list{display:grid;gap:12px;margin-top:16px}
+.player-card{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+}
+.player-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.player-head img{
+  width:52px;height:52px;border-radius:14px;object-fit:cover;object-position:center top;background:white;
+}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:850px){.stat-grid{grid-template-columns:repeat(5,1fr)}}
+.check-row{
+  display:flex;align-items:center;gap:8px;
+  padding:10px;border-radius:12px;background:rgba(0,0,0,.22);
+}
+.check-row input{width:auto;margin:0;transform:scale(1.2)}
+.check-row label{margin:0;color:white;font-weight:500}
+
+.small-help{color:var(--muted);font-size:13px;line-height:1.45}
+</style>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+<section class="page-header">
+  <div class="badge">ADMIN</div>
+  <h1>Lynbørs Admin</h1>
+  <p>Driftssiden for kampdatoer, deadlines, resultater og fantasy stats. Ikke rør match id med mindre du vil åpne portalen til kaos.</p>
+</section>
+
+<section class="admin-card">
+  <h2>🚨 Mangler-panel</h2>
+  <div id="issues" class="issue-list">Laster kontroll...</div>
+</section>
+
+<section class="admin-grid">
+
+  <div class="admin-card">
+    <h2>Kamper</h2>
+    <p class="small-help">Velg kamp her. Redigeringen skjer i boksen ved siden av.</p>
+    <div id="matchList" class="match-list">Laster kamper...</div>
+  </div>
+
+  <div class="admin-card">
+    <h2>Rediger valgt kamp</h2>
+
+    <label>Kamp-ID</label>
+    <input id="editId" disabled>
+
+    <div class="form-grid">
+      <div>
+        <label>Lag</label>
+        <select id="editTeam">
+          <option value="men">Herrer</option>
+          <option value="women">Kvinner</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Aktiv</label>
+        <select id="editActive">
+          <option value="true">Ja</option>
+          <option value="false">Nei</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Hjemmelag</label>
+        <input id="editHome">
+      </div>
+
+      <div>
+        <label>Bortelag</label>
+        <input id="editAway">
+      </div>
+
+      <div>
+        <label>Kampstart</label>
+        <input id="editDateTime" type="datetime-local">
+      </div>
+
+      <div>
+        <label>Deadline</label>
+        <input id="editDeadline" type="datetime-local">
+      </div>
+
+      <div>
+        <label>Hjemmemål</label>
+        <input id="editActualHome" type="number" min="0" placeholder="tom">
+      </div>
+
+      <div>
+        <label>Bortemål</label>
+        <input id="editActualAway" type="number" min="0" placeholder="tom">
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="secondary" onclick="setDeadlineFiveBefore()">Deadline 5 min før kamp</button>
+      <button onclick="saveMatch()">Lagre kamp</button>
+      <button class="ghost" onclick="clearResult()">Tøm resultat</button>
+      <button class="danger" onclick="toggleActive()">Aktiv/deaktiv</button>
+    </div>
+
+    <div id="matchStatus" class="status"></div>
+  </div>
+
+</section>
+
+<section class="admin-card" style="margin-top:16px;">
+  <h2>Fantasy stats</h2>
+  <p class="small-help">Henter spillere fra players.js. Nye spillere legges inn i players.js manuelt, ikke her.</p>
+
+  <div class="action-row">
+    <button class="secondary" onclick="loadFantasyStats()">Last inn stats for valgt kamp</button>
+    <button onclick="saveFantasyStats()">Lagre alle fantasy stats</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-box">Mål<strong id="sumGoals">0</strong></div>
+    <div class="summary-box">Assist<strong id="sumAssists">0</strong></div>
+    <div class="summary-box">Clean sheet<strong id="sumCleanSheets">0</strong></div>
+    <div class="summary-box">Røde kort<strong id="sumRedCards">0</strong></div>
+  </div>
+
+  <div id="fantasyStatus" class="status"></div>
+  <div id="playersList" class="players-list"></div>
+</section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { supabaseClient } from "./js/supabase.js";
+import { fetchMatches } from "./js/matches.js";
+import { players, getPlayerImage } from "./js/players.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("admin");
+document.getElementById("footer").innerHTML = renderFooter();
+
+let allMatches = [];
+let selectedMatchId = null;
+
+const byId = id => document.getElementById(id);
+
+function showStatus(id, message, type = "ok") {
+  const el = byId(id);
+  el.className = `status ${type}`;
+  el.innerHTML = message;
+}
+
+function toInputDateTime(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0,16);
+}
+
+function fromInputDateTime(value) {
+  return value || null;
+}
+
+function numberOrNull(value) {
+  if (value === "" || value === null || value === undefined) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function formatMatchDate(value) {
+  if (!value) return "Dato mangler";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString("no-NO", {
+    day:"2-digit",
+    month:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+function selectedMatch() {
+  return allMatches.find(m => String(m.id) === String(selectedMatchId)) || null;
+}
+
+async function loadAll() {
+  allMatches = await fetchMatches();
+  allMatches = [...allMatches].sort((a,b) => new Date(a.date || a.deadline || 0) - new Date(b.date || b.deadline || 0));
+
+  if (!selectedMatchId && allMatches[0]) {
+    const future = allMatches.find(m => m.active !== false && new Date(m.deadline || m.date) >= new Date());
+    selectedMatchId = future?.id || allMatches[0].id;
+  }
+
+  renderMatchList();
+  loadMatchEditor();
+  renderPlayers();
+  await loadFantasyStats();
+  await renderIssues();
+}
+
+function renderMatchList() {
+  const box = byId("matchList");
+
+  if (!allMatches.length) {
+    box.innerHTML = `<div class="small-help">Ingen kamper funnet.</div>`;
+    return;
+  }
+
+  box.innerHTML = allMatches.map(match => {
+    const played = match.actual_home !== null && match.actual_home !== undefined &&
+                   match.actual_away !== null && match.actual_away !== undefined;
+
+    return `
+      <div class="match-admin-row ${match.id === selectedMatchId ? "active" : ""}" onclick="selectMatch('${String(match.id).replaceAll("'", "\\'")}')">
+        <div>
+          <div class="match-title">${match.home} - ${match.away}</div>
+          <div class="match-meta">${formatMatchDate(match.date)} · ${match.team === "women" ? "Kvinner" : "Herrer"}</div>
+          <span class="pill ${match.active === false ? "red" : "green"}">${match.active === false ? "Inaktiv" : "Aktiv"}</span>
+          <span class="pill ${played ? "green" : "yellow"}">${played ? `${match.actual_home}-${match.actual_away}` : "Resultat mangler"}</span>
+        </div>
+        <div>›</div>
+      </div>
+    `;
+  }).join("");
+}
+
+window.selectMatch = async function(id) {
+  selectedMatchId = id;
+  renderMatchList();
+  loadMatchEditor();
+  await loadFantasyStats();
+};
+
+function loadMatchEditor() {
+  const match = selectedMatch();
+  if (!match) return;
+
+  byId("editId").value = match.id || "";
+  byId("editTeam").value = match.team || "men";
+  byId("editActive").value = match.active === false ? "false" : "true";
+  byId("editHome").value = match.home || "";
+  byId("editAway").value = match.away || "";
+  byId("editDateTime").value = toInputDateTime(match.date);
+  byId("editDeadline").value = toInputDateTime(match.deadline);
+  byId("editActualHome").value = match.actual_home ?? "";
+  byId("editActualAway").value = match.actual_away ?? "";
+}
+
+window.setDeadlineFiveBefore = function() {
+  const startValue = byId("editDateTime").value;
+
+  if (!startValue) {
+    showStatus("matchStatus", "Sett kampstart først.", "error");
+    return;
+  }
+
+  const d = new Date(startValue);
+  d.setMinutes(d.getMinutes() - 5);
+
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  byId("editDeadline").value = local.toISOString().slice(0,16);
+};
+
+window.clearResult = function() {
+  byId("editActualHome").value = "";
+  byId("editActualAway").value = "";
+};
+
+window.toggleActive = function() {
+  byId("editActive").value = byId("editActive").value === "true" ? "false" : "true";
+};
+
+window.saveMatch = async function() {
+  const match = selectedMatch();
+  if (!match) return;
+
+  const updates = {
+    team: byId("editTeam").value,
+    active: byId("editActive").value === "true",
+    home: byId("editHome").value.trim(),
+    away: byId("editAway").value.trim(),
+    date: fromInputDateTime(byId("editDateTime").value),
+    deadline: fromInputDateTime(byId("editDeadline").value),
+    actual_home: numberOrNull(byId("editActualHome").value),
+    actual_away: numberOrNull(byId("editActualAway").value)
+  };
+
+  if (!updates.home || !updates.away || !updates.date || !updates.deadline) {
+    showStatus("matchStatus", "Hjemmelag, bortelag, kampstart og deadline må fylles ut.", "error");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .update(updates)
+    .eq("id", match.id);
+
+  if (error) {
+    console.error(error);
+    showStatus("matchStatus", "Klarte ikke å lagre kamp.", "error");
+    return;
+  }
+
+  showStatus("matchStatus", `Lagret endringer for <strong>${match.id}</strong>.`);
+  await loadAll();
+};
+
+function safeId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replaceAll("æ","ae")
+    .replaceAll("ø","o")
+    .replaceAll("å","a")
+    .replaceAll(" ","_")
+    .replaceAll(".","")
+    .replaceAll("-","_");
+}
+
+function orderedPlayers() {
+  return [...players].sort((a,b) =>
+    (a.order ?? 9999) - (b.order ?? 9999) ||
+    a.short.localeCompare(b.short)
+  );
+}
+
+function renderPlayers() {
+  const list = byId("playersList");
+
+  list.innerHTML = orderedPlayers().map(player => {
+    const id = safeId(player.short);
+
+    return `
+      <div class="player-card">
+        <div class="player-head">
+          <img src="${getPlayerImage(player.short)}" onerror="this.src='../lblogoen.png'" alt="">
+          <div>
+            <strong>${player.short}</strong><br>
+            <span class="small-help">${player.name} · ${player.position}</span>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div>
+            <label>Mål</label>
+            <input id="goals_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div>
+            <label>Assist</label>
+            <input id="assists_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div>
+            <label>Strafferedning</label>
+            <input id="penalty_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div class="check-row">
+            <input id="cs_${id}" type="checkbox" data-stat-input>
+            <label for="cs_${id}">CS</label>
+          </div>
+
+          <div class="check-row">
+            <input id="red_${id}" type="checkbox" data-stat-input>
+            <label for="red_${id}">Rødt</label>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  document.querySelectorAll("[data-stat-input]").forEach(input => {
+    input.addEventListener("input", updateSummary);
+    input.addEventListener("change", updateSummary);
+  });
+
+  updateSummary();
+}
+
+function clearFantasyInputs() {
+  orderedPlayers().forEach(player => {
+    const id = safeId(player.short);
+    byId(`goals_${id}`).value = 0;
+    byId(`assists_${id}`).value = 0;
+    byId(`penalty_${id}`).value = 0;
+    byId(`cs_${id}`).checked = false;
+    byId(`red_${id}`).checked = false;
+  });
+
+  updateSummary();
+}
+
+window.loadFantasyStats = async function() {
+  const match = selectedMatch();
+  if (!match) return;
+
+  clearFantasyInputs();
+
+  const { data, error } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*")
+    .eq("match_id", match.id);
+
+  if (error) {
+    console.error(error);
+    showStatus("fantasyStatus", "Klarte ikke å laste fantasy stats.", "error");
+    return;
+  }
+
+  (data || []).forEach(row => {
+    const id = safeId(row.player);
+
+    if (!byId(`goals_${id}`)) return;
+
+    byId(`goals_${id}`).value = row.goals || 0;
+    byId(`assists_${id}`).value = row.assists || 0;
+    byId(`penalty_${id}`).value = row.penalty_save || 0;
+    byId(`cs_${id}`).checked = !!row.clean_sheet;
+    byId(`red_${id}`).checked = !!row.red_card;
+  });
+
+  updateSummary();
+  showStatus("fantasyStatus", `Fantasy stats lastet for <strong>${match.home} - ${match.away}</strong>.`);
+};
+
+function getInputNumber(id) {
+  const n = Number(byId(id).value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function collectFantasyRows() {
+  const match = selectedMatch();
+
+  return orderedPlayers().map(player => {
+    const id = safeId(player.short);
+
+    return {
+      match_id: match.id,
+      player: player.short,
+      goals: getInputNumber(`goals_${id}`),
+      assists: getInputNumber(`assists_${id}`),
+      penalty_save: getInputNumber(`penalty_${id}`),
+      clean_sheet: byId(`cs_${id}`).checked,
+      red_card: byId(`red_${id}`).checked
+    };
+  });
+}
+
+window.saveFantasyStats = async function() {
+  const match = selectedMatch();
+  if (!match) return;
+
+  const rows = collectFantasyRows();
+
+  const { error } = await supabaseClient
+    .from("fantasy_stats")
+    .upsert(rows, { onConflict:"match_id,player" });
+
+  if (error) {
+    console.error(error);
+    showStatus("fantasyStatus", "Klarte ikke å lagre fantasy stats.", "error");
+    return;
+  }
+
+  showStatus("fantasyStatus", `Lagret fantasy stats for <strong>${match.home} - ${match.away}</strong>.`);
+  await renderIssues();
+};
+
+function updateSummary() {
+  if (!byId("sumGoals")) return;
+
+  const rows = collectFantasyRowsSafe();
+
+  byId("sumGoals").textContent = rows.reduce((sum,row) => sum + row.goals, 0);
+  byId("sumAssists").textContent = rows.reduce((sum,row) => sum + row.assists, 0);
+  byId("sumCleanSheets").textContent = rows.filter(row => row.clean_sheet).length;
+  byId("sumRedCards").textContent = rows.filter(row => row.red_card).length;
+}
+
+function collectFantasyRowsSafe() {
+  const match = selectedMatch();
+  if (!match) return [];
+
+  return orderedPlayers().map(player => {
+    const id = safeId(player.short);
+    if (!byId(`goals_${id}`)) {
+      return { goals:0, assists:0, clean_sheet:false, red_card:false };
+    }
+
+    return {
+      goals: getInputNumber(`goals_${id}`),
+      assists: getInputNumber(`assists_${id}`),
+      penalty_save: getInputNumber(`penalty_${id}`),
+      clean_sheet: byId(`cs_${id}`).checked,
+      red_card: byId(`red_${id}`).checked
+    };
+  });
+}
+
+async function renderIssues() {
+  const box = byId("issues");
+
+  const { data:fantasyRows } = await supabaseClient
+    .from("fantasy_stats")
+    .select("match_id,player");
+
+  const issues = [];
+
+  const fantasyMatchIds = new Set((fantasyRows || []).map(row => row.match_id));
+
+  allMatches.forEach(match => {
+    const hasResult = match.actual_home !== null && match.actual_home !== undefined &&
+                      match.actual_away !== null && match.actual_away !== undefined;
+
+    if (!match.team) {
+      issues.push({ type:"warn", text:`${match.id}: mangler team.` });
+    }
+
+    if (!match.deadline) {
+      issues.push({ type:"bad", text:`${match.id}: mangler deadline.` });
+    }
+
+    if (hasResult && match.team !== "women" && !fantasyMatchIds.has(match.id)) {
+      issues.push({ type:"warn", text:`${match.home} - ${match.away}: resultat finnes, men fantasy stats mangler.` });
+    }
+
+    if (!hasResult && new Date(match.date || match.deadline) < new Date()) {
+      issues.push({ type:"warn", text:`${match.home} - ${match.away}: kampdato er passert, men resultat mangler.` });
+    }
+  });
+
+  players.forEach(player => {
+    if (player.order === undefined) {
+      issues.push({ type:"warn", text:`${player.short}: mangler order i players.js.` });
+    }
+  });
+
+  if (!issues.length) {
+    box.innerHTML = `<div class="issue good">✅ Ingen åpenbare mangler funnet.</div>`;
+    return;
+  }
+
+  box.innerHTML = issues.map(issue => `
+    <div class="issue ${issue.type}">
+      ${issue.type === "bad" ? "🚨" : "⚠️"} ${issue.text}
+    </div>
+  `).join("");
+}
+
+loadAll();
+</script>
+
+</body>
+</html>
