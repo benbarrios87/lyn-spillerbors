@@ -1223,12 +1223,14 @@ function getFilteredMatches() {
 }
 
 function getOpenMatchesByTeam(team, limit = 3) {
-  return allMatches
+  const matches = allMatches
     .filter(m => m.active !== false)
     .filter(m => getMatchTeam(m) === team)
-    .filter(m => !isTipLocked(m))
-    .sort((a,b) => parseLocalDateTime(a.deadline) - parseLocalDateTime(b.deadline))
-    .slice(0, limit);
+    .sort((a,b) => parseLocalDateTime(a.deadline || a.date) - parseLocalDateTime(b.deadline || b.date));
+
+  const open = matches.filter(m => !isTipLocked(m));
+
+  return (open.length ? open : matches).slice(0, limit);
 }
 
 function getNextTipMatches(limit = 3) {
