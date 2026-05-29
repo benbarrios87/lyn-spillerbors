@@ -1173,11 +1173,10 @@ label {
 </footer>
 
 <script type="module">
-  import { players } from "./js/players.js";
+import { players } from "./js/players.js";
 import { fetchMatches } from "./js/matches.js";
 import { supabaseClient } from "./js/supabase.js";
-  
-);
+
 async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
     return;
@@ -1204,7 +1203,6 @@ async function trackEvent(eventType, data = {}) {
     console.log("trackEvent feil", err);
   }
 }
-import { players } from "./js/players.js";
   
 let matchStats = {};
   let allMatches = [];
