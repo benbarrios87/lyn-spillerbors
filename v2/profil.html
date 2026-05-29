@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Lynbørs 2.0 • Profil</title>
 
   <link rel="icon" href="../lblogoen.png">
-
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
 
@@ -20,36 +18,35 @@
 
 <main class="page-wrap">
 
-  <section class="player-hero" id="profileHero">
-    Laster profil...
+  <section id="profileHero" class="profile-hero">Laster profil...</section>
+
+  <section class="data-grid">
+    <div class="data-card">
+      <h2>Børs</h2>
+      <div id="ratingStats">Laster...</div>
+    </div>
+
+    <div class="data-card">
+      <h2>Tipping</h2>
+      <div id="tipStats">Laster...</div>
+    </div>
   </section>
 
   <section class="data-grid">
-
     <div class="data-card">
-      <h2>Stemmeprofil</h2>
-
-      <div id="profileStats">
-        Laster...
-      </div>
+      <h2>Fantasy</h2>
+      <div id="fantasyStats">Laster...</div>
     </div>
 
     <div class="data-card">
-      <h2>Favorittspillere</h2>
-
-      <div id="favoritePlayers">
-        Laster...
-      </div>
+      <h2>Favoritter</h2>
+      <div id="favoriteStats">Laster...</div>
     </div>
-
   </section>
 
   <section class="data-card">
-    <h2>Siste stemmer</h2>
-
-    <div id="recentVotes">
-      Laster...
-    </div>
+    <h2>Siste børsstemmer</h2>
+    <div id="recentVotes">Laster...</div>
   </section>
 
 </main>
@@ -57,257 +54,331 @@
 <div id="footer"></div>
 
 <script type="module">
-
 import { renderNavbar, renderFooter } from "./js/layout.js";
-
+import { supabaseClient } from "./js/supabase.js";
+import { fetchMatches } from "./js/matches.js";
 import {
   fetchVotes,
-  getPlayerVotes
+  getPlayerVotes,
+  isPredictionVote
 } from "./js/ratings.js";
-
 import {
+  getPlayerImage,
   getPlayerDisplayName,
-  getPlayerImage
+  getPlayerId
 } from "./js/players.js";
 
-document.getElementById("navbar").innerHTML =
-  renderNavbar();
-
-document.getElementById("footer").innerHTML =
-  renderFooter();
+document.getElementById("navbar").innerHTML = renderNavbar("profil");
+document.getElementById("footer").innerHTML = renderFooter();
 
 const params = new URLSearchParams(window.location.search);
-
-const username = params.get("user");
+const usernameRaw = params.get("user") || params.get("voter") || "";
 
 const heroEl = document.getElementById("profileHero");
-const statsEl = document.getElementById("profileStats");
-const favoritesEl = document.getElementById("favoritePlayers");
-const recentEl = document.getElementById("recentVotes");
+const ratingStatsEl = document.getElementById("ratingStats");
+const tipStatsEl = document.getElementById("tipStats");
+const fantasyStatsEl = document.getElementById("fantasyStats");
+const favoriteStatsEl = document.getElementById("favoriteStats");
+const recentVotesEl = document.getElementById("recentVotes");
 
-function clean(value) {
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+function cleanName(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function displayName(value) {
+  return String(value || "").trim() || "Ukjent bruker";
+}
+
+function round(value, decimals = 2) {
+  return Number(Number(value || 0).toFixed(decimals));
+}
+
+function decodeGoals(value) {
+  return Number(value) - 1;
+}
+
+function getOutcome(home, away) {
+  home = Number(home);
+  away = Number(away);
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
+
+function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
+  const exact = Number(tipHome) === Number(actualHome) && Number(tipAway) === Number(actualAway);
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (Number(tipHome) - Number(tipAway)) === (Number(actualHome) - Number(actualAway));
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
+  return 0;
+}
+
+function getMatchTitle(matchId, matches) {
+  const match = matches.find(m => String(m.id) === String(matchId));
+  if (!match) return matchId;
+  return `${match.home} - ${match.away}`;
+}
+
+function getMatchDate(matchId, matches) {
+  const match = matches.find(m => String(m.id) === String(matchId));
+  if (!match || !match.date) return "";
+  const d = new Date(match.date);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
+
+function buildPredictions(votes) {
+  const map = {};
+
+  votes
+    .filter(isPredictionVote)
+    .forEach(v => {
+      const key = `${v.match_id}_${cleanName(v.voter)}`;
+
+      if (!map[key]) {
+        map[key] = {
+          voter:v.voter,
+          match_id:v.match_id,
+          home:null,
+          away:null
+        };
+      }
+
+      if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+      if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+    });
+
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
+
+async function fetchFantasyPicks() {
+  const { data, error } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*")
+    .limit(5000);
+
+  if (error) {
+    console.error("Kunne ikke hente fantasy_picks", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+function renderMiniStats(items) {
+  return `
+    <div class="stat-grid">
+      ${items.map(item => `
+        <div class="mini-stat">
+          <span>${item.label}</span>
+          <strong>${item.value}</strong>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function playerChip(playerName, extra = "") {
+  const id = getPlayerId(playerName);
+  const href = id ? `spiller.html?id=${encodeURIComponent(id)}` : `spiller.html?player=${encodeURIComponent(playerName)}`;
+
+  return `
+    <a class="player-chip" href="${href}">
+      <img src="${getPlayerImage(playerName)}" onerror="this.src='../lblogoen.png'">
+      <span>${getPlayerDisplayName(playerName)}</span>
+      ${extra ? `<strong>${extra}</strong>` : ""}
+    </a>
+  `;
+}
+
 async function init() {
+  const wantedUser = cleanName(usernameRaw);
 
-  const votes = await fetchVotes();
-
-  const userVotes = getPlayerVotes(votes)
-    .filter(vote =>
-      clean(vote.voter) === clean(username)
-    );
-
-  if (!userVotes.length) {
-
-    heroEl.innerHTML = `
-      <div class="data-card">
-        Fant ikke bruker.
-      </div>
-    `;
-
+  if (!wantedUser) {
+    heroEl.innerHTML = `<div class="data-card">Ingen bruker valgt.</div>`;
+    ratingStatsEl.innerHTML = "";
+    tipStatsEl.innerHTML = "";
+    fantasyStatsEl.innerHTML = "";
+    favoriteStatsEl.innerHTML = "";
+    recentVotesEl.innerHTML = "";
     return;
   }
 
-  const ratings = userVotes.map(v =>
-    Number(v.rating)
-  ).filter(v => !Number.isNaN(v));
+  const [votes, matches, fantasyPicks] = await Promise.all([
+    fetchVotes(),
+    fetchMatches(),
+    fetchFantasyPicks()
+  ]);
 
-  const average =
-    ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  const playerVotes = getPlayerVotes(votes).filter(v => cleanName(v.voter) === wantedUser);
+  const predictions = buildPredictions(votes).filter(p => cleanName(p.voter) === wantedUser);
+  const userFantasyPicks = fantasyPicks.filter(p => cleanName(p.voter) === wantedUser);
 
-  const playerMap = {};
+  const name = displayName(playerVotes[0]?.voter || predictions[0]?.voter || userFantasyPicks[0]?.voter || usernameRaw);
 
-  userVotes.forEach(vote => {
+  const ratings = playerVotes
+    .map(v => Number(v.rating))
+    .filter(v => !Number.isNaN(v));
 
-    const player = vote.player;
+  const averageGiven = ratings.length ? round(ratings.reduce((a,b) => a + b, 0) / ratings.length) : 0;
+  const uniqueMatchesRated = new Set(playerVotes.map(v => v.match_id)).size;
 
-    if (!playerMap[player]) {
-      playerMap[player] = {
-        player,
-        votes:0,
-        total:0
-      };
-    }
-
-    playerMap[player].votes += 1;
-    playerMap[player].total += Number(vote.rating || 0);
+  const playerCounts = {};
+  playerVotes.forEach(v => {
+    const player = String(v.player || "").trim();
+    if (!player) return;
+    playerCounts[player] = (playerCounts[player] || 0) + 1;
   });
 
-  const favorites = Object.values(playerMap)
-    .map(player => ({
-      ...player,
-      average: player.total / player.votes
-    }))
-    .sort((a, b) => b.average - a.average);
+  const favoritePlayers = Object.entries(playerCounts)
+    .map(([player, count]) => ({ player, count }))
+    .sort((a,b) => b.count - a.count);
+
+  let tipPoints = 0;
+  let exact = 0;
+  let outcome = 0;
+  let scoredTips = 0;
+
+  predictions.forEach(p => {
+    const match = matches.find(m => String(m.id) === String(p.match_id));
+    if (!match || match.actual_home == null || match.actual_away == null) return;
+
+    const points = scorePrediction(p.home, p.away, match.actual_home, match.actual_away);
+    tipPoints += points;
+    scoredTips++;
+
+    if (points === 3) exact++;
+    if (points > 0) outcome++;
+  });
+
+  const captainCounts = {};
+  userFantasyPicks.forEach(pick => {
+    const captain = String(pick.captain || "").trim();
+    if (!captain) return;
+    captainCounts[captain] = (captainCounts[captain] || 0) + 1;
+  });
+
+  const favoriteCaptain = Object.entries(captainCounts)
+    .map(([player, count]) => ({ player, count }))
+    .sort((a,b) => b.count - a.count)[0];
 
   heroEl.innerHTML = `
-    <div class="player-hero-card">
-
-      <img
-        src="../lblogoen.png"
-        class="hero-avatar"
-      >
+    <div class="profile-hero-card">
+      <div class="profile-avatar">${name.slice(0, 1).toUpperCase()}</div>
 
       <div>
-
-        <div class="badge">
-          SUPPORTERPROFIL
-        </div>
-
-        <h1>${username}</h1>
-
-        <div class="hero-rating">
-          ${average.toFixed(2)}
-        </div>
-
+        <div class="badge">BRUKERPROFIL</div>
+        <h1>${name}</h1>
         <div class="match-meta">
-          ${userVotes.length} stemmer avgitt
+          ${ratings.length} børsstemmer · ${predictions.length} tips · ${userFantasyPicks.length} fantasylag
         </div>
-
       </div>
-
     </div>
   `;
 
-  statsEl.innerHTML = `
-    <div class="stat-grid">
+  ratingStatsEl.innerHTML = renderMiniStats([
+    { label:"Stemmer", value:ratings.length },
+    { label:"Snitt gitt", value:averageGiven || "-" },
+    { label:"Kamper", value:uniqueMatchesRated },
+    { label:"Høyeste", value:ratings.length ? Math.max(...ratings) : "-" },
+    { label:"Laveste", value:ratings.length ? Math.min(...ratings) : "-" },
+    { label:"Spillere", value:Object.keys(playerCounts).length }
+  ]);
 
-      <div class="mini-stat">
-        <span>Snittkarakter</span>
-        <strong>${average.toFixed(2)}</strong>
-      </div>
+  tipStatsEl.innerHTML = renderMiniStats([
+    { label:"Tips levert", value:predictions.length },
+    { label:"Poeng", value:tipPoints },
+    { label:"Tellende tips", value:scoredTips },
+    { label:"Helt riktig", value:exact },
+    { label:"Poenggivende", value:outcome },
+    { label:"Snitt", value:scoredTips ? round(tipPoints / scoredTips) : "-" }
+  ]);
 
-      <div class="mini-stat">
-        <span>Stemmer</span>
-        <strong>${userVotes.length}</strong>
-      </div>
+  fantasyStatsEl.innerHTML = `
+    ${renderMiniStats([
+      { label:"Lag levert", value:userFantasyPicks.length },
+      { label:"Kapteiner", value:Object.keys(captainCounts).length },
+      { label:"Favorittkaptein", value:favoriteCaptain ? favoriteCaptain.player : "-" }
+    ])}
 
-      <div class="mini-stat">
-        <span>Favoritt</span>
-        <strong>
-          ${favorites[0]?.player || "-"}
-        </strong>
-      </div>
-
+    <div class="profile-list">
+      ${userFantasyPicks.slice(0, 6).map(pick => `
+        <div class="profile-row">
+          <div>
+            <strong>${getMatchTitle(pick.match_id, matches)}</strong>
+            <div class="match-meta">
+              ${pick.player1 || "-"} · ${pick.player2 || "-"} · Kaptein: ${pick.captain || "-"}
+            </div>
+          </div>
+        </div>
+      `).join("") || `<div class="small">Ingen fantasyvalg funnet.</div>`}
     </div>
   `;
 
-  favoritesEl.innerHTML = favorites
-    .slice(0, 5)
-    .map(player => `
-      <div class="match-row">
+  favoriteStatsEl.innerHTML = `
+    <div class="chip-list">
+      ${favoritePlayers.slice(0, 8).map(row =>
+        playerChip(row.player, `${row.count}x`)
+      ).join("") || `<div class="small">Ingen favoritter ennå.</div>`}
+    </div>
+  `;
 
-        <div class="player-info">
-
-          <img
-            src="${getPlayerImage(player.player)}"
-            class="mini-avatar"
-          >
-
-          <div>
-            <a
-  href="spiller.html?player=${encodeURIComponent(player.player)}"
-  class="player-link"
->
-  ${getPlayerDisplayName(player.player)}
-</a>
-
-            <div class="match-meta">
-              ${player.votes} stemmer
-            </div>
-          </div>
-
+  recentVotesEl.innerHTML = playerVotes.slice(0, 25).map(vote => `
+    <div class="profile-row">
+      <div>
+        <strong>${getMatchTitle(vote.match_id, matches)}</strong>
+        <div class="match-meta">
+          ${getMatchDate(vote.match_id, matches)} · ${getPlayerDisplayName(vote.player)}
         </div>
-
-        <div class="rating-score">
-          ${player.average.toFixed(2)}
-        </div>
-
       </div>
-    `).join("");
 
-  recentEl.innerHTML = userVotes
-    .slice(0, 15)
-    .map(vote => `
-      <div class="match-row">
-
-        <div class="player-info">
-
-          <img
-            src="${getPlayerImage(vote.player)}"
-            class="mini-avatar"
-          >
-
-          <div>
-
-            <a
-  href="spiller.html?player=${encodeURIComponent(vote.player)}"
-  class="player-link"
->
-  ${getPlayerDisplayName(vote.player)}
-</a>
-
-            <div class="match-meta">
-              ${vote.match_id}
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="rating-score">
-          ${vote.rating}
-        </div>
-
+      <div class="rating-pill">
+        ${vote.rating}
       </div>
-    `).join("");
+    </div>
+  `).join("") || `<div class="small">Ingen børsstemmer funnet.</div>`;
 }
 
 init();
-
 </script>
 
 <style>
-
-.player-hero {
+.profile-hero {
   margin-bottom:24px;
 }
 
-.player-hero-card {
+.profile-hero-card {
   display:flex;
   align-items:center;
   gap:24px;
-
   padding:26px;
-
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:28px;
-
   box-shadow:0 12px 35px rgba(0,0,0,0.32);
 }
 
-.hero-avatar {
-  width:100px;
-  height:100px;
-
-  border-radius:22px;
-
-  object-fit:cover;
-
-  background:white;
-
-  border:3px solid rgba(255,255,255,0.18);
+.profile-avatar {
+  width:112px;
+  height:112px;
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:58px;
+  font-weight:900;
+  background:linear-gradient(135deg, var(--gold), rgba(255,255,255,0.15));
+  color:#111827;
 }
 
-.hero-rating {
-  margin-top:8px;
-
-  font-size:52px;
-  font-weight:bold;
-
-  color:var(--gold);
+.profile-hero-card h1 {
+  margin:10px 0 6px;
 }
 
 .stat-grid {
@@ -326,53 +397,95 @@ init();
   display:block;
   margin-bottom:8px;
   color:var(--muted);
+  font-size:13px;
 }
 
 .mini-stat strong {
-  font-size:26px;
+  font-size:28px;
 }
 
-.mini-avatar {
+.profile-list,
+.chip-list {
+  margin-top:14px;
+  display:grid;
+  gap:10px;
+}
+
+.profile-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
+}
+
+.rating-pill {
+  min-width:50px;
+  text-align:center;
+  font-weight:900;
+  font-size:20px;
+  padding:8px 10px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.08);
+  color:var(--gold);
+}
+
+.player-chip {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
+  color:inherit;
+  text-decoration:none;
+  transition:0.15s ease;
+}
+
+.player-chip:hover {
+  transform:translateY(-1px);
+  background:rgba(255,255,255,0.09);
+}
+
+.player-chip img {
   width:42px;
   height:42px;
-
-  min-width:42px;
-
+  border-radius:12px;
   object-fit:cover;
   object-position:center top;
-
-  border-radius:10px;
-
   background:white;
-
-  border:2px solid rgba(255,255,255,0.18);
-}
-   .player-link {
-  color:white;
-  text-decoration:none;
 }
 
-.player-link:hover {
+.player-chip span {
+  flex:1;
+}
+
+.player-chip strong {
   color:var(--gold);
 }
 
 @media(max-width:700px) {
-
-  .player-hero-card {
+  .profile-hero-card {
     flex-direction:column;
     text-align:center;
   }
 
-  .hero-rating {
-    font-size:42px;
+  .profile-avatar {
+    width:88px;
+    height:88px;
+    font-size:44px;
   }
 
   .stat-grid {
-    grid-template-columns:1fr;
+    grid-template-columns:1fr 1fr;
   }
 
+  .profile-row {
+    align-items:flex-start;
+  }
 }
-
 </style>
 
 </body>
