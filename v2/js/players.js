@@ -5,6 +5,7 @@ export const players = [
     short: "Pedersen",
     image: "../bilder/pedersen.png",
     position: "KEEPER",
+    order: 1,
     aliases: ["Pedersen", "Alexander Pedersen"]
   },
   {
@@ -22,6 +23,7 @@ export const players = [
     short: "SAH",
     image: "../bilder/sah.png",
     position: "FORS",
+    order: 2,
     aliases: ["SAH", "Sander Amble Haugen"]
   },
   {
@@ -29,7 +31,8 @@ export const players = [
     name: "William Sell",
     short: "Sell",
     image: "../bilder/sell.png",
-    position: "FORS",
+    position: "FORS
+      order: 3,
     aliases: ["Sell", "William Sell"]
   },
   {
@@ -38,6 +41,7 @@ export const players = [
     short: "Midtskogen",
     image: "../bilder/midtskogen.png",
     position: "FORS",
+      order: 4,
     aliases: ["Midtskogen", "Ådne Midtskogen"]
   },
   {
@@ -46,6 +50,7 @@ export const players = [
     short: "HSN",
     image: "../bilder/hsn.png",
     position: "FORS",
+      order: 5,
     aliases: ["HSN", "Herman Solberg Nilsen"]
   },
   {
@@ -79,6 +84,7 @@ export const players = [
     short: "Fredriksen",
     image: "../bilder/fredriksen.png",
     position: "MID",
+      order: 6,
     aliases: ["Fredriksen", "Didrik Fredriksen"]
   },
   {
@@ -103,6 +109,7 @@ export const players = [
     short: "Kurtovic",
     image: "../bilder/kurtovic.png",
     position: "MID",
+      order: 7,
     aliases: ["Kurtovic", "William Kurtovic"]
   },
   {
@@ -111,6 +118,7 @@ export const players = [
     short: "Monglo",
     image: "../bilder/monglo.png",
     position: "MID",
+      order: 8,
     aliases: ["Monglo", "Isaac Monglo"]
   },
   {
@@ -144,6 +152,7 @@ export const players = [
     short: "ABO",
     image: "../bilder/abo.png",
     position: "ANG",
+      order: 9,
     aliases: ["ABO", "Anders Bjørntvedt Olsen"]
   },
   {
@@ -152,6 +161,7 @@ export const players = [
     short: "MJ",
     image: "../bilder/mj.png",
     position: "ANG",
+      order: 10,
     aliases: ["MJ", "Matias Johansen"]
   },
   {
@@ -160,6 +170,7 @@ export const players = [
     short: "Hellum",
     image: "../bilder/hellum.png",
     position: "ANG",
+      order: 11,
     aliases: ["Hellum", "Andreas Hellum"]
   },
   {
