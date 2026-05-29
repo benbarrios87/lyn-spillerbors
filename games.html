@@ -520,14 +520,15 @@ const games = [
     status: "Spillbar nå",
     live: true
   },
-  {
-    id: "who",
-    title: "Hvem er dette?",
-    icon: "📸",
-    href: "#",
-    text: "Gjett Lyn-spilleren fra bilde, hint og små spor.",
-    status: "Kommer",
-    live: false
+    {
+  id: "wordle",
+  title: "Lyn Wordle",
+  icon: "🔤",
+  href: "wordle.html",
+  text: "Gjett etternavnet til dagens tidligere Lyn-spiller. Seks forsøk, maks prestisje.",
+  status: "Spillbar nå",
+  live: true
+}
   },
   {
     id: "dailyxi",
@@ -746,7 +747,9 @@ async function init() {
   const user = getGameUser();
   const careerRows = await getGameLeaderboard("career");
 const dailyXiRows = await getGameLeaderboard("dailyxi");
-const allRows = [...careerRows, ...dailyXiRows];
+  const wordleRows = await getGameLeaderboard("wordle");
+  
+  const allRows = [...careerRows, ...dailyXiRows, ...wordleRows];
 
 renderIdentity(user, allRows);
 renderTodayGame(allRows, user);
