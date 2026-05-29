@@ -218,52 +218,41 @@ function renderMatchInfo() {
 }
 
 function renderVoteGrid() {
-  const groupedHtml = POSITION_ORDER.map(position => {
-    const group = players.filter(player => player.position === position);
+  const sortedPlayers = [...players]
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
-    if (!group.length) return "";
+  voteGridEl.innerHTML = sortedPlayers.map(player => `
+    <div class="vote-card">
+      <div class="vote-player">
+        <img
+          src="${player.image}"
+          class="vote-avatar"
+          onerror="this.src='../lblogoen.png'"
+        >
 
-    return `
-      <div class="position-group">
-        <div class="position-title">${POSITION_LABELS[position] || position}</div>
-
-        ${group.map(player => `
-          <div class="vote-card">
-            <div class="vote-player">
-              <img
-                src="${player.image}"
-                class="vote-avatar"
-                onerror="this.src='../lblogoen.png'"
-              >
-
-              <div>
-                <strong>${getPlayerDisplayName(player.name)}</strong>
-                <div class="match-meta">${player.short}</div>
-              </div>
-            </div>
-
-            <div class="rating-buttons" data-player="${player.short}">
-              ${Array.from({ length: 10 }, (_, i) => {
-                const value = i + 1;
-                return `
-                  <button
-                    class="rating-btn"
-                    data-value="${value}"
-                    type="button"
-                    ${votingClosed ? "disabled" : ""}
-                  >
-                    ${value}
-                  </button>
-                `;
-              }).join("")}
-            </div>
-          </div>
-        `).join("")}
+        <div>
+          <strong>${getPlayerDisplayName(player.name)}</strong>
+          <div class="match-meta">${player.position} • ${player.short}</div>
+        </div>
       </div>
-    `;
-  }).join("");
 
-  voteGridEl.innerHTML = groupedHtml || `<div class="match-meta">Ingen spillere funnet.</div>`;
+      <div class="rating-buttons" data-player="${player.short}">
+        ${Array.from({ length: 10 }, (_, i) => {
+          const value = i + 1;
+          return `
+            <button
+              class="rating-btn"
+              data-value="${value}"
+              type="button"
+              ${votingClosed ? "disabled" : ""}
+            >
+              ${value}
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
 
   setupRatingButtons();
   updateProgress();
