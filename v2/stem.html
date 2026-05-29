@@ -18,33 +18,28 @@
 
 <main class="page-wrap">
 
-  <section class="page-header">
-    <div class="badge">NY STEMMING</div>
-    <h1>Spillerbørs</h1>
-    <p>Velg kamp, skriv brukernavn og sett børsen. Gamle stemmer lastes automatisk hvis de finnes.</p>
+  <section class="page-header compact-header">
+    <div class="badge">SPILLERBØRS</div>
+    <h1>Sett børsen</h1>
+    <p>Velg kamp, skriv navn og gi spillerne karakter. Gamle stemmer lastes automatisk.</p>
   </section>
 
-  <section class="data-card">
-    <h2>Velg kamp</h2>
+  <section class="data-card setup-card">
+    <label class="field-label" for="matchSelect">Kamp</label>
     <select id="matchSelect" class="match-select"></select>
     <div id="matchInfo"></div>
   </section>
 
-  <section class="data-card">
+  <section class="data-card vote-section">
     <div class="section-head">
-      <h2>Dine karakterer</h2>
-      <div id="voteProgress" class="vote-progress">0 av 0 spillere vurdert</div>
+      <div>
+        <h2>Dine karakterer</h2>
+        <div id="loadStatus" class="load-status"></div>
+      </div>
+      <div id="voteProgress" class="vote-progress">0 av 0</div>
     </div>
 
-    <div class="quick-actions">
-      <button type="button" class="quick-btn" data-fill="5">Alle 5</button>
-      <button type="button" class="quick-btn" data-fill="6">Alle 6</button>
-      <button type="button" class="quick-btn" data-fill="7">Alle 7</button>
-    </div>
-
-    <div id="loadStatus" class="load-status"></div>
-
-    <div class="vote-grid" id="voteGrid">
+    <div id="voteGrid" class="vote-grid">
       Laster spillere...
     </div>
   </section>
@@ -58,13 +53,15 @@
       autocomplete="nickname"
     >
 
-    <button id="clearBtn" class="clear-btn" type="button">
-      Nullstill
-    </button>
+    <div class="submit-buttons">
+      <button id="clearBtn" class="clear-btn" type="button">
+        Nullstill
+      </button>
 
-    <button id="submitBtn" class="submit-btn" type="button">
-      Send børs
-    </button>
+      <button id="submitBtn" class="submit-btn" type="button">
+        Send børs
+      </button>
+    </div>
   </section>
 
 </main>
@@ -96,20 +93,6 @@ let votingClosed = false;
 const TIP_PLAYERS = [
   "TIP_HOME_GOALS",
   "TIP_AWAY_GOALS"
-];
-
-const POSITION_LABELS = {
-  KEEPER: "Keeper",
-  FORS: "Forsvar",
-  MID: "Midtbane",
-  ANG: "Angrep"
-};
-
-const POSITION_ORDER = [
-  "KEEPER",
-  "FORS",
-  "MID",
-  "ANG"
 ];
 
 async function init() {
@@ -167,13 +150,6 @@ async function init() {
     clearDraft();
     setStatus("Skjema nullstilt.", "neutral");
   });
-
-  document.querySelectorAll(".quick-btn").forEach(button => {
-    button.addEventListener("click", () => {
-      if (votingClosed) return;
-      fillAllRatings(Number(button.dataset.fill));
-    });
-  });
 }
 
 function renderMatchInfo() {
@@ -188,7 +164,7 @@ function renderMatchInfo() {
 
   const statusText = votingClosed
     ? "Stengt"
-    : "Åpen for stemming";
+    : "Åpen";
 
   const statusClass = votingClosed
     ? "closed"
@@ -222,19 +198,20 @@ function renderVoteGrid() {
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   voteGridEl.innerHTML = sortedPlayers.map(player => `
-    <div class="vote-card">
-      <div class="vote-player">
+    <article class="vote-card">
+      <a class="vote-player-link" href="spiller.html?id=${encodeURIComponent(player.id)}">
         <img
           src="${player.image}"
           class="vote-avatar"
           onerror="this.src='../lblogoen.png'"
+          alt=""
         >
 
-        <div>
+        <div class="vote-player-text">
           <strong>${getPlayerDisplayName(player.name)}</strong>
-          <div class="match-meta">${player.position} • ${player.short}</div>
+          <span>${player.position} • ${player.short}</span>
         </div>
-      </div>
+      </a>
 
       <div class="rating-buttons" data-player="${player.short}">
         ${Array.from({ length: 10 }, (_, i) => {
@@ -251,7 +228,7 @@ function renderVoteGrid() {
           `;
         }).join("")}
       </div>
-    </div>
+    </article>
   `).join("");
 
   setupRatingButtons();
@@ -286,7 +263,7 @@ function setupRatingButtons() {
 
 async function loadExistingVotes(voter) {
   if (!voter || !activeMatch) {
-    setStatus("Skriv inn brukernavn for å hente gamle stemmer.", "neutral");
+    setStatus("Skriv inn navn for å hente gamle stemmer.", "neutral");
     return;
   }
 
@@ -309,7 +286,7 @@ async function loadExistingVotes(voter) {
   );
 
   if (!playerVotes.length) {
-    setStatus("Ingen gamle spillerstemmer funnet for denne brukeren/kampen.", "neutral");
+    setStatus("Ingen gamle spillerstemmer funnet.", "neutral");
     updateProgress();
     return;
   }
@@ -401,7 +378,7 @@ async function submitVotes() {
 
   submitBtn.disabled = false;
   submitBtn.textContent = "Lagret!";
-  setStatus(`Børs lagret med ${ratings.length} spillere. Jess!`, "good");
+  setStatus(`Børs lagret med ${ratings.length} spillere.`, "good");
 
   setTimeout(() => {
     submitBtn.textContent = "Send børs";
@@ -417,16 +394,6 @@ function setRating(wrapper, value) {
       button.dataset.value === String(value)
     );
   });
-}
-
-function fillAllRatings(value) {
-  document.querySelectorAll(".rating-buttons").forEach(wrapper => {
-    setRating(wrapper, value);
-  });
-
-  updateProgress();
-  saveDraft();
-  setStatus(`Alle spillere satt til ${value}.`, "neutral");
 }
 
 function clearRatings(showStatus = true) {
@@ -452,7 +419,7 @@ function updateProgress() {
   const total = document.querySelectorAll(".rating-buttons").length;
 
   voteProgressEl.textContent =
-    `${selected} av ${total} spillere vurdert`;
+    `${selected} av ${total}`;
 }
 
 function setStatus(message, type = "neutral") {
@@ -546,23 +513,47 @@ init();
 </script>
 
 <style>
+.compact-header {
+  padding-bottom:6px;
+}
+
+.setup-card {
+  padding-bottom:18px;
+}
+
+.field-label {
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:bold;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+}
+
 .match-select {
   width:100%;
-  padding:14px;
+  padding:15px 14px;
   border:none;
-  border-radius:14px;
+  border-radius:16px;
   font-size:16px;
+  font-weight:700;
+  color:#101010;
+  background:white;
 }
 
 .active-match-box {
   margin-top:14px;
-  padding:18px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.05);
+  padding:16px;
+  border-radius:20px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 40%),
+    rgba(255,255,255,0.055);
   display:flex;
   justify-content:space-between;
   gap:16px;
   align-items:center;
+  border:1px solid rgba(255,255,255,0.08);
 }
 
 .match-title-row {
@@ -596,51 +587,34 @@ init();
   white-space:nowrap;
 }
 
+.vote-section {
+  padding-bottom:18px;
+}
+
 .section-head {
   display:flex;
   justify-content:space-between;
   gap:12px;
-  align-items:center;
+  align-items:flex-start;
   margin-bottom:12px;
 }
 
 .section-head h2 {
-  margin:0;
+  margin:0 0 4px;
 }
 
 .vote-progress {
-  padding:7px 11px;
+  padding:8px 12px;
   border-radius:999px;
   background:rgba(255,255,255,0.08);
-  color:var(--muted);
+  color:var(--gold);
   font-size:13px;
   font-weight:bold;
-}
-
-.quick-actions {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:12px;
-}
-
-.quick-btn {
-  border:none;
-  border-radius:999px;
-  padding:8px 12px;
-  background:rgba(255,255,255,0.10);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.quick-btn:hover {
-  background:rgba(255,255,255,0.18);
+  white-space:nowrap;
 }
 
 .load-status {
-  min-height:22px;
-  margin-bottom:12px;
+  min-height:20px;
   color:var(--muted);
   font-size:14px;
 }
@@ -656,53 +630,66 @@ init();
 .vote-grid {
   display:grid;
   grid-template-columns:1fr;
-  gap:18px;
-}
-
-.position-group {
-  display:grid;
-  gap:12px;
-}
-
-.position-title {
-  margin-top:4px;
-  color:var(--gold);
-  font-weight:bold;
-  text-transform:uppercase;
-  letter-spacing:0.08em;
-  font-size:13px;
+  gap:14px;
 }
 
 .vote-card {
   display:grid;
-  grid-template-columns:1fr auto;
+  grid-template-columns:minmax(210px, 1fr) auto;
   gap:14px;
   align-items:center;
   padding:14px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+  border:1px solid rgba(255,255,255,0.08);
 }
 
-.vote-player {
+.vote-player-link {
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:13px;
   min-width:0;
+  color:white;
+  text-decoration:none;
+}
+
+.vote-player-link:hover strong {
+  color:var(--gold);
 }
 
 .vote-avatar {
-  width:52px;
-  height:52px;
-  min-width:52px;
+  width:56px;
+  height:56px;
+  min-width:56px;
   object-fit:cover;
   object-position:center top;
-  border-radius:12px;
+  border-radius:16px;
   background:white;
+  box-shadow:0 8px 18px rgba(0,0,0,0.22);
+}
+
+.vote-player-text {
+  min-width:0;
+}
+
+.vote-player-text strong {
+  display:block;
+  line-height:1.15;
+  font-size:16px;
+  transition:color 0.15s ease;
+}
+
+.vote-player-text span {
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:13px;
 }
 
 .rating-buttons {
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(10, 34px);
   gap:6px;
   justify-content:flex-end;
 }
@@ -711,7 +698,7 @@ init();
   width:34px;
   height:34px;
   border:none;
-  border-radius:10px;
+  border-radius:11px;
   background:rgba(255,255,255,0.10);
   color:white;
   cursor:pointer;
@@ -725,6 +712,7 @@ init();
 .rating-btn.active {
   background:var(--gold);
   color:black;
+  box-shadow:0 0 0 2px rgba(255,255,255,0.14);
 }
 
 .rating-btn:disabled {
@@ -736,31 +724,40 @@ init();
   position:sticky;
   bottom:0;
   z-index:20;
-  display:flex;
+  display:grid;
+  grid-template-columns:1fr auto;
   gap:12px;
   margin-top:22px;
-  padding:18px;
-  border-radius:22px;
-  background:rgba(5,8,20,0.92);
-  backdrop-filter:blur(10px);
+  padding:16px;
+  border-radius:24px 24px 0 0;
+  background:rgba(5,8,20,0.94);
+  backdrop-filter:blur(12px);
   border:1px solid rgba(255,255,255,0.10);
+  box-shadow:0 -12px 30px rgba(0,0,0,0.28);
 }
 
 .name-input {
-  flex:1;
-  padding:14px;
+  width:100%;
+  padding:15px;
   border:none;
-  border-radius:14px;
+  border-radius:16px;
   font-size:16px;
+  font-weight:700;
+}
+
+.submit-buttons {
+  display:flex;
+  gap:10px;
 }
 
 .submit-btn,
 .clear-btn {
-  padding:14px 22px;
+  padding:14px 20px;
   border:none;
-  border-radius:14px;
+  border-radius:16px;
   font-weight:bold;
   cursor:pointer;
+  white-space:nowrap;
 }
 
 .submit-btn {
@@ -778,36 +775,112 @@ init();
   color:white;
 }
 
-@media(max-width:800px) {
+@media(max-width:900px) {
   .vote-card {
     grid-template-columns:1fr;
+    gap:13px;
   }
 
   .rating-buttons {
-    justify-content:flex-start;
+    grid-template-columns:repeat(5, minmax(44px, 1fr));
+    justify-content:stretch;
   }
 
   .rating-btn {
-    width:38px;
-    height:38px;
+    width:100%;
+    height:44px;
+    border-radius:13px;
+    font-size:16px;
+  }
+}
+
+@media(max-width:640px) {
+  .page-wrap {
+    padding-bottom:0;
   }
 
-  .submit-wrap {
-    flex-direction:column;
+  .compact-header h1 {
+    font-size:32px;
   }
 
   .active-match-box {
-    flex-direction:column;
     align-items:flex-start;
-  }
-
-  .section-head {
     flex-direction:column;
-    align-items:flex-start;
   }
 
   .match-result {
     font-size:24px;
+  }
+
+  .section-head {
+    align-items:flex-start;
+  }
+
+  .vote-card {
+    padding:14px;
+    border-radius:22px;
+  }
+
+  .vote-player-link {
+    align-items:center;
+  }
+
+  .vote-avatar {
+    width:64px;
+    height:64px;
+    min-width:64px;
+    border-radius:18px;
+  }
+
+  .vote-player-text strong {
+    font-size:18px;
+  }
+
+  .rating-buttons {
+    grid-template-columns:repeat(5, 1fr);
+    gap:8px;
+  }
+
+  .rating-btn {
+    height:46px;
+    font-size:16px;
+  }
+
+  .submit-wrap {
+    grid-template-columns:1fr;
+    left:0;
+    right:0;
+    border-radius:22px 22px 0 0;
+    margin-left:-2px;
+    margin-right:-2px;
+  }
+
+  .submit-buttons {
+    display:grid;
+    grid-template-columns:0.8fr 1.2fr;
+  }
+
+  .submit-btn,
+  .clear-btn {
+    width:100%;
+    padding:15px 12px;
+  }
+}
+
+@media(max-width:380px) {
+  .rating-buttons {
+    gap:6px;
+  }
+
+  .rating-btn {
+    height:42px;
+    font-size:15px;
+  }
+
+  .vote-avatar {
+    width:58px;
+    height:58px;
+    min-width:58px;
   }
 }
 </style>
