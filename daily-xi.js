@@ -1,3 +1,8 @@
+import {
+  saveGameScore,
+  getGameUser
+} from "./v2/js/games-core.js";
+
 const dailyIndex =
   new Date().getDate() % challenges.length;
 const challenge =
