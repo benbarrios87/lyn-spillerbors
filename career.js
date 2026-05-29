@@ -39,9 +39,6 @@ const message =
 const guessInput =
   document.getElementById("guessInput");
 
-window.revealNextClub = revealNextClub;
-window.submitCareerGuess = submitCareerGuess;
-
 function renderCareer() {
 
   careerList.innerHTML = "";
@@ -170,6 +167,20 @@ function submitCareerGuess() {
     message.innerHTML =
       `🏆 Riktig! ${career.answer} · ${score} poeng`;
 
+    saveGameScore({
+  game: "career",
+  challengeId: `career-${careerIndex}-${career.answer}`,
+  score,
+  maxScore: 100,
+  attempts: 1,
+  details: {
+    answer: career.answer,
+    revealed,
+    totalClubs: career.clubs.length,
+    user: getGameUser()
+  }
+});
+    
     return;
   }
 
