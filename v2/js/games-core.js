@@ -64,3 +64,20 @@ export async function getGameLeaderboard(game) {
 
   return data || [];
 }
+
+export async function hasPlayedToday(game, challengeId) {
+
+  const voter = getGameUser();
+
+  if (!voter) return false;
+
+  const { data } = await supabaseClient
+    .from("game_scores")
+    .select("id")
+    .eq("game", game)
+    .eq("challenge_id", challengeId)
+    .eq("voter", voter)
+    .maybeSingle();
+
+  return !!data;
+}
