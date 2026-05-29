@@ -1110,9 +1110,9 @@ label {
       <select id="player1"></select>
       <select id="player2"></select>
       <select id="captain"></select>
-      <img id="img-player1" src="bilder/lyn-logo.png" alt="">
-      <img id="img-player2" src="bilder/lyn-logo.png" alt="">
-      <img id="img-captain" src="bilder/lyn-logo.png" alt="">
+      <img id="img-player1" src="../lblogoen.png" alt="">
+      <img id="img-player2" src="../lblogoen.png" alt="">
+      <img id="img-captain" src="../lblogoen.png" alt="">
     </div>
 
     <div class="pick-shell">
@@ -1160,7 +1160,7 @@ label {
 
 <div id="successOverlay" class="success-overlay">
   <div class="success-box">
-    <img id="successImage" src="bilder/lyn-logo.png" alt="">
+    <img id="successImage" src="../lblogoen.png" alt="">
     <div class="success-title">Lagret!</div>
     <div id="successText" class="success-text"></div>
     <button class="success-close" onclick="closeSuccessOverlay()">Nydelig</button>
@@ -1259,7 +1259,10 @@ function getStatsMatch() {
 }
 
 function getPlayer(playerName) {
-  return players.find(p => p.name === playerName);
+  return players.find(p =>
+    p.short === playerName ||
+    p.name === playerName
+  );
 }
 
 function getPlayerPosition(playerName) {
@@ -1269,7 +1272,7 @@ function getPlayerPosition(playerName) {
 
 function getPlayerImage(playerName) {
   const player = getPlayer(playerName);
-  return player ? player.image : "bilder/lyn-logo.png";
+  return player ? player.image : "../lblogoen.png";
 }
   
 
@@ -1380,38 +1383,40 @@ function renderPlayerCards() {
   const team = getSelectedTeamFromInputs();
   const selectedRegulars = [team.player1, team.player2].filter(Boolean);
 
-  const visiblePlayers = players.filter(player => {
+  const visiblePlayers = [...players]
+  .filter(player => {
     return activePositionFilter === "ALLE" || player.position === activePositionFilter;
-  });
+  })
+  .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   grid.innerHTML = visiblePlayers.map(player => {
-    const isSelected = selectedRegulars.includes(player.name);
-    const isCaptain = team.captain === player.name;
-    const lastPoints = getPlayerLastPoints(player.name);
-    const stat = matchStats[player.name];
+    const isSelected = selectedRegulars.includes(player.short);
+    const isCaptain = team.captain === player.short;
+    const lastPoints = getPlayerLastPoints(player.short);
+    const stat = matchStats[player.short];
     const ratingText = stat && stat.rating ? `Børs ${stat.rating.toFixed(1)}` : "Børs –";
     const pointsText = lastPoints === null ? "Sist –" : `Sist ${lastPoints}p`;
 
     return `
       <div class="pick-card ${isSelected ? "selected" : ""} ${isCaptain ? "captain" : ""}">
         <div class="pick-card-top">
-          <img class="pick-card-img" src="${player.image}" alt="${player.name}" onerror="this.src='bilder/lyn-logo.png'">
+          <img class="pick-card-img" src="${getPlayerImage(player.short)}" alt="${player.short}" onerror="this.src='../lblogoen.png'">
           <div>
-            <div class="pick-card-name">${isCaptain ? "⭐ " : ""}${player.name}</div>
+            <div class="pick-card-name">${isCaptain ? "⭐ " : ""}${player.short}</div>
             <div class="position-tag">${player.position}</div>
           </div>
         </div>
         <div class="pick-meta">
           <span class="meta-pill">${pointsText}</span>
           <span class="meta-pill">${ratingText}</span>
-          <span class="meta-pill">${getOwnershipText(player.name)}</span>
+          <span class="meta-pill">${getOwnershipText(player.short)}</span>
         </div>
        
         <div class="card-actions">
-          <button type="button" class="${isSelected ? "ghost-btn" : ""}" onclick="chooseRegularPlayer('${player.name.replace(/'/g,"\\'")}')">
+          <button type="button" class="${isSelected ? "ghost-btn" : ""}" onclick="chooseRegularPlayer('${player.short.replace(/'/g,"\\'")}')">
             ${isSelected ? "Valgt ✓" : "Velg"}
           </button>
-          <button type="button" class="captain-btn" onclick="chooseCaptain('${player.name.replace(/'/g,"\\'")}')">
+          <button type="button" class="captain-btn" onclick="chooseCaptain('${player.short.replace(/'/g,"\\'")}')">
             ${isCaptain ? "Kaptein ✓" : "Kaptein ⭐"}
           </button>
         </div>
@@ -1435,7 +1440,7 @@ function updateTeamBuilder() {
     const value = slot.value;
     return `
       <div class="builder-slot">
-        <img src="${value ? getPlayerImage(value) : "bilder/lyn-logo.png"}" alt="" onerror="this.src='bilder/lyn-logo.png'">
+        <img src="${value ? getPlayerImage(value) : "../lblogoen.png"}" alt="" onerror="this.src='../lblogoen.png'">
         <div>
           <div class="slot-label">${slot.label}</div>
           <div class="slot-name ${value ? "" : "slot-empty"}">${value || "Ikke valgt"}</div>
@@ -1539,7 +1544,7 @@ function playerLink(playerName) {
 function playerChip(playerName) {
   return `
     <div class="player-chip">
-      <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='bilder/lyn-logo.png'">
+      <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='../lblogoen.png'">
       <div>
        <strong>${playerLink(playerName)}</strong><br>
         <span class="small">${getPlayerPosition(playerName)}</span>
@@ -1620,7 +1625,7 @@ function fillSelects() {
     select.innerHTML = `<option value="">Velg spiller</option>`;
 
     players.forEach(player => {
-      select.innerHTML += `<option value="${player.name}">${player.name} (${player.position})</option>`;
+      select.innerHTML += `<option value="${player.short}">${player.short} (${player.position})</option>`;
     });
   });
 
@@ -1634,7 +1639,7 @@ function updatePlayerImages() {
     const select = document.getElementById(id);
     const image = document.getElementById(`img-${id}`);
     const player = getPlayer(select.value);
-    image.src = player ? player.image : "bilder/lyn-logo.png";
+    image.src = player ? player.image : "../lblogoen.png";
   });
 }
 
@@ -1845,7 +1850,7 @@ function playerPointsCard(playerName, pointsData, isCaptain) {
   return `
     <div class="player-points-card ${isCaptain ? "captain" : ""}">
       <div class="player-card-top">
-        <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='bilder/lyn-logo.png'">
+        <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='../lblogoen.png'">
         <div>
           <div class="player-card-name">${isCaptain ? "⭐ " : ""}${playerName}</div>
           <div class="position-tag">${getPlayerPosition(playerName)}</div>
@@ -1956,10 +1961,10 @@ function renderPodium(leaderboard) {
 
 function renderRoundPlayers() {
   const rows = players.map(player => {
-    const points = calculatePoints(player.name, false).total;
+    const points = calculatePoints(player.short, false).total;
 
     return {
-      name: player.name,
+      name: player.short,
       position: player.position,
       image: player.image,
       points
@@ -1971,7 +1976,7 @@ function renderRoundPlayers() {
     <div class="round-players">
       ${rows.slice(0, 8).map((row, index) => `
         <div class="round-player">
-          <img src="${row.image}" alt="${row.name}" onerror="this.src='bilder/lyn-logo.png'">
+          <img src="${row.image}" alt="${row.name}" onerror="this.src='../lblogoen.png'">
           <div>
             <strong>${index + 1}. ${playerLink(row.name)}</strong><br>
             <span class="small">${row.position}</span>
