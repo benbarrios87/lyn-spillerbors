@@ -11,24 +11,8 @@ let guessed = [];
 let guessedScorers = [];
 let lives = 3;
 let gameOver = false;
-let username =
-  localStorage.getItem("dailyXiUsername");
-
-if(!username) {
-
-  username =
-    prompt("Velg brukernavn");
-
-  if(!username) {
-    username = "Lyn-supporter";
-  }
-
-  localStorage.setItem(
-    "dailyXiUsername",
-    username
-  );
-
-}
+let username = getGameUser() || "Lyn-supporter";
+let scoreSaved = false;
 
 const stats = JSON.parse(
   localStorage.getItem("dailyXiStats")
@@ -227,6 +211,44 @@ function renderGuessedList() {
 function setMessage(text) {
   document.getElementById("message").innerText = text;
 }
+function calculateDailyXiScore(won = false) {
+  const lineupPoints = guessed.filter(name =>
+    challenge.lineup.some(player => player.name === name)
+  ).length * 7;
+
+  const bonusPoints = guessedScorers.length * 5;
+
+  const lifeBonus = won ? lives * 5 : 0;
+
+  return Math.min(100, lineupPoints + bonusPoints + lifeBonus);
+}
+
+function saveDailyXiScore(won = false) {
+  if (scoreSaved) return;
+
+  scoreSaved = true;
+
+  const finalScore = calculateDailyXiScore(won);
+
+  saveGameScore({
+    game: "dailyxi",
+    challengeId: `dailyxi-${dailyIndex}-${challenge.title}`,
+    score: finalScore,
+    maxScore: 100,
+    attempts: 1,
+    details: {
+      title: challenge.title,
+      result: challenge.result,
+      formation: challenge.formation,
+      guessedPlayers: guessed,
+      guessedScorers,
+      livesLeft: lives,
+      won
+    }
+  }).then(result => {
+    console.log("Daily XI score lagret:", result, finalScore);
+  });
+}
 
 function endGame(text) {
   gameOver = true;
@@ -308,7 +330,8 @@ localStorage.setItem(
 );
 
 renderProfile();
-      endGame("🏆 DU KLARTE DAGENS LYN XI");
+      saveDailyXiScore(true);
+endGame(`🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`);
     }
 
     return;
@@ -334,7 +357,8 @@ localStorage.setItem(
 );
 
 renderProfile();
-    endGame("💀 Game over");
+    saveDailyXiScore(false);
+endGame(`💀 Game over · ${calculateDailyXiScore(false)} poeng`);
     revealAnswers();
   } else {
     setMessage(`❌ Feil. ${lives} liv igjen`);
