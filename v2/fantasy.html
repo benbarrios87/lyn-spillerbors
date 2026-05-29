@@ -1,20 +1,208 @@
-<h1>Fantasy</h1>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<select id="matchSelect"></select>
+<title>Lyn Fantasy</title>
 
-<input
-  id="username"
-  placeholder="Ditt navn"
->
+<link rel="icon" href="../lblogoen.png">
 
-<select id="player1"></select>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
 
-<select id="player2"></select>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
 
-<select id="captain"></select>
+<body>
 
-<button id="saveBtn">
-  Lagre lag
-</button>
+<div id="navbar"></div>
 
-<div id="currentTeam"></div>
+<main class="page-wrap">
+
+<section class="page-header">
+  <div class="badge">LYN FANTASY</div>
+  <h1>Fantasy</h1>
+  <p>Velg to Lyn-spillere og en kaptein.</p>
+</section>
+
+<section class="data-card">
+
+  <label>Kamp</label>
+  <select id="matchSelect"></select>
+
+</section>
+
+<section class="data-card">
+
+  <h2>Ditt lag</h2>
+
+  <div class="team-preview">
+
+    <div id="slot1" class="team-slot">
+      Velg spiller 1
+    </div>
+
+    <div id="slot2" class="team-slot">
+      Velg spiller 2
+    </div>
+
+    <div id="slotCaptain" class="team-slot captain-slot">
+      Velg kaptein ⭐
+    </div>
+
+  </div>
+
+</section>
+
+<section class="data-card">
+
+  <h2>Velg spillere</h2>
+
+  <div id="playerGrid" class="player-grid"></div>
+
+</section>
+
+</main>
+
+<div class="save-bar">
+
+  <input
+    id="username"
+    placeholder="Ditt navn"
+  >
+
+  <button id="saveBtn">
+    Lagre lag
+  </button>
+
+</div>
+
+<div id="footer"></div>
+
+<script type="module">
+
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { players } from "./js/players.js";
+import { fetchMatches } from "./js/matches.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("fantasy");
+document.getElementById("footer").innerHTML = renderFooter();
+
+const grid = document.getElementById("playerGrid");
+
+grid.innerHTML = players.map(player => `
+<div class="player-card">
+
+  <img
+    src="${player.image}"
+    class="player-image"
+    onerror="this.src='../lblogoen.png'"
+  >
+
+  <strong>${player.short}</strong>
+
+</div>
+`).join("");
+
+const matches = await fetchMatches();
+
+document.getElementById("matchSelect").innerHTML =
+matches
+.filter(m => m.active)
+.map(match => `
+<option value="${match.id}">
+${match.home} - ${match.away}
+</option>
+`)
+.join("");
+
+</script>
+
+<style>
+
+.player-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+gap:12px;
+}
+
+.player-card{
+background:rgba(255,255,255,.05);
+padding:12px;
+border-radius:18px;
+text-align:center;
+cursor:pointer;
+}
+
+.player-card:hover{
+transform:translateY(-2px);
+}
+
+.player-image{
+width:72px;
+height:72px;
+border-radius:16px;
+object-fit:cover;
+object-position:center top;
+margin-bottom:8px;
+}
+
+.team-preview{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.team-slot{
+background:rgba(255,255,255,.05);
+border-radius:18px;
+padding:16px;
+min-height:120px;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+.captain-slot{
+border:2px solid var(--gold);
+}
+
+.save-bar{
+position:sticky;
+bottom:0;
+display:flex;
+gap:12px;
+padding:16px;
+background:#08111f;
+}
+
+.save-bar input{
+flex:1;
+padding:12px;
+border-radius:12px;
+border:none;
+}
+
+.save-bar button{
+background:var(--gold);
+color:black;
+border:none;
+padding:12px 20px;
+border-radius:12px;
+font-weight:bold;
+}
+
+@media(max-width:700px){
+
+.team-preview{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</body>
+</html>
