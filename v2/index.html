@@ -860,9 +860,8 @@ async function fetchFantasyStats() {
   return data || [];
 }
 
-function renderMyDeliveries(match, myPrediction, myFantasyPick) {
+function renderMyDeliveries(matches, predictions, storedName) {
   const box = document.getElementById("myDeliveries");
-  const storedName = getStoredForumName();
 
   if (!storedName) {
     box.innerHTML = `
@@ -874,58 +873,28 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
 
   const rows = [];
 
-  if (myPrediction) {
-    rows.push(`
-      <div class="delivery-row">
-        <div class="delivery-icon">⚽</div>
-        <div>
-          <div class="delivery-main">${match.home} ${myPrediction.home}–${myPrediction.away} ${match.away}</div>
-          <div class="delivery-sub">Tippetips levert</div>
-        </div>
-        <a class="delivery-action" href="tips.html">Endre</a>
-      </div>
-    `);
-  } else {
-    rows.push(`
-      <div class="delivery-row">
-        <div class="delivery-icon">⚽</div>
-        <div>
-          <div class="delivery-main">Ikke levert tips ennå</div>
-          <div class="delivery-sub">Fristen er åpen</div>
-        </div>
-        <a class="delivery-action" href="tips.html">Lever</a>
-      </div>
-    `);
-  }
+  matches.forEach(match => {
+    const myPrediction = predictions.find(p =>
+      p.match_id === match.id &&
+      cleanName(p.voter) === storedName
+    );
 
-  if (match.team !== "women") {
-    if (myFantasyPick) {
-      rows.push(`
-        <div class="delivery-row">
-          <div class="delivery-icon">⭐</div>
-          <div>
-            <div class="delivery-main">${myFantasyPick.player1} · ${myFantasyPick.player2} · ⭐ ${myFantasyPick.captain}</div>
-            <div class="delivery-sub">Fantasy-lag levert</div>
+    rows.push(`
+      <div class="delivery-row">
+        <div class="delivery-icon">⚽</div>
+        <div>
+          <div class="delivery-main">${match.home} – ${match.away}</div>
+          <div class="delivery-sub">
+            ${myPrediction ? `Tips levert: ${myPrediction.home}–${myPrediction.away}` : "Ikke levert tips ennå"}
           </div>
-          <a class="delivery-action" href="fantasy.html">Endre</a>
         </div>
-      `);
-    } else {
-      rows.push(`
-        <div class="delivery-row">
-          <div class="delivery-icon">⭐</div>
-          <div>
-            <div class="delivery-main">Ikke levert fantasy ennå</div>
-            <div class="delivery-sub">Velg to spillere og kaptein</div>
-          </div>
-          <a class="delivery-action" href="fantasy.html">Lever</a>
-        </div>
-      `);
-    }
-  }
+        <a class="delivery-action" href="tips.html">${myPrediction ? "Endre" : "Lever"}</a>
+      </div>
+    `);
+  });
 
   box.innerHTML = `
-    <div class="my-deliveries-title">Mine leveringer · ${storedName}</div>
+    <div class="my-deliveries-title">Mine leveringer · ${getStoredForumName()}</div>
     ${rows.join("")}
   `;
 }
@@ -934,10 +903,22 @@ async function loadNextMatchWidget() {
   const box = document.getElementById("nextMatchWidget");
   const now = new Date();
 
-  const upcoming = globalMatches
-    .filter(m => m.active !== false)
-    .filter(m => parseLocalDateTime(m.deadline || m.date) > now)
-    .sort((a,b) => parseLocalDateTime(a.deadline || a.date) - parseLocalDateTime(b.deadline || b.date))[0];
+ const upcomingMatchesSorted = globalMatches
+  .filter(m => m.active !== false)
+  .filter(m => parseLocalDateTime(m.deadline || m.date) > now)
+  .sort((a,b) => parseLocalDateTime(a.deadline || a.date) - parseLocalDateTime(b.deadline || b.date));
+
+const firstUpcoming = upcomingMatchesSorted[0];
+
+const firstDateKey = firstUpcoming
+  ? parseLocalDateTime(firstUpcoming.deadline || firstUpcoming.date).toDateString()
+  : null;
+
+const upcomingMatches = upcomingMatchesSorted.filter(m =>
+  parseLocalDateTime(m.deadline || m.date).toDateString() === firstDateKey
+);
+
+const upcoming = firstUpcoming;
 
   if (!upcoming) {
     box.innerHTML = `<div class="small">Ingen kommende kamper funnet.</div>`;
@@ -968,12 +949,14 @@ async function loadNextMatchWidget() {
       : null;
   }
 
-  renderMyDeliveries(upcoming, myPrediction, myFantasyPick);
+  renderMyDeliveries(upcomingMatches, predictions, storedName);
 
-  box.innerHTML = `
-    <div class="next-kicker">Neste kamp · ${getMatchTeamLabel(upcoming)} · ${upcoming.team !== "women" ? "Tips og fantasy" : "Tippetips"}</div>
+box.innerHTML = `
+  <div class="next-kicker">Neste kampdag · ${upcomingMatches.length} kamp${upcomingMatches.length === 1 ? "" : "er"}</div>
 
-    <div class="next-title">${upcoming.home} – ${upcoming.away}</div>
+  <div class="next-title">
+    ${upcomingMatches.map(m => `${m.home} – ${m.away}`).join("<br>")}
+  </div>
 
     <div class="next-meta">
       ⏰ Kampstart og frist: ${formatNiceDateTime(upcoming.deadline || upcoming.date)}<br>
