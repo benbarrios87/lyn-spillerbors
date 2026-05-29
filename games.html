@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyn Games</title>
+
+  <link rel="icon" href="lblogoen.png">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --red:#d71920;
+      --blue:#13294b;
+      --gold:#ffd166;
+      --dark:#07111f;
+      --panel:rgba(5,8,20,0.76);
+      --line:rgba(255,255,255,0.16);
+      --muted:rgba(255,255,255,0.72);
+    }
+
+    * {
+      box-sizing:border-box;
+    }
+
+    body {
+      margin:0;
+      min-height:100vh;
+      font-family:Arial, sans-serif;
+      color:white;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,209,102,.30), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(11,99,229,.28), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(215,25,32,.24), transparent 34%),
+        linear-gradient(135deg, #06111f, #102a43 55%, #090d18);
+    }
+
+    .wrap {
+      width:100%;
+      max-width:1080px;
+      margin:0 auto;
+      padding:28px 14px 70px;
+    }
+
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:22px;
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:white;
+      text-decoration:none;
+      font-weight:900;
+    }
+
+    .brand img {
+      width:42px;
+      height:42px;
+      object-fit:contain;
+    }
+
+    .toplinks {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .toplinks a {
+      color:white;
+      text-decoration:none;
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .hero {
+      text-align:center;
+      padding:34px 22px;
+      border-radius:34px;
+      background:
+        linear-gradient(135deg, rgba(11,99,229,.92), rgba(215,25,32,.76)),
+        radial-gradient(circle at top, rgba(255,255,255,.20), transparent 44%);
+      box-shadow:0 24px 60px rgba(0,0,0,.38);
+      border:1px solid rgba(255,255,255,.25);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::after {
+      content:"GAMES";
+      position:absolute;
+      right:-20px;
+      bottom:-12px;
+      font-size:100px;
+      font-weight:900;
+      color:rgba(255,255,255,.06);
+      transform:rotate(-6deg);
+      pointer-events:none;
+    }
+
+    .kicker {
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background:var(--gold);
+      color:#101827;
+      font-weight:900;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+
+    h1 {
+      margin:16px 0 10px;
+      font-size:58px;
+      line-height:1;
+    }
+
+    .hero p {
+      max-width:680px;
+      margin:auto;
+      font-size:18px;
+      line-height:1.45;
+      color:rgba(255,255,255,.92);
+    }
+
+    .identity {
+      margin:22px auto 0;
+      max-width:660px;
+      padding:14px;
+      border-radius:22px;
+      background:rgba(0,0,0,.34);
+      border:1px solid rgba(255,255,255,.14);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      text-align:left;
+      position:relative;
+      z-index:2;
+    }
+
+    .identity strong {
+      color:var(--gold);
+    }
+
+    .identity a {
+      color:var(--gold);
+      font-weight:900;
+      text-decoration:none;
+    }
+
+    .main-grid {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
+      margin-top:22px;
+    }
+
+    @media(min-width:900px) {
+      .main-grid {
+        grid-template-columns:1.1fr .9fr;
+        align-items:start;
+      }
+    }
+
+    .panel {
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:0 16px 42px rgba(0,0,0,.32);
+      backdrop-filter:blur(8px);
+    }
+
+    .panel h2 {
+      margin:0 0 12px;
+      font-size:26px;
+    }
+
+    .today-card {
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top right, rgba(255,209,102,.22), transparent 35%),
+        linear-gradient(135deg, rgba(19,41,75,.95), rgba(215,25,32,.78));
+      border-color:rgba(255,209,102,.52);
+    }
+
+    .today-card::after {
+      content:"🧩";
+      position:absolute;
+      right:22px;
+      top:18px;
+      font-size:64px;
+      opacity:.16;
+    }
+
+    .game-title {
+      font-size:34px;
+      font-weight:900;
+      margin:6px 0 8px;
+    }
+
+    .game-text {
+      color:rgba(255,255,255,.84);
+      line-height:1.45;
+      max-width:600px;
+    }
+
+    .play-row {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .btn {
+      display:inline-block;
+      border:none;
+      border-radius:16px;
+      padding:13px 18px;
+      background:var(--gold);
+      color:#111827;
+      font-weight:900;
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow:0 10px 24px rgba(255,122,26,.18);
+    }
+
+    .btn.secondary {
+      background:rgba(255,255,255,.10);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:none;
+    }
+
+    .score-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:18px;
+    }
+
+    .score-box {
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      text-align:center;
+    }
+
+    .score-box span {
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:6px;
+    }
+
+    .score-box strong {
+      display:block;
+      color:var(--gold);
+      font-size:28px;
+    }
+
+    .leaderboard {
+      display:grid;
+      gap:10px;
+    }
+
+    .leader-row {
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      border-radius:18px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.11);
+    }
+
+    .rank {
+      width:34px;
+      height:34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:rgba(255,255,255,.10);
+      font-weight:900;
+    }
+
+    .rank.gold {
+      background:var(--gold);
+      color:#111827;
+    }
+
+    .leader-name {
+      font-weight:900;
+    }
+
+    .leader-sub {
+      color:var(--muted);
+      font-size:13px;
+      margin-top:2px;
+    }
+
+    .leader-score {
+      color:var(--gold);
+      font-weight:900;
+      font-size:22px;
+    }
+
+    .games-grid {
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+
+    @media(min-width:760px) {
+      .games-grid {
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    .mini-game {
+      position:relative;
+      min-height:150px;
+      padding:20px;
+      border-radius:24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 34%),
+        rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.13);
+      overflow:hidden;
+    }
+
+    .mini-game.locked {
+      opacity:.62;
+    }
+
+    .mini-icon {
+      font-size:34px;
+      margin-bottom:10px;
+    }
+
+    .mini-title {
+      font-size:22px;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+
+    .mini-text {
+      color:var(--muted);
+      line-height:1.4;
+      font-size:14px;
+    }
+
+    .mini-status {
+      margin-top:14px;
+      display:inline-block;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:900;
+      font-size:12px;
+      color:var(--gold);
+    }
+
+    .week-strip {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:8px;
+      margin-top:16px;
+    }
+
+    .day {
+      padding:11px 6px;
+      border-radius:16px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .day.active {
+      background:rgba(255,209,102,.18);
+      border-color:rgba(255,209,102,.55);
+      color:white;
+      font-weight:900;
+    }
+
+    .day strong {
+      display:block;
+      font-size:20px;
+      margin-bottom:4px;
+    }
+
+    .empty {
+      color:var(--muted);
+      line-height:1.45;
+      padding:12px;
+      border-radius:16px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    @media(max-width:650px) {
+      .topbar {
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      h1 {
+        font-size:42px;
+      }
+
+      .hero p {
+        font-size:16px;
+      }
+
+      .identity {
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .score-grid {
+        grid-template-columns:1fr;
+      }
+
+      .week-strip {
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="brand" href="v2/index.html">
+      <img src="lblogoen.png" alt="">
+      <span>Lynbørs</span>
+    </a>
+
+    <nav class="toplinks">
+      <a href="v2/index.html">Forside</a>
+      <a href="career.html">Karrieregåten</a>
+      <a href="v2/lynligaen.html">Lynligaen</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">Lyn Games</div>
+    <h1>🎮 Dagens utfordring</h1>
+    <p>
+      Små Lyn-spill på rotasjon. Samme forumnavn som resten av Lynbørs, samme prestisje, mer unødvendig alvor.
+    </p>
+
+    <div id="identityBox" class="identity">
+      Laster bruker...
+    </div>
+  </section>
+
+  <section class="main-grid">
+
+    <div class="panel today-card">
+      <div class="kicker">I dag</div>
+      <div id="todayGame">Laster dagens spill...</div>
+    </div>
+
+    <div class="panel">
+      <h2>🏆 Toppliste</h2>
+      <div id="leaderboard" class="leaderboard">Laster...</div>
+    </div>
+
+  </section>
+
+  <section class="panel" style="margin-top:18px;">
+    <h2>📅 Ukesrotasjon</h2>
+    <div id="weekStrip" class="week-strip"></div>
+  </section>
+
+  <section class="panel" style="margin-top:18px;">
+    <h2>🕹️ Alle Lyn Games</h2>
+    <div id="gamesGrid" class="games-grid"></div>
+  </section>
+
+</div>
+
+<script type="module">
+import {
+  getGameLeaderboard,
+  getGameUser
+} from "./v2/js/games-core.js";
+
+const games = [
+  {
+    id: "career",
+    title: "Karrieregåten",
+    icon: "🧩",
+    href: "career.html",
+    text: "Klubbkarrieren avsløres steg for steg. Gjett tidlig for maks poeng.",
+    status: "Spillbar nå",
+    live: true
+  },
+  {
+    id: "who",
+    title: "Hvem er dette?",
+    icon: "📸",
+    href: "#",
+    text: "Gjett Lyn-spilleren fra bilde, hint og små spor.",
+    status: "Kommer",
+    live: false
+  },
+  {
+    id: "dailyxi",
+    title: "Daily XI",
+    icon: "⚽",
+    href: "#",
+    text: "Sett sammen riktig Lyn-ellever fra en gitt kamp eller sesong.",
+    status: "Kommer",
+    live: false
+  },
+  {
+    id: "coach",
+    title: "Trenergåten",
+    icon: "🧠",
+    href: "#",
+    text: "Hvilke trenere hadde spilleren i Lyn-karrieren?",
+    status: "Kommer",
+    live: false
+  },
+  {
+    id: "year",
+    title: "Hvilket år?",
+    icon: "📅",
+    href: "#",
+    text: "Vi gir deg kamp, spiller eller øyeblikk. Du gjetter året.",
+    status: "Kommer",
+    live: false
+  },
+  {
+    id: "season",
+    title: "Sesonggåten",
+    icon: "🏆",
+    href: "#",
+    text: "Mål, tabell, profiler og kaos. Hvilken Lyn-sesong er dette?",
+    status: "Kommer",
+    live: false
+  },
+  {
+    id: "random",
+    title: "Random Challenge",
+    icon: "🎲",
+    href: "#",
+    text: "Alt som ikke passer noe annet sted. På godt og vondt.",
+    status: "Kommer",
+    live: false
+  }
+];
+
+const days = ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"];
+const todayIndex = new Date().getDay();
+const todaysGame = games[todayIndex % games.length];
+
+function cleanName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function formatDate(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("no-NO", {
+    day:"2-digit",
+    month:"2-digit"
+  });
+}
+
+function bestScoresByUser(rows) {
+  const map = {};
+
+  rows.forEach(row => {
+    const key = cleanName(row.voter);
+
+    if (!map[key] || Number(row.score) > Number(map[key].score)) {
+      map[key] = row;
+    }
+  });
+
+  return Object.values(map).sort((a,b) =>
+    Number(b.score) - Number(a.score) ||
+    new Date(a.created_at) - new Date(b.created_at)
+  );
+}
+
+function renderIdentity(user, allRows) {
+  const box = document.getElementById("identityBox");
+
+  if (!user) {
+    box.innerHTML = `
+      <div>
+        <strong>Ingen bruker valgt</strong><br>
+        <span style="color:var(--muted)">Sett forumnavn på Lynbørs-forsiden først.</span>
+      </div>
+      <a href="v2/index.html">Sett navn</a>
+    `;
+    return;
+  }
+
+  const myRows = allRows.filter(row => cleanName(row.voter) === cleanName(user));
+  const best = myRows.sort((a,b) => Number(b.score) - Number(a.score))[0];
+
+  box.innerHTML = `
+    <div>
+      Spiller som <strong>${user}</strong><br>
+      <span style="color:var(--muted)">
+        ${best ? `Beste Career-score: ${best.score} poeng` : "Ingen score lagret ennå"}
+      </span>
+    </div>
+    <a href="career.html">Spill nå</a>
+  `;
+}
+
+function renderTodayGame(rows, user) {
+  const box = document.getElementById("todayGame");
+
+  const relevantRows = rows.filter(row => row.game === todaysGame.id);
+  const myBest = relevantRows
+    .filter(row => cleanName(row.voter) === cleanName(user))
+    .sort((a,b) => Number(b.score) - Number(a.score))[0];
+
+  box.innerHTML = `
+    <div class="game-title">${todaysGame.icon} ${todaysGame.title}</div>
+    <div class="game-text">${todaysGame.text}</div>
+
+    <div class="score-grid">
+      <div class="score-box">
+        <span>Din beste</span>
+        <strong>${myBest ? myBest.score : "–"}</strong>
+      </div>
+
+      <div class="score-box">
+        <span>Forsøk</span>
+        <strong>${relevantRows.length}</strong>
+      </div>
+
+      <div class="score-box">
+        <span>Status</span>
+        <strong>${todaysGame.live ? "Live" : "Snart"}</strong>
+      </div>
+    </div>
+
+    <div class="play-row">
+      ${
+        todaysGame.live
+          ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
+          : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
+      }
+      <a class="btn secondary" href="career.html">Spill Karrieregåten</a>
+    </div>
+  `;
+}
+
+function renderLeaderboard(rows) {
+  const box = document.getElementById("leaderboard");
+  const careerRows = bestScoresByUser(rows.filter(row => row.game === "career"));
+
+  if (!careerRows.length) {
+    box.innerHTML = `<div class="empty">Ingen score ennå. Bli første som setter standarden.</div>`;
+    return;
+  }
+
+  box.innerHTML = careerRows.slice(0,10).map((row, index) => {
+    const medal = index === 0 ? "gold" : "";
+
+    return `
+      <div class="leader-row">
+        <div class="rank ${medal}">${index + 1}</div>
+
+        <div>
+          <div class="leader-name">${row.voter}</div>
+          <div class="leader-sub">
+            ${row.challenge_id || "career"} · ${formatDate(row.created_at)}
+          </div>
+        </div>
+
+        <div class="leader-score">${row.score}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderWeekStrip() {
+  const box = document.getElementById("weekStrip");
+
+  box.innerHTML = days.map((day, index) => {
+    const game = games[index % games.length];
+
+    return `
+      <div class="day ${index === todayIndex ? "active" : ""}">
+        <strong>${game.icon}</strong>
+        ${day}<br>
+        ${game.title}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderGamesGrid() {
+  const box = document.getElementById("gamesGrid");
+
+  box.innerHTML = games.map(game => `
+    <div class="mini-game ${game.live ? "" : "locked"}">
+      <div class="mini-icon">${game.icon}</div>
+      <div class="mini-title">${game.title}</div>
+      <div class="mini-text">${game.text}</div>
+      <div class="mini-status">${game.status}</div>
+      ${
+        game.live
+          ? `<div style="margin-top:14px;"><a class="btn secondary" href="${game.href}">Åpne</a></div>`
+          : ""
+      }
+    </div>
+  `).join("");
+}
+
+async function init() {
+  const user = getGameUser();
+  const careerRows = await getGameLeaderboard("career");
+
+  renderIdentity(user, careerRows);
+  renderTodayGame(careerRows, user);
+  renderLeaderboard(careerRows);
+  renderWeekStrip();
+  renderGamesGrid();
+}
+
+init();
+</script>
+
+</body>
+</html>
