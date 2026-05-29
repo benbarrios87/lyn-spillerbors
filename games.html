@@ -578,7 +578,8 @@ const games = [
 
 const days = ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"];
 const todayIndex = new Date().getDay();
-const todaysGame = games[todayIndex % games.length];
+const liveGames = games.filter(g => g.live);
+const todaysGame = liveGames[todayIndex % liveGames.length];
 
 function cleanName(value) {
   return String(value || "").trim().toLowerCase();
@@ -632,7 +633,7 @@ function renderIdentity(user, allRows) {
     <div>
       Spiller som <strong>${user}</strong><br>
       <span style="color:var(--muted)">
-        ${best ? `Beste Career-score: ${best.score} poeng` : "Ingen score lagret ennå"}
+        ${best ? `Beste LynGames-score: ${best.score} poeng` : "Ingen score lagret ennå"}
       </span>
     </div>
     <a href="career.html">Spill nå</a>
