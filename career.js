@@ -1,3 +1,8 @@
+import {
+  saveGameScore,
+  getGameUser
+} from "./v2/js/games-core.js";
+
 const startDate =
   new Date("2026-01-01");
 
