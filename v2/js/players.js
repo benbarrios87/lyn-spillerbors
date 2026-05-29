@@ -31,7 +31,7 @@ export const players = [
     name: "William Sell",
     short: "Sell",
     image: "../bilder/sell.png",
-    position: "FORS
+    position: "FORS",
       order: 3,
     aliases: ["Sell", "William Sell"]
   },
