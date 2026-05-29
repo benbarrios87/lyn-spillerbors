@@ -39,6 +39,32 @@ const message =
 
 const guessInput =
   document.getElementById("guessInput");
+initPlayedCheck();
+
+async function initPlayedCheck() {
+
+  const alreadyPlayed =
+    await hasPlayedToday(
+      "career",
+      `career-${careerIndex}-${career.answer}`
+    );
+
+  if (!alreadyPlayed) return;
+
+  finished = true;
+
+  guessInput.disabled = true;
+
+  const btn =
+    document.getElementById("revealBtn");
+
+  if (btn) {
+    btn.disabled = true;
+  }
+
+  message.innerHTML =
+    "🏆 Du har allerede spilt dagens Karrieregåte";
+}
 
 function renderCareer() {
 
