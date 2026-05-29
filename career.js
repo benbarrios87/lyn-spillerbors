@@ -1,6 +1,7 @@
 import {
   saveGameScore,
-  getGameUser
+  getGameUser,
+  hasPlayedToday
 } from "./v2/js/games-core.js";
 
 const startDate =
