@@ -1104,12 +1104,28 @@ padding-right:120px;
 </footer>
 
     <script type="module">
+import { supabaseClient } from "../js/supabase.js";
+import { fetchMatches } from "../js/matches.js";
 
-      <script src="../tips-core.js"></script>
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
-<script type="module">
-import { supabaseClient } from "./js/supabase.js";
-import { fetchMatches } from "./js/matches.js";
+function decodeGoals(value) {
+  return Number(value) - 1;
+}
+
+function isPredictionVote(vote) {
+  return vote.player === TIP_HOME_PLAYER || vote.player === TIP_AWAY_PLAYER;
+}
+
+function getOutcome(home, away) {
+  home = Number(home);
+  away = Number(away);
+
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
 
 let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
