@@ -27,7 +27,6 @@ const players = [
   "HOLMEN",
   "LUSTU",
   "KNUDTZON",
-  "KJELDER",
   "HAMOUD",
   "MARKSTEDT",
   "TESSEM",
@@ -36,7 +35,7 @@ const players = [
   "GUASTAVINO",
   "SOKOLOWSKI",
   "POWELL",
-  "HENRIKSEN",
   "WAEHLER",
   "KAASA"
+  "MIKEL"
 ];
