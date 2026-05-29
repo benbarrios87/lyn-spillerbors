@@ -1105,14 +1105,15 @@ padding-right:120px;
 
     <script type="module">
 
-      import { supabaseClient } from "./js/supabase.js";
+      <script src="../tips-core.js"></script>
+
+<script type="module">
+import { supabaseClient } from "./js/supabase.js";
 import { fetchMatches } from "./js/matches.js";
-import { renderNavbar, renderFooter } from "./js/layout.js";
 
 let openCouponMatches = [];
 let currentTeamFilter = localStorage.getItem("lynbors_tip_team_filter") || "all";
 let allMatches = [];
-
 
 function parseLocalDateTime(value) {
   if (!value) return null;
@@ -1125,17 +1126,15 @@ async function loadMatchesFromSupabase() {
   allMatches = await fetchMatches();
   return allMatches;
 }
-async function fetchVotes(query = "") {
+
+async function fetchVotes(matchId = null) {
   let q = supabaseClient
     .from("votes")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending:false })
     .limit(10000);
 
-  if (query.includes("match_id=eq.")) {
-    const matchId = decodeURIComponent(query.split("match_id=eq.")[1]);
-    q = q.eq("match_id", matchId);
-  }
+  if (matchId) q = q.eq("match_id", matchId);
 
   const { data, error } = await q;
 
@@ -1147,36 +1146,13 @@ async function fetchVotes(query = "") {
   return data || [];
 }
 
-async function trackEvent(eventType, data = {}) {
-  if (localStorage.getItem("lyncentral_ignore_tracking") === "true") return;
-
-  try {
-    await fetch(SUPABASE_URL + "/rest/v1/site_events", {
-      method:"POST",
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:"Bearer " + SUPABASE_KEY,
-        "Content-Type":"application/json",
-        Prefer:"return=minimal"
-      },
-      body:JSON.stringify({
-        event_type:eventType,
-        page:location.pathname,
-        voter:data.voter || null,
-        match_id:data.match_id || null,
-        details:data
-      })
-    });
-  } catch(err) {
-    console.log("trackEvent feil", err);
-  }
+async function trackEvent() {
+  return;
 }
 
-const voterInput = document.getElementById("voter");
-voterInput.value = localStorage.getItem("lynbors_voter") || "";
-voterInput.addEventListener("input", () => {
-  localStorage.setItem("lynbors_voter", voterInput.value.trim());
-});
+function cleanVoterName(name) {
+  return String(name || "").trim().toLowerCase();
+}
 
 function getMatchTeam(matchData) {
   return matchData && matchData.team ? matchData.team : "men";
@@ -1185,81 +1161,30 @@ function getMatchTeam(matchData) {
 function getTeamLabel(team) {
   return team === "women" ? "Kvinner" : "Herrer";
 }
-  function buildPredictions(votes) {
+
+function buildPredictions(votes) {
   const map = {};
 
   votes
     .filter(isPredictionVote)
-    .filter(isRealMatch)
+    .filter(v => v.match_id && v.match_id !== "TEST")
     .forEach(v => {
       const key = `${v.match_id}_${v.voter}`;
 
       if (!map[key]) {
         map[key] = {
-          voter: v.voter,
-          match_id: v.match_id,
-          home: null,
-          away: null
+          voter:v.voter,
+          match_id:v.match_id,
+          home:null,
+          away:null
         };
       }
 
-      if (v.player === TIP_HOME_PLAYER) {
-        map[key].home = decodeGoals(v.rating);
-      }
-
-      if (v.player === TIP_AWAY_PLAYER) {
-        map[key].away = decodeGoals(v.rating);
-      }
+      if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+      if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
     });
 
-  return Object.values(map).filter(
-    p => p.home !== null && p.away !== null
-  );
-}
-
-function getTeamBadge(matchData) {
-  const team = getMatchTeam(matchData);
-  const cls = team === "women" ? "women" : "men";
-  return `<span class="team-badge ${cls}">${getTeamLabel(team)}</span>`;
-}
-
-function matchPassesTeamFilter(matchData) {
-  if (currentTeamFilter === "all") return true;
-  return getMatchTeam(matchData) === currentTeamFilter;
-}
-
-function getFilteredMatches() {
-  return allMatches.filter(matchPassesTeamFilter);
-}
-
-function setTeamFilter(filter) {
-  currentTeamFilter = filter || "all";
-  localStorage.setItem("lynbors_tip_team_filter", currentTeamFilter);
-
-  document.querySelectorAll(".team-tab").forEach(btn => btn.classList.remove("active"));
-  const activeTab = document.getElementById("tab-" + currentTeamFilter);
-  if (activeTab) activeTab.classList.add("active");
-
-  const couponTypeBox = document.getElementById("couponTypeBox");
-  if (couponTypeBox) {
-    couponTypeBox.classList.remove("filter-men", "filter-women");
-    if (currentTeamFilter === "men") couponTypeBox.classList.add("filter-men");
-    if (currentTeamFilter === "women") couponTypeBox.classList.add("filter-women");
-  }
-
-  const viewSelect = document.getElementById("viewTeamFilter");
-  if (viewSelect) viewSelect.value = currentTeamFilter;
-
-  renderCoupons();
-  renderResultMatchSelect();
-  loadTipStats();
-
-  const results = document.getElementById("results");
-  if (results) results.innerHTML = "";
-}
-
-function isRealMatch(v) {
-  return v.match_id && v.match_id !== "TEST";
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
 }
 
 function getMatchData(matchId) {
@@ -1288,6 +1213,15 @@ function formatDeadline(deadline) {
   });
 }
 
+function matchPassesTeamFilter(matchData) {
+  if (currentTeamFilter === "all") return true;
+  return getMatchTeam(matchData) === currentTeamFilter;
+}
+
+function getFilteredMatches() {
+  return allMatches.filter(matchPassesTeamFilter);
+}
+
 function getOpenMatchesByTeam(team, limit = 3) {
   return allMatches
     .filter(m => m.active !== false)
@@ -1305,6 +1239,31 @@ function getNextTipMatches(limit = 3) {
     ...getOpenMatchesByTeam("men", limit),
     ...getOpenMatchesByTeam("women", limit)
   ];
+}
+
+function getTeamBadge(matchData) {
+  const team = getMatchTeam(matchData);
+  const cls = team === "women" ? "women" : "men";
+  return `<span class="team-badge ${cls}">${getTeamLabel(team)}</span>`;
+}
+
+function setTeamFilter(filter) {
+  currentTeamFilter = filter || "all";
+  localStorage.setItem("lynbors_tip_team_filter", currentTeamFilter);
+
+  document.querySelectorAll(".team-tab").forEach(btn => btn.classList.remove("active"));
+  const activeTab = document.getElementById("tab-" + currentTeamFilter);
+  if (activeTab) activeTab.classList.add("active");
+
+  const viewSelect = document.getElementById("viewTeamFilter");
+  if (viewSelect) viewSelect.value = currentTeamFilter;
+
+  renderCoupons();
+  renderResultMatchSelect();
+  loadTipStats();
+
+  const results = document.getElementById("results");
+  if (results) results.innerHTML = "";
 }
 
 function renderCouponCard(m, i) {
@@ -1342,8 +1301,8 @@ function renderCouponGroup(title, subtitle, team, matches) {
 
   const cls = team === "women" ? "women" : "men";
   const img = team === "women"
-    ? "bilder/damekupong-Photoroom.png"
-    : "bilder/herrekupong-Photoroom.png";
+    ? "../bilder/damekupong-Photoroom.png"
+    : "../bilder/herrekupong-Photoroom.png";
 
   return `
     <div class="coupon-group ${cls}">
@@ -1411,28 +1370,23 @@ function encodeGoals(goals) {
   return Number(goals) + 1;
 }
 
-function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
-  tipHome = Number(tipHome);
-  tipAway = Number(tipAway);
-  actualHome = Number(actualHome);
-  actualAway = Number(actualAway);
-
-  const exact = tipHome === actualHome && tipAway === actualAway;
-  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
-  const sameGoalDiff = (tipHome - tipAway) === (actualHome - actualAway);
-
-  if (exact) return 3;
-  if (sameOutcome && sameGoalDiff) return 2;
-  if (sameOutcome) return 1;
-  return 0;
-}
-
 function validateTip(label, value) {
   if (!Number.isInteger(value) || value < 0 || value > 9) {
     alert(`${label}: tips må være et helt tall fra 0 til 9.`);
     return false;
   }
   return true;
+}
+
+function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
+  const exact = Number(tipHome) === Number(actualHome) && Number(tipAway) === Number(actualAway);
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = (Number(tipHome) - Number(tipAway)) === (Number(actualHome) - Number(actualAway));
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
+  return 0;
 }
 
 async function sendTips() {
@@ -1485,31 +1439,15 @@ async function sendTips() {
     return;
   }
 
-  const response = await fetch(
-    SUPABASE_URL + "/rest/v1/votes?on_conflict=match_id,voter,player",
-    {
-      method:"POST",
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:"Bearer " + SUPABASE_KEY,
-        "Content-Type":"application/json",
-        Prefer:"resolution=merge-duplicates,return=minimal"
-      },
-      body:JSON.stringify(rows)
-    }
-  );
+  const { error } = await supabaseClient
+    .from("votes")
+    .upsert(rows, { onConflict:"match_id,voter,player" });
 
-  if (!response.ok) {
+  if (error) {
+    console.error(error);
     alert("Noe gikk feil. Kupongen ble ikke sendt.");
-    console.error(await response.text());
     return;
   }
-
-  trackEvent("tips_submitted", {
-    voter,
-    matches:savedMatches.length,
-    filter:currentTeamFilter
-  });
 
   showSuccessOverlay(savedMatches.length);
 
@@ -1525,16 +1463,7 @@ async function sendTips() {
 
 async function getVotesForSelectedMatch() {
   const match = document.getElementById("resultMatch").value;
-  return await fetchVotes("?match_id=eq." + encodeURIComponent(match));
-}
-
-function filterPredictionsByCurrentTeam(predictions) {
-  if (currentTeamFilter === "all") return predictions;
-
-  return predictions.filter(p => {
-    const matchData = getMatchData(p.match_id);
-    return matchData && getMatchTeam(matchData) === currentTeamFilter;
-  });
+  return await fetchVotes(match);
 }
 
 function renderPeoplePrediction(predictions) {
@@ -1562,28 +1491,12 @@ function renderPeoplePrediction(predictions) {
   const total = predictions.length;
   const mostCommon = Object.entries(resultCounts).sort((a,b) => b[1] - a[1])[0];
 
-  const bars = [
-    { label:"Hjemme", value:homeWins },
-    { label:"Uavgjort", value:draws },
-    { label:"Borte", value:awayWins }
-  ];
-
   return `
     <div class="people-box">
       <strong>Folkets kupong</strong><br>
       <span class="small">
         Mest tippet resultat: ${mostCommon[0]} · Snittips: ${(homeTotal / total).toFixed(1)}-${(awayTotal / total).toFixed(1)}
       </span>
-      ${bars.map(row => {
-        const percent = total ? Math.round((row.value / total) * 100) : 0;
-        return `
-          <div class="bar-row">
-            <div>${row.label}</div>
-            <div class="bar"><div class="bar-fill" style="width:${percent}%"></div></div>
-            <div>${percent}%</div>
-          </div>
-        `;
-      }).join("")}
     </div>
   `;
 }
@@ -1656,26 +1569,14 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
     const matchData = getMatchData(p.match_id);
 
     const actualHome = Number(matchData?.actual_home);
-const actualAway = Number(matchData?.actual_away);
+    const actualAway = Number(matchData?.actual_away);
 
-if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
+    if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
-const points = scorePrediction(
-  p.home,
-  p.away,
-  actualHome,
-  actualAway
-);
+    const points = scorePrediction(p.home, p.away, actualHome, actualAway);
 
     if (!users[p.voter]) {
-      users[p.voter] = {
-        points:0,
-        correct:0,
-        diffs:0,
-        outcomes:0,
-        zeroes:0,
-        tips:0
-      };
+      users[p.voter] = { points:0, correct:0, diffs:0, outcomes:0, tips:0 };
     }
 
     users[p.voter].points += points;
@@ -1684,7 +1585,6 @@ const points = scorePrediction(
     if (points === 3) users[p.voter].correct++;
     if (points === 2) users[p.voter].diffs++;
     if (points === 1) users[p.voter].outcomes++;
-    if (points === 0) users[p.voter].zeroes++;
   });
 
   return Object.keys(users).map(user => ({
@@ -1694,7 +1594,6 @@ const points = scorePrediction(
     correct:users[user].correct,
     diffs:users[user].diffs,
     outcomes:users[user].outcomes,
-    zeroes:users[user].zeroes,
     tips:users[user].tips,
     sub:`${users[user].correct} helt riktige · ${users[user].diffs} målforskjell · ${users[user].outcomes} riktig utfall · ${users[user].tips} tips`
   })).sort((a,b) =>
@@ -1704,21 +1603,6 @@ const points = scorePrediction(
     b.outcomes - a.outcomes ||
     a.player.localeCompare(b.player)
   );
-}
-
-function buildMostAccuratePredictors(allVotes, teamFilter = "all") {
-  return buildPredictionLeaderboardRows(allVotes, teamFilter)
-    .filter(r => r.correct > 0)
-    .sort((a,b) =>
-      b.correct - a.correct ||
-      b.raw - a.raw ||
-      a.player.localeCompare(b.player)
-    )
-    .map(r => ({
-      player:r.player,
-      score:r.correct,
-      sub:`${r.raw} poeng · ${r.tips} tips`
-    }));
 }
 
 function renderMiniRanking(items, limit = 5, showMedals = true) {
@@ -1744,47 +1628,9 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
   }).join("");
 }
 
-function renderLeaderboardPodium(rows) {
-  if (!rows || rows.length === 0) return "";
-
-  const first = rows[0];
-  const second = rows[1];
-  const third = rows[2];
-
-  const card = (row, medal, extraClass = "") => {
-    if (!row) return `<div></div>`;
-    return `
-      <div class="podium-card ${extraClass}">
-        <div class="podium-medal">${medal}</div>
-        <a href="profil.html?user=${encodeURIComponent(row.player)}" class="profile-link">
-          <strong>${row.player}</strong>
-        </a>
-        <div class="podium-score">${row.score}</div>
-        <div class="small">${row.sub || ""}</div>
-      </div>
-    `;
-  };
-
-  return `
-    <div class="podium-grid">
-      ${card(second, "🥈")}
-      ${card(first, "🥇", "first")}
-      ${card(third, "🥉")}
-    </div>
-  `;
-}
-
 async function loadPredictionLeaderboard() {
   const allVotes = await fetchVotes();
   const rows = buildPredictionLeaderboardRows(allVotes, "all");
-  const menRows = buildPredictionLeaderboardRows(allVotes, "men");
-  const womenRows = buildPredictionLeaderboardRows(allVotes, "women");
-
-  console.log("WOMEN MATCHES", allMatches.filter(m => m.team === "women"));
-  console.log("WOMEN PREDICTIONS", buildPredictions(allVotes).filter(p => {
-    const m = getMatchData(p.match_id);
-    return m && m.team === "women";
-  }));
 
   if (rows.length === 0) {
     document.getElementById("results").innerHTML =
@@ -1793,87 +1639,27 @@ async function loadPredictionLeaderboard() {
   }
 
   document.getElementById("results").innerHTML = `
-    <div class="bb">Tippetabell · Samlet for herrer og kvinner</div>
-    ${renderLeaderboardPodium(rows)}
-
-    <div class="stats-grid" style="margin-bottom:14px;">
-      <div class="stat-card">
-        <h3>Beste herretipper</h3>
-        ${renderMiniRanking(menRows, 1, true)}
-      </div>
-      
-    </div>
-
+    <div class="bb">Tippetabell · Samlet</div>
     ${renderMiniRanking(rows, 99)}
   `;
 }
 
 async function loadTipStats() {
   const allVotes = await fetchVotes();
-  const predictionVotes = allVotes.filter(isPredictionVote);
-  const allPredictions = buildPredictions(predictionVotes);
-  const visiblePredictions = filterPredictionsByCurrentTeam(allPredictions);
-
+  const predictions = buildPredictions(allVotes);
   const leaderboard = buildPredictionLeaderboardRows(allVotes, "all");
-  const menLeaderboard = buildPredictionLeaderboardRows(allVotes, "men");
-  const womenLeaderboard = buildPredictionLeaderboardRows(allVotes, "women");
-  const accurate = buildMostAccuratePredictors(allVotes, "all");
-
-  const totalTips = visiblePredictions.length;
-  const uniqueUsers = new Set(visiblePredictions.map(p => p.voter)).size;
-  const finishedMatches = getFilteredMatches()
-  .filter(m => m.actual_home != null && m.actual_away != null)
-  .length;
-
-  const mostActive = {};
-  allPredictions.forEach(p => {
-    mostActive[p.voter] = (mostActive[p.voter] || 0) + 1;
-  });
-
-  const mostActiveRows = Object.keys(mostActive).map(user => ({
-    player:user,
-    score:mostActive[user],
-    sub:"kuponger levert totalt"
-  })).sort((a,b) => b.score - a.score);
-
-  const filterLabel = currentTeamFilter === "all" ? "Alle kamper" : getTeamLabel(currentTeamFilter);
 
   document.getElementById("tipStats").innerHTML = `
     <div class="hero-stat">
-      <h3>Kupongstatus · ${filterLabel}</h3>
-      <div class="big">${totalTips} tips</div>
-      <div>${uniqueUsers} brukere · ${finishedMatches} kamper med registrert resultat i valgt visning</div>
+      <h3>Kupongstatus</h3>
+      <div class="big">${predictions.length} tips</div>
+      <div>${new Set(predictions.map(p => p.voter)).size} brukere</div>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>Tippetabellen samlet</h3>
-        <div class="small">Herrer og kvinner teller i samme tabell.</div>
+        <h3>Tippetabellen</h3>
         ${renderMiniRanking(leaderboard, 999)}
-      </div>
-
-      <div class="stat-card">
-        <h3>Beste herretipper</h3>
-        ${renderMiniRanking(menLeaderboard, 5, true)}
-      </div>
-
-      <div class="stat-card">
-        <h3>Treffsikre typer</h3>
-        <div class="small">Flest helt riktige resultater samlet.</div>
-        ${renderMiniRanking(accurate, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>Mest aktive tippere</h3>
-        ${renderMiniRanking(mostActiveRows, 8, false)}
-      </div>
-
-      <div class="stat-card">
-        <h3>Poengsystem</h3>
-        <div class="result-row"><div><strong>Helt riktig resultat</strong><br><span class="small">Du tipper 2-1, kampen ender 2-1</span></div><div class="result-score">3 p</div></div>
-        <div class="result-row"><div><strong>Riktig utfall + riktig målforskjell</strong><br><span class="small">Du tipper 2-1, kampen ender 3-2</span></div><div class="result-score">2 p</div></div>
-        <div class="result-row"><div><strong>Riktig utfall</strong><br><span class="small">Du tipper riktig vinner eller riktig uavgjort</span></div><div class="result-score">1 p</div></div>
-        <div class="result-row"><div><strong>Feil utfall</strong><br><span class="small">Bom på vinner/uavgjort</span></div><div class="result-score">0 p</div></div>
       </div>
     </div>
   `;
@@ -1899,10 +1685,7 @@ function countFilledCoupons() {
     const homeInput = document.querySelector(`input[data-match="${match.id}"][data-side="home"]`);
     const awayInput = document.querySelector(`input[data-match="${match.id}"][data-side="away"]`);
 
-    const home = homeInput ? homeInput.value : "";
-    const away = awayInput ? awayInput.value : "";
-
-    if (home !== "" || away !== "") filled++;
+    if ((homeInput && homeInput.value !== "") || (awayInput && awayInput.value !== "")) filled++;
   });
 
   return filled;
@@ -1913,16 +1696,11 @@ function updateCouponProgress() {
   const filled = countFilledCoupons();
   const percent = total ? Math.round((filled / total) * 100) : 0;
 
-  const text = document.getElementById("couponProgressText");
-  const fill = document.getElementById("couponProgressFill");
+  document.getElementById("couponProgressText").textContent = total
+    ? `${filled} av ${total} kuponger påbegynt. Tomme kuponger lagres ikke.`
+    : "Ingen åpne kuponger akkurat nå.";
 
-  if (text) {
-    text.textContent = total
-      ? `${filled} av ${total} kuponger påbegynt. Tomme kuponger lagres ikke.`
-      : "Ingen åpne kuponger akkurat nå.";
-  }
-
-  if (fill) fill.style.width = percent + "%";
+  document.getElementById("couponProgressFill").style.width = percent + "%";
 
   renderStickySubmit();
 }
@@ -1954,18 +1732,9 @@ function showSuccessOverlay(count) {
   const text = document.getElementById("successText");
   if (!overlay || !text) return;
 
-  const lines = [
-    "Pedersen gir tommel opp. Det betyr ikke nødvendigvis at tipset er bra.",
-    "Kupongen er inne. Nå kan du late som dette var nøye analysert.",
-    "Forumet er varslet. Magefølelsen står for regningen.",
-    "Levert med selvtillit. Anger kan komme etter kampslutt.",
-    "Dette kan bli genialt. Eller veldig Lyn."
-  ];
-
   text.innerHTML = `
     <strong>${count} kupong${count === 1 ? "" : "er"} lagret.</strong><br>
-    Gamle tips på samme kamp ble oppdatert.<br><br>
-    ${lines[Math.floor(Math.random() * lines.length)]}
+    Gamle tips på samme kamp ble oppdatert.
   `;
 
   overlay.style.display = "flex";
@@ -1977,17 +1746,26 @@ function closeSuccessOverlay() {
 }
 
 async function init() {
+  const savedVoter = localStorage.getItem("lynbors_voter") || "";
+  const voterInput = document.getElementById("voter");
+  if (voterInput) {
+    voterInput.value = savedVoter;
+    voterInput.addEventListener("input", () => {
+      localStorage.setItem("lynbors_voter", voterInput.value.trim());
+    });
+  }
+
   await loadMatchesFromSupabase();
   setTeamFilter(currentTeamFilter);
 }
-  
+
 window.showPanel = showPanel;
 window.setTeamFilter = setTeamFilter;
 window.sendTips = sendTips;
 window.loadMatchPredictions = loadMatchPredictions;
 window.loadPredictionLeaderboard = loadPredictionLeaderboard;
 window.closeSuccessOverlay = closeSuccessOverlay;
-  
+
 init();
 </script>
 
