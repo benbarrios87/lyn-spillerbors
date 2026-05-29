@@ -1,6 +1,7 @@
 import {
   saveGameScore,
-  getGameUser
+  getGameUser,
+  hasPlayedToday
 } from "./v2/js/games-core.js";
 
 const dailyIndex =
@@ -23,6 +24,25 @@ const stats = JSON.parse(
 };
 
 renderProfile();
+initPlayedCheck();
+async function initPlayedCheck() {
+
+  const alreadyPlayed =
+    await hasPlayedToday(
+      "dailyxi",
+      `dailyxi-${dailyIndex}-${challenge.title}`
+    );
+
+  if (!alreadyPlayed) return;
+
+  gameOver = true;
+
+  document.getElementById("guessInput").disabled = true;
+
+  setMessage(
+    "🏆 Du har allerede spilt dagens Daily XI"
+  );
+}
 
 function renderBonusBox() {
 
