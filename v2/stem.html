@@ -112,13 +112,14 @@ async function init() {
   }
 
   matchSelectEl.innerHTML = relevantMatches.map(match => {
-    const label = match.active ? " • åpen" : "";
-    return `
-      <option value="${match.id}">
-        ${match.home} - ${match.away}${label}
-      </option>
-    `;
-  }).join("");
+  const label = match.active ? " • åpen" : "";
+
+  return `
+    <option value="${match.id}">
+      ${match.home} - ${match.away}${label}
+    </option>
+  `;
+}).join("");
 
   activeMatch = relevantMatches[0];
 
@@ -155,7 +156,7 @@ async function init() {
 function renderMatchInfo() {
   if (!activeMatch) return;
 
-  votingClosed = isVotingClosed(activeMatch);
+ votingClosed = false;
 
   const resultText =
     activeMatch.actual_home !== null && activeMatch.actual_away !== null
@@ -318,11 +319,6 @@ async function submitVotes() {
 
   if (!activeMatch) {
     alert("Ingen kamp valgt.");
-    return;
-  }
-
-  if (votingClosed) {
-    alert("Stemmegivning er stengt for denne kampen.");
     return;
   }
 
