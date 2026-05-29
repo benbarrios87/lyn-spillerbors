@@ -287,7 +287,10 @@ function toInputDateTime(value) {
 }
 
 function fromInputDateTime(value) {
-  return value || null;
+  if (!value) return null;
+
+  const d = new Date(value);
+  return d.toISOString();
 }
 
 function numberOrNull(value) {
