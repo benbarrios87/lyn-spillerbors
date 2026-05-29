@@ -14,6 +14,7 @@ export const players = [
     short: "Trige",
     image: "../bilder/trige.png",
     position: "KEEPER",
+    order: 9999,
     aliases: ["Trige", "Mats Trige"]
   },
 
@@ -135,6 +136,7 @@ export const players = [
     short: "Andersen",
     image: "../bilder/andersen.png",
     position: "KEEPER",
+    order: 9999,
     aliases: ["Andersen", "Marcus Andersen"]
   },
   {
