@@ -531,12 +531,12 @@ const games = [
   },
   {
     id: "dailyxi",
-    title: "Daily XI",
-    icon: "⚽",
-    href: "#",
-    text: "Sett sammen riktig Lyn-ellever fra en gitt kamp eller sesong.",
-    status: "Kommer",
-    live: false
+  title: "Daily XI",
+  icon: "⚽",
+  href: "daily-xi.html",
+  text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv, og målscorere gir bonus.",
+  status: "Spillbar nå",
+  live: true
   },
   {
     id: "coach",
@@ -681,8 +681,7 @@ function renderTodayGame(rows, user) {
 
 function renderLeaderboard(rows) {
   const box = document.getElementById("leaderboard");
-  const careerRows = bestScoresByUser(rows.filter(row => row.game === "career"));
-
+  const careerRows = bestScoresByUser(rows);
   if (!careerRows.length) {
     box.innerHTML = `<div class="empty">Ingen score ennå. Bli første som setter standarden.</div>`;
     return;
@@ -745,10 +744,12 @@ function renderGamesGrid() {
 async function init() {
   const user = getGameUser();
   const careerRows = await getGameLeaderboard("career");
+const dailyXiRows = await getGameLeaderboard("dailyxi");
+const allRows = [...careerRows, ...dailyXiRows];
 
-  renderIdentity(user, careerRows);
-  renderTodayGame(careerRows, user);
-  renderLeaderboard(careerRows);
+renderIdentity(user, allRows);
+renderTodayGame(allRows, user);
+renderLeaderboard(allRows);
   renderWeekStrip();
   renderGamesGrid();
 }
