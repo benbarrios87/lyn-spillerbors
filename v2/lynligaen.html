@@ -1,1 +1,851 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynbørs 2.0 • Lynligaen</title>
 
+<link rel="icon" href="../lblogoen.png">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+.hero-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:850px){.hero-grid{grid-template-columns:repeat(4,1fr)}}
+
+.hero-stat,.studio-card,.league-card,.award-card,.round-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 12px 35px rgba(0,0,0,.28);
+}
+
+.hero-stat h3{margin:0 0 8px;color:var(--muted);font-size:14px}
+.hero-stat .big{font-size:30px;font-weight:900;color:var(--gold)}
+.hero-stat .delta{margin-top:6px;color:var(--muted);font-size:13px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+.tab-btn{
+  width:auto;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.08);
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+}
+.tab-btn.active{background:var(--red)}
+
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.podium{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
+@media(min-width:850px){
+  .podium{grid-template-columns:1fr 1.15fr 1fr;align-items:end}
+  .podium-card.first{transform:translateY(-10px)}
+}
+
+.podium-card{
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:18px;
+  text-align:center;
+}
+.podium-card.first{border-color:var(--gold)}
+.medal-big{font-size:36px}
+.podium-name{font-size:22px;font-weight:900;margin-top:8px}
+.podium-score{font-size:40px;font-weight:900;color:var(--gold);margin-top:8px}
+
+.table-wrap{overflow-x:auto}
+.league-table{width:100%;border-collapse:collapse;min-width:760px}
+.league-table th,.league-table td{padding:12px 8px;border-bottom:1px solid var(--line);text-align:left}
+.league-table th{color:var(--muted);font-size:13px}
+.league-table td:last-child,.league-table th:last-child{text-align:right;font-weight:900;color:var(--gold)}
+
+.stats-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:850px){.stats-grid{grid-template-columns:1fr 1fr}}
+
+.result-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+}
+.result-score{font-weight:900;color:var(--gold);font-size:20px}
+
+.profile-link{color:white;text-decoration:none;font-weight:900}
+.profile-link:hover{text-decoration:underline}
+
+.badge-pill{
+  display:inline-block;
+  margin-top:5px;
+  margin-right:4px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  background:rgba(255,255,255,.1);
+  border:1px solid var(--line);
+}
+
+.warning{
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  color:var(--muted);
+}
+
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  margin-top:16px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:10px 0;
+}
+.ticker span{
+  display:inline-block;
+  padding-left:100%;
+  animation:ticker 32s linear infinite;
+}
+@keyframes ticker{
+  from{transform:translateX(0)}
+  to{transform:translateX(-100%)}
+}
+</style>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+<section class="page-header">
+  <div class="badge">LYN CENTRAL</div>
+  <h1>Lynligaen</h1>
+  <p>Sammenlagttabellen for Tippetips og Lyn Fantasy. Her kårer vi den ultimate Lynbørs-nerden.</p>
+</section>
+
+<section class="data-card">
+  <div id="overview">Laster Lynligaen...</div>
+</section>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="studio">Studio</button>
+  <button class="tab-btn" data-tab="table">Tabell</button>
+  <button class="tab-btn" data-tab="awards">Awards</button>
+  <button class="tab-btn" data-tab="rounds">Runder</button>
+  <button class="tab-btn" data-tab="rules">Regler</button>
+</nav>
+
+<section id="studio" class="tab-panel active">
+  <div id="studioPanel" class="data-card">Laster studio...</div>
+</section>
+
+<section id="table" class="tab-panel">
+  <div id="leagueTable" class="data-card">Laster tabell...</div>
+</section>
+
+<section id="awards" class="tab-panel">
+  <div id="awardsPanel" class="data-card">Laster awards...</div>
+</section>
+
+<section id="rounds" class="tab-panel">
+  <div id="roundsPanel" class="data-card">Laster runder...</div>
+</section>
+
+<section id="rules" class="tab-panel">
+  <div id="rulesPanel" class="data-card"></div>
+</section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { supabaseClient } from "./js/supabase.js";
+import { fetchMatches } from "./js/matches.js";
+import { fetchVotes, isPredictionVote, getPlayerVotes } from "./js/ratings.js";
+import { getPlayerPosition } from "./js/players.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("lynligaen");
+document.getElementById("footer").innerHTML = renderFooter();
+
+const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
+const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
+
+let matchesData = [];
+
+function cleanName(name){
+  return String(name || "").trim().toLowerCase();
+}
+
+function profileLink(user){
+  return `<a class="profile-link" href="profil.html?user=${encodeURIComponent(user)}">${user}</a>`;
+}
+
+function getMatch(matchId){
+  return matchesData.find(m => String(m.id) === String(matchId)) || null;
+}
+
+function getActualScore(match){
+  if (!match || match.actual_home == null || match.actual_away == null) return null;
+  return { home:Number(match.actual_home), away:Number(match.actual_away) };
+}
+
+function getMatchTitle(matchId){
+  const match = getMatch(matchId);
+  return match ? `${match.home} - ${match.away}` : matchId;
+}
+
+function formatDate(dateString){
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("no-NO",{day:"2-digit",month:"2-digit"});
+}
+
+function decodeGoals(value){
+  return Number(value) - 1;
+}
+
+function getOutcome(home, away){
+  home = Number(home);
+  away = Number(away);
+  if (home > away) return "H";
+  if (home < away) return "B";
+  return "U";
+}
+
+function scorePrediction(tipHome, tipAway, actualHome, actualAway){
+  const exact = Number(tipHome) === Number(actualHome) && Number(tipAway) === Number(actualAway);
+  const sameOutcome = getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
+  const sameGoalDiff = Number(tipHome) - Number(tipAway) === Number(actualHome) - Number(actualAway);
+
+  if (exact) return 3;
+  if (sameOutcome && sameGoalDiff) return 2;
+  if (sameOutcome) return 1;
+  return 0;
+}
+
+async function fetchFantasyPicks(){
+  const { data, error } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*")
+    .limit(5000);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data || [];
+}
+
+async function fetchFantasyStats(){
+  const { data, error } = await supabaseClient
+    .from("fantasy_stats")
+    .select("*")
+    .limit(5000);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data || [];
+}
+
+function buildPredictions(votes){
+  const map = {};
+
+  votes.filter(isPredictionVote).forEach(v => {
+    const voter = cleanName(v.voter);
+    const key = `${v.match_id}|||${voter}`;
+
+    if (!map[key]) {
+      map[key] = {
+        match_id:v.match_id,
+        voter,
+        home:null,
+        away:null
+      };
+    }
+
+    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
+    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+  });
+
+  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+}
+
+function buildTipRounds(votes){
+  const byMatch = {};
+
+  buildPredictions(votes).forEach(prediction => {
+    const match = getMatch(prediction.match_id);
+    const actual = getActualScore(match);
+    if (!match || !actual) return;
+
+    const raw = scorePrediction(
+      prediction.home,
+      prediction.away,
+      actual.home,
+      actual.away
+    );
+
+    if (!byMatch[prediction.match_id]) byMatch[prediction.match_id] = [];
+
+    byMatch[prediction.match_id].push({
+      match_id:prediction.match_id,
+      voter:prediction.voter,
+      raw,
+      tipPoints:raw,
+      home:prediction.home,
+      away:prediction.away
+    });
+  });
+
+  return Object.keys(byMatch).map(matchId => ({
+    match_id:matchId,
+    type:"tips",
+    rows:byMatch[matchId].sort((a,b) => b.raw - a.raw || a.voter.localeCompare(b.voter))
+  }));
+}
+
+function buildRatingMaps(votes){
+  const maps = {};
+
+  getPlayerVotes(votes).forEach(v => {
+    const matchId = v.match_id;
+    const player = String(v.player || "").trim();
+
+    if (!maps[matchId]) maps[matchId] = {};
+    if (!maps[matchId][player]) maps[matchId][player] = { total:0, count:0 };
+
+    maps[matchId][player].total += Number(v.rating);
+    maps[matchId][player].count += 1;
+  });
+
+  return maps;
+}
+
+function calculateFantasyPoints(player, isCaptain, statsMap){
+  const stat = statsMap[player];
+  const position = getPlayerPosition(player);
+
+  if (!stat) return 0;
+
+  let points = 0;
+
+  if (stat.goals > 0) {
+    if (position === "ANG") points += stat.goals * 4;
+    if (position === "MID") points += stat.goals * 5;
+    if (position === "FORS") points += stat.goals * 6;
+    if (position === "KEEPER") points += stat.goals * 10;
+  }
+
+  points += Number(stat.assists || 0) * 3;
+
+  if (stat.clean_sheet) {
+    if (position === "MID") points += 1;
+    if (position === "FORS") points += 4;
+    if (position === "KEEPER") points += 5;
+  }
+
+  if (stat.penalty_save && position === "KEEPER") points += 5;
+  if (stat.red_card) points -= 3;
+  if (stat.rating >= 7.5) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+
+  if (isCaptain) points = Math.round(points * 1.5);
+
+  return points;
+}
+
+function awardFantasyTierPoints(rows){
+  const sorted = [...rows].sort((a,b) => b.raw - a.raw);
+  const n = sorted.length;
+  if (!n) return [];
+
+  const q1 = Math.ceil(n / 4);
+  const q2 = Math.ceil(n / 2);
+  const q3 = Math.ceil((n * 3) / 4);
+
+  const eliteCutoff = sorted[q1 - 1]?.raw ?? -999;
+  const strongCutoff = sorted[q2 - 1]?.raw ?? -999;
+  const mediumCutoff = sorted[q3 - 1]?.raw ?? -999;
+
+  return sorted.map((row,index) => {
+    let tier = "Bunn";
+    let tierPoints = 0;
+
+    if (row.raw >= eliteCutoff) {
+      tier = "Elite";
+      tierPoints = 5;
+    } else if (row.raw >= strongCutoff) {
+      tier = "Sterk";
+      tierPoints = 3;
+    } else if (row.raw >= mediumCutoff) {
+      tier = "Med";
+      tierPoints = 1;
+    }
+
+    return { ...row, tier, tierPoints, rank:index + 1 };
+  });
+}
+
+function buildFantasyRounds(picks, stats, votes){
+  const ratingMaps = buildRatingMaps(votes);
+  const statsByMatch = {};
+
+  stats.forEach(row => {
+    if (!statsByMatch[row.match_id]) statsByMatch[row.match_id] = {};
+
+    const ratingData = ratingMaps[row.match_id]?.[row.player];
+    const rating = ratingData ? ratingData.total / ratingData.count : 0;
+
+    statsByMatch[row.match_id][row.player] = { ...row, rating };
+  });
+
+  const byMatch = {};
+
+  picks.forEach(pick => {
+    const matchId = pick.match_id;
+    const statsMap = statsByMatch[matchId] || {};
+
+    const raw =
+      calculateFantasyPoints(pick.player1, false, statsMap) +
+      calculateFantasyPoints(pick.player2, false, statsMap) +
+      calculateFantasyPoints(pick.captain, true, statsMap);
+
+    if (!byMatch[matchId]) byMatch[matchId] = [];
+
+    byMatch[matchId].push({
+      match_id:matchId,
+      voter:cleanName(pick.voter),
+      raw,
+      team:`${pick.player1}, ${pick.player2}, ⭐ ${pick.captain}`
+    });
+  });
+
+  return Object.keys(byMatch)
+    .filter(matchId => byMatch[matchId].some(row => row.raw !== 0))
+    .map(matchId => ({
+      match_id:matchId,
+      type:"fantasy",
+      rows:awardFantasyTierPoints(byMatch[matchId])
+    }));
+}
+
+function ensureUser(users, voter){
+  if (!users[voter]) {
+    users[voter] = {
+      voter,
+      fantasy:0,
+      tipping:0,
+      total:0,
+      fantasyRounds:0,
+      tipRounds:0,
+      eliteFantasy:0,
+      strongFantasy:0,
+      mediumFantasy:0,
+      perfectTips:0,
+      correctDiffs:0,
+      correctOutcomes:0,
+      rawFantasy:0,
+      rawTips:0,
+      bestFantasyRound:0,
+      bestTipRound:0,
+      lastRoundTotal:0
+    };
+  }
+
+  return users[voter];
+}
+
+function combineLeague(fantasyRounds, tipRounds){
+  const users = {};
+  const roundMap = {};
+
+  fantasyRounds.forEach(round => {
+    if (!roundMap[round.match_id]) roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
+    roundMap[round.match_id].fantasy = round.rows;
+
+    round.rows.forEach(row => {
+      const user = ensureUser(users, row.voter);
+
+      user.fantasy += row.tierPoints;
+      user.rawFantasy += row.raw;
+      user.fantasyRounds += 1;
+      user.bestFantasyRound = Math.max(user.bestFantasyRound, row.raw);
+
+      if (row.tierPoints === 5) user.eliteFantasy += 1;
+      if (row.tierPoints === 3) user.strongFantasy += 1;
+      if (row.tierPoints === 1) user.mediumFantasy += 1;
+    });
+  });
+
+  tipRounds.forEach(round => {
+    if (!roundMap[round.match_id]) roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
+    roundMap[round.match_id].tips = round.rows;
+
+    round.rows.forEach(row => {
+      const user = ensureUser(users, row.voter);
+
+      user.tipping += row.tipPoints;
+      user.rawTips += row.raw;
+      user.tipRounds += 1;
+      user.bestTipRound = Math.max(user.bestTipRound, row.raw);
+
+      if (row.raw === 3) user.perfectTips += 1;
+      if (row.raw === 2) user.correctDiffs += 1;
+      if (row.raw === 1) user.correctOutcomes += 1;
+    });
+  });
+
+  const rounds = Object.values(roundMap).sort((a,b) => {
+    const ma = getMatch(a.match_id);
+    const mb = getMatch(b.match_id);
+    return new Date(ma?.date || "2099-01-01") - new Date(mb?.date || "2099-01-01");
+  });
+
+  const latestRound = rounds[rounds.length - 1];
+
+  if (latestRound) {
+    latestRound.fantasy.forEach(row => {
+      ensureUser(users,row.voter).lastRoundTotal += row.tierPoints;
+    });
+
+    latestRound.tips.forEach(row => {
+      ensureUser(users,row.voter).lastRoundTotal += row.tipPoints;
+    });
+  }
+
+  Object.values(users).forEach(user => {
+    user.total = user.fantasy + user.tipping;
+  });
+
+  const league = Object.values(users).sort((a,b) =>
+    b.total - a.total ||
+    b.fantasy - a.fantasy ||
+    b.tipping - a.tipping ||
+    a.voter.localeCompare(b.voter)
+  );
+
+  return { league, rounds };
+}
+
+function renderPodium(league){
+  const [first, second, third] = [league[0], league[1], league[2]];
+
+  const card = (row, medal, extra = "") => {
+    if (!row) return `<div></div>`;
+
+    return `
+      <div class="podium-card ${extra}">
+        <div class="medal-big">${medal}</div>
+        <div class="podium-name">${profileLink(row.voter)}</div>
+        <div class="podium-score">${row.total}</div>
+        <div class="small">Fantasy ${row.fantasy} · Tipp ${row.tipping}</div>
+      </div>
+    `;
+  };
+
+  return `
+    <div class="podium">
+      ${card(second,"🥈")}
+      ${card(first,"🥇","first")}
+      ${card(third,"🥉")}
+    </div>
+  `;
+}
+
+function badges(row){
+  return `
+    ${row.eliteFantasy ? `<span class="badge-pill">Fantasy elite x${row.eliteFantasy}</span>` : ""}
+    ${row.perfectTips ? `<span class="badge-pill">Orakel x${row.perfectTips}</span>` : ""}
+    ${row.lastRoundTotal ? `<span class="badge-pill">Siste +${row.lastRoundTotal}</span>` : ""}
+  `;
+}
+
+function renderLeagueTable(league){
+  if (!league.length) return `<div class="warning">Ingen ligaresultater ennå.</div>`;
+
+  return `
+    ${renderPodium(league)}
+
+    <div class="table-wrap">
+      <table class="league-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Bruker</th>
+            <th>Fantasy</th>
+            <th>Tipp</th>
+            <th>Siste</th>
+            <th>Runder</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${league.map((row,index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${profileLink(row.voter)}<br>${badges(row)}</td>
+              <td>${row.fantasy}</td>
+              <td>${row.tipping}</td>
+              <td>${row.lastRoundTotal ? "+" + row.lastRoundTotal : "–"}</td>
+              <td><span class="small">F ${row.fantasyRounds} · T ${row.tipRounds}</span></td>
+              <td>${row.total}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderMiniRanking(rows, limit = 6){
+  if (!rows.length) return `<div class="small">Ingen data enda.</div>`;
+
+  const medals = ["🥇","🥈","🥉"];
+
+  return rows.slice(0,limit).map((row,index) => `
+    <div class="result-row">
+      <div>
+        ${index < 3 ? medals[index] : ""}
+        ${profileLink(row.voter)}<br>
+        <span class="small">${row.sub || ""}</span>
+      </div>
+      <div class="result-score">${row.score}</div>
+    </div>
+  `).join("");
+}
+
+function renderAwards(league){
+  if (!league.length) return `<div class="warning">Ingen awards ennå.</div>`;
+
+  const total = [...league].sort((a,b) => b.total - a.total);
+  const fantasy = [...league].sort((a,b) => b.fantasy - a.fantasy || b.eliteFantasy - a.eliteFantasy);
+  const tipping = [...league].sort((a,b) => b.tipping - a.tipping || b.perfectTips - a.perfectTips);
+  const oracle = [...league].filter(u => u.perfectTips > 0).sort((a,b) => b.perfectTips - a.perfectTips);
+  const active = [...league].sort((a,b) => (b.fantasyRounds + b.tipRounds) - (a.fantasyRounds + a.tipRounds));
+  const last = [...league].filter(u => u.lastRoundTotal > 0).sort((a,b) => b.lastRoundTotal - a.lastRoundTotal);
+
+  return `
+    <div class="stats-grid">
+      <div class="award-card">
+        <h3>👑 Mest komplett</h3>
+        ${renderMiniRanking(total.map(u => ({...u, score:u.total, sub:`Fantasy ${u.fantasy} · Tipp ${u.tipping}`})))}
+      </div>
+
+      <div class="award-card">
+        <h3>⚽ Fantasy-sjefen</h3>
+        ${renderMiniRanking(fantasy.map(u => ({...u, score:u.fantasy, sub:`${u.eliteFantasy} elite · ${u.fantasyRounds} runder`})))}
+      </div>
+
+      <div class="award-card">
+        <h3>🎯 Tippekongen</h3>
+        ${renderMiniRanking(tipping.map(u => ({...u, score:u.tipping, sub:`${u.perfectTips} helt riktige · ${u.tipRounds} runder`})))}
+      </div>
+
+      <div class="award-card">
+        <h3>🔮 Orakelet</h3>
+        ${renderMiniRanking(oracle.map(u => ({...u, score:u.perfectTips, sub:"Helt riktige resultater"})))}
+      </div>
+
+      <div class="award-card">
+        <h3>🚀 Siste runde</h3>
+        ${renderMiniRanking(last.map(u => ({...u, score:"+" + u.lastRoundTotal, sub:`Total ${u.total}`})))}
+      </div>
+
+      <div class="award-card">
+        <h3>🏅 Mest aktiv</h3>
+        ${renderMiniRanking(active.map(u => ({...u, score:u.fantasyRounds + u.tipRounds, sub:`Fantasy ${u.fantasyRounds} · Tipp ${u.tipRounds}`})))}
+      </div>
+    </div>
+  `;
+}
+
+function renderRounds(rounds){
+  if (!rounds.length) return `<div class="warning">Ingen runder klare ennå.</div>`;
+
+  return `
+    <div class="stats-grid">
+      ${[...rounds].reverse().map(round => {
+        const match = getMatch(round.match_id);
+        const fantasyWinner = [...round.fantasy].sort((a,b) => b.raw - a.raw)[0];
+        const tipWinner = [...round.tips].sort((a,b) => b.raw - a.raw)[0];
+        const actual = getActualScore(match);
+
+        return `
+          <div class="round-card">
+            <h3>${match ? `${formatDate(match.date)} · ${match.home} - ${match.away}` : round.match_id}</h3>
+            <div class="small">${actual ? `Resultat ${actual.home}-${actual.away}` : "Resultat ikke registrert"}</div>
+
+            <div class="result-row">
+              <div>
+                <strong>Fantasy elite</strong><br>
+                <span class="small">${round.fantasy.filter(r => r.tierPoints === 5).map(r => r.voter).join(", ") || "Ingen"}</span>
+              </div>
+              <div class="result-score">${fantasyWinner ? fantasyWinner.raw : "–"}</div>
+            </div>
+
+            <div class="result-row">
+              <div>
+                <strong>Tippevinner</strong><br>
+                <span class="small">${tipWinner ? `${tipWinner.voter} · ${tipWinner.home}-${tipWinner.away}` : "Ingen scoret tips ennå"}</span>
+              </div>
+              <div class="result-score">${tipWinner ? tipWinner.raw : "–"}</div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderRules(){
+  return `
+    <h2>Regler og poeng</h2>
+    <p>Lynligaen er sammenlagttabellen for <strong>Tippetips</strong> og <strong>Lyn Fantasy</strong>.</p>
+
+    <h3>Tippetips</h3>
+    <p>
+      3 poeng for helt riktig resultat<br>
+      2 poeng for riktig utfall og riktig målforskjell<br>
+      1 poeng for riktig utfall<br>
+      0 poeng for bom
+    </p>
+
+    <h3>Lyn Fantasy</h3>
+    <p>
+      Øverste fjerdedel i en fantasyrunde får 5 ligapoeng<br>
+      Andre fjerdedel får 3 ligapoeng<br>
+      Tredje fjerdedel får 1 ligapoeng<br>
+      Nederste fjerdedel får 0 ligapoeng
+    </p>
+  `;
+}
+
+function buildTicker(league, rounds){
+  if (!league.length) return "Lynligaen venter på data";
+
+  const leader = league[0];
+  const fantasyKing = [...league].sort((a,b) => b.fantasy - a.fantasy)[0];
+  const tipKing = [...league].sort((a,b) => b.tipping - a.tipping)[0];
+  const lastHero = [...league].sort((a,b) => b.lastRoundTotal - a.lastRoundTotal)[0];
+
+  return [
+    `🔥 ${leader.voter} leder med ${leader.total} poeng`,
+    `⚽ ${fantasyKing.voter} leder fantasy med ${fantasyKing.fantasy}`,
+    `🎯 ${tipKing.voter} leder tipping med ${tipKing.tipping}`,
+    lastHero?.lastRoundTotal ? `🚀 ${lastHero.voter} tok +${lastHero.lastRoundTotal} sist` : "Neste runde kan snu alt",
+    "Lynligaen kårer den ultimate Lynbørs-nerden"
+  ].join(" &nbsp;&nbsp; | &nbsp;&nbsp; ");
+}
+
+function renderStudio(league, rounds){
+  if (!league.length) return `<div class="warning">Ingen ligaresultater ennå.</div>`;
+
+  const leader = league[0];
+  const chaser = league[1];
+
+  return `
+    ${renderPodium(league)}
+
+    <div class="studio-card">
+      <h2>🔥 ${leader.voter} sitter i førersetet</h2>
+      <p class="small">
+        ${chaser ? `${chaser.voter} jager på ${chaser.total} poeng. Avstanden er ${leader.total - chaser.total} poeng.` : "Ingen reell jakt ennå."}
+      </p>
+    </div>
+  `;
+}
+
+function setupTabs(){
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab)?.classList.add("active");
+    });
+  });
+}
+
+async function init(){
+  setupTabs();
+
+  matchesData = await fetchMatches();
+
+  const [votes, picks, stats] = await Promise.all([
+    fetchVotes(),
+    fetchFantasyPicks(),
+    fetchFantasyStats()
+  ]);
+
+  const fantasyRounds = buildFantasyRounds(picks, stats, votes);
+  const tipRounds = buildTipRounds(votes);
+  const { league, rounds } = combineLeague(fantasyRounds, tipRounds);
+
+  const totalFantasyPicks = picks.length;
+  const totalTipPredictions = buildPredictions(votes).length;
+  const totalPlayerVotes = getPlayerVotes(votes).length;
+  const leader = league[0];
+
+  document.getElementById("overview").innerHTML = `
+    <div class="hero-grid">
+      <div class="hero-stat">
+        <h3>Ligaleder</h3>
+        <div class="big">${leader ? leader.voter : "–"}</div>
+        <div class="delta">${leader ? leader.total + " poeng" : "Ingen data ennå"}</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Fantasy picks</h3>
+        <div class="big">${totalFantasyPicks}</div>
+        <div class="delta">${fantasyRounds.length} fantasyrunder</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Kuponger</h3>
+        <div class="big">${totalTipPredictions}</div>
+        <div class="delta">${tipRounds.length} scorede tipperunder</div>
+      </div>
+
+      <div class="hero-stat">
+        <h3>Børsstemmer</h3>
+        <div class="big">${totalPlayerVotes}</div>
+        <div class="delta">spillerstemmer totalt</div>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <span>${buildTicker(league, rounds)}</span>
+    </div>
+  `;
+
+  document.getElementById("studioPanel").innerHTML = renderStudio(league, rounds);
+  document.getElementById("leagueTable").innerHTML = renderLeagueTable(league);
+  document.getElementById("awardsPanel").innerHTML = renderAwards(league);
+  document.getElementById("roundsPanel").innerHTML = renderRounds(rounds);
+  document.getElementById("rulesPanel").innerHTML = renderRules();
+}
+
+init();
+</script>
+
+</body>
+</html>
