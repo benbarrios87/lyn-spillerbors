@@ -165,7 +165,32 @@ function submitCareerGuess() {
     renderCareer();
 
     message.innerHTML =
-      `🏆 Riktig! ${career.answer} · ${score} poeng`;
+  `🏆 Riktig! ${career.answer} · ${score} poeng`;
+
+console.log("Prøver å lagre score:", {
+  game: "career",
+  challengeId: `career-${careerIndex}-${career.answer}`,
+  score,
+  user: getGameUser()
+});
+
+saveGameScore({
+  game: "career",
+  challengeId: `career-${careerIndex}-${career.answer}`,
+  score,
+  maxScore: 100,
+  attempts: 1,
+  details: {
+    answer: career.answer,
+    revealed,
+    totalClubs: career.clubs.length,
+    user: getGameUser()
+  }
+}).then(result => {
+  console.log("saveGameScore ferdig:", result);
+});
+
+return;
 
     saveGameScore({
   game: "career",
