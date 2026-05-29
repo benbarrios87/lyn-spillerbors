@@ -1,3 +1,9 @@
+import {
+  saveGameScore,
+  getGameUser,
+  hasPlayedToday
+} from "./v2/js/games-core.js";
+
 const startDate =
   new Date("2026-01-01");
 
@@ -13,9 +19,13 @@ const diffDays =
 const answer =
   players[diffDays % players.length];
 
+const challengeId =
+  `wordle-${diffDays}-${answer}`;
+
 const maxGuesses = 6;
 let guesses = [];
 let finished = false;
+let scoreSaved = false;
 
 const board =
   document.getElementById("board");
@@ -28,6 +38,67 @@ const message =
 
 const guessInput =
   document.getElementById("guessInput");
+
+async function initPlayedCheck() {
+  const alreadyPlayed =
+    await hasPlayedToday("wordle", challengeId);
+
+  if (!alreadyPlayed) return;
+
+  finished = true;
+  guessInput.disabled = true;
+
+  const btn =
+    document.querySelector(".guess-box button");
+
+  if (btn) btn.disabled = true;
+
+  message.innerHTML =
+    "🏆 Du har allerede spilt dagens Lyn Wordle";
+}
+
+function calculateWordleScore(won = false) {
+  if (!won) return 0;
+
+  const attempts =
+    guesses.length;
+
+  const scores = {
+    1: 100,
+    2: 85,
+    3: 70,
+    4: 55,
+    5: 40,
+    6: 25
+  };
+
+  return scores[attempts] || 0;
+}
+
+function saveWordleScore(won = false) {
+  if (scoreSaved) return;
+
+  scoreSaved = true;
+
+  const finalScore =
+    calculateWordleScore(won);
+
+  saveGameScore({
+    game: "wordle",
+    challengeId,
+    score: finalScore,
+    maxScore: 100,
+    attempts: guesses.length,
+    details: {
+      answer,
+      guesses,
+      won,
+      user: getGameUser()
+    }
+  }).then(result => {
+    console.log("Wordle score lagret:", result, finalScore);
+  });
+}
 
 function renderBoard() {
   board.innerHTML = "";
@@ -104,12 +175,24 @@ function submitGuess() {
 
   if (guess === answer) {
     finished = true;
+
+    saveWordleScore(true);
+
     message.innerHTML =
-      `🏆 Riktig! ${answer}`;
+      `🏆 Riktig! ${answer} · ${calculateWordleScore(true)} poeng`;
+
+    guessInput.disabled = true;
+
   } else if (guesses.length >= maxGuesses) {
     finished = true;
+
+    saveWordleScore(false);
+
     message.innerHTML =
       `💀 Ferdig! Svaret var ${answer}`;
+
+    guessInput.disabled = true;
+
   } else {
     message.innerHTML =
       "Ikke riktig";
@@ -124,4 +207,7 @@ guessInput.addEventListener("keydown", e => {
   }
 });
 
+window.submitGuess = submitGuess;
+
 renderBoard();
+initPlayedCheck();
