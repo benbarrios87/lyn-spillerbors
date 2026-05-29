@@ -37,6 +37,6 @@ const players = [
   "SOKOLOWSKI",
   "POWELL",
   "WAEHLER",
-  "KAASA"
-  "MIKEL"
+  "KAASA",
+  "MIKEL",
 ];
