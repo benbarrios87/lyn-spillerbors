@@ -34,6 +34,9 @@ const message =
 const guessInput =
   document.getElementById("guessInput");
 
+window.revealNextClub = revealNextClub;
+window.submitCareerGuess = submitCareerGuess;
+
 function renderCareer() {
 
   careerList.innerHTML = "";
@@ -84,7 +87,7 @@ function revealNextClub() {
   if (revealed < career.clubs.length) {
 
   revealed++;
-  score -= 10;
+  score = Math.max(0, score - 10);
 
   renderCareer();
 
@@ -171,7 +174,7 @@ function submitCareerGuess() {
   if (revealed < career.clubs.length) {
 
   revealed++;
-  score -= 10;
+  score = Math.max(0, score - 10);
   renderCareer();
 
 } else {
@@ -191,4 +194,10 @@ guessInput.addEventListener("keydown", e => {
     submitCareerGuess();
   }
 });
+
+window.revealNextClub = revealNextClub;
+window.submitCareerGuess = submitCareerGuess;
+
 renderCareer();
+
+
