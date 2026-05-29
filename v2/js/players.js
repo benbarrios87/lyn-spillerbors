@@ -145,6 +145,7 @@ export const players = [
     short: "Aadland",
     image: "../bilder/aadland.png",
     position: "MID",
+    order: 9998,
     aliases: ["Aadland", "Magnus Aadland", "Ådland", "Magnus Ådland"]
   },
 
