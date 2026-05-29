@@ -4,6 +4,7 @@ const players = [
   "ALHABSI",
   "LAAJAB",
   "BOTHEIM",
+  "SELL",
   "JOHNSEN",
   "IGHALO",
   "HELLUM",
