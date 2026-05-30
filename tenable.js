@@ -6,6 +6,8 @@ import {
   hasPlayedToday
 } from "./v2/js/games-core.js";
 
+import { supabaseClient } from "./v2/js/supabase.js";
+
 const startDate = new Date("2026-01-01");
 const today = new Date();
 
@@ -226,6 +228,21 @@ function finishGame() {
   `;
 
   message.innerHTML = "";
+}
+async function getMyPreviousResult() {
+  const user = getGameUser();
+
+  if (!user) return null;
+
+  const { data } = await supabaseClient
+    .from("game_scores")
+    .select("*")
+    .eq("game", "tenable")
+    .eq("challenge_id", challengeId)
+    .eq("voter", user)
+    .maybeSingle();
+
+  return data;
 }
 
 async function initPlayedCheck() {
