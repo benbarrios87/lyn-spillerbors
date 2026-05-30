@@ -1,3 +1,9 @@
+import {
+  saveGameScore,
+  getGameUser,
+  hasPlayedToday
+} from "./v2/js/games-core.js";
+
 const startDate = new Date("2026-01-01");
 const today = new Date();
 
@@ -11,32 +17,21 @@ const challenge =
     diffDays % window.tenableChallenges.length
   ];
 
+const challengeId =
+  `tenable-${diffDays}-${challenge.id}`;
+
 let found = [];
 let finished = false;
+let scoreSaved = false;
 
-const titleBox =
-  document.getElementById("titleBox");
-
-const statSlots =
-  document.getElementById("statSlots");
-
-const guessInput =
-  document.getElementById("guessInput");
-
-const guessBtn =
-  document.getElementById("guessBtn");
-
-const finishBtn =
-  document.getElementById("finishBtn");
-
-const message =
-  document.getElementById("message");
-
-const foundBox =
-  document.getElementById("foundBox");
-
-const resultBox =
-  document.getElementById("resultBox");
+const titleBox = document.getElementById("titleBox");
+const statSlots = document.getElementById("statSlots");
+const guessInput = document.getElementById("guessInput");
+const guessBtn = document.getElementById("guessBtn");
+const finishBtn = document.getElementById("finishBtn");
+const message = document.getElementById("message");
+const foundBox = document.getElementById("foundBox");
+const resultBox = document.getElementById("resultBox");
 
 function normalize(text) {
   return String(text || "")
@@ -70,24 +65,13 @@ function renderSlots() {
     .map(answer => `
       <div class="slot ${isFound(answer) ? "found" : ""}">
         ${answer.value}
-        <small>
-          ${
-            isFound(answer)
-              ? answer.label
-              : "?"
-          }
-        </small>
+        <small>${isFound(answer) ? answer.label : "?"}</small>
       </div>
     `)
     .join("");
 }
 
 function renderFound() {
-  if (!found.length) {
-    foundBox.innerHTML = "";
-    return;
-  }
-
   foundBox.innerHTML = found
     .map(name => `<div class="found-row">✅ ${name}</div>`)
     .join("");
@@ -152,10 +136,37 @@ function lockGame() {
   finishBtn.disabled = true;
 }
 
+function saveTenableScore(score) {
+  if (scoreSaved) return;
+
+  scoreSaved = true;
+
+  saveGameScore({
+    game: "tenable",
+    challengeId,
+    score,
+    maxScore: 100,
+    attempts: 1,
+    details: {
+      title: challenge.title,
+      found,
+      total: challenge.answers.length,
+      missing: challenge.answers
+        .filter(answer => !isFound(answer))
+        .map(answer => answer.label),
+      user: getGameUser()
+    }
+  }).then(result => {
+    console.log("Tenable score lagret:", result, score);
+  });
+}
+
 function finishGame() {
   lockGame();
 
   const score = calculateScore();
+
+  saveTenableScore(score);
 
   const missing = challenge.answers
     .filter(answer => !isFound(answer));
@@ -190,8 +201,19 @@ function finishGame() {
   message.innerHTML = "";
 }
 
-guessBtn.addEventListener("click", addGuess);
+async function initPlayedCheck() {
+  const alreadyPlayed =
+    await hasPlayedToday("tenable", challengeId);
 
+  if (!alreadyPlayed) return;
+
+  lockGame();
+
+  message.innerHTML =
+    "🏆 Du har allerede spilt dagens Lyn Tenable.";
+}
+
+guessBtn.addEventListener("click", addGuess);
 finishBtn.addEventListener("click", finishGame);
 
 guessInput.addEventListener("keydown", e => {
@@ -203,3 +225,4 @@ guessInput.addEventListener("keydown", e => {
 renderTitle();
 renderSlots();
 renderFound();
+initPlayedCheck();
