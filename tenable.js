@@ -1,3 +1,5 @@
+let lives = 5;
+
 import {
   saveGameScore,
   getGameUser,
@@ -114,6 +116,9 @@ function addGuess() {
 
   message.innerHTML =
     `✅ ${answer.label} (${answer.value})`;
+
+  const livesBox =
+  document.getElementById("livesBox");
 
   renderSlots();
   renderFound();
