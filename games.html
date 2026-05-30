@@ -512,6 +512,15 @@ import {
 
 const games = [
   {
+    id: "rebel",
+    title: "Rebel Mentality",
+    icon: "🦊",
+    href: "rebel.html",
+    text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
+    status: "Spillbar nå",
+    live: true
+  },
+  {
     id: "career",
     title: "Karrieregåten",
     icon: "🧩",
@@ -520,57 +529,66 @@ const games = [
     status: "Spillbar nå",
     live: true
   },
-    {
-  id: "wordle",
-  title: "Lyn Wordle",
-  icon: "🔤",
-  href: "wordle.html",
-  text: "Gjett etternavnet til dagens tidligere Lyn-spiller. Seks forsøk, maks prestisje.",
-  status: "Spillbar nå",
-  live: true
-  },
   {
     id: "dailyxi",
-  title: "Daily XI",
-  icon: "⚽",
-  href: "daily-xi.html",
-  text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv, og målscorere gir bonus.",
-  status: "Spillbar nå",
-  live: true
+    title: "Daily XI",
+    icon: "⚽",
+    href: "daily-xi.html",
+    text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv, og målscorere gir bonus.",
+    status: "Spillbar nå",
+    live: true
   },
   {
-  id: "herd",
-  title: "Herd Mentality",
-  icon: "🐑",
-  href: "herd.html",
-  text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
-  status: "Spillbar nå",
-  live: true
-},
+    id: "wordle",
+    title: "Lyn Wordle",
+    icon: "🔤",
+    href: "wordle.html",
+    text: "Gjett etternavnet til dagens tidligere Lyn-spiller. Seks forsøk, maks prestisje.",
+    status: "Spillbar nå",
+    live: true
+  },
   {
-  id: "hvem",
-  title: "Hvem er dette?",
-  icon: "📸",
-  href: "hvem.html",
-  text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
-  status: "Spillbar nå",
-  live: true
-},
-{
-  id: "rebel",
-  title: "Rebel Mentality",
-  icon: "🦊",
-  href: "rebel.html",
-  text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
-  status: "Spillbar nå",
-  live: true
-},
+    id: "hvem",
+    title: "Hvem er dette?",
+    icon: "📸",
+    href: "hvem.html",
+    text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
+    status: "Spillbar nå",
+    live: true
+  },
+  {
+    id: "tenable",
+    title: "Lyn Tenable",
+    icon: "🔟",
+    href: "tenable.html",
+    text: "Finn flest mulig riktige svar før livene ryker. 80% kunnskap, 20% overlevelse.",
+    status: "Spillbar nå",
+    live: true
+  },
+  {
+    id: "herd",
+    title: "Herd Mentality",
+    icon: "🐑",
+    href: "herd.html",
+    text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
+    status: "Spillbar nå",
+    live: true
+  }
 ];
+
+const weeklySchedule = {
+  0: "rebel",    // Søndag
+  1: "career",   // Mandag
+  2: "dailyxi",  // Tirsdag
+  3: "wordle",   // Onsdag
+  4: "hvem",     // Torsdag
+  5: "tenable",  // Fredag
+  6: "herd"      // Lørdag
+};
 
 const days = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
 const todayIndex = new Date().getDay();
-const liveGames = games.filter(g => g.live);
-const todaysGame = liveGames[todayIndex % liveGames.length];
+const todaysGame = games.find(g => g.id === weeklySchedule[todayIndex]) || games[0];
 
 function cleanName(value) {
   return String(value || "").trim().toLowerCase();
@@ -581,26 +599,62 @@ function formatDate(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("no-NO", {
-    day:"2-digit",
-    month:"2-digit"
+    day: "2-digit",
+    month: "2-digit"
   });
 }
 
-function bestScoresByUser(rows) {
-  const map = {};
+function challengeKey(row) {
+  return `${cleanName(row.voter)}__${row.game || "unknown"}__${row.challenge_id || "daily"}`;
+}
+
+function buildTotalLeaderboard(rows) {
+  const bestAttemptMap = {};
 
   rows.forEach(row => {
-    const key = cleanName(row.voter);
+    const key = challengeKey(row);
+    const score = Number(row.score || 0);
 
-    if (!map[key] || Number(row.score) > Number(map[key].score)) {
-      map[key] = row;
+    if (!bestAttemptMap[key] || score > Number(bestAttemptMap[key].score || 0)) {
+      bestAttemptMap[key] = row;
     }
   });
 
-  return Object.values(map).sort((a,b) =>
-    Number(b.score) - Number(a.score) ||
-    new Date(a.created_at) - new Date(b.created_at)
-  );
+  const userMap = {};
+
+  Object.values(bestAttemptMap).forEach(row => {
+    const key = cleanName(row.voter);
+    if (!key) return;
+
+    if (!userMap[key]) {
+      userMap[key] = {
+        voter: row.voter,
+        total: 0,
+        gamesPlayed: new Set(),
+        attempts: 0,
+        latest: row.created_at
+      };
+    }
+
+    userMap[key].total += Number(row.score || 0);
+    userMap[key].gamesPlayed.add(row.game || "unknown");
+    userMap[key].attempts += 1;
+
+    if (new Date(row.created_at) > new Date(userMap[key].latest)) {
+      userMap[key].latest = row.created_at;
+    }
+  });
+
+  return Object.values(userMap)
+    .map(user => ({
+      ...user,
+      gamesCount: user.gamesPlayed.size
+    }))
+    .sort((a, b) =>
+      Number(b.total) - Number(a.total) ||
+      Number(b.gamesCount) - Number(a.gamesCount) ||
+      new Date(a.latest) - new Date(b.latest)
+    );
 }
 
 function renderIdentity(user, allRows) {
@@ -617,17 +671,17 @@ function renderIdentity(user, allRows) {
     return;
   }
 
-  const myRows = allRows.filter(row => cleanName(row.voter) === cleanName(user));
-  const best = myRows.sort((a,b) => Number(b.score) - Number(a.score))[0];
+  const leaderboard = buildTotalLeaderboard(allRows);
+  const me = leaderboard.find(row => cleanName(row.voter) === cleanName(user));
 
   box.innerHTML = `
     <div>
       Spiller som <strong>${user}</strong><br>
       <span style="color:var(--muted)">
-        ${best ? `Beste LynGames-score: ${best.score} poeng` : "Ingen score lagret ennå"}
+        ${me ? `Samlet Lyn Games-score: ${me.total} poeng` : "Ingen score lagret ennå"}
       </span>
     </div>
-    <a href="career.html">Spill nå</a>
+    <a href="${todaysGame.href}">Spill dagens game</a>
   `;
 }
 
@@ -635,9 +689,11 @@ function renderTodayGame(rows, user) {
   const box = document.getElementById("todayGame");
 
   const relevantRows = rows.filter(row => row.game === todaysGame.id);
+  const uniquePlayers = new Set(relevantRows.map(row => cleanName(row.voter)).filter(Boolean));
+
   const myBest = relevantRows
     .filter(row => cleanName(row.voter) === cleanName(user))
-    .sort((a,b) => Number(b.score) - Number(a.score))[0];
+    .sort((a, b) => Number(b.score || 0) - Number(a.score || 0))[0];
 
   box.innerHTML = `
     <div class="game-title">${todaysGame.icon} ${todaysGame.title}</div>
@@ -650,8 +706,8 @@ function renderTodayGame(rows, user) {
       </div>
 
       <div class="score-box">
-        <span>Forsøk</span>
-        <strong>${relevantRows.length}</strong>
+        <span>Spillere</span>
+        <strong>${uniquePlayers.size}</strong>
       </div>
 
       <div class="score-box">
@@ -660,25 +716,26 @@ function renderTodayGame(rows, user) {
       </div>
     </div>
 
-   <div class="play-row">
-  ${
-    todaysGame.live
-      ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
-      : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
-  }
-</div>
+    <div class="play-row">
+      ${
+        todaysGame.live
+          ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
+          : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
+      }
+    </div>
   `;
 }
 
 function renderLeaderboard(rows) {
   const box = document.getElementById("leaderboard");
-  const careerRows = bestScoresByUser(rows);
-  if (!careerRows.length) {
+  const leaderboard = buildTotalLeaderboard(rows);
+
+  if (!leaderboard.length) {
     box.innerHTML = `<div class="empty">Ingen score ennå. Bli første som setter standarden.</div>`;
     return;
   }
 
-  box.innerHTML = careerRows.slice(0,10).map((row, index) => {
+  box.innerHTML = leaderboard.slice(0, 10).map((row, index) => {
     const medal = index === 0 ? "gold" : "";
 
     return `
@@ -688,11 +745,11 @@ function renderLeaderboard(rows) {
         <div>
           <div class="leader-name">${row.voter}</div>
           <div class="leader-sub">
-            ${row.challenge_id || "career"} · ${formatDate(row.created_at)}
+            ${row.gamesCount} spill · ${row.attempts} runder · sist ${formatDate(row.latest)}
           </div>
         </div>
 
-        <div class="leader-score">${row.score}</div>
+        <div class="leader-score">${row.total}</div>
       </div>
     `;
   }).join("");
@@ -702,7 +759,7 @@ function renderWeekStrip() {
   const box = document.getElementById("weekStrip");
 
   box.innerHTML = days.map((day, index) => {
-    const game = games[index % games.length];
+    const game = games.find(g => g.id === weeklySchedule[index]);
 
     return `
       <div class="day ${index === todayIndex ? "active" : ""}">
@@ -732,24 +789,25 @@ function renderGamesGrid() {
   `).join("");
 }
 
+async function loadRowsForGame(gameId) {
+  try {
+    const rows = await getGameLeaderboard(gameId);
+    return rows.map(row => ({
+      ...row,
+      game: row.game || gameId
+    }));
+  } catch (error) {
+    console.error(`Kunne ikke hente leaderboard for ${gameId}:`, error);
+    return [];
+  }
+}
+
 async function init() {
   const user = getGameUser();
 
-  const careerRows = await getGameLeaderboard("career");
-  const dailyXiRows = await getGameLeaderboard("dailyxi");
-  const wordleRows = await getGameLeaderboard("wordle");
-  const herdRows = await getGameLeaderboard("herd");
-  const hvemRows = await getGameLeaderboard("hvem");
-  const rebelRows = await getGameLeaderboard("rebel");
-
-  const allRows = [
-    ...careerRows,
-    ...dailyXiRows,
-    ...wordleRows,
-    ...herdRows,
-    ...hvemRows,
-    ...rebelRows
-  ];
+  const allRows = (
+    await Promise.all(games.map(game => loadRowsForGame(game.id)))
+  ).flat();
 
   renderIdentity(user, allRows);
   renderTodayGame(allRows, user);
@@ -760,6 +818,5 @@ async function init() {
 
 init();
 </script>
-
 </body>
 </html>
