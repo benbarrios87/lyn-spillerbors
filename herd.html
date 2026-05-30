@@ -1,1 +1,32 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyn Mentality</title>
+  <link rel="icon" href="lblogoen.png">
+  <link rel="stylesheet" href="mentality.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
+<main class="mentality-wrap herd">
+  <section class="hero">
+    <div class="game-kicker">Lyn Games · Herd Mode</div>
+    <h1>🐑 Tenk som Lyn-fansen</h1>
+    <p>Svar det du tror flest andre svarer.</p>
+  </section>
+
+  <section class="game-card">
+    <div id="userBox"></div>
+    <div id="questions"></div>
+    <button id="submitBtn">Lever svar</button>
+    <div id="message"></div>
+  </section>
+</main>
+
+<script src="mentalityspm.js"></script>
+<script type="module" src="herd.js"></script>
+
+</body>
+</html>
