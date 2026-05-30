@@ -105,6 +105,20 @@ function addGuess() {
   if (!answer) {
     message.innerHTML = "❌ Ikke på lista.";
     return;
+    if (!answer) {
+  lives--;
+
+  renderLives();
+
+  message.innerHTML =
+    "❌ Ikke på lista.";
+
+  if (lives <= 0) {
+    finishGame();
+  }
+
+  return;
+}
   }
 
   if (isFound(answer)) {
