@@ -4,9 +4,10 @@ body {
   font-family:Arial, sans-serif;
   color:white;
   background:
-    radial-gradient(circle at 15% 10%, rgba(255,209,102,.30), transparent 28%),
-    radial-gradient(circle at 85% 20%, rgba(11,99,229,.28), transparent 30%),
-    linear-gradient(135deg, #06111f, #102a43 55%, #090d18);
+  radial-gradient(circle at 15% 10%, rgba(255,209,102,.50), transparent 28%),
+  radial-gradient(circle at 85% 18%, rgba(255,255,255,.34), transparent 26%),
+  radial-gradient(circle at 50% 95%, rgba(215,25,32,.24), transparent 34%),
+  linear-gradient(135deg, #f7b733, #0b63e5 52%, #d71920);
 }
 
 .tenable-wrap {
@@ -53,14 +54,15 @@ body {
   margin-top:22px;
   padding:22px;
   border-radius:28px;
-  background:rgba(5,8,20,.76);
-  border:1px solid rgba(255,255,255,.16);
-  box-shadow:0 16px 42px rgba(0,0,0,.32);
-}
+  background:rgba(255,255,255,.88);
+  color:#111827;
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:0 16px 42px rgba(0,0,0,.24);
 
 #titleBox {
   text-align:center;
   margin-bottom:18px;
+  color:rgba(17,24,39,.72);
 }
 
 #titleBox h2 {
@@ -91,15 +93,15 @@ body {
 }
 
 .slot.found {
-  background:rgba(255,209,102,.18);
-  border-color:rgba(255,209,102,.55);
-  color:white;
+  background:#ffd166;
+  border-color:#ffb703;
+  color:#111827;
 }
 
 .slot small {
   display:block;
   margin-top:5px;
-  color:rgba(255,255,255,.78);
+color:rgba(17,24,39,.72);
   font-size:12px;
 }
 
@@ -116,8 +118,8 @@ input {
   border-radius:15px;
   padding:15px;
   font-size:17px;
-  background:rgba(255,255,255,.10);
-  color:white;
+background:rgba(17,24,39,.08);
+  color:#111827;
 }
 
 button {
@@ -164,8 +166,8 @@ input:disabled {
 .missing-row {
   padding:11px 13px;
   border-radius:15px;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.10);
+   background:rgba(17,24,39,.06);
+  border:1px solid rgba(17,24,39,.10);
 }
 
 .found-row {
