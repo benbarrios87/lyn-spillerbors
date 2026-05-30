@@ -246,18 +246,69 @@ async function getMyPreviousResult() {
 }
 
 async function initPlayedCheck() {
+
   const alreadyPlayed =
-    await hasPlayedToday("tenable", challengeId);
+    await hasPlayedToday(
+      "tenable",
+      challengeId
+    );
 
   if (!alreadyPlayed) return;
 
+  const result =
+    await getMyPreviousResult();
+
   lockGame();
 
-  message.innerHTML =
-    "🏆 Du har allerede spilt dagens Lyn Tenable.";
-}
+  if (!result) {
+    message.innerHTML =
+      "🏆 Du har allerede spilt dagens Lyn Tenable.";
+    return;
+  }
 
-guessBtn.addEventListener("click", addGuess);
+  const foundCount =
+    result.details?.found?.length || 0;
+
+  const totalCount =
+    result.details?.total || 0;
+
+  const foundList =
+    result.details?.found || [];
+
+  resultBox.innerHTML = `
+    <div class="result-title">
+      🏆 Du har allerede spilt dagens Lyn Tenable
+    </div>
+
+    <div>
+      Score:
+      <strong>${result.score} poeng</strong>
+    </div>
+
+    <div style="margin-top:10px;">
+      Fant ${foundCount} av ${totalCount}
+    </div>
+
+    ${
+      foundList.length
+        ? `
+          <div class="result-title">
+            Dine funn
+          </div>
+
+          ${foundList.map(name => `
+            <div class="found-row">
+              ✅ ${name}
+            </div>
+          `).join("")}
+        `
+        : ""
+    }
+  `;
+
+  message.innerHTML = "";
+  
+  guessBtn.addEventListener("click", addGuess);
 finishBtn.addEventListener("click", finishGame);
 
 guessInput.addEventListener("keydown", e => {
@@ -265,6 +316,7 @@ guessInput.addEventListener("keydown", e => {
     addGuess();
   }
 });
+
 
 renderTitle();
 renderSlots();
