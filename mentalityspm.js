@@ -1,4 +1,4 @@
-const mentalityQuestions = [
+window.mentalityQuestions = [
 
   // STADION / KLUBB
   {
