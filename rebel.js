@@ -6,6 +6,8 @@ import {
 
 const MODE = "rebel";
 const QUESTION_COUNT = 5;
+const DEADLINE_HOUR = 22;
+
 const startDate = new Date("2026-01-01");
 const today = new Date();
 const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
@@ -16,7 +18,9 @@ const submitBtn = document.getElementById("submitBtn");
 const message = document.getElementById("message");
 
 const challengeId = `${MODE}-${diffDays}`;
-const DEADLINE_HOUR = 22;
+
+let selectedQuestions = [];
+let alreadyPlayed = false;
 
 function isClosed() {
   return new Date().getHours() >= DEADLINE_HOUR;
@@ -28,9 +32,6 @@ function lockInputs() {
     input.disabled = true;
   });
 }
-
-let selectedQuestions = [];
-let alreadyPlayed = false;
 
 function seededRandom(seed) {
   let x = Math.sin(seed) * 10000;
@@ -114,6 +115,13 @@ function getAnswers() {
 async function submitAnswers() {
   if (alreadyPlayed) return;
 
+  if (isClosed()) {
+    lockInputs();
+    message.innerHTML =
+      "⏰ Dagens Rebel Mentality er stengt. Resultatene er klare.";
+    return;
+  }
+
   const answers = getAnswers();
 
   if (answers.some(a => !a.answer)) {
@@ -122,7 +130,7 @@ async function submitAnswers() {
   }
 
   const result = await saveGameScore({
-    game: "rebel",
+    game: MODE,
     challengeId,
     score: 0,
     maxScore: 100,
@@ -139,20 +147,26 @@ async function submitAnswers() {
   }
 
   alreadyPlayed = true;
-  submitBtn.disabled = true;
-  document.querySelectorAll("input").forEach(input => input.disabled = true);
+  lockInputs();
 
-  message.innerHTML = "🦊 Svar levert! Poeng regnes når resultatene samles.";
+  message.innerHTML =
+    "🦊 Svar levert! Foreløpig score er 0. Poeng regnes når dagens svar er samlet.";
 }
 
 async function initPlayedCheck() {
-  alreadyPlayed = await hasPlayedToday("rebel", challengeId);
+  alreadyPlayed = await hasPlayedToday(MODE, challengeId);
 
-  if (!alreadyPlayed) return;
+  if (alreadyPlayed) {
+    lockInputs();
+    message.innerHTML = "🏆 Du har allerede spilt dagens Rebel Mentality.";
+    return;
+  }
 
-  submitBtn.disabled = true;
-  document.querySelectorAll("input").forEach(input => input.disabled = true);
-  message.innerHTML = "🏆 Du har allerede spilt dagens Rebel Mentality.";
+  if (isClosed()) {
+    lockInputs();
+    message.innerHTML =
+      "⏰ Dagens Rebel Mentality er stengt. Resultatene er klare.";
+  }
 }
 
 renderUser();
