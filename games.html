@@ -558,7 +558,7 @@ const games = [
 },
 ];
 
-const days = ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"];
+const days = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
 const todayIndex = new Date().getDay();
 const liveGames = games.filter(g => g.live);
 const todaysGame = liveGames[todayIndex % liveGames.length];
