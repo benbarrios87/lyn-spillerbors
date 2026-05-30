@@ -114,6 +114,13 @@ function getAnswers() {
 async function submitAnswers() {
   if (alreadyPlayed) return;
 
+  if (isClosed()) {
+    lockInputs();
+    message.innerHTML =
+      "⏰ Dagens Mentality er stengt. Resultatene åpner kl. 22.";
+    return;
+  }
+
   const answers = getAnswers();
 
   if (answers.some(a => !a.answer)) {
@@ -122,7 +129,7 @@ async function submitAnswers() {
   }
 
   const result = await saveGameScore({
-    game: "herd",
+    game: MODE,
     challengeId,
     score: 0,
     maxScore: 100,
@@ -139,20 +146,26 @@ async function submitAnswers() {
   }
 
   alreadyPlayed = true;
-  submitBtn.disabled = true;
-  document.querySelectorAll("input").forEach(input => input.disabled = true);
+submitBtn.disabled = true;
+document.querySelectorAll("input").forEach(input => input.disabled = true);
 
-  message.innerHTML = "🐑 Svar levert! Poeng regnes når resultatene samles.";
+message.innerHTML = "🐑 Svar levert! Poeng regnes når resultatene samles.";
 }
 
 async function initPlayedCheck() {
   alreadyPlayed = await hasPlayedToday("herd", challengeId);
 
-  if (!alreadyPlayed) return;
+  if (alreadyPlayed) {
+    lockInputs();
+    message.innerHTML = "🏆 Du har allerede spilt dagens Herd Mentality.";
+    return;
+  }
 
-  submitBtn.disabled = true;
-  document.querySelectorAll("input").forEach(input => input.disabled = true);
-  message.innerHTML = "🏆 Du har allerede spilt dagens Herd Mentality.";
+  if (isClosed()) {
+    lockInputs();
+    message.innerHTML =
+      "⏰ Dagens Herd Mentality er stengt. Resultatene er klare.";
+  }
 }
 
 renderUser();
