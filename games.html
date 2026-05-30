@@ -651,14 +651,13 @@ function renderTodayGame(rows, user) {
       </div>
     </div>
 
-    <div class="play-row">
-      ${
-        todaysGame.live
-          ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
-          : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
-      }
-      <a class="btn secondary" href="career.html">Spill Karrieregåten</a>
-    </div>
+   <div class="play-row">
+  ${
+    todaysGame.live
+      ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
+      : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
+  }
+</div>
   `;
 }
 
