@@ -523,7 +523,7 @@ window.mentalityQuestions = [
     type: "choice",
     category: "dilemma",
     question: "Hvis DU måtte startet en seriekamp for Lyn i morgen, hvor ville du gjort minst skade?",
-    options: ["Keeper", "Forsvarer", "Back", "Midtbane", "Angrep",]
+    options: ["Keeper", "Forsvarer", "Back", "Midtbane", "Angrep"]
   },
   {
     id: "q074",
