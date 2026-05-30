@@ -136,9 +136,10 @@ button {
 button.secondary {
   width:100%;
   margin-top:12px;
-  background:rgba(255,255,255,.10);
+  background:linear-gradient(135deg, #13294b, #0b63e5);
   color:white;
-  border:1px solid rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:0 10px 22px rgba(19,41,75,.22);
 }
 
 button:disabled,
