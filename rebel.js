@@ -39,7 +39,7 @@ function seededRandom(seed) {
 }
 
 function pickQuestions() {
-  const pool = mentalityQuestions
+  const pool = window.mentalityQuestions
     .filter(q => q.mode.includes(MODE))
     .map((q, index) => ({
       ...q,
