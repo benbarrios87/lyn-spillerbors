@@ -19,6 +19,9 @@ const challenge =
     diffDays % window.tenableChallenges.length
   ];
 
+  const livesBox =
+  document.getElementById("livesBox");
+ ];
 const challengeId =
   `tenable-${diffDays}-${challenge.id}`;
 
@@ -103,15 +106,12 @@ function addGuess() {
   if (!value.trim()) return;
 
   if (!answer) {
-    message.innerHTML = "❌ Ikke på lista.";
-    return;
-    if (!answer) {
   lives--;
 
   renderLives();
 
   message.innerHTML =
-    "❌ Ikke på lista.";
+    `❌ Ikke på lista. ${lives} liv igjen.`;
 
   if (lives <= 0) {
     finishGame();
@@ -119,7 +119,6 @@ function addGuess() {
 
   return;
 }
-  }
 
   if (isFound(answer)) {
     message.innerHTML = "Du har allerede tatt den.";
@@ -130,9 +129,6 @@ function addGuess() {
 
   message.innerHTML =
     `✅ ${answer.label} (${answer.value})`;
-
-  const livesBox =
-  document.getElementById("livesBox");
 
   renderSlots();
   renderFound();
