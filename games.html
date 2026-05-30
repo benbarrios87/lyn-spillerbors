@@ -539,41 +539,24 @@ const games = [
   live: true
   },
   {
-    id: "coach",
-    title: "Trenergåten",
-    icon: "🧠",
-    href: "#",
-    text: "Hvilke trenere hadde spilleren i Lyn-karrieren?",
-    status: "Kommer",
-    live: false
-  },
-  {
-    id: "year",
-    title: "Hvilket år?",
-    icon: "📅",
-    href: "#",
-    text: "Vi gir deg kamp, spiller eller øyeblikk. Du gjetter året.",
-    status: "Kommer",
-    live: false
-  },
-  {
-    id: "season",
-    title: "Sesonggåten",
-    icon: "🏆",
-    href: "#",
-    text: "Mål, tabell, profiler og kaos. Hvilken Lyn-sesong er dette?",
-    status: "Kommer",
-    live: false
-  },
-  {
-    id: "random",
-    title: "Random Challenge",
-    icon: "🎲",
-    href: "#",
-    text: "Alt som ikke passer noe annet sted. På godt og vondt.",
-    status: "Kommer",
-    live: false
-  }
+    {
+  id: "herd",
+  title: "Herd Mentality",
+  icon: "🐑",
+  href: "herd.html",
+  text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
+  status: "Spillbar nå",
+  live: true
+},
+{
+  id: "rebel",
+  title: "Rebel Mentality",
+  icon: "🦊",
+  href: "rebel.html",
+  text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
+  status: "Spillbar nå",
+  live: true
+},
 ];
 
 const days = ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"];
@@ -744,15 +727,24 @@ function renderGamesGrid() {
 
 async function init() {
   const user = getGameUser();
-  const careerRows = await getGameLeaderboard("career");
-const dailyXiRows = await getGameLeaderboard("dailyxi");
-  const wordleRows = await getGameLeaderboard("wordle");
-  
-  const allRows = [...careerRows, ...dailyXiRows, ...wordleRows];
 
-renderIdentity(user, allRows);
-renderTodayGame(allRows, user);
-renderLeaderboard(allRows);
+  const careerRows = await getGameLeaderboard("career");
+  const dailyXiRows = await getGameLeaderboard("dailyxi");
+  const wordleRows = await getGameLeaderboard("wordle");
+  const herdRows = await getGameLeaderboard("herd");
+  const rebelRows = await getGameLeaderboard("rebel");
+
+  const allRows = [
+    ...careerRows,
+    ...dailyXiRows,
+    ...wordleRows,
+    ...herdRows,
+    ...rebelRows
+  ];
+
+  renderIdentity(user, allRows);
+  renderTodayGame(allRows, user);
+  renderLeaderboard(allRows);
   renderWeekStrip();
   renderGamesGrid();
 }
