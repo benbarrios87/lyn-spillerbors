@@ -547,7 +547,7 @@ window.mentalityQuestions = [
     type: "choice",
     category: "dilemma",
     question: "Du får gratis sesongkort resten av livet, men må velge én ulempe. Hva velger du?",
-    options: ["Aldri mer bortekamp", "Aldri mer hjemmekamp", "sitte alene på en tom tribunedel", "Aldri mer derby"]
+    options: ["Du får ikke se siste 10 minuttene av noen kamper", "Aldri mer hjemmekamp", "sitte alene på en tom tribunedel", "Aldri mer derby"]
   },
   {
     id: "q078",
