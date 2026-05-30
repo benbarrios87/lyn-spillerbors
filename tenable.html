@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyn Tenable</title>
+
+  <link rel="icon" href="lblogoen.png">
+  <link rel="stylesheet" href="tenable.css">
+</head>
+
+<body>
+
+<main class="tenable-wrap">
+
+  <section class="hero">
+    <div class="game-kicker">Lyn Games · Tenable</div>
+    <h1>🔟 Lyn Tenable</h1>
+    <p>
+      Finn så mange riktige svar du klarer. Tallene er hintene dine.
+    </p>
+  </section>
+
+  <section class="game-card">
+    <div id="titleBox"></div>
+    <div id="statSlots"></div>
+
+    <div class="guess-box">
+      <input id="guessInput" type="text" placeholder="Skriv svar...">
+      <button id="guessBtn">Legg til</button>
+    </div>
+
+    <button id="finishBtn" class="secondary">Jeg er ferdig</button>
+
+    <div id="message"></div>
+    <div id="foundBox"></div>
+    <div id="resultBox"></div>
+  </section>
+
+</main>
+
+<script src="tenable-data.js"></script>
+<script src="tenable.js"></script>
+
+</body>
+</html>
