@@ -21,7 +21,7 @@ const challenge =
 
   const livesBox =
   document.getElementById("livesBox");
- ];
+ 
 const challengeId =
   `tenable-${diffDays}-${challenge.id}`;
 
