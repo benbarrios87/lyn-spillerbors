@@ -128,9 +128,21 @@ function addGuess() {
   }
 }
 
+function renderLives() {
+  livesBox.innerHTML =
+    `❤️`.repeat(lives) +
+    `🖤`.repeat(5 - lives);
+}
+
 function calculateScore() {
+  const findScore =
+    (found.length / challenge.answers.length) * 80;
+
+  const lifeScore =
+    (lives / 5) * 20;
+
   return Math.round(
-    (found.length / challenge.answers.length) * 100
+    findScore + lifeScore
   );
 }
 
@@ -230,4 +242,5 @@ guessInput.addEventListener("keydown", e => {
 renderTitle();
 renderSlots();
 renderFound();
+renderLives();
 initPlayedCheck();
