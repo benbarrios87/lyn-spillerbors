@@ -5,138 +5,232 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hvem er dette?</title>
 
+  <link rel="icon" href="lblogoen.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     body {
-      margin: 0;
-      padding: 18px;
-      background: #101010;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,sans-serif;
+      color:white;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,209,102,.26), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(11,99,229,.26), transparent 30%),
+        linear-gradient(135deg,#06111f,#102a43 55%,#090d18);
     }
 
-    .game {
-      max-width: 430px;
-      margin: 0 auto;
+    .wrap {
+      max-width:780px;
+      margin:auto;
+      padding:28px 14px 70px;
+    }
+
+    .hero {
+      text-align:center;
+      padding:30px 20px;
+      border-radius:32px;
+      background:
+        linear-gradient(135deg,rgba(11,99,229,.92),rgba(215,25,32,.74)),
+        radial-gradient(circle at top,rgba(255,255,255,.20),transparent 44%);
+      box-shadow:0 24px 60px rgba(0,0,0,.38);
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+    .kicker {
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background:#ffd166;
+      color:#111827;
+      font-weight:900;
+      font-size:13px;
+      text-transform:uppercase;
     }
 
     h1 {
-      margin-bottom: 6px;
+      margin:16px 0 10px;
+      font-size:42px;
     }
 
-    .sub {
-      opacity: 0.75;
-      margin-bottom: 18px;
+    .hero p {
+      margin:0;
+      color:rgba(255,255,255,.88);
+      line-height:1.45;
+    }
+
+    .card {
+      margin-top:22px;
+      padding:22px;
+      border-radius:28px;
+      background:rgba(5,8,20,.76);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 16px 42px rgba(0,0,0,.32);
+      text-align:center;
+    }
+
+    .meta {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+      color:#ffd166;
+      font-weight:900;
     }
 
     .image-wrap {
-      margin: 0 auto 18px;
-      min-height: 260px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height:320px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:18px;
     }
 
     .player-image {
-      max-width: 270px;
-      max-height: 320px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      border-radius: 16px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+      max-width:100%;
+      max-height:360px;
+      object-fit:contain;
+      border-radius:22px;
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
+    }
+
+    .guess-box {
+      display:flex;
+      gap:10px;
+      margin-top:16px;
     }
 
     input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 15px;
-      border-radius: 14px;
-      border: 1px solid #333;
-      background: #1d1d1d;
-      color: white;
-      font-size: 17px;
-      text-align: center;
-      margin-bottom: 10px;
+      flex:1;
+      border:none;
+      outline:none;
+      border-radius:15px;
+      padding:15px;
+      font-size:17px;
+      background:rgba(255,255,255,.10);
+      color:white;
     }
 
     button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 10px;
+      border:none;
+      border-radius:15px;
+      padding:15px 18px;
+      background:linear-gradient(135deg,#ffd166,#ff7a1a);
+      color:#111827;
+      font-weight:900;
+      cursor:pointer;
+      font-size:16px;
     }
 
-    .primary {
-      background: #fff;
-      color: #111;
+    button.secondary {
+      background:rgba(255,255,255,.10);
+      color:white;
+      border:1px solid rgba(255,255,255,.16);
     }
 
-    .secondary {
-      background: #252525;
-      color: white;
+    button:disabled,
+    input:disabled {
+      opacity:.55;
+      cursor:not-allowed;
     }
 
-    .result {
-      min-height: 28px;
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 8px;
+    .actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
     }
 
-    .hint {
-      margin-top: 8px;
-      color: #ddd;
-      opacity: 0.9;
-      min-height: 24px;
+    #message {
+      min-height:34px;
+      margin-top:16px;
+      color:#ffd166;
+      font-weight:900;
+      font-size:20px;
     }
 
-    .progress {
-      margin: 14px 0;
-      opacity: 0.75;
+    #hintBox {
+      margin-top:12px;
+      color:rgba(255,255,255,.86);
+      line-height:1.45;
     }
 
     .small {
-      font-size: 14px;
-      opacity: 0.7;
-      margin-top: 10px;
+      margin-top:10px;
+      color:rgba(255,255,255,.62);
+      font-size:14px;
+    }
+
+    @media(max-width:650px) {
+      h1 {
+        font-size:34px;
+      }
+
+      .guess-box,
+      .actions {
+        grid-template-columns:1fr;
+        flex-direction:column;
+      }
+
+      .guess-box {
+        display:flex;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<div class="game">
-  <h1>Hvem er dette?</h1>
-  <div class="sub">Tre Lyn-spillere. Skriv navnet.</div>
+<main class="wrap">
 
-  <div class="progress" id="progress"></div>
+  <section class="hero">
+    <div class="kicker">Lyn Games · Hvem er dette?</div>
+    <h1>📸 Gjett Lyn-spilleren</h1>
+    <p>
+      Dagens bilde. Jo færre hint du bruker, jo mer poeng får du.
+    </p>
+  </section>
 
-  <div class="image-wrap">
-    <img id="playerImage" class="player-image" alt="">
-  </div>
+  <section class="card">
+    <div class="meta">
+      <div id="userBox">Laster bruker...</div>
+      <div id="scoreBox">100 poeng mulig</div>
+    </div>
 
-  <input id="answerInput" placeholder="Skriv navn her..." autocomplete="off">
+    <div class="image-wrap">
+      <img id="playerImage" class="player-image" alt="">
+    </div>
 
-  <button class="primary" onclick="checkAnswer()">Svar</button>
-  <button class="secondary" onclick="showHint()">Hint</button>
-  <button class="secondary" id="nextBtn" onclick="nextRound()" style="display:none;">Neste</button>
+    <div class="guess-box">
+      <input id="answerInput" placeholder="Skriv navn..." autocomplete="off">
+      <button id="answerBtn">Svar</button>
+    </div>
 
-  <div class="result" id="result"></div>
-  <div class="hint" id="hint"></div>
-  <div class="small" id="extra"></div>
-</div>
+    <div class="actions">
+      <button class="secondary" id="hintBtn">Vis hint</button>
+      <button class="secondary" id="giveUpBtn">Gi opp</button>
+    </div>
 
-<script>
+    <div id="message"></div>
+    <div id="hintBox"></div>
+    <div class="small" id="extraBox"></div>
+  </section>
+
+</main>
+
+<script type="module">
+import {
+  saveGameScore,
+  getGameUser,
+  hasPlayedToday
+} from "./v2/js/games-core.js";
+
 const players = [
   {
     name: "Ronny Johnsen",
     image: "bilder/johnsen.webp",
-    group: "L",
     position: "Forsvar",
     year: "1993",
     funHint: "Vant Champions League med Manchester United",
@@ -145,7 +239,6 @@ const players = [
   {
     name: "Ståle Stensaas",
     image: "bilder/stensaas.webp",
-    group: "M",
     position: "Venstreback",
     year: "2007",
     funHint: "Dro fra Lyn til Gent i 2005",
@@ -154,16 +247,14 @@ const players = [
   {
     name: "Einar Rossbach",
     image: "bilder/rossbach.webp",
-    group: "V",
     position: "Keeper",
     year: "1994",
-    funHint: "Far av keeper som har spilt mange kamper for Odd og Stabæk de siste årene",
+    funHint: "Far til en keeper med mange kamper for Odd og Stabæk",
     aliases: ["einar rossbach", "rossbach"]
   },
   {
     name: "Tommy Berntsen",
     image: "bilder/berntsen.webp",
-    group: "L",
     position: "Midtstopper",
     year: "2003",
     funHint: "Assistenttrener i Lyn i dag",
@@ -172,7 +263,6 @@ const players = [
   {
     name: "Mounir Hamoud",
     image: "bilder/hamoud.webp",
-    group: "M",
     position: "Venstreback",
     year: "2005",
     funHint: "Tidligere Lyn-spiller som gikk bort brått i 2024",
@@ -181,133 +271,196 @@ const players = [
   {
     name: "Keijo Huusko",
     image: "bilder/huusko.jpg",
-    group: "V",
     position: "Spiss",
     year: "2005",
-    funHint: "Finsk spiss med 8 landskamper",
+    funHint: "Finsk spiss med landskamper",
     aliases: ["keijo huusko", "huusko", "keijo"]
   }
 ];
 
-let quiz = [];
-let round = 0;
-let score = 0;
+const startDate = new Date("2026-01-01");
+const today = new Date();
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+
+const player = players[diffDays % players.length];
+const challengeId = `hvem-${diffDays}-${player.name}`;
+
 let hintLevel = 0;
-let answered = false;
+let finished = false;
+let scoreSaved = false;
+
+const userBox = document.getElementById("userBox");
+const scoreBox = document.getElementById("scoreBox");
+const image = document.getElementById("playerImage");
+const input = document.getElementById("answerInput");
+const answerBtn = document.getElementById("answerBtn");
+const hintBtn = document.getElementById("hintBtn");
+const giveUpBtn = document.getElementById("giveUpBtn");
+const message = document.getElementById("message");
+const hintBox = document.getElementById("hintBox");
+const extraBox = document.getElementById("extraBox");
+
+function currentScore() {
+  const scores = {
+    0: 100,
+    1: 80,
+    2: 60,
+    3: 40
+  };
+
+  return scores[hintLevel] || 40;
+}
 
 function normalize(text) {
-  return text
+  return String(text || "")
     .toLowerCase()
     .trim()
-    .replaceAll("å", "a")
-    .replaceAll("ø", "o")
-    .replaceAll("æ", "ae")
-    .replaceAll("ð", "d")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "o")
+    .replace(/å/g, "a")
+    .replace(/ð/g, "d")
     .replace(/[^a-z0-9 ]/g, "")
     .replace(/\s+/g, " ");
 }
 
-function pickOne(group) {
-  const pool = players.filter(p => p.group === group);
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function startQuiz() {
-  quiz = [
-    pickOne("L"),
-    pickOne("M"),
-    pickOne("V")
-  ];
-
-  round = 0;
-  score = 0;
-  loadRound();
-}
-
-function loadRound() {
-  const player = quiz[round];
-
-  hintLevel = 0;
-  answered = false;
-
-  document.getElementById("progress").innerText = `Spørsmål ${round + 1} av 3`;
-  document.getElementById("playerImage").src = player.image;
-  document.getElementById("answerInput").value = "";
-  document.getElementById("answerInput").disabled = false;
-  document.getElementById("result").innerText = "";
-  document.getElementById("hint").innerText = "";
-  document.getElementById("extra").innerText = "";
-  document.getElementById("nextBtn").style.display = "none";
-
-  document.getElementById("answerInput").focus();
-}
-
-function checkAnswer() {
-  if (answered) return;
-
-  const player = quiz[round];
-  const guess = normalize(document.getElementById("answerInput").value);
-
+function isCorrect(value) {
+  const guess = normalize(value);
   const accepted = player.aliases.map(normalize);
 
-  if (accepted.includes(guess)) {
-    score++;
-    document.getElementById("result").innerText = "Riktig!";
-  } else {
-    document.getElementById("result").innerText = `Feil! Det var ${player.name}.`;
+  return accepted.includes(guess);
+}
+
+function lockGame() {
+  input.disabled = true;
+  answerBtn.disabled = true;
+  hintBtn.disabled = true;
+  giveUpBtn.disabled = true;
+}
+
+function updateScoreBox() {
+  scoreBox.innerHTML = `${currentScore()} poeng mulig`;
+}
+
+function showPlayerInfo() {
+  hintBox.innerHTML = player.funHint;
+  extraBox.innerHTML = `${player.position}. Spilte for Lyn i ${player.year}.`;
+}
+
+function saveScore(won, score) {
+  if (scoreSaved) return;
+
+  scoreSaved = true;
+
+  saveGameScore({
+    game: "hvem",
+    challengeId,
+    score,
+    maxScore: 100,
+    attempts: 1,
+    details: {
+      answer: player.name,
+      hintsUsed: hintLevel,
+      won,
+      user: getGameUser()
+    }
+  }).then(result => {
+    console.log("Hvem er dette score lagret:", result, score);
+  });
+}
+
+function submitAnswer() {
+  if (finished) return;
+
+  const value = input.value.trim();
+
+  if (!value) {
+    message.innerHTML = "Skriv et navn først.";
+    return;
   }
 
-  answered = true;
-  document.getElementById("answerInput").disabled = true;
-  document.getElementById("hint").innerText = player.funHint;
-  document.getElementById("extra").innerText = `${player.position}. Spilte for Lyn i ${player.year}.`;
-  document.getElementById("nextBtn").style.display = "block";
+  if (isCorrect(value)) {
+    finished = true;
+
+    const score = currentScore();
+
+    message.innerHTML = `🏆 Riktig! ${player.name} · ${score} poeng`;
+    showPlayerInfo();
+    lockGame();
+    saveScore(true, score);
+    return;
+  }
+
+  message.innerHTML = "❌ Feil. Prøv igjen eller bruk hint.";
+  input.value = "";
+  input.focus();
 }
 
 function showHint() {
-  const player = quiz[round];
+  if (finished) return;
 
   if (hintLevel === 0) {
-    document.getElementById("hint").innerText = `Hint: ${player.position}`;
+    hintBox.innerHTML = `Hint 1: ${player.position}`;
     hintLevel++;
   } else if (hintLevel === 1) {
-    document.getElementById("hint").innerText = `Hint: Spilte for Lyn i ${player.year}`;
+    hintBox.innerHTML = `Hint 2: Spilte for Lyn i ${player.year}`;
+    hintLevel++;
+  } else if (hintLevel === 2) {
+    hintBox.innerHTML = `Hint 3: ${player.funHint}`;
     hintLevel++;
   } else {
-    document.getElementById("hint").innerText = player.funHint;
+    hintBox.innerHTML = "Du har brukt alle hintene.";
   }
+
+  updateScoreBox();
 }
 
-function nextRound() {
-  if (round < 2) {
-    round++;
-    loadRound();
-  } else {
-    showFinal();
+function giveUp() {
+  if (finished) return;
+
+  finished = true;
+
+  message.innerHTML = `💀 Det var ${player.name}`;
+  showPlayerInfo();
+  lockGame();
+  saveScore(false, 0);
+}
+
+async function initPlayedCheck() {
+  const alreadyPlayed = await hasPlayedToday("hvem", challengeId);
+
+  if (!alreadyPlayed) return;
+
+  finished = true;
+  lockGame();
+  message.innerHTML = "🏆 Du har allerede spilt dagens Hvem er dette?";
+  showPlayerInfo();
+}
+
+function init() {
+  const user = getGameUser();
+
+  userBox.innerHTML = user
+    ? `Spiller som <strong>${user}</strong>`
+    : `Sett forumnavn på forsiden først`;
+
+  image.src = player.image;
+  updateScoreBox();
+  initPlayedCheck();
+}
+
+answerBtn.addEventListener("click", submitAnswer);
+hintBtn.addEventListener("click", showHint);
+giveUpBtn.addEventListener("click", giveUp);
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    submitAnswer();
   }
-}
-
-function showFinal() {
-  document.querySelector(".game").innerHTML = `
-    <h1>Ferdig!</h1>
-    <div class="result">Du fikk ${score} av 3 riktige.</div>
-    <div class="small">${finalText(score)}</div>
-    <button class="primary" onclick="location.reload()">Spill igjen</button>
-  `;
-}
-
-function finalText(score) {
-  if (score === 3) return "Obskur Lyn-hjerne.";
-  if (score === 2) return "Sterkt. Du har sett litt for mye Lyn.";
-  if (score === 1) return "Godkjent. Men du må grave dypere i minnene.";
-  return "Dette var vondt. Rett på Lynhistorie-rehab.";
-}
-
-document.getElementById("answerInput").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") checkAnswer();
 });
 
-startQuiz();
+init();
 </script>
 
 </body>
