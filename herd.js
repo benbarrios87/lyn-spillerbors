@@ -16,6 +16,18 @@ const submitBtn = document.getElementById("submitBtn");
 const message = document.getElementById("message");
 
 const challengeId = `${MODE}-${diffDays}`;
+const DEADLINE_HOUR = 22;
+
+function isClosed() {
+  return new Date().getHours() >= DEADLINE_HOUR;
+}
+
+function lockInputs() {
+  submitBtn.disabled = true;
+  document.querySelectorAll("input").forEach(input => {
+    input.disabled = true;
+  });
+}
 
 let selectedQuestions = [];
 let alreadyPlayed = false;
