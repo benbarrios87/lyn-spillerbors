@@ -508,7 +508,7 @@ window.mentalityQuestions = [
     type: "text",
     category: "kaos",
     question: "Hvem i dagens stall er mest sannsynlig til å havne i en opphetet diskusjon med dommeren?"
-  }
+  },
   {
     id: "q072",
     mode: ["herd", "rebel"],
