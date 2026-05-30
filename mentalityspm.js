@@ -200,7 +200,7 @@ window.mentalityQuestions = [
     mode: ["herd", "rebel"],
     type: "text",
     category: "stall",
-    question: "Hvem tror du får flest kamper i Lyn-drakta til slutt?"
+    question: "Hvem i dagens stall tror du får flest kamper i Lyn-drakta til slutt?"
   },
 
   // KAOS DAGENS STALL
@@ -547,7 +547,7 @@ window.mentalityQuestions = [
     type: "choice",
     category: "dilemma",
     question: "Du får gratis sesongkort resten av livet, men må velge én ulempe. Hva velger du?",
-    options: ["Aldri mer bortekamp", "Aldri mer hjemmekamp", "Aldri mer cupkamp", "Aldri mer derby"]
+    options: ["Aldri mer bortekamp", "Aldri mer hjemmekamp", "sitte alene på en tom tribunedel", "Aldri mer derby"]
   },
   {
     id: "q078",
@@ -602,7 +602,7 @@ window.mentalityQuestions = [
     mode: ["herd", "rebel"],
     type: "choice",
     category: "dilemma",
-    question: "Du må møte en Lyn-spiller i én konkurranse. Hva velger du?",
+    question: "Du må møte en selvvalgt nåværende Lyn-spiller i én skonkurranse. Hva velger du?",
     options: ["Sprint", "Quiz", "Sjakk", "Beer pong"]
   },
   {
