@@ -547,6 +547,15 @@ const games = [
   status: "Spillbar nå",
   live: true
 },
+  {
+  id: "hvem",
+  title: "Hvem er dette?",
+  icon: "📸",
+  href: "hvem.html",
+  text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
+  status: "Spillbar nå",
+  live: true
+},
 {
   id: "rebel",
   title: "Rebel Mentality",
@@ -730,6 +739,7 @@ async function init() {
   const dailyXiRows = await getGameLeaderboard("dailyxi");
   const wordleRows = await getGameLeaderboard("wordle");
   const herdRows = await getGameLeaderboard("herd");
+  const hvemRows = await getGameLeaderboard("hvem");
   const rebelRows = await getGameLeaderboard("rebel");
 
   const allRows = [
@@ -737,6 +747,7 @@ async function init() {
     ...dailyXiRows,
     ...wordleRows,
     ...herdRows,
+    ...hvemRows,
     ...rebelRows
   ];
 
