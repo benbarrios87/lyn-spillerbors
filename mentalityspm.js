@@ -602,7 +602,7 @@ window.mentalityQuestions = [
     mode: ["herd", "rebel"],
     type: "choice",
     category: "dilemma",
-    question: "Du må møte en selvvalgt nåværende Lyn-spiller i én skonkurranse. Hva velger du?",
+    question: "Du må møte en selvvalgt nåværende Lyn-spiller i én konkurranse. Hva velger du?",
     options: ["Sprint", "Quiz", "Sjakk", "Beer pong"]
   },
   {
