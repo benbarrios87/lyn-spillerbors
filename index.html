@@ -421,42 +421,6 @@ h1 {
   letter-spacing:0.6px;
 }
 
-.card.games-feature-card {
-  border-color:rgba(255,209,102,0.65);
-  box-shadow:
-    0 12px 32px rgba(0,0,0,0.42),
-    0 0 24px rgba(255,209,102,0.16);
-  background:
-    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
-    linear-gradient(135deg,#25125e,#0b63e5 48%,#d71920);
-}
-
-.card.games-feature-card::before {
-  content:"NYTT";
-  position:absolute;
-  top:14px;
-  right:18px;
-  z-index:3;
-  background:var(--gold);
-  color:#16100a;
-  font-size:12px;
-  font-weight:900;
-  padding:5px 9px;
-  border-radius:999px;
-  letter-spacing:0.6px;
-}
-
-.games-player {
-  width:170px;
-  height:180px;
-  max-width:170px;
-  object-fit:cover;
-  object-position:center;
-  border-radius:0 0 0 22px;
-  mask-image:linear-gradient(90deg, black 70%, transparent 100%);
-  -webkit-mask-image:linear-gradient(90deg, black 70%, transparent 100%);
-}
-
 .card.stats-feature-card {
   background:
     radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
@@ -967,7 +931,6 @@ h1 {
     <a href="bors.html">Børs</a>
     <a href="tippetips.html">Tips</a>
     <a href="fantasy.html">Fantasy</a>
-    <a href="games.html">Games</a>
     <a href="lynligaen.html">Ligaen</a>
     <a href="stats.html">Stats</a>
   </nav>
@@ -1043,14 +1006,6 @@ h1 {
       <div class="card-title">Lynligaen</div>
       <div class="card-text">
         Sammenlagttabellen som kombinerer børs, tipping og fantasy.
-      </div>
-    </div>
-
-    <div class="card games-feature-card" onclick="location.href='games.html'">
-      <img src="bilder/games1.jpg" class="card-player games-player" alt="">
-      <div class="card-title">Lyn Games</div>
-      <div class="card-text">
-        Wordle, Tenable, Daily XI, Karrieregåten, Hvem er dette, Herd og Rebel.
       </div>
     </div>
 
