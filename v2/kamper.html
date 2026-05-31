@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Lynbørs 2.0 • Kamper</title>
+  <title>Lynbørs 2.0 • Kamparkiv</title>
 
   <link rel="icon" href="../lblogoen.png">
-
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
 
@@ -34,18 +33,12 @@
 
     <div class="data-card">
       <h2>Kommende kamper</h2>
-
-      <div id="upcomingMatches" class="match-list">
-        Laster...
-      </div>
+      <div id="upcomingMatches" class="match-list">Laster...</div>
     </div>
 
     <div class="data-card">
       <h2>Siste resultater</h2>
-
-      <div id="completedMatches" class="match-list">
-        Laster...
-      </div>
+      <div id="completedMatches" class="match-list">Laster...</div>
     </div>
 
   </section>
@@ -55,7 +48,6 @@
 <div id="footer"></div>
 
 <script type="module">
-
 import { renderNavbar, renderFooter } from "./js/layout.js";
 import { fetchMatches } from "./js/matches.js";
 import { formatShortDate, getActualScore } from "./js/utils.js";
@@ -66,22 +58,43 @@ document.getElementById("footer").innerHTML = renderFooter();
 const upcomingEl = document.getElementById("upcomingMatches");
 const completedEl = document.getElementById("completedMatches");
 
-async function init() {
+function formatDeadline(value) {
+  if (!value) return "Ikke satt";
 
+  try {
+    return formatShortDate(value);
+  } catch {
+    return String(value);
+  }
+}
+
+async function init() {
   const matches = await fetchMatches();
 
-  const upcoming = matches.filter(match =>
-    match.active === true &&
-    match.actual_home === null
-  );
+  const upcoming = matches
+    .filter(match =>
+      match.active === true &&
+      match.actual_home === null &&
+      match.actual_away === null
+    )
+    .sort((a, b) => new Date(a.date || a.deadline) - new Date(b.date || b.deadline));
 
-  const completed = matches.filter(match =>
-    match.actual_home !== null &&
-    match.actual_away !== null
-  ).reverse();
+  const completed = matches
+    .filter(match =>
+      match.actual_home !== null &&
+      match.actual_home !== undefined &&
+      match.actual_away !== null &&
+      match.actual_away !== undefined
+    )
+    .sort((a, b) => new Date(b.date || b.deadline) - new Date(a.date || a.deadline));
 
-  upcomingEl.innerHTML = upcoming.length
-    ? upcoming.map(match => `
+  renderUpcoming(upcoming);
+  renderCompleted(completed);
+}
+
+function renderUpcoming(matches) {
+  upcomingEl.innerHTML = matches.length
+    ? matches.map(match => `
       <div class="match-item">
 
         <div>
@@ -98,43 +111,45 @@ async function init() {
 
         <div class="match-meta">
           Deadline:<br>
-          ${match.deadline || "Ikke satt"}
+          ${formatDeadline(match.deadline)}
         </div>
 
       </div>
     `).join("")
-    : "Ingen kommende kamper.";
+    : `<div class="match-meta">Ingen kommende kamper.</div>`;
+}
 
-  completedEl.innerHTML = completed.slice(0, 10).map(match => {
+function renderCompleted(matches) {
+  completedEl.innerHTML = matches.length
+    ? matches.slice(0, 10).map(match => {
+      const score = getActualScore(match);
 
-    const score = getActualScore(match);
+      return `
+        <div class="match-item">
 
-    return `
-      <div class="match-item">
+          <div>
+            <strong>${match.home} - ${match.away}</strong>
 
-        <div>
-          <strong>${match.home} - ${match.away}</strong>
+            <div class="match-meta">
+              ${formatShortDate(match.date)}
+            </div>
 
-          <div class="match-meta">
-            ${formatShortDate(match.date)}
+            <div class="badge-small done">
+              Ferdigspilt
+            </div>
           </div>
 
-          <div class="badge-small done">
-            Ferdigspilt
+          <div class="match-score">
+            ${score.home} - ${score.away}
           </div>
-        </div>
 
-        <div class="match-score">
-          ${score.home} - ${score.away}
         </div>
-
-      </div>
-    `;
-  }).join("");
+      `;
+    }).join("")
+    : `<div class="match-meta">Ingen resultater ennå.</div>`;
 }
 
 init();
-
 </script>
 
 </body>
