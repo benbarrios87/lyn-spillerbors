@@ -7,7 +7,6 @@
   <title>Lynbørs 2.0 • Stats</title>
 
   <link rel="icon" href="../lblogoen.png">
-
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
 
@@ -26,23 +25,19 @@
     <h1>Lynbørs Stats</h1>
 
     <p>
-      Første versjon av den nye statsmotoren i Lynbørs 2.0.
+      Sesongranking, børs, målpoeng og MVP-formelen samlet på ett sted.
     </p>
   </section>
 
   <section class="data-card">
-
     <h2>🏆 MVP-ranking</h2>
 
     <p class="match-meta">
-      Formel:
-      børs × 10 + mål × 2 + assist × 1.5 + clean sheet (kun keeper/forsvar)
+      Formel: <strong>børssnitt × 10</strong> + <strong>mål × 2</strong> + <strong>assist × 1.5</strong> + <strong>clean sheet × 1</strong>
     </p>
 
     <div class="table-wrap">
-
       <table class="stats-table">
-
         <thead>
           <tr>
             <th>#</th>
@@ -60,11 +55,8 @@
             <td colspan="7">Laster...</td>
           </tr>
         </tbody>
-
       </table>
-
     </div>
-
   </section>
 
 </main>
@@ -72,44 +64,59 @@
 <div id="footer"></div>
 
 <script type="module">
-
 import { renderNavbar, renderFooter } from "./js/layout.js";
+import { supabaseClient } from "./js/supabase.js";
 
 import {
   fetchVotes,
   buildMVPRanking
 } from "./js/ratings.js";
 
-document.getElementById("navbar").innerHTML =
-  renderNavbar("stats");
-
-document.getElementById("footer").innerHTML =
-  renderFooter();
+document.getElementById("navbar").innerHTML = renderNavbar("stats");
+document.getElementById("footer").innerHTML = renderFooter();
 
 const tableEl = document.getElementById("mvpTable");
 
+function playerUrl(player) {
+  return `spiller.html?player=${encodeURIComponent(player)}`;
+}
+
 async function init() {
+  const [votes, fantasyResponse] = await Promise.all([
+    fetchVotes(),
+    supabaseClient
+      .from("fantasy_stats")
+      .select("*")
+  ]);
 
-  const votes = await fetchVotes();
+  const fantasyStats = fantasyResponse.data || [];
 
-  const { data: fantasyStats } = await window.supabase
-    .createClient(
-      "https://oqwlbdnthdbomnobxqot.supabase.co",
-      "sb_publishable_7rvKgvaG_Op8qN0R9CWdAA_RATzpP4z"
-    )
-    .from("fantasy_stats")
-    .select("*");
+  if (fantasyResponse.error) {
+    console.error(fantasyResponse.error);
+    tableEl.innerHTML = `
+      <tr>
+        <td colspan="7">Klarte ikke å laste fantasy stats.</td>
+      </tr>
+    `;
+    return;
+  }
 
-  const ranking = buildMVPRanking(
-    votes,
-    fantasyStats || []
-  );
+  const ranking = buildMVPRanking(votes, fantasyStats);
+
+  if (!ranking.length) {
+    tableEl.innerHTML = `
+      <tr>
+        <td colspan="7">Ingen stats registrert ennå.</td>
+      </tr>
+    `;
+    return;
+  }
 
   const fantasyTotals = {};
 
-  (fantasyStats || []).forEach(row => {
-
+  fantasyStats.forEach(row => {
     const player = String(row.player || "").trim();
+    if (!player || row.match_id === "TEST") return;
 
     if (!fantasyTotals[player]) {
       fantasyTotals[player] = {
@@ -127,46 +134,46 @@ async function init() {
     }
   });
 
-  tableEl.innerHTML = ranking.slice(0, 20).map((player, index) => {
-
+  tableEl.innerHTML = ranking.slice(0, 30).map((player, index) => {
     const fantasy = fantasyTotals[player.player] || {
       goals:0,
       assists:0,
       cs:0
     };
 
-    return `
-      <tr>
+    const medal =
+      index === 0 ? "🥇" :
+      index === 1 ? "🥈" :
+      index === 2 ? "🥉" :
+      index + 1;
 
-        <td>${index + 1}</td>
+    return `
+      <tr class="${index < 3 ? "top-row" : ""}">
+        <td>${medal}</td>
 
         <td>
-          <strong>${player.player}</strong>
+          <a class="player-link" href="${playerUrl(player.player)}">
+            <strong>${player.player}</strong>
+          </a>
         </td>
 
         <td>${player.average}</td>
-
         <td>${fantasy.goals}</td>
-
         <td>${fantasy.assists}</td>
-
         <td>${fantasy.cs}</td>
 
         <td>
           <strong>${player.mvpScore}</strong>
         </td>
-
       </tr>
     `;
   }).join("");
 }
 
 init();
-
 </script>
 
 <style>
-
 .table-wrap {
   overflow-x:auto;
 }
@@ -179,7 +186,7 @@ init();
 
 .stats-table th,
 .stats-table td {
-  padding:12px 10px;
+  padding:13px 10px;
   border-bottom:1px solid rgba(255,255,255,0.08);
   text-align:left;
 }
@@ -187,6 +194,8 @@ init();
 .stats-table th {
   color:var(--muted);
   font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
 }
 
 .stats-table td:last-child,
@@ -198,6 +207,31 @@ init();
   background:rgba(255,255,255,0.04);
 }
 
+.stats-table .top-row {
+  background:rgba(255,209,102,0.06);
+}
+
+.player-link {
+  color:white;
+  text-decoration:none;
+}
+
+.player-link:hover {
+  color:var(--gold);
+  text-decoration:underline;
+}
+
+@media(max-width:700px) {
+  .stats-table {
+    min-width:620px;
+  }
+
+  .stats-table th,
+  .stats-table td {
+    padding:11px 8px;
+    font-size:14px;
+  }
+}
 </style>
 
 </body>
