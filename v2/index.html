@@ -435,7 +435,7 @@ h1 {
 
 .grid {
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:18px;
 }
 
@@ -525,13 +525,16 @@ h1 {
 }
 
 .games-feature-card {
-  grid-column:span 2;
-  min-height:220px;
-  padding-left:270px;
-  border-color:rgba(255,209,102,0.62);
+  grid-column:1 / -1;
+  min-height:240px;
+  padding-left:330px;
+  border-color:rgba(255,209,102,0.72);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,0.48),
+    0 0 30px rgba(255,209,102,0.18);
   background:
-    linear-gradient(90deg, rgba(7,12,27,0.10), rgba(7,12,27,0.38)),
-    radial-gradient(circle at 75% 18%, rgba(255,209,102,0.18), transparent 35%),
+    linear-gradient(90deg, rgba(7,12,27,0.04), rgba(7,12,27,0.38) 42%, rgba(215,25,32,0.64)),
+    radial-gradient(circle at 82% 18%, rgba(255,209,102,0.22), transparent 34%),
     linear-gradient(135deg, #25125e, #0b63e5 45%, #d71920) !important;
 }
 
@@ -542,13 +545,13 @@ h1 {
 .games-feature-card .card-player {
   left:0;
   height:100%;
-  width:270px;
-  max-width:270px;
+  width:330px;
+  max-width:330px;
   object-fit:cover;
   object-position:center;
-  opacity:.92;
-  mask-image:linear-gradient(90deg, black 65%, transparent 100%);
-  -webkit-mask-image:linear-gradient(90deg, black 65%, transparent 100%);
+  opacity:.96;
+  mask-image:linear-gradient(90deg, black 70%, transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg, black 70%, transparent 100%);
 }
 
 .games-feature-card::after {
@@ -560,6 +563,20 @@ h1 {
   transform:none;
   opacity:.28;
 }
+
+.stats-feature-card {
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 35%),
+    linear-gradient(135deg,#d71920,#ff3942) !important;
+}
+
+.stats-feature-card::after {
+  content:"📊";
+  font-size:50px;
+  right:18px;
+  opacity:.35;
+}
+
 
 .fantasy-player {
   width:210px !important;
@@ -963,8 +980,8 @@ h1 {
   }
 
   .games-feature-card {
-    min-height:210px;
-    padding:170px 18px 22px;
+    min-height:230px;
+    padding:175px 18px 22px;
   }
 
   .games-feature-card .card-player {
@@ -973,11 +990,11 @@ h1 {
     bottom:auto;
     width:100%;
     max-width:none;
-    height:155px;
+    height:165px;
     object-fit:cover;
     object-position:center;
-    mask-image:linear-gradient(180deg, black 70%, transparent 100%);
-    -webkit-mask-image:linear-gradient(180deg, black 70%, transparent 100%);
+    mask-image:linear-gradient(180deg, black 72%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, black 72%, transparent 100%);
   }
 
   .fantasy-player {
@@ -1028,7 +1045,7 @@ h1 {
       <a href="tippetips.html">Tips</a>
       <a href="fantasy.html">Fantasy</a>
       <a href="games.html">Games</a>
-      <a href="lynligaen.html">Lynligaen</a>
+      <a href="lynligaen.html">Ligaen</a>
       <a href="stats.html">Stats</a>
     </nav>
   </header>
@@ -1135,7 +1152,7 @@ h1 {
       </div>
     </div>
 
-    <div class="card" onclick="location.href='stats.html'">
+    <div class="card stats-feature-card" onclick="location.href='stats.html'">
       <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Stats</div>
       <div class="card-text">
