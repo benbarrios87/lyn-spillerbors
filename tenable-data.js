@@ -2,7 +2,7 @@ window.tenableChallenges = [
   {
     id: "england-last-unique-champions-001",
     title: "Siste 10 ulike vinnere av engelsk toppserie",
-    intro: "Tallene viser antall ligatitler. Årstallet er sist de vant.",
+    intro: "Tallene viser antall ligatitler.",
     answers: [
       { label: "Arsenal", value: 14, aliases: ["arsenal"] },
       { label: "Liverpool", value: 20, aliases: ["liverpool"] },
@@ -20,7 +20,7 @@ window.tenableChallenges = [
   {
     id: "ballon-dor-last-unique-winners-001",
     title: "Siste 10 ulike Ballon d'Or-vinnere",
-    intro: "Finn spillerne. Tallene viser året de sist vant.",
+    intro: "Tallene viser året de sist vant.",
     answers: [
       { label: "Ousmane Dembélé", value: 2025, aliases: ["dembele", "dembélé", "ousmane dembele", "ousmane dembélé"] },
       { label: "Rodri", value: 2024, aliases: ["rodri", "rodrigo hernandez", "rodrigo hernández"] },
@@ -38,7 +38,7 @@ window.tenableChallenges = [
   {
     id: "norway-last-unique-champions-001",
     title: "Siste 10 ulike vinnere av norsk toppserie",
-    intro: "Finn klubbene. Tallene viser året de sist vant.",
+    intro: "Tallene viser året de sist vant.",
     answers: [
       { label: "Viking", value: 2025, aliases: ["viking"] },
       { label: "Bodø/Glimt", value: 2024, aliases: ["bodo glimt", "bodø glimt", "bodø/glimt", "bodo/glimt", "glimt"] },
@@ -131,196 +131,171 @@ window.tenableChallenges = [
     answers: [
       { label: "John Arne Riise", value: 321, aliases: ["riise", "john arne riise"] },
       { label: "Claus Lundekvam", value: 290, aliases: ["lundekvam", "claus lundekvam"] },
-      { label: "Henning Berg", value: 275, aliases: ["berg", "henning berg"] },
       { label: "Morten Gamst Pedersen", value: 288, aliases: ["gamst", "pedersen", "morten gamst pedersen"] },
+      { label: "Henning Berg", value: 275, aliases: ["berg", "henning berg"] },
       { label: "Brede Hangeland", value: 272, aliases: ["hangeland", "brede hangeland"] },
       { label: "Ole Gunnar Solskjær", value: 235, aliases: ["solskjær", "solskjaer", "ole gunnar solskjær", "ole gunnar solskjaer"] },
       { label: "Joshua King", value: 223, aliases: ["king", "joshua king"] },
       { label: "Øyvind Leonhardsen", value: 186, aliases: ["leonhardsen", "øyvind leonhardsen", "oyvind leonhardsen"] },
-      { label: "Gunnar Halle", value: 167, aliases: ["halle", "gunnar halle"] },
-      { label: "Alf-Inge Håland", value: 181, aliases: ["alf inge haaland", "alf inge håland", "håland", "haaland"] }
-    ]),
-{
-  id: "lyn-most-appearances-2000-001",
-  title: "Flest kamper for Lyn siden 2000",
-  intro: "Tallene viser antall kamper for Lyns A-lag.",
-  answers: [
-    {
-      label: "Jo Tessem",
-      value: 209,
-      aliases: ["jo tessem", "tessem"]
-    },
-    {
-      label: "Tomasz Sokolowski",
-      value: 182,
-      aliases: ["tomasz sokolowski", "sokolowski"]
-    },
-    {
-      label: "Tommy Berntsen",
-      value: 180,
-      aliases: ["tommy berntsen", "berntsen"]
-    },
-    {
-      label: "Per Egil Swift",
-      value: 166,
-      aliases: ["per egil swift", "swift"]
-    },
-    {
-      label: "Tommy Nilsen",
-      value: 159,
-      aliases: ["tommy nilsen", "nilsen"]
-    },
-    {
-      label: "Anders Bjørntvedt Olsen",
-      value: 144,
-      aliases: [
-        "anders bjørntvedt olsen",
-        "anders bjorntvedt olsen",
-        "bjørntvedt olsen",
-        "bjorntvedt olsen"
-      ]
-    },
-    {
-      label: "Steven Lustü",
-      value: 139,
-      aliases: [
-        "steven lustu",
-        "steven lüstü",
-        "lustu",
-        "lüstü"
-      ]
-    },
-    {
-      label: "William Sell",
-      value: 139,
-      aliases: [
-        "william sell",
-        "sell"
-      ]
-    },
-    {
-      label: "Ole Bjørn Sundgot",
-      value: 138,
-      aliases: [
-        "ole bjørn sundgot",
-        "ole bjorn sundgot",
-        "sundgot"
-      ]
-    },
-    {
-      label: "Jan Derek Sørensen",
-      value: 136,
-      aliases: [
-        "jan derek sørensen",
-        "jan derek sorensen",
-        "sørensen",
-        "sorensen"
-      ]
-    }
-  ]
-},
-    id: "lyn-redcards-001",
-    title: "Lyn-spillere siden 1990 med minst 2 røde kort",
-    intro: "Tallene viser antall røde kort. Klarer du å finne spillerne?",
-    answers: [
-      {
-        label: "Steven Lustü",
-        value: 4,
-        aliases: ["steven lustu", "lustu", "lüstü", "steven lüstü"]
-      },
-      {
-        label: "Mads Dahm",
-        value: 3,
-        aliases: ["mads dahm", "dahm"]
-      },
-      {
-        label: "Christoffer Lars Simensen",
-        value: 2,
-        aliases: ["christoffer lars simensen", "christoffer simensen", "simensen"]
-      },
-      {
-        label: "Eirik Haugstad",
-        value: 2,
-        aliases: ["eirik haugstad", "haugstad"]
-      },
-      {
-        label: "Kristian Flittie Onstad",
-        value: 2,
-        aliases: ["kristian flittie onstad", "flittie onstad", "onstad"]
-      },
-      {
-        label: "Mohammed Ouseb",
-        value: 2,
-        aliases: ["mohammed ouseb", "ouseb"]
-      },
-      {
-        label: "Paul Obiefule",
-        value: 2,
-        aliases: ["paul obiefule", "obiefule"]
-      },
-      {
-        label: "Theodor Elmar Bjarnasson",
-        value: 2,
-        aliases: ["theodor elmar bjarnasson", "theodor bjarnasson", "bjarnasson"]
-      }
+      { label: "Alf-Inge Håland", value: 181, aliases: ["alf inge haaland", "alf inge håland", "håland", "haaland"] },
+      { label: "Gunnar Halle", value: 167, aliases: ["halle", "gunnar halle"] }
     ]
   },
 
+  {
+    id: "lyn-most-appearances-2000-001",
+    title: "Flest kamper for Lyn siden 2000",
+    intro: "Tallene viser antall kamper for Lyns A-lag.",
+    answers: [
+      { label: "Jo Tessem", value: 209, aliases: ["jo tessem", "tessem"] },
+      { label: "Tomasz Sokolowski", value: 182, aliases: ["tomasz sokolowski", "sokolowski"] },
+      { label: "Tommy Berntsen", value: 180, aliases: ["tommy berntsen", "berntsen"] },
+      { label: "Per Egil Swift", value: 166, aliases: ["per egil swift", "swift"] },
+      { label: "Tommy Nilsen", value: 159, aliases: ["tommy nilsen", "nilsen"] },
+      { label: "Anders Bjørntvedt Olsen", value: 144, aliases: ["anders bjørntvedt olsen", "anders bjorntvedt olsen", "bjørntvedt olsen", "bjorntvedt olsen"] },
+      { label: "Steven Lustü", value: 139, aliases: ["steven lustu", "steven lüstü", "lustu", "lüstü"] },
+      { label: "William Sell", value: 139, aliases: ["william sell", "sell"] },
+      { label: "Ole Bjørn Sundgot", value: 138, aliases: ["ole bjørn sundgot", "ole bjorn sundgot", "sundgot"] },
+      { label: "Jan Derek Sørensen", value: 136, aliases: ["jan derek sørensen", "jan derek sorensen", "sørensen", "sorensen"] }
+    ]
+  },
+
+  {
+    id: "lyn-redcards-001",
+    title: "Lyn-spillere siden 1990 med minst 2 røde kort",
+    intro: "Tallene viser antall røde kort.",
+    answers: [
+      { label: "Steven Lustü", value: 4, aliases: ["steven lustu", "lustu", "lüstü", "steven lüstü"] },
+      { label: "Mads Dahm", value: 3, aliases: ["mads dahm", "dahm"] },
+      { label: "Christoffer Lars Simensen", value: 2, aliases: ["christoffer lars simensen", "christoffer simensen", "simensen"] },
+      { label: "Eirik Haugstad", value: 2, aliases: ["eirik haugstad", "haugstad"] },
+      { label: "Kristian Flittie Onstad", value: 2, aliases: ["kristian flittie onstad", "flittie onstad", "onstad"] },
+      { label: "Mohammed Ouseb", value: 2, aliases: ["mohammed ouseb", "ouseb"] },
+      { label: "Paul Obiefule", value: 2, aliases: ["paul obiefule", "obiefule"] },
+      { label: "Theodor Elmar Bjarnasson", value: 2, aliases: ["theodor elmar bjarnasson", "theodor bjarnasson", "bjarnasson"] }
+    ]
+  },
+{
+  id: "worldcup-winners-001",
+  title: "Land som har vunnet VM",
+  intro: "Tallene viser antall VM-titler.",
+  answers: [
+    { label: "Brasil", value: 5, aliases: ["brasil", "brazil"] },
+    { label: "Tyskland", value: 4, aliases: ["tyskland", "germany", "vest-tyskland", "west germany"] },
+    { label: "Italia", value: 4, aliases: ["italia", "italy"] },
+    { label: "Argentina", value: 3, aliases: ["argentina"] },
+    { label: "Frankrike", value: 2, aliases: ["frankrike", "france"] },
+    { label: "Uruguay", value: 2, aliases: ["uruguay"] },
+    { label: "England", value: 1, aliases: ["england"] },
+    { label: "Spania", value: 1, aliases: ["spania", "spain"] }
+  ]
+},
+
+{
+  id: "worldcup-goals-001",
+  title: "Spillere med flest VM-mål",
+  intro: "Tallene viser antall mål i VM-sluttspill.",
+  answers: [
+    { label: "Miroslav Klose", value: 16, aliases: ["klose", "miroslav klose"] },
+    { label: "Ronaldo", value: 15, aliases: ["ronaldo", "ronaldo nazario"] },
+    { label: "Gerd Müller", value: 14, aliases: ["gerd muller", "gerd müller", "muller", "müller"] },
+    { label: "Lionel Messi", value: 13, aliases: ["messi", "lionel messi"] },
+    { label: "Just Fontaine", value: 13, aliases: ["fontaine", "just fontaine"] },
+    { label: "Pelé", value: 12, aliases: ["pele", "pelé"] },
+    { label: "Kylian Mbappé", value: 12, aliases: ["mbappe", "mbappé", "kylian mbappe", "kylian mbappé"] },
+    { label: "Sándor Kocsis", value: 11, aliases: ["kocsis", "sandor kocsis", "sándor kocsis"] },
+    { label: "Jürgen Klinsmann", value: 11, aliases: ["klinsmann", "jurgen klinsmann", "jürgen klinsmann"] },
+    { label: "Helmut Rahn", value: 10, aliases: ["rahn", "helmut rahn"] }
+  ]
+},
+
+{
+  id: "ucl-club-titles-001",
+  title: "Klubber med flest Champions League/Serievinnercup-titler",
+  intro: "Tallene viser antall titler.",
+  answers: [
+    { label: "Real Madrid", value: 15, aliases: ["real madrid", "madrid"] },
+    { label: "AC Milan", value: 7, aliases: ["milan", "ac milan"] },
+    { label: "Bayern München", value: 6, aliases: ["bayern", "bayern munchen", "bayern münchen", "bayern munich"] },
+    { label: "Liverpool", value: 6, aliases: ["liverpool"] },
+    { label: "Barcelona", value: 5, aliases: ["barcelona", "barca", "barça"] },
+    { label: "Ajax", value: 4, aliases: ["ajax"] },
+    { label: "Inter", value: 3, aliases: ["inter", "inter milan", "internazionale"] },
+    { label: "Manchester United", value: 3, aliases: ["manchester united", "man united", "man utd", "united"] },
+    { label: "Juventus", value: 2, aliases: ["juventus", "juve"] },
+    { label: "Benfica", value: 2, aliases: ["benfica"] }
+  ]
+},
+
+{
+  id: "ucl-goals-001",
+  title: "Spillere med flest Champions League-mål",
+  intro: "Tallene viser antall mål i Champions League.",
+  answers: [
+    { label: "Cristiano Ronaldo", value: 140, aliases: ["ronaldo", "cristiano", "cristiano ronaldo"] },
+    { label: "Lionel Messi", value: 129, aliases: ["messi", "lionel messi"] },
+    { label: "Robert Lewandowski", value: 109, aliases: ["lewandowski", "robert lewandowski"] },
+    { label: "Karim Benzema", value: 90, aliases: ["benzema", "karim benzema"] },
+    { label: "Raúl", value: 71, aliases: ["raul", "raúl", "raul gonzalez", "raúl gonzález"] },
+    { label: "Kylian Mbappé", value: 70, aliases: ["mbappe", "mbappé", "kylian mbappe", "kylian mbappé"] },
+    { label: "Erling Haaland", value: 57, aliases: ["haaland", "erling haaland"] },
+    { label: "Thomas Müller", value: 57, aliases: ["muller", "müller", "thomas muller", "thomas müller"] },
+    { label: "Ruud van Nistelrooy", value: 56, aliases: ["van nistelrooy", "nistelrooy", "ruud van nistelrooy"] },
+    { label: "Harry Kane", value: 54, aliases: ["kane", "harry kane"] }
+  ]
+},
+
+{
+  id: "ucl-single-season-goals-001",
+  title: "Flest mål i én Champions League-sesong",
+  intro: "Tallene viser mål i én sesong.",
+  answers: [
+    { label: "Cristiano Ronaldo", value: 17, aliases: ["ronaldo", "cristiano", "cristiano ronaldo"] },
+    { label: "Robert Lewandowski", value: 15, aliases: ["lewandowski", "robert lewandowski"] },
+    { label: "Karim Benzema", value: 15, aliases: ["benzema", "karim benzema"] },
+    { label: "Kylian Mbappé", value: 15, aliases: ["mbappe", "mbappé", "kylian mbappe", "kylian mbappé"] },
+    { label: "Lionel Messi", value: 14, aliases: ["messi", "lionel messi"] },
+    { label: "José Altafini", value: 14, aliases: ["altafini", "jose altafini", "josé altafini"] },
+    { label: "Harry Kane", value: 14, aliases: ["kane", "harry kane"] },
+    { label: "Raphinha", value: 13, aliases: ["raphinha"] },
+    { label: "Serhou Guirassy", value: 13, aliases: ["guirassy", "serhou guirassy"] },
+    { label: "Ruud van Nistelrooy", value: 12, aliases: ["van nistelrooy", "nistelrooy", "ruud van nistelrooy"] }
+  ]
+},
+  
+  {
+  id: "worldcup-appearances-001",
+  title: "Land med flest VM-deltakelser",
+  intro: "Tallene viser antall VM-sluttspill.",
+  answers: [
+    { label: "Brasil", value: 23, aliases: ["brasil", "brazil"] },
+    { label: "Tyskland", value: 21, aliases: ["tyskland", "germany"] },
+    { label: "Argentina", value: 19, aliases: ["argentina"] },
+    { label: "Italia", value: 18, aliases: ["italia", "italy"] },
+    { label: "Mexico", value: 18, aliases: ["mexico", "mexico"] },
+    { label: "Spania", value: 16, aliases: ["spania", "spain"] },
+    { label: "Frankrike", value: 16, aliases: ["frankrike", "france"] },
+    { label: "England", value: 16, aliases: ["england"] },
+    { label: "Uruguay", value: 15, aliases: ["uruguay"] },
+    { label: "Belgia", value: 15, aliases: ["belgia", "belgium"] }
+  ]
+},
+  
   {
     id: "lyn-nationalities-001",
     title: "Nasjonaliteter i Lyns A-lag siden 1990 med minst 3 spillere",
     intro: "Tallene viser antall spillere fra landet. Norge er ikke med.",
     answers: [
-      {
-        label: "Sverige",
-        value: 16,
-        aliases: ["sverige", "svensk", "sweden"]
-      },
-      {
-        label: "Island",
-        value: 11,
-        aliases: ["island", "iceland"]
-      },
-      {
-        label: "Nigeria",
-        value: 7,
-        aliases: ["nigeria"]
-      },
-      {
-        label: "Australia",
-        value: 5,
-        aliases: ["australia"]
-      },
-      {
-        label: "Senegal",
-        value: 3,
-        aliases: ["senegal"]
-      },
-      {
-        label: "England",
-        value: 3,
-        aliases: ["england"]
-      },
-      {
-        label: "Danmark",
-        value: 3,
-        aliases: ["danmark", "denmark"]
-      },
-      {
-        label: "Elfenbenskysten",
-        value: 3,
-        aliases: ["elfenbenskysten", "ivory coast", "cote divoire", "côte d'ivoire"]
-      },
-      {
-        label: "Frankrike",
-        value: 3,
-        aliases: ["frankrike", "france"]
-      },
-      {
-        label: "Argentina",
-        value: 3,
-        aliases: ["argentina"]
-      }
+      { label: "Sverige", value: 16, aliases: ["sverige", "svensk", "sweden"] },
+      { label: "Island", value: 11, aliases: ["island", "iceland"] },
+      { label: "Nigeria", value: 7, aliases: ["nigeria"] },
+      { label: "Australia", value: 5, aliases: ["australia"] },
+      { label: "Senegal", value: 3, aliases: ["senegal"] },
+      { label: "England", value: 3, aliases: ["england"] },
+      { label: "Danmark", value: 3, aliases: ["danmark", "denmark"] },
+      { label: "Elfenbenskysten", value: 3, aliases: ["elfenbenskysten", "ivory coast", "cote divoire", "côte d'ivoire", "cote d ivoire"] },
+      { label: "Frankrike", value: 3, aliases: ["frankrike", "france"] },
+      { label: "Argentina", value: 3, aliases: ["argentina"] }
     ]
   }
 ];
