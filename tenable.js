@@ -306,10 +306,23 @@ async function initPlayedCheck() {
     }
   `;
 
-  message.innerHTML = "";
-  
-  guessBtn.addEventListener("click", addGuess);
+   message.innerHTML = "";
+}
+
+guessBtn.addEventListener("click", addGuess);
 finishBtn.addEventListener("click", finishGame);
+
+guessInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    addGuess();
+  }
+});
+
+renderTitle();
+renderSlots();
+renderFound();
+renderLives();
+initPlayedCheck();
 
 guessInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
