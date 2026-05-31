@@ -4,23 +4,19 @@ import {
   hasPlayedToday
 } from "./v2/js/games-core.js";
 
-const startDate =
-  new Date("2026-01-01");
+const startDate = new Date("2026-01-01");
+const today = new Date();
 
-const today =
-  new Date();
+const diffDays = Math.floor(
+  (today - startDate) / (1000 * 60 * 60 * 24)
+);
 
-const diffDays =
-  Math.floor(
-    (today - startDate) /
-    (1000 * 60 * 60 * 24)
-  );
+const dailyIndex = diffDays % challenges.length;
+const challenge = challenges[dailyIndex];
 
-const dailyIndex =
-  diffDays % challenges.length;
+const challengeId =
+  `dailyxi-${diffDays}-${challenge.title}`;
 
-const challenge =
-  challenges[dailyIndex];
 let guessed = [];
 let guessedScorers = [];
 let lives = 3;
@@ -31,80 +27,96 @@ let scoreSaved = false;
 const stats = JSON.parse(
   localStorage.getItem("dailyXiStats")
 ) || {
-  played:0,
-  wins:0,
-  goals:0
+  played: 0,
+  wins: 0,
+  goals: 0
 };
 
+const guessInput = document.getElementById("guessInput");
+
 renderProfile();
+renderLives();
+renderPitch();
+renderBonusBox();
 initPlayedCheck();
+
+document.getElementById("info").innerHTML = `
+  <div><strong>${challenge.title}</strong></div>
+  <div>${challenge.competition}</div>
+  <div>${challenge.date}</div>
+  <div>Resultat: ${challenge.result}</div>
+  <div>Formasjon: ${challenge.formation}</div>
+  <div>Tilskuere: ${Number(challenge.attendance || 0).toLocaleString("no-NO")}</div>
+`;
+
 async function initPlayedCheck() {
-
-  const alreadyPlayed =
-    await hasPlayedToday(
-      "dailyxi",
-      `dailyxi-${dailyIndex}-${challenge.title}`
-    );
-
-  if (!alreadyPlayed) return;
-
-  gameOver = true;
-
-  document.getElementById("guessInput").disabled = true;
-
-  setMessage(
-    "🏆 Du har allerede spilt dagens Daily XI"
+  const alreadyPlayed = await hasPlayedToday(
+    "dailyxi",
+    challengeId
   );
-}
 
-function renderBonusBox() {
-
-  const box =
-    document.getElementById("bonusBox");
-
-  if (!box) return;
-
-  if (!challenge.bonusGoalscorers.length) {
-    box.innerHTML = "";
+  if (!alreadyPlayed) {
+    guessInput.focus();
     return;
   }
 
-  const uniqueScorers =
-    [...new Set(challenge.bonusGoalscorers)];
+  gameOver = true;
+  guessInput.disabled = true;
 
-  box.innerHTML = `
+  const btn = document.querySelector(".guess-box button");
+  if (btn) btn.disabled = true;
 
-   <h3>
-  ⭐ Målscorere
-  (${guessedScorers.length}/${uniqueScorers.length})
-</h3>
+  setMessage("🏆 Du har allerede spilt dagens Daily XI");
+}
 
-<div class="bonus-help">
-  Målscorere kan også være innbyttere.
-</div>
+function normalize(str) {
+  return String(str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "o")
+    .replace(/å/g, "a")
+    .replace(/[^a-z0-9]/g, "");
+}
 
-    <div class="bonus-grid">
+function lastName(fullName) {
+  return String(fullName || "").split(" ").slice(-1)[0];
+}
 
-      ${uniqueScorers.map(name => {
+function levenshtein(a, b) {
+  const matrix = Array.from({ length: a.length + 1 }, () => []);
 
-        const found =
-          guessedScorers.includes(
-            normalize(name)
-          );
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
 
-        return `
-          <div class="
-            bonus-chip
-            ${found ? "found" : ""}
-          ">
-            ${found ? "⚽ " + name : "⚽ ?"}
-          </div>
-        `;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
 
-      }).join("")}
+  return matrix[a.length][b.length];
+}
 
-    </div>
-  `;
+function isNameMatch(guess, fullName) {
+  const g = normalize(guess);
+  const full = normalize(fullName);
+  const last = normalize(lastName(fullName));
+
+  if (!g) return false;
+
+  return (
+    g === full ||
+    g === last ||
+    (full.includes(g) && g.length >= 5) ||
+    (last.includes(g) && g.length >= 4) ||
+    (levenshtein(g, last) <= 1 && g.length >= 5)
+  );
 }
 
 function renderProfile() {
@@ -130,64 +142,6 @@ function renderProfile() {
       </div>
     </div>
   `;
-}
- 
-document.getElementById("info").innerHTML = `
-  <div><strong>${challenge.title}</strong></div>
-  <div>${challenge.competition}</div>
-  <div>${challenge.date}</div>
-  <div>Resultat: ${challenge.result}</div>
-  <div>Formasjon: ${challenge.formation}</div>
-  <div>Tilskuere: ${challenge.attendance.toLocaleString("no-NO")}</div>
-`;
-
-function normalize(str) {
-  return String(str || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/æ/g, "ae")
-    .replace(/ø/g, "o")
-    .replace(/å/g, "a")
-    .replace(/[^a-z0-9]/g, "");
-}
-
-function lastName(fullName) {
-  return String(fullName || "").split(" ").slice(-1)[0];
-}
-
-function isNameMatch(guess, fullName) {
-  const g = normalize(guess);
-  const full = normalize(fullName);
-  const last = normalize(lastName(fullName));
-
-  if (!g) return false;
-
-  if (g === full || g === last) return true;
-
-  if (full.includes(g) && g.length >= 5) return true;
-  if (last.includes(g) && g.length >= 4) return true;
-
-  return levenshtein(g, last) <= 1 && g.length >= 5;
-}
-
-function levenshtein(a, b) {
-  const matrix = Array.from({ length: a.length + 1 }, () => []);
-
-  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
-  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
-
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1,
-        matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
-      );
-    }
-  }
-
-  return matrix[a.length][b.length];
 }
 
 function renderLives() {
@@ -228,29 +182,75 @@ function renderGuessedList() {
 
   wrapper.innerHTML = `
     <h3>Gjettede spillere (${guessed.length}/11)</h3>
+
     <div class="guessed-grid">
-      ${guessed.length ? guessed.map(p => `<div>${p}</div>`).join("") : "<div>Ingen ennå</div>"}
+      ${
+        guessed.length
+          ? guessed.map(p => `<div>${p}</div>`).join("")
+          : "<div>Ingen ennå</div>"
+      }
     </div>
 
     <div class="hint">
       Tips: Etternavn holder. Små skrivefeil tåles.
-      ${challenge.bonusGoalscorers.length ? "<br>Bonus: målscorere kan også treffes." : ""}
+      ${
+        challenge.bonusGoalscorers?.length
+          ? "<br>Bonus: målscorere kan også treffes."
+          : ""
+      }
     </div>
   `;
 
   document.querySelector(".container").appendChild(wrapper);
 }
 
+function renderBonusBox() {
+  const box = document.getElementById("bonusBox");
+  if (!box) return;
+
+  const scorers = challenge.bonusGoalscorers || [];
+
+  if (!scorers.length) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const uniqueScorers = [...new Set(scorers)];
+
+  box.innerHTML = `
+    <h3>
+      ⭐ Målscorere
+      (${guessedScorers.length}/${uniqueScorers.length})
+    </h3>
+
+    <div class="bonus-help">
+      Målscorere kan også være innbyttere.
+    </div>
+
+    <div class="bonus-grid">
+      ${uniqueScorers.map(name => {
+        const found = guessedScorers.includes(normalize(name));
+
+        return `
+          <div class="bonus-chip ${found ? "found" : ""}">
+            ${found ? "⚽ " + name : "⚽ ?"}
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 function setMessage(text) {
   document.getElementById("message").innerText = text;
 }
+
 function calculateDailyXiScore(won = false) {
   const lineupPoints = guessed.filter(name =>
     challenge.lineup.some(player => player.name === name)
   ).length * 7;
 
   const bonusPoints = guessedScorers.length * 5;
-
   const lifeBonus = won ? lives * 5 : 0;
 
   return Math.min(100, lineupPoints + bonusPoints + lifeBonus);
@@ -265,10 +265,10 @@ function saveDailyXiScore(won = false) {
 
   saveGameScore({
     game: "dailyxi",
-    challengeId: `dailyxi-${dailyIndex}-${challenge.title}`,
+    challengeId,
     score: finalScore,
     maxScore: 100,
-    attempts: 1,
+    attempts: 3 - lives + 1,
     details: {
       title: challenge.title,
       result: challenge.result,
@@ -276,7 +276,8 @@ function saveDailyXiScore(won = false) {
       guessedPlayers: guessed,
       guessedScorers,
       livesLeft: lives,
-      won
+      won,
+      user: getGameUser()
     }
   }).then(result => {
     console.log("Daily XI score lagret:", result, finalScore);
@@ -286,33 +287,33 @@ function saveDailyXiScore(won = false) {
 function endGame(text) {
   gameOver = true;
   setMessage(text);
-  document.getElementById("guessInput").disabled = true;
-}
-function checkBonusScorer(rawGuess) {
-  if (!challenge.bonusGoalscorers.length) return false;
-  
 
-  const foundScorer = challenge.bonusGoalscorers.find(scorer =>
+  guessInput.disabled = true;
+
+  const btn = document.querySelector(".guess-box button");
+  if (btn) btn.disabled = true;
+}
+
+function checkBonusScorer(rawGuess) {
+  const scorers = challenge.bonusGoalscorers || [];
+  if (!scorers.length) return false;
+
+  const foundScorer = scorers.find(scorer =>
     isNameMatch(rawGuess, scorer)
   );
 
   if (!foundScorer) return false;
-  if (
-  guessedScorers.includes(
-    normalize(foundScorer)
-  )
-) {
-  return false;
-}
 
-  guessedScorers.push(normalize(foundScorer));
+  const normalizedScorer = normalize(foundScorer);
 
+  if (guessedScorers.includes(normalizedScorer)) {
+    return false;
+  }
+
+  guessedScorers.push(normalizedScorer);
   stats.goals++;
 
-  localStorage.setItem(
-    "dailyXiStats",
-    JSON.stringify(stats)
-  );
+  localStorage.setItem("dailyXiStats", JSON.stringify(stats));
 
   renderProfile();
   renderBonusBox();
@@ -323,11 +324,10 @@ function checkBonusScorer(rawGuess) {
 function submitGuess() {
   if (gameOver) return;
 
-  const input = document.getElementById("guessInput");
-  const rawGuess = input.value.trim();
+  const rawGuess = guessInput.value.trim();
 
-  input.value = "";
-  input.focus();
+  guessInput.value = "";
+  guessInput.focus();
 
   if (!rawGuess) return;
 
@@ -343,28 +343,25 @@ function submitGuess() {
 
     guessed.push(foundPlayer.name);
 
-const bonusHit = checkBonusScorer(rawGuess);
+    const bonusHit = checkBonusScorer(rawGuess);
 
-renderPitch();
+    renderPitch();
 
-setMessage(
-  bonusHit
-    ? `✅ Riktig! ${foundPlayer.name} ⭐ Bonusmålscorer!`
-    : `✅ Riktig! ${foundPlayer.name}`
-);
+    setMessage(
+      bonusHit
+        ? `✅ Riktig! ${foundPlayer.name} ⭐ Bonusmålscorer!`
+        : `✅ Riktig! ${foundPlayer.name}`
+    );
 
     if (guessed.length === challenge.lineup.length) {
       stats.played++;
-stats.wins++;
+      stats.wins++;
 
-localStorage.setItem(
-  "dailyXiStats",
-  JSON.stringify(stats)
-);
+      localStorage.setItem("dailyXiStats", JSON.stringify(stats));
+      renderProfile();
 
-renderProfile();
       saveDailyXiScore(true);
-endGame(`🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`);
+      endGame(`🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`);
     }
 
     return;
@@ -372,11 +369,10 @@ endGame(`🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`);
 
   const bonusHit = checkBonusScorer(rawGuess);
 
-if (bonusHit) {
-  setMessage(`⭐ Bonusmålscorer! ${bonusHit}`);
-  return;
-}
-
+  if (bonusHit) {
+    setMessage(`⭐ Bonusmålscorer! ${bonusHit}`);
+    return;
+  }
 
   lives--;
   renderLives();
@@ -384,15 +380,12 @@ if (bonusHit) {
   if (lives <= 0) {
     stats.played++;
 
-localStorage.setItem(
-  "dailyXiStats",
-  JSON.stringify(stats)
-);
+    localStorage.setItem("dailyXiStats", JSON.stringify(stats));
+    renderProfile();
 
-renderProfile();
     saveDailyXiScore(false);
-endGame(`💀 Game over · ${calculateDailyXiScore(false)} poeng`);
     revealAnswers();
+    endGame(`💀 Game over · ${calculateDailyXiScore(false)} poeng`);
   } else {
     setMessage(`❌ Feil. ${lives} liv igjen`);
   }
@@ -408,12 +401,10 @@ function revealAnswers() {
   renderPitch();
 }
 
-document.getElementById("guessInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") submitGuess();
+guessInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    submitGuess();
+  }
 });
 
-renderLives();
-renderPitch();
-renderBonusBox();
-
-document.getElementById("guessInput").focus();
+window.submitGuess = submitGuess;
