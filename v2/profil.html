@@ -304,7 +304,12 @@ async function init() {
     ${renderMiniStats([
       { label:"Lag levert", value:userFantasyPicks.length },
       { label:"Kapteiner", value:Object.keys(captainCounts).length },
-      { label:"Favorittkaptein", value:favoriteCaptain ? favoriteCaptain.player : "-" }
+      {
+  label:"Favorittkaptein",
+  value:favoriteCaptain
+    ? `${favoriteCaptain.player} (${favoriteCaptain.count}x)`
+    : "-"
+}
     ])}
 
     <div class="profile-list">
