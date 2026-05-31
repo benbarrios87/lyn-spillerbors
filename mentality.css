@@ -173,6 +173,34 @@ button:disabled {
   font-weight:900;
   text-align:center;
 }
+.results-box {
+  margin-top:18px;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.results-box h3 {
+  margin:0 0 8px;
+  color:#ffd166;
+}
+
+.results-box p {
+  margin:0;
+  color:rgba(255,255,255,.78);
+  line-height:1.45;
+}
+
+.status-note {
+  margin-top:12px;
+  padding:12px;
+  border-radius:16px;
+  background:rgba(255,209,102,.12);
+  border:1px solid rgba(255,209,102,.28);
+  color:#ffd166;
+  font-weight:900;
+}
 
 @media(max-width:650px) {
   .hero h1 {
