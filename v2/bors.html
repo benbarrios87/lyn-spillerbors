@@ -70,8 +70,20 @@ async function init() {
   allVotes = await fetchVotes();
 
   const completed = allMatches
-    .filter(match => match.actual_home !== null && match.actual_away !== null)
-    .reverse();
+  .filter(match => {
+    if (match.actual_home === null || match.actual_away === null) {
+      return false;
+    }
+
+    const ranking = getMatchRanking(allVotes, match.id, {
+      minVotes: 1
+    });
+
+    return ranking.length > 0;
+  })
+  .sort((a,b) =>
+    new Date(b.date) - new Date(a.date)
+  );
 
   selectEl.innerHTML = completed.map(match => `
     <option value="${match.id}">
