@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -12,191 +13,123 @@
   --red:#d71920;
   --blue:#13294b;
   --gold:#ffd166;
-  --dark:#06111f;
-  --glass:rgba(5,8,20,0.68);
-  --line:rgba(255,255,255,0.14);
-  --muted:rgba(255,255,255,0.76);
-}
-
-* {
-  box-sizing:border-box;
-}
-
-body {
-  margin:0;
-  min-height:100vh;
-  font-family:Arial, sans-serif;
-  color:white;
-  background:
-    linear-gradient(rgba(0,0,0,0.50), rgba(0,0,0,0.62)),
-    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
-}
-
-.page {
-  width:100%;
-  max-width:1180px;
-  margin:0 auto;
-  padding:18px 16px 60px;
 }
 
 .topnav {
-  position:sticky;
-  top:0;
+  position:fixed;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
   z-index:50;
-  margin:0 auto 22px;
-  padding:10px 12px;
-  border-radius:0 0 24px 24px;
-  background:rgba(4,8,18,0.78);
-  border:1px solid rgba(255,255,255,0.12);
-  border-top:none;
-  backdrop-filter:blur(12px);
-  box-shadow:0 12px 28px rgba(0,0,0,0.28);
+  width:min(1120px, calc(100% - 24px));
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:12px;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 12px;
+  border-radius:20px;
+  background:rgba(8,12,24,0.88);
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 10px 28px rgba(0,0,0,0.34);
+  backdrop-filter:blur(10px);
 }
 
 .nav-brand {
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
   color:white;
-  text-decoration:none;
   font-weight:900;
-  letter-spacing:.2px;
+  text-decoration:none;
   white-space:nowrap;
 }
 
 .nav-brand img {
-  width:42px;
-  height:42px;
+  width:30px;
+  height:30px;
   object-fit:contain;
 }
 
 .nav-links {
   display:flex;
-  flex-wrap:wrap;
   gap:8px;
+  flex-wrap:wrap;
   justify-content:flex-end;
 }
 
 .nav-links a {
   color:white;
   text-decoration:none;
-  padding:9px 12px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.10);
-  font-size:14px;
-  font-weight:800;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  background:var(--gold);
-  color:#111827;
-}
-
-.hero {
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:20px;
-  align-items:stretch;
-}
-
-.hero-main {
-  min-height:380px;
-  border-radius:34px;
-  padding:34px;
-  background:
-    radial-gradient(circle at 85% 15%, rgba(255,209,102,0.22), transparent 28%),
-    linear-gradient(135deg, rgba(19,41,75,0.92), rgba(215,25,32,0.78)),
-    rgba(0,0,0,0.55);
-  border:1px solid rgba(255,255,255,0.18);
-  box-shadow:0 24px 60px rgba(0,0,0,0.38);
-  position:relative;
-  overflow:hidden;
-}
-
-.hero-main::after {
-  content:"LYN";
-  position:absolute;
-  right:-24px;
-  bottom:-22px;
-  font-size:150px;
+  font-size:13px;
   font-weight:900;
-  letter-spacing:6px;
-  color:rgba(255,255,255,0.055);
-  transform:rotate(-7deg);
-  pointer-events:none;
+  padding:8px 11px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+  background:var(--gold);
+  color:#17110a;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:92px 20px 20px;
+  box-sizing:border-box;
+}
+
+.wrapper {
+  width:100%;
+  max-width:1120px;
+  padding:30px 20px;
+  text-align:center;
 }
 
 .logo {
-  width:132px;
-  max-width:44vw;
+  width:170px;
+  max-width:70%;
+  margin-bottom:12px;
   filter:drop-shadow(0 8px 20px rgba(0,0,0,0.45));
-  position:relative;
-  z-index:2;
-}
-
-.kicker {
-  display:inline-block;
-  margin-top:20px;
-  padding:8px 13px;
-  border-radius:999px;
-  background:var(--gold);
-  color:#111827;
-  font-size:13px;
-  text-transform:uppercase;
-  letter-spacing:.7px;
-  font-weight:900;
-  position:relative;
-  z-index:2;
 }
 
 h1 {
-  margin:18px 0 10px;
-  font-size:64px;
-  line-height:.95;
+  margin:0;
+  font-size:52px;
+  letter-spacing:1px;
   color:white;
   text-shadow:0 4px 18px rgba(0,0,0,0.5);
-  position:relative;
-  z-index:2;
 }
 
 .subtitle {
-  max-width:680px;
-  margin:0;
-  font-size:19px;
-  line-height:1.48;
-  color:rgba(255,255,255,0.91);
+  margin-top:12px;
+  font-size:18px;
+  opacity:0.92;
+  line-height:1.5;
+  color:white;
   text-shadow:0 2px 10px rgba(0,0,0,0.55);
-  position:relative;
-  z-index:2;
-}
-
-.hero-side {
-  display:grid;
-  gap:16px;
-}
-
-.identity-box,
-.next-match-widget,
-.my-deliveries,
-.throne-card,
-.season-card,
-.player-of-year-card,
-.launch-panel {
-  background:var(--glass);
-  border:1px solid var(--line);
-  box-shadow:0 14px 36px rgba(0,0,0,0.34);
-  backdrop-filter:blur(9px);
 }
 
 .identity-box {
-  padding:18px;
-  border-radius:26px;
+  margin:22px auto 0;
+  max-width:680px;
+  padding:15px;
+  border-radius:20px;
+  background:rgba(0,0,0,0.58);
+  border:1px solid rgba(255,255,255,0.14);
+  color:white;
+  box-shadow:0 8px 22px rgba(0,0,0,0.28);
+  text-align:left;
 }
 
 .identity-top {
@@ -204,21 +137,21 @@ h1 {
   justify-content:space-between;
   gap:12px;
   align-items:center;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .identity-label {
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:1px;
-  color:var(--muted);
-  font-weight:900;
+  opacity:0.75;
+  font-weight:bold;
 }
 
 .identity-status {
   color:var(--gold);
   font-size:13px;
-  font-weight:900;
+  font-weight:bold;
   text-align:right;
 }
 
@@ -230,9 +163,10 @@ h1 {
 
 .identity-row input {
   width:100%;
+  box-sizing:border-box;
   border:none;
-  border-radius:15px;
-  padding:14px;
+  border-radius:13px;
+  padding:13px 14px;
   font-size:16px;
   background:rgba(255,255,255,0.12);
   color:white;
@@ -240,22 +174,24 @@ h1 {
 }
 
 .identity-row input::placeholder {
-  color:rgba(255,255,255,0.50);
+  color:rgba(255,255,255,0.5);
 }
 
 .identity-row button {
   border:none;
-  border-radius:15px;
+  border-radius:13px;
   padding:0 18px;
   background:var(--gold);
   color:#1b1300;
-  font-weight:900;
+  font-weight:bold;
   cursor:pointer;
 }
 
 .next-match-widget {
-  padding:20px;
-  border-radius:26px;
+  margin:24px auto 0;
+  max-width:680px;
+  padding:18px 20px;
+  border-radius:22px;
   text-align:left;
   color:white;
   position:relative;
@@ -263,7 +199,10 @@ h1 {
   background:
     radial-gradient(circle at top right, rgba(255,255,255,0.14), transparent 28%),
     linear-gradient(135deg, rgba(19,41,75,0.94), rgba(215,25,32,0.84));
-  border-color:rgba(255,209,102,0.4);
+  border:1px solid rgba(255,209,102,0.4);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.38),
+    0 0 18px rgba(255,209,102,0.08);
 }
 
 .next-match-widget::after {
@@ -284,7 +223,7 @@ h1 {
   z-index:2;
   color:var(--gold);
   font-size:13px;
-  font-weight:900;
+  font-weight:bold;
   letter-spacing:1px;
   text-transform:uppercase;
 }
@@ -293,7 +232,7 @@ h1 {
   position:relative;
   z-index:2;
   margin-top:8px;
-  font-size:32px;
+  font-size:34px;
   font-weight:900;
   line-height:1.05;
 }
@@ -304,17 +243,16 @@ h1 {
   margin-top:10px;
   font-size:14px;
   line-height:1.55;
-  color:rgba(255,255,255,0.92);
+  opacity:0.92;
 }
 
-.next-stats,
-.next-buttons {
+.next-stats {
   position:relative;
   z-index:2;
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  margin-top:13px;
+  margin-top:12px;
 }
 
 .next-pill {
@@ -323,17 +261,26 @@ h1 {
   border-radius:999px;
   padding:8px 12px;
   font-size:13px;
-  font-weight:900;
+  font-weight:bold;
+}
+
+.next-buttons {
+  position:relative;
+  z-index:2;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
 }
 
 .next-btn {
   border:none;
-  border-radius:15px;
-  padding:12px 15px;
+  border-radius:14px;
+  padding:11px 15px;
   font-size:14px;
-  font-weight:900;
+  font-weight:bold;
   cursor:pointer;
-  transition:.18s;
+  transition:0.18s;
 }
 
 .next-btn.primary {
@@ -352,23 +299,28 @@ h1 {
 }
 
 .next-loading {
-  opacity:.82;
+  opacity:0.8;
   text-align:center;
 }
 
 .my-deliveries {
-  border-radius:24px;
-  padding:18px;
+  margin:18px auto 0;
+  max-width:680px;
+  background:rgba(0,0,0,0.62);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:22px;
+  padding:17px;
   color:white;
   text-align:left;
+  box-shadow:0 10px 24px rgba(0,0,0,0.3);
 }
 
 .my-deliveries-title {
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:1px;
-  color:var(--muted);
-  font-weight:900;
+  opacity:0.72;
+  font-weight:bold;
   margin-bottom:10px;
 }
 
@@ -378,7 +330,7 @@ h1 {
   gap:10px;
   align-items:center;
   padding:10px 0;
-  border-top:1px solid rgba(255,255,255,0.10);
+  border-top:1px solid rgba(255,255,255,0.1);
 }
 
 .delivery-row:first-of-type {
@@ -390,68 +342,49 @@ h1 {
 }
 
 .delivery-main {
-  font-size:17px;
+  font-size:18px;
   font-weight:900;
 }
 
 .delivery-sub {
   margin-top:3px;
   font-size:13px;
-  color:var(--muted);
+  opacity:0.72;
 }
 
 .delivery-action {
   color:var(--gold);
-  font-weight:900;
+  font-weight:bold;
   text-decoration:none;
   white-space:nowrap;
   font-size:13px;
 }
 
 .delivery-empty {
-  color:var(--muted);
-  line-height:1.45;
-}
-
-.section-head {
-  margin:38px 0 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:16px;
-}
-
-.section-title {
-  margin:0;
-  font-size:30px;
-  font-weight:900;
-}
-
-.section-sub {
-  margin-top:5px;
-  color:var(--muted);
+  opacity:0.78;
   line-height:1.45;
 }
 
 .grid {
+  margin-top:40px;
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
 }
 
 .card {
   position:relative;
   overflow:hidden;
-  min-height:178px;
-  padding:24px 22px 22px 150px;
-  border-radius:26px;
+  min-height:180px;
+  padding:30px 28px 28px 210px;
+  border-radius:24px;
   color:white;
   text-align:left;
   cursor:pointer;
-  border:1px solid rgba(255,255,255,0.14);
-  box-shadow:0 12px 30px rgba(0,0,0,0.38);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 10px 28px rgba(0,0,0,0.38);
   backdrop-filter:blur(4px);
-  transition:.2s;
+  transition:0.2s;
   background:
     radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
     linear-gradient(135deg,#13294b,#1d4c8f);
@@ -463,50 +396,18 @@ h1 {
     linear-gradient(135deg,#d71920,#ff3942);
 }
 
-.card:hover {
-  transform:translateY(-4px);
-  box-shadow:0 18px 38px rgba(0,0,0,0.48);
-}
-
-.card::after {
-  content:"›";
-  position:absolute;
-  right:20px;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:50px;
-  font-weight:900;
-  opacity:.76;
-}
-
-.card-player {
-  position:absolute;
-  left:2px;
-  bottom:0;
-  height:170px;
-  max-width:150px;
-  object-fit:contain;
-  object-position:bottom left;
-  filter:drop-shadow(0 10px 18px rgba(0,0,0,0.45));
-  transition:.2s;
-}
-
-.card:hover .card-player {
-  transform:scale(1.08) translateY(-2px);
-}
-
-.fantasy-feature-card {
+.card.fantasy-feature-card {
   border-color:rgba(255,209,102,0.65);
   box-shadow:
     0 12px 32px rgba(0,0,0,0.42),
     0 0 24px rgba(255,209,102,0.16);
   background:
     radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
-    linear-gradient(135deg,#13294b,#d71920) !important;
+    linear-gradient(135deg,#13294b,#d71920);
 }
 
-.fantasy-feature-card::before,
-.games-feature-card::before {
+.card.fantasy-feature-card::before {
+  content:"HOT";
   position:absolute;
   top:14px;
   right:18px;
@@ -517,132 +418,129 @@ h1 {
   font-weight:900;
   padding:5px 9px;
   border-radius:999px;
-  letter-spacing:.6px;
+  letter-spacing:0.6px;
 }
 
-.fantasy-feature-card::before {
-  content:"HOT";
-}
-
-.games-feature-card {
+.card.games-feature-card {
   grid-column:1 / -1;
-  min-height:240px;
-  padding-left:330px;
+  min-height:205px;
+  padding-left:250px;
   border-color:rgba(255,209,102,0.72);
-  box-shadow:
-    0 18px 44px rgba(0,0,0,0.48),
-    0 0 30px rgba(255,209,102,0.18);
   background:
-    linear-gradient(90deg, rgba(7,12,27,0.04), rgba(7,12,27,0.38) 42%, rgba(215,25,32,0.64)),
-    radial-gradient(circle at 82% 18%, rgba(255,209,102,0.22), transparent 34%),
-    linear-gradient(135deg, #25125e, #0b63e5 45%, #d71920) !important;
+    radial-gradient(circle at top right, rgba(255,209,102,0.22), transparent 34%),
+    linear-gradient(135deg,#11115f,#0b63e5 45%,#d71920) !important;
 }
 
-.games-feature-card::before {
+.card.games-feature-card::before {
   content:"NYTT";
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:3;
+  background:var(--gold);
+  color:#16100a;
+  font-size:12px;
+  font-weight:900;
+  padding:5px 9px;
+  border-radius:999px;
+  letter-spacing:0.6px;
 }
 
-.games-feature-card .card-player {
-  left:0;
-  height:100%;
-  width:330px;
-  max-width:330px;
+.card.games-feature-card .card-player {
+  width:230px;
+  height:205px;
+  max-width:230px;
   object-fit:cover;
   object-position:center;
-  opacity:.96;
-  mask-image:linear-gradient(90deg, black 70%, transparent 100%);
-  -webkit-mask-image:linear-gradient(90deg, black 70%, transparent 100%);
+  border-radius:0 0 0 24px;
+  opacity:0.96;
+  mask-image:linear-gradient(90deg, black 72%, transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg, black 72%, transparent 100%);
 }
 
-.games-feature-card::after {
-  content:"🎮";
-  font-size:66px;
-  right:22px;
-  top:auto;
-  bottom:18px;
-  transform:none;
-  opacity:.28;
-}
-
-.stats-feature-card {
+.card.stats-feature-card {
   background:
-    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 35%),
+    radial-gradient(circle at top right, rgba(255,255,255,0.13), transparent 32%),
     linear-gradient(135deg,#d71920,#ff3942) !important;
 }
 
-.stats-feature-card::after {
-  content:"📊";
-  font-size:50px;
-  right:18px;
-  opacity:.35;
+
+.card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 18px 36px rgba(0,0,0,0.46);
 }
 
+.card-player {
+  position:absolute;
+  left:8px;
+  bottom:0;
+  height:205px;
+  max-width:210px;
+  object-fit:contain;
+  object-position:bottom left;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+  transition:0.2s;
+}
 
 .fantasy-player {
-  width:210px !important;
+  width:220px !important;
   height:auto !important;
   max-width:none !important;
-  left:-24px !important;
+  left:-20px !important;
   bottom:-8px !important;
+}
+
+.card:hover .card-player {
+  transform:scale(1.08) translateY(-2px);
 }
 
 .card-title {
   position:relative;
   z-index:2;
-  font-size:29px;
-  font-weight:900;
-  margin-bottom:9px;
+  font-size:30px;
+  font-weight:bold;
+  margin-bottom:10px;
 }
 
 .card-text {
   position:relative;
   z-index:2;
   font-size:15px;
-  color:rgba(255,255,255,0.91);
+  opacity:0.92;
   line-height:1.45;
 }
 
-.card-meta {
-  position:relative;
-  z-index:2;
-  margin-top:14px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-}
-
-.card-pill {
-  padding:6px 9px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.13);
-  border:1px solid rgba(255,255,255,0.12);
-  font-size:12px;
-  font-weight:900;
-  color:white;
-}
-
-.dashboard {
-  margin-top:30px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
+.card::after {
+  content:"›";
+  position:absolute;
+  right:22px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:52px;
+  font-weight:bold;
+  opacity:0.8;
 }
 
 .throne-card {
+  margin:28px auto 6px;
+  max-width:720px;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:18px;
-  padding:20px;
+  padding:18px 22px;
   background:
     linear-gradient(135deg, rgba(255,209,102,0.22), rgba(215,25,32,0.24)),
     rgba(0,0,0,0.66);
   border:1px solid rgba(255,209,102,0.5);
-  border-radius:26px;
+  border-radius:24px;
+  box-shadow:
+    0 14px 36px rgba(0,0,0,0.42),
+    0 0 28px rgba(255,209,102,0.12);
   color:white;
   text-align:left;
   cursor:pointer;
-  transition:.2s;
+  transition:0.2s;
 }
 
 .throne-card:hover {
@@ -654,57 +552,60 @@ h1 {
   line-height:1;
 }
 
-.throne-content {
-  text-align:left;
-}
-
 .throne-label {
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:1px;
-  color:var(--muted);
-  font-weight:900;
+  opacity:0.75;
+  font-weight:bold;
+}
+
+.throne-content {
+  text-align:center;
 }
 
 .throne-name {
   margin-top:2px;
-  font-size:36px;
+  font-size:38px;
   font-weight:900;
-  color:var(--gold);
+  color:#ffd166;
   line-height:1.1;
 }
 
 .throne-name a {
-  color:var(--gold);
+  color:#ffd166;
   text-decoration:none;
 }
 
 .throne-points {
   margin-top:4px;
-  font-size:14px;
-  color:var(--muted);
+  font-size:15px;
+  opacity:0.85;
 }
 
 .season-strip {
-  margin-top:0;
+  margin-top:34px;
 }
 
 .season-grid {
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px;
+  gap:16px;
 }
 
 .season-card {
-  border-radius:24px;
-  padding:20px;
+  background:rgba(0,0,0,0.60);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:20px;
+  padding:18px;
+  backdrop-filter:blur(4px);
   text-align:left;
   color:white;
 }
 
 .season-title {
   font-size:20px;
-  font-weight:900;
+  font-weight:800;
   margin-bottom:14px;
 }
 
@@ -723,7 +624,7 @@ h1 {
 }
 
 .season-row strong {
-  color:var(--gold);
+  color:#ffd166;
   font-size:16px;
   white-space:nowrap;
 }
@@ -731,24 +632,24 @@ h1 {
 .season-link {
   color:white;
   text-decoration:none;
-  font-weight:900;
+  font-weight:bold;
 }
 
 .season-link:hover {
-  color:var(--gold);
+  color:#ffd166;
 }
 
 .player-of-year-card {
-  margin-top:18px;
-  grid-column:1 / -1;
+  margin-top:26px;
   background:
     radial-gradient(circle at top right, rgba(255,209,102,0.18), transparent 34%),
     linear-gradient(135deg, rgba(19,41,75,0.92), rgba(0,0,0,0.72));
   border:1px solid rgba(255,209,102,0.45);
-  border-radius:26px;
-  padding:24px;
+  border-radius:24px;
+  padding:22px;
   color:white;
   text-align:left;
+  box-shadow:0 14px 34px rgba(0,0,0,0.36);
 }
 
 .player-of-year-head {
@@ -765,10 +666,10 @@ h1 {
 }
 
 .player-of-year-formula {
-  max-width:440px;
+  max-width:420px;
   font-size:13px;
   line-height:1.45;
-  color:var(--muted);
+  opacity:0.86;
 }
 
 .player-year-row {
@@ -792,7 +693,7 @@ h1 {
 .player-year-sub {
   margin-top:3px;
   font-size:13px;
-  color:var(--muted);
+  opacity:0.72;
 }
 
 .player-year-score {
@@ -802,9 +703,23 @@ h1 {
 }
 
 .player-year-loading {
-  opacity:.78;
+  opacity:0.78;
   text-align:center;
   padding:14px;
+}
+
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.next-match-widget,
+.throne-card,
+.season-card,
+.player-of-year-card,
+.identity-box,
+.my-deliveries {
+  animation:fadeInUp 0.5s ease both;
 }
 
 .footer {
@@ -814,7 +729,8 @@ h1 {
   justify-content:center;
   gap:14px;
   font-size:13px;
-  color:rgba(255,255,255,0.82);
+  opacity:0.82;
+  color:white;
   text-shadow:0 2px 8px rgba(0,0,0,0.5);
   flex-wrap:wrap;
 }
@@ -829,12 +745,12 @@ h1 {
 }
 
 .footer-text {
-  max-width:560px;
+  max-width:520px;
   line-height:1.5;
 }
 
 .footer a {
-  color:var(--gold);
+  color:#ffd166;
   text-decoration:none;
 }
 
@@ -842,45 +758,16 @@ h1 {
   text-decoration:underline;
 }
 
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(10px); }
-  to { opacity:1; transform:translateY(0); }
-}
-
-.hero-main,
-.identity-box,
-.next-match-widget,
-.my-deliveries,
-.card,
-.throne-card,
-.season-card,
-.player-of-year-card {
-  animation:fadeInUp .48s ease both;
-}
-
-@media(max-width:940px) {
-  .hero,
-  .dashboard {
-    grid-template-columns:1fr;
-  }
-
-  .grid {
-    grid-template-columns:1fr 1fr;
-  }
-
-  .games-feature-card {
-    grid-column:1 / -1;
-  }
-}
-
-@media(max-width:700px) {
-  .page {
-    padding:0 13px 46px;
+@media (max-width:700px) {
+  body {
+    justify-content:flex-start;
+    padding:86px 14px 14px;
   }
 
   .topnav {
-    position:relative;
-    border-radius:0 0 22px 22px;
+    top:8px;
+    width:calc(100% - 16px);
+    border-radius:18px;
     align-items:flex-start;
     flex-direction:column;
   }
@@ -891,30 +778,24 @@ h1 {
   }
 
   .nav-links a {
-    font-size:13px;
-    padding:8px 10px;
+    font-size:12px;
+    padding:7px 9px;
   }
 
-  .hero-main {
-    min-height:auto;
-    padding:26px 20px;
-    border-radius:28px;
-  }
-
-  .hero-main::after {
-    font-size:90px;
+  .wrapper {
+    padding:20px 0;
   }
 
   .logo {
-    width:112px;
+    width:135px;
   }
 
   h1 {
-    font-size:44px;
+    font-size:38px;
   }
 
   .subtitle {
-    font-size:16px;
+    font-size:15px;
   }
 
   .identity-row {
@@ -922,11 +803,20 @@ h1 {
   }
 
   .identity-row button {
-    padding:14px;
+    padding:13px;
+  }
+
+  .next-match-widget {
+    padding:22px;
+    border-radius:24px;
   }
 
   .next-title {
-    font-size:28px;
+    font-size:32px;
+  }
+
+  .next-meta {
+    font-size:15px;
   }
 
   .next-buttons {
@@ -945,26 +835,48 @@ h1 {
     grid-column:2;
   }
 
-  .section-head {
-    display:block;
-    margin-top:30px;
-  }
-
   .grid {
     grid-template-columns:1fr;
-    gap:15px;
+    gap:16px;
+    margin-top:28px;
   }
 
   .card {
-    min-height:150px;
-    padding:22px 18px 22px 142px;
-    border-radius:24px;
+    min-height:160px;
+    padding:22px 18px 22px 150px;
   }
 
   .card-player {
-    height:150px;
-    max-width:142px;
-    left:-6px;
+    height:165px;
+    max-width:155px;
+    left:-4px;
+  }
+
+  .card.games-feature-card {
+    grid-column:auto;
+    min-height:205px;
+    padding:168px 18px 22px;
+  }
+
+  .card.games-feature-card .card-player {
+    top:0;
+    left:0;
+    bottom:auto;
+    width:100%;
+    max-width:none;
+    height:158px;
+    border-radius:0;
+    object-fit:cover;
+    mask-image:linear-gradient(180deg, black 74%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, black 74%, transparent 100%);
+  }
+
+  .fantasy-player {
+    width:220px !important;
+    height:auto !important;
+    max-width:none !important;
+    left:-32px !important;
+    bottom:-8px !important;
   }
 
   .card-title {
@@ -979,35 +891,14 @@ h1 {
     display:none;
   }
 
-  .games-feature-card {
-    min-height:230px;
-    padding:175px 18px 22px;
-  }
-
-  .games-feature-card .card-player {
-    top:0;
-    left:0;
-    bottom:auto;
-    width:100%;
-    max-width:none;
-    height:165px;
-    object-fit:cover;
-    object-position:center;
-    mask-image:linear-gradient(180deg, black 72%, transparent 100%);
-    -webkit-mask-image:linear-gradient(180deg, black 72%, transparent 100%);
-  }
-
-  .fantasy-player {
-    width:205px !important;
-    left:-36px !important;
-  }
-
   .throne-card {
-    justify-content:flex-start;
+    padding:16px;
+    gap:14px;
+    margin-top:24px;
   }
 
   .throne-name {
-    font-size:27px;
+    font-size:26px;
   }
 
   .throne-crown {
@@ -1021,6 +912,38 @@ h1 {
   .player-of-year-head {
     display:block;
   }
+  .identity-box{
+  margin:20px auto;
+  max-width:520px;
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px;
+  padding:16px;
+}
+
+.identity-label{
+  font-size:13px;
+  text-transform:uppercase;
+  opacity:0.7;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+.identity-row{
+  display:flex;
+  gap:10px;
+}
+
+.identity-row input{
+  flex:1;
+}
+
+.identity-saved{
+  margin-top:10px;
+  color:#ffd166;
+  font-size:14px;
+  font-weight:bold;
+}
 
   .player-of-year-formula {
     margin-top:10px;
@@ -1031,75 +954,60 @@ h1 {
 
 <body>
 
-<div class="page">
+<header class="topnav">
+  <a class="nav-brand" href="index.html">
+    <img src="lblogoen.png" alt="">
+    <span>Lynbørs</span>
+  </a>
 
-  <header class="topnav">
-    <a class="nav-brand" href="index.html">
-      <img src="lblogoen.png" alt="Lynbørs">
-      <span>Lynbørs</span>
-    </a>
+  <nav class="nav-links">
+    <a class="active" href="index.html">Forside</a>
+    <a href="bors.html">Børs</a>
+    <a href="tippetips.html">Tips</a>
+    <a href="fantasy.html">Fantasy</a>
+    <a href="games.html">Games</a>
+    <a href="lynligaen.html">Ligaen</a>
+    <a href="stats.html">Stats</a>
+  </nav>
+</header>
 
-    <nav class="nav-links">
-      <a class="active" href="index.html">Forside</a>
-      <a href="bors.html">Børs</a>
-      <a href="tippetips.html">Tips</a>
-      <a href="fantasy.html">Fantasy</a>
-      <a href="games.html">Games</a>
-      <a href="lynligaen.html">Ligaen</a>
-      <a href="stats.html">Stats</a>
-    </nav>
-  </header>
+<div class="wrapper">
 
-  <section class="hero">
-    <div class="hero-main">
-      <img src="lblogoen.png" class="logo" alt="Lynbørs">
-      <div class="kicker">Supporterprosjekt</div>
-      <h1>Lynbørs</h1>
-      <p class="subtitle">
-        Børs, tipping, fantasy, Lynligaen og daglige minigames. Altfor mye prestisje, akkurat passe useriøst.
-      </p>
+  <img src="lblogoen.png" class="logo" alt="Lynbørs">
+
+  <h1>Lynbørs</h1>
+
+  <div class="subtitle">
+    Hjemmelaget supporterprosjekt for folk som mener spillerbørs, tipping og fantasy er altfor viktig.
+  </div>
+
+  <div class="identity-box">
+    <div class="identity-top">
+      <div class="identity-label">Ditt forumnavn</div>
+      <div id="identityStatus" class="identity-status">Ikke satt</div>
     </div>
-
-    <div class="hero-side">
-      <div class="identity-box">
-        <div class="identity-top">
-          <div class="identity-label">Ditt forumnavn</div>
-          <div id="identityStatus" class="identity-status">Ikke satt</div>
-        </div>
-        <div class="identity-row">
-          <input id="forumNameInput" type="text" placeholder="f.eks superben" maxlength="30">
-          <button type="button" onclick="saveForumName()">Lagre</button>
-        </div>
-      </div>
-
-      <div id="nextMatchWidget" class="next-match-widget">
-        <div class="next-loading">Laster neste kamp...</div>
-      </div>
+    <div class="identity-row">
+      <input id="forumNameInput" type="text" placeholder="f.eks superben" maxlength="30">
+      <button type="button" onclick="saveForumName()">Lagre</button>
     </div>
-  </section>
+  </div>
+
+  <div id="nextMatchWidget" class="next-match-widget">
+    <div class="next-loading">Laster neste kamp...</div>
+  </div>
 
   <div id="myDeliveries" class="my-deliveries">
     <div class="my-deliveries-title">Mine leveringer</div>
     <div class="delivery-empty">Skriv forumnavnet ditt over, så vises tips og fantasy-lag for neste kamp her.</div>
   </div>
 
-  <div class="section-head">
-    <div>
-      <h2 class="section-title">Velg modus</h2>
-      <div class="section-sub">Stem etter kamp, lever tips, bygg fantasy-lag eller jag heder i Lyn Games.</div>
-    </div>
-  </div>
-
   <div class="grid">
+
     <div class="card" onclick="location.href='bors.html'">
       <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Spillerbørs</div>
       <div class="card-text">
         Stem etter kamp og se hvem forumet kåret til banens beste.
-      </div>
-      <div class="card-meta">
-        <span class="card-pill">Børs</span>
-        <span class="card-pill">Banens beste</span>
       </div>
     </div>
 
@@ -1109,10 +1017,6 @@ h1 {
       <div class="card-text">
         Tipp resultater gjennom sesongen og konkurrer mot resten av forumet.
       </div>
-      <div class="card-meta">
-        <span class="card-pill">Resultat</span>
-        <span class="card-pill">Tabell</span>
-      </div>
     </div>
 
     <div class="card fantasy-feature-card" onclick="location.href='fantasy.html'">
@@ -1121,9 +1025,13 @@ h1 {
       <div class="card-text">
         Velg to spillere og en kaptein. Poeng basert på faktisk prestasjon på banen.
       </div>
-      <div class="card-meta">
-        <span class="card-pill">Kaptein</span>
-        <span class="card-pill">Live prestisje</span>
+    </div>
+
+    <div class="card" onclick="location.href='lynligaen.html'">
+      <img src="bilder/lynlaget-Photoroom.png" class="card-player" alt="">
+      <div class="card-title">Lynligaen</div>
+      <div class="card-text">
+        Sammenlagttabellen som kombinerer børs, tipping og fantasy.
       </div>
     </div>
 
@@ -1131,24 +1039,7 @@ h1 {
       <img src="bilder/games1.jpg" class="card-player" alt="">
       <div class="card-title">Lyn Games</div>
       <div class="card-text">
-        Daglige minigames: Wordle, Tenable, Daily XI, Karrieregåten, Mentality og mer.
-      </div>
-      <div class="card-meta">
-        <span class="card-pill">🎮 Dagens game</span>
-        <span class="card-pill">Leaderboard</span>
-        <span class="card-pill">7 dager</span>
-      </div>
-    </div>
-
-    <div class="card" onclick="location.href='lynligaen.html'">
-      <img src="bilder/lynlaget-Photoroom.png" class="card-player" alt="">
-      <div class="card-title">Lynligaen</div>
-      <div class="card-text">
-        Sammenlagttabellen som kombinerer tipping, fantasy og ære.
-      </div>
-      <div class="card-meta">
-        <span class="card-pill">Sammenlagt</span>
-        <span class="card-pill">Kongen</span>
+        Daglige minigames: Wordle, Tenable, Daily XI, Karrieregåten, Hvem er dette og Mentality.
       </div>
     </div>
 
@@ -1156,74 +1047,75 @@ h1 {
       <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Stats</div>
       <div class="card-text">
-        Se sesongtopper, spillerprofiler, mål, assist og utvikling gjennom året.
+        Sesongtopper, spillerprofiler, mål, assist og utvikling gjennom året.
       </div>
-      <div class="card-meta">
-        <span class="card-pill">Tall</span>
-        <span class="card-pill">Profiler</span>
+    </div>
+
+  </div>
+
+  <div id="throneCard" class="throne-card" onclick="location.href='lynligaen.html'">
+    <div class="throne-crown">👑</div>
+
+    <div class="throne-content">
+      <div class="throne-label">Nåværende konge av Lynligaen</div>
+
+      <div id="throneName" class="throne-name">
+        <a href="lynligaen.html">Laster leder...</a>
+      </div>
+
+      <div id="thronePoints" class="throne-points">
+        Sammenlagt for fantasy og tipping
       </div>
     </div>
   </div>
 
-  <section class="dashboard">
-    <div id="throneCard" class="throne-card" onclick="location.href='lynligaen.html'">
-      <div class="throne-crown">👑</div>
-      <div class="throne-content">
-        <div class="throne-label">Nåværende konge av Lynligaen</div>
-        <div id="throneName" class="throne-name">
-          <a href="lynligaen.html">Laster leder...</a>
-        </div>
-        <div id="thronePoints" class="throne-points">
-          Sammenlagt for fantasy og tipping
-        </div>
-      </div>
-    </div>
+  <div class="season-strip">
+    <div class="season-grid">
 
-    <div class="season-strip">
-      <div class="season-grid">
-        <div class="season-card">
-          <div class="season-title">⚽ Toppscorer</div>
-          <div id="topScorers"></div>
-        </div>
-
-        <div class="season-card">
-          <div class="season-title">🎁 Assistkonge</div>
-          <div id="topAssists"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="player-of-year-card">
-      <div class="player-of-year-head">
-        <div>
-          <div class="player-of-year-title">🏆 Årets Lynspiller så langt</div>
-          <div class="player-year-sub">En litt morsommere total enn bare børs.</div>
-        </div>
-        <div class="player-of-year-formula">
-          Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
-        </div>
+      <div class="season-card">
+        <div class="season-title">⚽ Toppscorer</div>
+        <div id="topScorers"></div>
       </div>
 
-      <div id="playerOfYear">
-        <div class="player-year-loading">Laster topp 3...</div>
+      <div class="season-card">
+        <div class="season-title">🎁 Assistkonge</div>
+        <div id="topAssists"></div>
       </div>
-    </div>
-  </section>
 
-  <footer class="footer">
-    <div class="footer-heart">
-      <img src="bilder/hjerte.jpg" alt="Hjerte">
     </div>
+  </div>
 
-    <div class="footer-text">
-      Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.<br>
-      Send meg mail på
-      <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>
-      om du ønsker kontakt.
+  <div class="player-of-year-card">
+    <div class="player-of-year-head">
+      <div>
+        <div class="player-of-year-title">🏆 Årets Lynspiller så langt</div>
+        <div class="player-year-sub">En litt morsommere total enn bare børs.</div>
+      </div>
+     <div class="player-of-year-formula">
+  Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
+</div>
+</div>
+
+<div id="playerOfYear">
+      <div class="player-year-loading">Laster topp 3...</div>
     </div>
-  </footer>
+  </div>
+
+ <div class="footer">
+  <div class="footer-heart">
+  <img src="bilder/hjerte.jpg" alt="Hjerte">
+  </div>
+
+  <div class="footer-text">
+    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.<br>
+    Send meg mail på
+    <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>
+    om du ønsker kontakt.
+  </div>
+</div>
 
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
