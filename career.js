@@ -20,6 +20,8 @@ const careerIndex =
   diffDays % careers.length;
 
 const career = careers[careerIndex];
+const challengeId =
+  `career-${diffDays}-${career.answer}`;
 
 let revealed = 1;
 let score = 100;
@@ -43,11 +45,11 @@ initPlayedCheck();
 
 async function initPlayedCheck() {
 
-  const alreadyPlayed =
-    await hasPlayedToday(
-      "career",
-      `career-${careerIndex}-${career.answer}`
-    );
+ const alreadyPlayed =
+  await hasPlayedToday(
+    "career",
+    challengeId
+  );
 
   if (!alreadyPlayed) return;
 
@@ -196,14 +198,14 @@ function submitCareerGuess() {
 
 console.log("Prøver å lagre score:", {
   game: "career",
-  challengeId: `career-${careerIndex}-${career.answer}`,
+  challengeId,
   score,
   user: getGameUser()
 });
 
 saveGameScore({
   game: "career",
-  challengeId: `career-${careerIndex}-${career.answer}`,
+  challengeId,
   score,
   maxScore: 100,
   attempts: 1,
@@ -217,22 +219,6 @@ saveGameScore({
   console.log("saveGameScore ferdig:", result);
 });
 
-return;
-
-    saveGameScore({
-  game: "career",
-  challengeId: `career-${careerIndex}-${career.answer}`,
-  score,
-  maxScore: 100,
-  attempts: 1,
-  details: {
-    answer: career.answer,
-    revealed,
-    totalClubs: career.clubs.length,
-    user: getGameUser()
-  }
-});
-    
     return;
   }
 
@@ -254,6 +240,20 @@ return;
   message.innerHTML =
     `💀 Ingen flere klubber! Det var ${career.answer}`;
 
+    saveGameScore({
+  game: "career",
+  challengeId,
+  score: 0,
+  maxScore: 100,
+  attempts: career.clubs.length,
+  details: {
+    answer: career.answer,
+    revealed,
+    totalClubs: career.clubs.length,
+    lost: true,
+    user: getGameUser()
+  }
+});
 }
 
 }
