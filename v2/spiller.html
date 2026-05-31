@@ -214,7 +214,10 @@ async function init() {
         <div>
           <strong>Beste kamp</strong>
           <div class="match-meta">
-            ${playerStats.bestMatch ? getMatchTitle(playerStats.bestMatch.match_id, matches) : "-"}
+           ${playerStats.bestMatch
+  ? `${getMatchTitle(playerStats.bestMatch.match_id, matches)}
+     · ${getMatchDate(playerStats.bestMatch.match_id, matches)}`
+  : "-"}
           </div>
         </div>
         <div class="rating-pill ${getRatingClass(playerStats.bestMatch?.average)}">
