@@ -4,6 +4,17 @@ import {
   hasPlayedToday
 } from "./v2/js/games-core.js";
 
+function normalize(str) {
+  return String(str || "")
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/Æ/g, "AE")
+    .replace(/Ø/g, "O")
+    .replace(/Å/g, "A")
+    .replace(/[^A-Z]/g, "");
+}
+
 const startDate =
   new Date("2026-01-01");
 
@@ -16,12 +27,14 @@ const diffDays =
     (1000 * 60 * 60 * 24)
   );
 
-const answer =
+const rawAnswer =
   players[diffDays % players.length];
+
+const answer =
+  normalize(rawAnswer);
 
 const challengeId =
   `wordle-${diffDays}-${answer}`;
-
 const maxGuesses = 6;
 let guesses = [];
 let finished = false;
@@ -141,17 +154,6 @@ function renderBoard() {
 
     board.appendChild(row);
   }
-}
-
-function normalize(str) {
-  return String(str || "")
-    .toUpperCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/Æ/g, "AE")
-    .replace(/Ø/g, "O")
-    .replace(/Å/g, "A")
-    .replace(/[^A-Z]/g, "");
 }
 
 function submitGuess() {
