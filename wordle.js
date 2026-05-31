@@ -60,6 +60,8 @@ async function initPlayedCheck() {
 
   finished = true;
   guessInput.disabled = true;
+  const btn = document.querySelector(".guess-box button");
+if (btn) btn.disabled = true;
 
   const btn =
     document.querySelector(".guess-box button");
@@ -181,9 +183,11 @@ function submitGuess() {
     saveWordleScore(true);
 
     message.innerHTML =
-      `🏆 Riktig! ${answer} · ${calculateWordleScore(true)} poeng`;
+      `🏆 Riktig! ${rawAnswer} · ${calculateWordleScore(true)} poeng`;
 
     guessInput.disabled = true;
+    const btn = document.querySelector(".guess-box button");
+if (btn) btn.disabled = true;
 
   } else if (guesses.length >= maxGuesses) {
     finished = true;
@@ -191,7 +195,7 @@ function submitGuess() {
     saveWordleScore(false);
 
     message.innerHTML =
-      `💀 Ferdig! Svaret var ${answer}`;
+      `💀 Ferdig! Svaret var ${rawAnswer}`
 
     guessInput.disabled = true;
 
