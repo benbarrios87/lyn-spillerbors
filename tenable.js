@@ -323,16 +323,3 @@ renderSlots();
 renderFound();
 renderLives();
 initPlayedCheck();
-
-guessInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    addGuess();
-  }
-});
-
-
-renderTitle();
-renderSlots();
-renderFound();
-renderLives();
-initPlayedCheck();
