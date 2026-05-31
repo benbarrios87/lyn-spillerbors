@@ -109,27 +109,21 @@ const displayName = getPlayerDisplayName(player.player);
         <a href="spiller.html?player=${encodeURIComponent(player.player)}" class="player-card-link">
           <div class="rating-row ${index === 0 ? "winner" : ""}">
             <div class="player-info">
-              <img
-  src="${image}"
-                class="player-avatar"
-                onerror="this.src='../lblogoen.png'"
-              >
-
-              <div class="player-text">
-                <strong>${index + 1}. ${displayName}</strong>
-                <div class="match-meta">
-  <a
-    href="profil.html?user=${encodeURIComponent("superben")}"
-    class="user-link"
+  <img
+    src="${image}"
+    class="player-avatar"
+    onerror="this.src='../lblogoen.png'"
   >
-    superben
-  </a>
-  • ${player.votes} stemmer
-</div>
-              </div>
-            </div>
 
-            <div class="rating-score">${player.average}</div>
+  <div class="player-text">
+    <strong>${index + 1}. ${displayName}</strong>
+    <div class="match-meta">
+      ${player.votes} stemmer
+    </div>
+  </div>
+</div>
+
+<div class="rating-score">${player.average}</div>
           </div>
         </a>
       `;
