@@ -1149,8 +1149,9 @@ async function fetchVotes(matchId = null) {
   let q = supabaseClient
     .from("votes")
     .select("*")
+    .in("player", [TIP_HOME_PLAYER, TIP_AWAY_PLAYER])
     .order("created_at", { ascending:false })
-    .limit(10000000);
+    .limit(50000);
 
   if (matchId) q = q.eq("match_id", matchId);
 
