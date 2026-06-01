@@ -1221,17 +1221,21 @@ function getTeamLabel(team) {
           voter: v.voter,
           match_id: v.match_id,
           home: null,
-          away: null
+away: null,
+rawHome: null,
+rawAway: null
         };
       }
 
-      if (v.player === TIP_HOME_PLAYER) {
-        map[key].home = decodeGoals(v.rating);
-      }
+     if (v.player === TIP_HOME_PLAYER) {
+  map[key].home = decodeGoals(v.rating);
+  map[key].rawHome = Number(v.rating);
+}
 
-      if (v.player === TIP_AWAY_PLAYER) {
-        map[key].away = decodeGoals(v.rating);
-      }
+if (v.player === TIP_AWAY_PLAYER) {
+  map[key].away = decodeGoals(v.rating);
+  map[key].rawAway = Number(v.rating);
+}
     });
 
   return Object.values(map).filter(
@@ -1448,6 +1452,23 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   if (sameOutcome) return 1;
   return 0;
 }
+  function scorePredictionFlexible(p, actualHome, actualAway) {
+  const encodedScore = scorePrediction(
+    p.home,
+    p.away,
+    actualHome,
+    actualAway
+  );
+
+  const rawScore = scorePrediction(
+    p.rawHome,
+    p.rawAway,
+    actualHome,
+    actualAway
+  );
+
+  return Math.max(encodedScore, rawScore);
+}
 
 function validateTip(label, value) {
   if (!Number.isInteger(value) || value < 0 || value > 9) {
@@ -1644,7 +1665,9 @@ async function loadMatchPredictions() {
   `;
 
   predictions.forEach(p => {
-    const points = actual ? scorePrediction(p.home, p.away, actual.home, actual.away) : null;
+   const points = actual
+  ? scorePredictionFlexible(p, actual.home, actual.away)
+  : null;
 
     html += `
       <div class="prediction-row">
@@ -1682,9 +1705,8 @@ const actualAway = Number(matchData?.actual_away);
 
 if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
-const points = scorePrediction(
-  p.home,
-  p.away,
+const points = scorePredictionFlexible(
+  p,
   actualHome,
   actualAway
 );
