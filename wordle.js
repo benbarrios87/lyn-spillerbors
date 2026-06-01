@@ -59,17 +59,13 @@ async function initPlayedCheck() {
   if (!alreadyPlayed) return;
 
   finished = true;
-  guessInput.disabled = true;
-  const btn = document.querySelector(".guess-box button");
+guessInput.disabled = true;
+
+const btn = document.querySelector(".guess-box button");
 if (btn) btn.disabled = true;
 
-  const btn =
-    document.querySelector(".guess-box button");
-
-  if (btn) btn.disabled = true;
-
-  message.innerHTML =
-    "🏆 Du har allerede spilt dagens Lyn Wordle";
+message.innerHTML =
+  "🏆 Du har allerede spilt dagens Lyn Wordle";
 }
 
 function calculateWordleScore(won = false) {
