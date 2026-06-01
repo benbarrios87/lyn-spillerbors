@@ -1214,8 +1214,19 @@ if (v.player === TIP_AWAY_PLAYER) {
   return Object.values(map).filter(p => p.home !== null && p.away !== null);
 }
 
+function normalizeMatchId(id) {
+  return String(id || "")
+    .trim()
+    .replace(/\s*-\s*/g, " - ")
+    .replace(/\s+/g, " ");
+}
+
 function getMatchData(matchId) {
-  return allMatches.find(m => m.id === matchId) || null;
+  const wanted = normalizeMatchId(matchId);
+
+  return allMatches.find(m =>
+    normalizeMatchId(m.id) === wanted
+  ) || null;
 }
 
 function isTipLocked(matchData) {
