@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lyn Games</title>
-
   <link rel="icon" href="lblogoen.png">
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -15,14 +13,12 @@
       --blue:#13294b;
       --gold:#ffd166;
       --dark:#07111f;
-      --panel:rgba(5,8,20,0.76);
-      --line:rgba(255,255,255,0.16);
-      --muted:rgba(255,255,255,0.72);
+      --panel:rgba(5,8,20,.78);
+      --line:rgba(255,255,255,.16);
+      --muted:rgba(255,255,255,.72);
     }
 
-    * {
-      box-sizing:border-box;
-    }
+    * { box-sizing:border-box; }
 
     body {
       margin:0;
@@ -30,17 +26,17 @@
       font-family:Arial, sans-serif;
       color:white;
       background:
-        radial-gradient(circle at 15% 10%, rgba(255,209,102,.30), transparent 28%),
-        radial-gradient(circle at 85% 20%, rgba(11,99,229,.28), transparent 30%),
-        radial-gradient(circle at 50% 90%, rgba(215,25,32,.24), transparent 34%),
+        radial-gradient(circle at 12% 8%, rgba(255,209,102,.32), transparent 27%),
+        radial-gradient(circle at 85% 18%, rgba(11,99,229,.30), transparent 30%),
+        radial-gradient(circle at 50% 92%, rgba(215,25,32,.25), transparent 34%),
         linear-gradient(135deg, #06111f, #102a43 55%, #090d18);
     }
 
     .wrap {
       width:100%;
-      max-width:1080px;
+      max-width:1120px;
       margin:0 auto;
-      padding:28px 14px 70px;
+      padding:26px 14px 70px;
     }
 
     .topbar {
@@ -48,7 +44,7 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      margin-bottom:22px;
+      margin-bottom:20px;
     }
 
     .brand {
@@ -86,7 +82,7 @@
 
     .hero {
       text-align:center;
-      padding:34px 22px;
+      padding:36px 22px;
       border-radius:34px;
       background:
         linear-gradient(135deg, rgba(11,99,229,.92), rgba(215,25,32,.76)),
@@ -100,9 +96,9 @@
     .hero::after {
       content:"GAMES";
       position:absolute;
-      right:-20px;
-      bottom:-12px;
-      font-size:100px;
+      right:-24px;
+      bottom:-14px;
+      font-size:110px;
       font-weight:900;
       color:rgba(255,255,255,.06);
       transform:rotate(-6deg);
@@ -137,7 +133,7 @@
 
     .identity {
       margin:22px auto 0;
-      max-width:660px;
+      max-width:680px;
       padding:14px;
       border-radius:22px;
       background:rgba(0,0,0,.34);
@@ -151,9 +147,7 @@
       z-index:2;
     }
 
-    .identity strong {
-      color:var(--gold);
-    }
+    .identity strong { color:var(--gold); }
 
     .identity a {
       color:var(--gold);
@@ -193,30 +187,31 @@
       position:relative;
       overflow:hidden;
       background:
-        radial-gradient(circle at top right, rgba(255,209,102,.22), transparent 35%),
-        linear-gradient(135deg, rgba(19,41,75,.95), rgba(215,25,32,.78));
-      border-color:rgba(255,209,102,.52);
+        radial-gradient(circle at top right, rgba(255,209,102,.28), transparent 35%),
+        linear-gradient(135deg, rgba(19,41,75,.98), rgba(215,25,32,.82));
+      border-color:rgba(255,209,102,.62);
     }
 
     .today-card::after {
-      content:"🧩";
+      content:"⭐";
       position:absolute;
       right:22px;
       top:18px;
-      font-size:64px;
+      font-size:72px;
       opacity:.16;
     }
 
     .game-title {
-      font-size:34px;
+      font-size:38px;
       font-weight:900;
-      margin:6px 0 8px;
+      margin:8px 0 8px;
+      line-height:1.05;
     }
 
     .game-text {
-      color:rgba(255,255,255,.84);
+      color:rgba(255,255,255,.86);
       line-height:1.45;
-      max-width:600px;
+      max-width:620px;
     }
 
     .play-row {
@@ -246,6 +241,11 @@
       box-shadow:none;
     }
 
+    .btn.locked {
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
     .score-grid {
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -272,6 +272,36 @@
       display:block;
       color:var(--gold);
       font-size:28px;
+    }
+
+    .leader-hero {
+      padding:16px;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at top right, rgba(255,209,102,.25), transparent 35%),
+        rgba(255,255,255,.08);
+      border:1px solid rgba(255,209,102,.35);
+      margin-bottom:12px;
+    }
+
+    .leader-hero .label {
+      color:var(--gold);
+      font-weight:900;
+      font-size:13px;
+      text-transform:uppercase;
+    }
+
+    .leader-hero .name {
+      margin-top:6px;
+      font-size:30px;
+      font-weight:900;
+    }
+
+    .leader-hero .score {
+      margin-top:4px;
+      color:var(--gold);
+      font-size:34px;
+      font-weight:900;
     }
 
     .leaderboard {
@@ -306,9 +336,7 @@
       color:#111827;
     }
 
-    .leader-name {
-      font-weight:900;
-    }
+    .leader-name { font-weight:900; }
 
     .leader-sub {
       color:var(--muted);
@@ -320,6 +348,37 @@
       color:var(--gold);
       font-weight:900;
       font-size:22px;
+    }
+
+    .week-strip {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:8px;
+      margin-top:16px;
+    }
+
+    .day {
+      padding:12px 6px;
+      border-radius:16px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .day.active {
+      background:rgba(255,209,102,.20);
+      border-color:rgba(255,209,102,.60);
+      color:white;
+      font-weight:900;
+      box-shadow:0 0 0 2px rgba(255,209,102,.16);
+    }
+
+    .day strong {
+      display:block;
+      font-size:21px;
+      margin-bottom:4px;
     }
 
     .games-grid {
@@ -337,7 +396,7 @@
 
     .mini-game {
       position:relative;
-      min-height:150px;
+      min-height:170px;
       padding:20px;
       border-radius:24px;
       background:
@@ -347,8 +406,15 @@
       overflow:hidden;
     }
 
+    .mini-game.today {
+      border-color:rgba(255,209,102,.65);
+      background:
+        radial-gradient(circle at top right, rgba(255,209,102,.22), transparent 36%),
+        rgba(255,255,255,.09);
+    }
+
     .mini-game.locked {
-      opacity:.62;
+      opacity:.58;
     }
 
     .mini-icon {
@@ -378,36 +444,6 @@
       font-weight:900;
       font-size:12px;
       color:var(--gold);
-    }
-
-    .week-strip {
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:8px;
-      margin-top:16px;
-    }
-
-    .day {
-      padding:11px 6px;
-      border-radius:16px;
-      background:rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.12);
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .day.active {
-      background:rgba(255,209,102,.18);
-      border-color:rgba(255,209,102,.55);
-      color:white;
-      font-weight:900;
-    }
-
-    .day strong {
-      display:block;
-      font-size:20px;
-      margin-bottom:4px;
     }
 
     .empty {
@@ -461,8 +497,8 @@
 
     <nav class="toplinks">
       <a href="v2/index.html">Forside</a>
-      <a href="career.html">Karrieregåten</a>
       <a href="v2/lynligaen.html">Lynligaen</a>
+      <a href="v2/fantasy.html">Fantasy</a>
     </nav>
   </header>
 
@@ -470,7 +506,7 @@
     <div class="kicker">Lyn Games</div>
     <h1>🎮 Dagens utfordring</h1>
     <p>
-      Små Lyn-spill på rotasjon. Samme forumnavn som resten av Lynbørs, samme prestisje, mer unødvendig alvor.
+      Ett Lyn-spill er dagens offisielle utfordring. Resten ligger på benken og venter på sin tur.
     </p>
 
     <div id="identityBox" class="identity">
@@ -479,17 +515,18 @@
   </section>
 
   <section class="main-grid">
-
     <div class="panel today-card">
-      <div class="kicker">I dag</div>
+      <div class="kicker">Dagens spill</div>
       <div id="todayGame">Laster dagens spill...</div>
     </div>
 
     <div class="panel">
-      <h2>🏆 Toppliste</h2>
+      <h2>👑 Leder akkurat nå</h2>
+      <div id="leaderHero"></div>
+
+      <h2 style="margin-top:18px;">🏆 Toppliste</h2>
       <div id="leaderboard" class="leaderboard">Laster...</div>
     </div>
-
   </section>
 
   <section class="panel" style="margin-top:18px;">
@@ -512,78 +549,64 @@ import {
 
 const games = [
   {
-    id: "rebel",
-    title: "Rebel Mentality",
-    icon: "🦊",
-    href: "rebel.html",
-    text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
-    status: "Spillbar nå",
-    live: true
-  },
-  {
     id: "career",
     title: "Karrieregåten",
     icon: "🧩",
     href: "career.html",
-    text: "Klubbkarrieren avsløres steg for steg. Gjett tidlig for maks poeng.",
-    status: "Spillbar nå",
-    live: true
+    text: "Klubbkarrieren avsløres steg for steg. Gjett tidlig for maks poeng."
   },
   {
     id: "dailyxi",
     title: "Daily XI",
     icon: "⚽",
     href: "daily-xi.html",
-    text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv, og målscorere gir bonus.",
-    status: "Spillbar nå",
-    live: true
-  },
-  {
-    id: "wordle",
-    title: "Lyn Wordle",
-    icon: "🔤",
-    href: "wordle.html",
-    text: "Gjett etternavnet til dagens tidligere Lyn-spiller. Seks forsøk, maks prestisje.",
-    status: "Spillbar nå",
-    live: true
-  },
-  {
-    id: "hvem",
-    title: "Hvem er dette?",
-    icon: "📸",
-    href: "hvem.html",
-    text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
-    status: "Spillbar nå",
-    live: true
-  },
-  {
-    id: "tenable",
-    title: "Lyn Tenable",
-    icon: "🔟",
-    href: "tenable.html",
-    text: "Finn flest mulig riktige svar før livene ryker. 80% kunnskap, 20% overlevelse.",
-    status: "Spillbar nå",
-    live: true
+    text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv."
   },
   {
     id: "herd",
     title: "Herd Mentality",
     icon: "🐑",
     href: "herd.html",
-    text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
-    status: "Spillbar nå",
-    live: true
+    text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22."
+  },
+  {
+    id: "hvem",
+    title: "Hvem er dette?",
+    icon: "📸",
+    href: "hvem.html",
+    text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng."
+  },
+  {
+    id: "tenable",
+    title: "Lyn Tenable",
+    icon: "🔟",
+    href: "tenable.html",
+    text: "Finn flest mulig riktige svar før livene ryker."
+  },
+  {
+    id: "wordle",
+    title: "Lyn Wordle",
+    icon: "🔤",
+    href: "wordle.html",
+    text: "Gjett etternavnet til dagens tidligere Lyn-spiller."
+  },
+  {
+    id: "rebel",
+    title: "Rebel Mentality",
+    icon: "🦊",
+    href: "rebel.html",
+    text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22."
   }
 ];
 
 const weeklySchedule = {
-  0: "rebel",    // Søndag
-  1: "career",   // Mandag
-  2: "dailyxi",  // Tirsdag
-  3: "herd",     // Onsdag
-  4: "hvem",     // Torsdag
-  5: "tenable",  // Fredag
-  6: "wordle"    // Lørdag
+  0: "rebel",
+  1: "career",
+  2: "dailyxi",
+  3: "herd",
+  4: "hvem",
+  5: "tenable",
+  6: "wordle"
 };
 
 const days = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
@@ -604,6 +627,10 @@ function formatDate(value) {
   });
 }
 
+function isTodayGame(gameId) {
+  return todaysGame && todaysGame.id === gameId;
+}
+
 function challengeKey(row) {
   return `${cleanName(row.voter)}__${row.game || "unknown"}__${row.challenge_id || "daily"}`;
 }
@@ -612,6 +639,8 @@ function buildTotalLeaderboard(rows) {
   const bestAttemptMap = {};
 
   rows.forEach(row => {
+    if (["herd", "rebel"].includes(row.game)) return;
+
     const key = challengeKey(row);
     const score = Number(row.score || 0);
 
@@ -712,16 +741,35 @@ function renderTodayGame(rows, user) {
 
       <div class="score-box">
         <span>Status</span>
-        <strong>${todaysGame.live ? "Live" : "Snart"}</strong>
+        <strong>Åpen</strong>
       </div>
     </div>
 
     <div class="play-row">
-      ${
-        todaysGame.live
-          ? `<a class="btn" href="${todaysGame.href}">Spill dagens game</a>`
-          : `<a class="btn secondary" href="#">Ikke åpnet ennå</a>`
-      }
+      <a class="btn" href="${todaysGame.href}">Spill dagens game</a>
+      <a class="btn secondary" href="#gamesGrid">Se ukens spill</a>
+    </div>
+  `;
+}
+
+function renderLeaderHero(leaderboard) {
+  const box = document.getElementById("leaderHero");
+
+  if (!leaderboard.length) {
+    box.innerHTML = `<div class="empty">Ingen leder ennå. Perfekt tidspunkt å bli historisk.</div>`;
+    return;
+  }
+
+  const leader = leaderboard[0];
+
+  box.innerHTML = `
+    <div class="leader-hero">
+      <div class="label">Nåværende Games-sjef</div>
+      <div class="name">👑 ${leader.voter}</div>
+      <div class="score">${leader.total} poeng</div>
+      <div class="leader-sub">
+        ${leader.gamesCount} spill · ${leader.attempts} runder · sist ${formatDate(leader.latest)}
+      </div>
     </div>
   `;
 }
@@ -729,6 +777,8 @@ function renderTodayGame(rows, user) {
 function renderLeaderboard(rows) {
   const box = document.getElementById("leaderboard");
   const leaderboard = buildTotalLeaderboard(rows);
+
+  renderLeaderHero(leaderboard);
 
   if (!leaderboard.length) {
     box.innerHTML = `<div class="empty">Ingen score ennå. Bli første som setter standarden.</div>`;
@@ -774,19 +824,29 @@ function renderWeekStrip() {
 function renderGamesGrid() {
   const box = document.getElementById("gamesGrid");
 
-  box.innerHTML = games.map(game => `
-    <div class="mini-game ${game.live ? "" : "locked"}">
-      <div class="mini-icon">${game.icon}</div>
-      <div class="mini-title">${game.title}</div>
-      <div class="mini-text">${game.text}</div>
-      <div class="mini-status">${game.status}</div>
-      ${
-        game.live
-          ? `<div style="margin-top:14px;"><a class="btn secondary" href="${game.href}">Åpne</a></div>`
-          : ""
-      }
-    </div>
-  `).join("");
+  box.innerHTML = games.map(game => {
+    const open = isTodayGame(game.id);
+
+    return `
+      <div class="mini-game ${open ? "today" : "locked"}">
+        <div class="mini-icon">${game.icon}</div>
+        <div class="mini-title">${game.title}</div>
+        <div class="mini-text">${game.text}</div>
+
+        <div class="mini-status">
+          ${open ? "Dagens spill" : "Kommer senere i uka"}
+        </div>
+
+        <div style="margin-top:14px;">
+          ${
+            open
+              ? `<a class="btn secondary" href="${game.href}">Spill nå</a>`
+              : `<span class="btn secondary locked">Låst</span>`
+          }
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 async function loadRowsForGame(gameId) {
