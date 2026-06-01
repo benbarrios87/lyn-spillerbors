@@ -191,7 +191,7 @@ if (btn) btn.disabled = true;
     saveWordleScore(false);
 
     message.innerHTML =
-      `💀 Ferdig! Svaret var ${rawAnswer}`
+      `💀 Ferdig! Svaret var ${rawAnswer}`;
 
     guessInput.disabled = true;
 
