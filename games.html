@@ -12,7 +12,6 @@
       --red:#d71920;
       --blue:#13294b;
       --gold:#ffd166;
-      --dark:#07111f;
       --panel:rgba(5,8,20,.78);
       --line:rgba(255,255,255,.16);
       --muted:rgba(255,255,255,.72);
@@ -33,7 +32,6 @@
     }
 
     .wrap {
-      width:100%;
       max-width:1120px;
       margin:0 auto;
       padding:26px 14px 70px;
@@ -275,7 +273,7 @@
     }
 
     .leader-hero {
-      padding:16px;
+      padding:18px;
       border-radius:22px;
       background:
         radial-gradient(circle at top right, rgba(255,209,102,.25), transparent 35%),
@@ -302,6 +300,26 @@
       color:var(--gold);
       font-size:34px;
       font-weight:900;
+    }
+
+    .badges {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:10px;
+    }
+
+    .badge-chip {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:6px 9px;
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:12px;
+      font-weight:900;
+      color:white;
     }
 
     .leaderboard {
@@ -446,6 +464,32 @@
       color:var(--gold);
     }
 
+    .support-box {
+      margin-top:24px;
+      padding:20px;
+      border-radius:22px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      text-align:center;
+      color:rgba(255,255,255,.85);
+    }
+
+    .support-box h3 {
+      margin:0 0 10px;
+      color:var(--gold);
+    }
+
+    .support-box p {
+      margin:8px 0;
+      line-height:1.5;
+    }
+
+    .support-box a {
+      color:var(--gold);
+      font-weight:900;
+      text-decoration:none;
+    }
+
     .empty {
       color:var(--muted);
       line-height:1.45;
@@ -499,6 +543,10 @@
       <a href="v2/index.html">Forside</a>
       <a href="v2/lynligaen.html">Lynligaen</a>
       <a href="v2/fantasy.html">Fantasy</a>
+      <a href="v2/tips.html">Tippetips</a>
+      <a href="v2/bors.html">Børs</a>
+      <a href="v2/stats.html">Stats</a>
+      <a href="games.html">Games</a>
     </nav>
   </header>
 
@@ -535,9 +583,26 @@
   </section>
 
   <section class="panel" style="margin-top:18px;">
+    <h2>🎖️ Badges</h2>
+    <div id="badgeBoard" class="games-grid"></div>
+  </section>
+
+  <section class="panel" style="margin-top:18px;">
     <h2>🕹️ Alle Lyn Games</h2>
     <div id="gamesGrid" class="games-grid"></div>
   </section>
+
+  <div class="support-box">
+    <h3>☕ Fornøyd med prosjektet?</h3>
+    <p>
+      Hvis du har glede av Lynbørs og Lyn Games kan du gjerne vippse en kaffekapsel til
+      <strong>40001410</strong>.
+    </p>
+    <p>
+      Har du innspill, forslag eller oppdager feil?
+      Ta kontakt på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>.
+    </p>
+  </div>
 
 </div>
 
@@ -549,64 +614,73 @@ import {
 
 const games = [
   {
-    id: "career",
-    title: "Karrieregåten",
-    icon: "🧩",
-    href: "career.html",
-    text: "Klubbkarrieren avsløres steg for steg. Gjett tidlig for maks poeng."
+    id:"career",
+    title:"Karrieregåten",
+    icon:"🧩",
+    href:"career.html",
+    text:"Klubbkarrieren avsløres steg for steg. Gjett tidlig for maks poeng.",
+    badge:"Karrierekonge"
   },
   {
-    id: "dailyxi",
-    title: "Daily XI",
-    icon: "⚽",
-    href: "daily-xi.html",
-    text: "Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv."
+    id:"dailyxi",
+    title:"Daily XI",
+    icon:"⚽",
+    href:"daily-xi.html",
+    text:"Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv.",
+    badge:"Daily XI-sjef"
   },
   {
-    id: "herd",
-    title: "Herd Mentality",
-    icon: "🐑",
-    href: "herd.html",
-    text: "Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22."
+    id:"herd",
+    title:"Herd Mentality",
+    icon:"🐑",
+    href:"herd.html",
+    text:"Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
+    badge:"Flokkleder",
+    excludedFromTotal:true
   },
   {
-    id: "hvem",
-    title: "Hvem er dette?",
-    icon: "📸",
-    href: "hvem.html",
-    text: "Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng."
+    id:"hvem",
+    title:"Hvem er dette?",
+    icon:"📸",
+    href:"hvem.html",
+    text:"Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
+    badge:"Ørneblikk"
   },
   {
-    id: "tenable",
-    title: "Lyn Tenable",
-    icon: "🔟",
-    href: "tenable.html",
-    text: "Finn flest mulig riktige svar før livene ryker."
+    id:"tenable",
+    title:"Lyn Tenable",
+    icon:"🔟",
+    href:"tenable.html",
+    text:"Finn flest mulig riktige svar før livene ryker.",
+    badge:"Tenable-geni"
   },
   {
-    id: "wordle",
-    title: "Lyn Wordle",
-    icon: "🔤",
-    href: "wordle.html",
-    text: "Gjett etternavnet til dagens tidligere Lyn-spiller."
+    id:"wordle",
+    title:"Lyn Wordle",
+    icon:"🔤",
+    href:"wordle.html",
+    text:"Gjett etternavnet til dagens tidligere Lyn-spiller.",
+    badge:"Wordlemester"
   },
   {
-    id: "rebel",
-    title: "Rebel Mentality",
-    icon: "🦊",
-    href: "rebel.html",
-    text: "Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22."
+    id:"rebel",
+    title:"Rebel Mentality",
+    icon:"🦊",
+    href:"rebel.html",
+    text:"Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
+    badge:"Opprører",
+    excludedFromTotal:true
   }
 ];
 
 const weeklySchedule = {
-  0: "rebel",
-  1: "career",
-  2: "dailyxi",
-  3: "herd",
-  4: "hvem",
-  5: "tenable",
-  6: "wordle"
+  0:"rebel",
+  1:"career",
+  2:"dailyxi",
+  3:"herd",
+  4:"hvem",
+  5:"tenable",
+  6:"wordle"
 };
 
 const days = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
@@ -622,8 +696,8 @@ function formatDate(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("no-NO", {
-    day: "2-digit",
-    month: "2-digit"
+    day:"2-digit",
+    month:"2-digit"
   });
 }
 
@@ -635,11 +709,75 @@ function challengeKey(row) {
   return `${cleanName(row.voter)}__${row.game || "unknown"}__${row.challenge_id || "daily"}`;
 }
 
+function getGameById(gameId) {
+  return games.find(game => game.id === gameId) || null;
+}
+
+function getBestByGame(rows) {
+  const result = {};
+
+  rows.forEach(row => {
+    const game = getGameById(row.game);
+    if (!game) return;
+
+    const score = Number(row.score || 0);
+    const current = result[row.game];
+
+    if (
+      !current ||
+      score > Number(current.score || 0) ||
+      (
+        score === Number(current.score || 0) &&
+        new Date(row.created_at) < new Date(current.created_at)
+      )
+    ) {
+      result[row.game] = row;
+    }
+  });
+
+  return result;
+}
+
+function getBadgesForUser(user, bestByGame) {
+  const cleanUser = cleanName(user);
+  const badges = [];
+
+  games.forEach(game => {
+    const best = bestByGame[game.id];
+    if (!best) return;
+
+    if (cleanName(best.voter) === cleanUser) {
+      badges.push({
+        icon:game.icon,
+        label:game.badge,
+        game:game.title
+      });
+    }
+  });
+
+  return badges;
+}
+
+function renderBadgeChips(badges) {
+  if (!badges || !badges.length) return "";
+
+  return `
+    <div class="badges">
+      ${badges.map(badge => `
+        <span class="badge-chip" title="${badge.game}">
+          ${badge.icon} ${badge.label}
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
 function buildTotalLeaderboard(rows) {
   const bestAttemptMap = {};
 
   rows.forEach(row => {
-    if (["herd", "rebel"].includes(row.game)) return;
+    const game = getGameById(row.game);
+    if (game && game.excludedFromTotal) return;
 
     const key = challengeKey(row);
     const score = Number(row.score || 0);
@@ -657,11 +795,11 @@ function buildTotalLeaderboard(rows) {
 
     if (!userMap[key]) {
       userMap[key] = {
-        voter: row.voter,
-        total: 0,
-        gamesPlayed: new Set(),
-        attempts: 0,
-        latest: row.created_at
+        voter:row.voter,
+        total:0,
+        gamesPlayed:new Set(),
+        attempts:0,
+        latest:row.created_at
       };
     }
 
@@ -677,7 +815,7 @@ function buildTotalLeaderboard(rows) {
   return Object.values(userMap)
     .map(user => ({
       ...user,
-      gamesCount: user.gamesPlayed.size
+      gamesCount:user.gamesPlayed.size
     }))
     .sort((a, b) =>
       Number(b.total) - Number(a.total) ||
@@ -702,6 +840,7 @@ function renderIdentity(user, allRows) {
 
   const leaderboard = buildTotalLeaderboard(allRows);
   const me = leaderboard.find(row => cleanName(row.voter) === cleanName(user));
+  const badges = getBadgesForUser(user, getBestByGame(allRows));
 
   box.innerHTML = `
     <div>
@@ -709,6 +848,7 @@ function renderIdentity(user, allRows) {
       <span style="color:var(--muted)">
         ${me ? `Samlet Lyn Games-score: ${me.total} poeng` : "Ingen score lagret ennå"}
       </span>
+      ${renderBadgeChips(badges)}
     </div>
     <a href="${todaysGame.href}">Spill dagens game</a>
   `;
@@ -752,7 +892,7 @@ function renderTodayGame(rows, user) {
   `;
 }
 
-function renderLeaderHero(leaderboard) {
+function renderLeaderHero(leaderboard, allRows) {
   const box = document.getElementById("leaderHero");
 
   if (!leaderboard.length) {
@@ -761,15 +901,17 @@ function renderLeaderHero(leaderboard) {
   }
 
   const leader = leaderboard[0];
+  const badges = getBadgesForUser(leader.voter, getBestByGame(allRows));
 
   box.innerHTML = `
     <div class="leader-hero">
-      <div class="label">Nåværende Games-sjef</div>
+      <div class="label">Nåværende Games-konge</div>
       <div class="name">👑 ${leader.voter}</div>
       <div class="score">${leader.total} poeng</div>
       <div class="leader-sub">
         ${leader.gamesCount} spill · ${leader.attempts} runder · sist ${formatDate(leader.latest)}
       </div>
+      ${renderBadgeChips(badges)}
     </div>
   `;
 }
@@ -777,8 +919,9 @@ function renderLeaderHero(leaderboard) {
 function renderLeaderboard(rows) {
   const box = document.getElementById("leaderboard");
   const leaderboard = buildTotalLeaderboard(rows);
+  const bestByGame = getBestByGame(rows);
 
-  renderLeaderHero(leaderboard);
+  renderLeaderHero(leaderboard, rows);
 
   if (!leaderboard.length) {
     box.innerHTML = `<div class="empty">Ingen score ennå. Bli første som setter standarden.</div>`;
@@ -787,6 +930,7 @@ function renderLeaderboard(rows) {
 
   box.innerHTML = leaderboard.slice(0, 10).map((row, index) => {
     const medal = index === 0 ? "gold" : "";
+    const badges = getBadgesForUser(row.voter, bestByGame);
 
     return `
       <div class="leader-row">
@@ -797,9 +941,37 @@ function renderLeaderboard(rows) {
           <div class="leader-sub">
             ${row.gamesCount} spill · ${row.attempts} runder · sist ${formatDate(row.latest)}
           </div>
+          ${renderBadgeChips(badges)}
         </div>
 
         <div class="leader-score">${row.total}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderBadgeBoard(rows) {
+  const box = document.getElementById("badgeBoard");
+  const bestByGame = getBestByGame(rows);
+
+  box.innerHTML = games.map(game => {
+    const best = bestByGame[game.id];
+
+    return `
+      <div class="mini-game ${best ? "today" : ""}">
+        <div class="mini-icon">${game.icon}</div>
+        <div class="mini-title">${game.badge}</div>
+        <div class="mini-text">
+          ${game.title}<br>
+          ${
+            best
+              ? `<strong>${best.voter}</strong> leder med ${best.score} poeng`
+              : "Ingen har tatt denne enda."
+          }
+        </div>
+        <div class="mini-status">
+          ${best ? "Badge delt ut" : "Ledig badge"}
+        </div>
       </div>
     `;
   }).join("");
@@ -854,7 +1026,7 @@ async function loadRowsForGame(gameId) {
     const rows = await getGameLeaderboard(gameId);
     return rows.map(row => ({
       ...row,
-      game: row.game || gameId
+      game:row.game || gameId
     }));
   } catch (error) {
     console.error(`Kunne ikke hente leaderboard for ${gameId}:`, error);
@@ -872,6 +1044,7 @@ async function init() {
   renderIdentity(user, allRows);
   renderTodayGame(allRows, user);
   renderLeaderboard(allRows);
+  renderBadgeBoard(allRows);
   renderWeekStrip();
   renderGamesGrid();
 }
