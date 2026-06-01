@@ -1,17 +1,13 @@
 
 <!DOCTYPE html>
 <html lang="no">
-<link rel="icon" href="../lblogoen.png">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tippetips</title>
+  <link rel="icon" href="../lblogoen.png">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-</head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tippetips</title>
-<link rel="icon" href="../lblogoen.png">
-
-<style>
+  <style>
 :root {
   --red:#d71920;
   --blue:#13294b;
@@ -1195,13 +1191,22 @@ function buildPredictions(votes) {
         map[key] = {
           voter:v.voter,
           match_id:v.match_id,
-          home:null,
-          away:null
+        home:null,
+away:null,
+rawHome:null,
+rawAway:null
         };
       }
 
-      if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
-      if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+      if (v.player === TIP_HOME_PLAYER) {
+  map[key].home = decodeGoals(v.rating);
+  map[key].rawHome = Number(v.rating);
+}
+
+if (v.player === TIP_AWAY_PLAYER) {
+  map[key].away = decodeGoals(v.rating);
+  map[key].rawAway = Number(v.rating);
+}
     });
 
   return Object.values(map).filter(p => p.home !== null && p.away !== null);
@@ -1410,6 +1415,23 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   if (sameOutcome) return 1;
   return 0;
 }
+      function scorePredictionFlexible(p, actualHome, actualAway) {
+  const decodedScore = scorePrediction(
+    p.home,
+    p.away,
+    actualHome,
+    actualAway
+  );
+
+  const rawScore = scorePrediction(
+    p.rawHome,
+    p.rawAway,
+    actualHome,
+    actualAway
+  );
+
+  return Math.max(decodedScore, rawScore);
+}
 
 async function sendTips() {
   const voter = cleanVoterName(document.getElementById("voter").value);
@@ -1557,7 +1579,9 @@ async function loadMatchPredictions() {
   `;
 
   predictions.forEach(p => {
-    const points = actual ? scorePrediction(p.home, p.away, actual.home, actual.away) : null;
+    const points = actual
+  ? scorePredictionFlexible(p, actual.home, actual.away)
+  : null;
 
     html += `
       <div class="prediction-row">
@@ -1595,7 +1619,11 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
 
     if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
-    const points = scorePrediction(p.home, p.away, actualHome, actualAway);
+    const points = scorePredictionFlexible(
+  p,
+  actualHome,
+  actualAway
+);
 
     if (!users[p.voter]) {
       users[p.voter] = { points:0, correct:0, diffs:0, outcomes:0, tips:0 };
