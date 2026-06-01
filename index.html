@@ -494,7 +494,7 @@ h1 {
 }
 
 .card:hover .card-player {
-  transform:scale(1.08) translateY(-2px);
+  transform:scale(1.03);
 }
 
 .card-title {
@@ -860,10 +860,12 @@ h1 {
   }
 
   .games-player {
-    height:155px;
-    max-width:150px;
-    width:150px;
-  }
+  height:155px;
+  max-width:150px;
+  object-fit:contain;
+  object-position:bottom left;
+  border-radius:0;
+}
 
   .card-title {
     font-size:25px;
