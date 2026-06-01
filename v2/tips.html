@@ -1150,7 +1150,7 @@ async function fetchVotes(matchId = null) {
     .from("votes")
     .select("*")
     .order("created_at", { ascending:false })
-    .limit(10000);
+    .limit(10000000);
 
   if (matchId) q = q.eq("match_id", matchId);
 
@@ -1702,6 +1702,15 @@ function renderMiniRanking(items, limit = 5, showMedals = true) {
 
 async function loadPredictionLeaderboard() {
   const allVotes = await fetchVotes();
+  console.log("IDIETRIX TIPPEVOTES", allVotes
+  .filter(v => v.voter === "idietrix")
+  .filter(isPredictionVote)
+  .map(v => ({
+    match_id: v.match_id,
+    player: v.player,
+    rating: v.rating
+  }))
+);
   const rows = buildPredictionLeaderboardRows(allVotes, "all");
 
   if (rows.length === 0) {
