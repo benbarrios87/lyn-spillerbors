@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -14,13 +12,32 @@
   --blue:#13294b;
   --gold:#ffd166;
 }
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,0.46), rgba(0,0,0,0.48)),
+    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:92px 20px 20px;
+}
+
 .topnav {
   position:fixed;
   top:12px;
   left:50%;
   transform:translateX(-50%);
   z-index:50;
-  width:min(960px, calc(100% - 24px));
+  width:min(980px, calc(100% - 24px));
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -73,25 +90,9 @@
   color:#17110a;
 }
 
-
-body {
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
-    url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding:92px 20px 20px;
-  box-sizing:border-box;
-}
-
 .wrapper {
   width:100%;
-  max-width:900px;
+  max-width:920px;
   padding:30px 20px;
   text-align:center;
 }
@@ -163,7 +164,6 @@ h1 {
 
 .identity-row input {
   width:100%;
-  box-sizing:border-box;
   border:none;
   border-radius:13px;
   padding:13px 14px;
@@ -365,8 +365,27 @@ h1 {
   line-height:1.45;
 }
 
+.mode-heading {
+  margin-top:34px;
+  text-align:left;
+  color:white;
+}
+
+.mode-heading-title {
+  font-size:28px;
+  font-weight:900;
+  text-shadow:0 3px 14px rgba(0,0,0,.45);
+}
+
+.mode-heading-text {
+  margin-top:6px;
+  font-size:15px;
+  opacity:.88;
+  line-height:1.45;
+}
+
 .grid {
-  margin-top:40px;
+  margin-top:22px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:20px;
@@ -375,39 +394,56 @@ h1 {
 .card {
   position:relative;
   overflow:hidden;
-  min-height:155px;
+  min-height:160px;
   padding:26px 26px 26px 170px;
   border-radius:24px;
   color:white;
   text-align:left;
   cursor:pointer;
-  border:1px solid rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.14);
   box-shadow:0 10px 28px rgba(0,0,0,0.38);
   backdrop-filter:blur(4px);
   transition:0.2s;
-  background:
-    radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
-    linear-gradient(135deg,#13294b,#1d4c8f);
 }
 
-.card:nth-child(even) {
-  background:
-    radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
-    linear-gradient(135deg,#d71920,#ff3942);
+.card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 18px 36px rgba(0,0,0,0.46);
 }
 
-.card.fantasy-feature-card {
+.card.bors-card {
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.13), transparent 32%),
+    linear-gradient(135deg,#13294b,#0b63e5);
+}
+
+.card.tips-card {
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 34%),
+    linear-gradient(135deg,#7a1f1f,#d71920);
+}
+
+.card.fantasy-card {
   border-color:rgba(255,209,102,0.65);
-  box-shadow:
-    0 12px 32px rgba(0,0,0,0.42),
-    0 0 24px rgba(255,209,102,0.16);
   background:
     radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
     linear-gradient(135deg,#13294b,#d71920);
 }
 
-.card.fantasy-feature-card::before {
-  content:"HOT";
+.card.liga-card {
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.18), transparent 34%),
+    linear-gradient(135deg,#111827,#8b5cf6);
+}
+
+.card.games-card {
+  border-color:rgba(255,209,102,0.65);
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.22), transparent 34%),
+    linear-gradient(135deg,#25125e,#0b63e5 48%,#d71920);
+}
+
+.card.feature::before {
   position:absolute;
   top:14px;
   right:18px;
@@ -421,32 +457,12 @@ h1 {
   letter-spacing:0.6px;
 }
 
-.card.stats-feature-card {
-  background:
-    radial-gradient(circle at top right, rgba(255,255,255,0.11), transparent 32%),
-    linear-gradient(135deg,#d71920,#ff3942);
+.card.fantasy-card.feature::before {
+  content:"HOT";
 }
 
-.card.stats-feature-card::before {
-  content:"LIVE";
-  position:absolute;
-  top:14px;
-  right:18px;
-  z-index:3;
-  background:rgba(255,255,255,0.18);
-  color:white;
-  border:1px solid rgba(255,255,255,0.22);
-  font-size:12px;
-  font-weight:900;
-  padding:5px 9px;
-  border-radius:999px;
-  letter-spacing:0.6px;
-}
-
-
-.card:hover {
-  transform:translateY(-4px);
-  box-shadow:0 18px 36px rgba(0,0,0,0.46);
+.card.games-card.feature::before {
+  content:"NYTT";
 }
 
 .card-player {
@@ -467,6 +483,14 @@ h1 {
   max-width:none !important;
   left:-20px !important;
   bottom:-8px !important;
+}
+
+.games-player {
+  height:180px;
+  max-width:170px;
+  object-fit:cover;
+  object-position:center;
+  border-radius:0 0 0 22px;
 }
 
 .card:hover .card-player {
@@ -531,16 +555,16 @@ h1 {
   line-height:1;
 }
 
+.throne-content {
+  text-align:center;
+}
+
 .throne-label {
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:1px;
   opacity:0.75;
   font-weight:bold;
-}
-
-.throne-content {
-  text-align:center;
 }
 
 .throne-name {
@@ -687,20 +711,6 @@ h1 {
   padding:14px;
 }
 
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(10px); }
-  to { opacity:1; transform:translateY(0); }
-}
-
-.next-match-widget,
-.throne-card,
-.season-card,
-.player-of-year-card,
-.identity-box,
-.my-deliveries {
-  animation:fadeInUp 0.5s ease both;
-}
-
 .footer {
   margin-top:36px;
   display:flex;
@@ -737,9 +747,23 @@ h1 {
   text-decoration:underline;
 }
 
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.next-match-widget,
+.throne-card,
+.season-card,
+.player-of-year-card,
+.identity-box,
+.my-deliveries,
+.card {
+  animation:fadeInUp 0.5s ease both;
+}
+
 @media (max-width:700px) {
   body {
-    justify-content:flex-start;
     padding:86px 14px 14px;
   }
 
@@ -792,10 +816,6 @@ h1 {
 
   .next-title {
     font-size:32px;
-  }
-
-  .next-meta {
-    font-size:15px;
   }
 
   .next-buttons {
@@ -878,38 +898,6 @@ h1 {
   .player-of-year-head {
     display:block;
   }
-  .identity-box{
-  margin:20px auto;
-  max-width:520px;
-  background:rgba(0,0,0,0.5);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:18px;
-  padding:16px;
-}
-
-.identity-label{
-  font-size:13px;
-  text-transform:uppercase;
-  opacity:0.7;
-  margin-bottom:10px;
-  font-weight:bold;
-}
-
-.identity-row{
-  display:flex;
-  gap:10px;
-}
-
-.identity-row input{
-  flex:1;
-}
-
-.identity-saved{
-  margin-top:10px;
-  color:#ffd166;
-  font-size:14px;
-  font-weight:bold;
-}
 
   .player-of-year-formula {
     margin-top:10px;
@@ -928,10 +916,11 @@ h1 {
 
   <nav class="nav-links">
     <a class="active" href="index.html">Forside</a>
-    <a href="bors.html">Børs</a>
-    <a href="tippetips.html">Tips</a>
-    <a href="fantasy.html">Fantasy</a>
-    <a href="lynligaen.html">Ligaen</a>
+    <a href="v2/bors.html">Børs</a>
+    <a href="v2/tips.html">Tips</a>
+    <a href="v2/fantasy.html">Fantasy</a>
+    <a href="v2/lynligaen.html">Ligaen</a>
+    <a href="games.html">Games</a>
   </nav>
 </header>
 
@@ -950,6 +939,7 @@ h1 {
       <div class="identity-label">Ditt forumnavn</div>
       <div id="identityStatus" class="identity-status">Ikke satt</div>
     </div>
+
     <div class="identity-row">
       <input id="forumNameInput" type="text" placeholder="f.eks superben" maxlength="30">
       <button type="button" onclick="saveForumName()">Lagre</button>
@@ -965,34 +955,32 @@ h1 {
     <div class="delivery-empty">Skriv forumnavnet ditt over, så vises tips og fantasy-lag for neste kamp her.</div>
   </div>
 
-  <div style="margin-top:34px;text-align:left;color:white;">
-    <div style="font-size:28px;font-weight:900;text-shadow:0 3px 14px rgba(0,0,0,.45);">
-      Velg modus
-    </div>
-    <div style="margin-top:6px;font-size:15px;opacity:.88;line-height:1.45;">
+  <div class="mode-heading">
+    <div class="mode-heading-title">Velg modus</div>
+    <div class="mode-heading-text">
       Stem etter kamp, lever tips, bygg fantasy-lag eller jag daglig prestisje i Lyn Games.
     </div>
   </div>
 
   <div class="grid">
 
-    <div class="card" onclick="location.href='bors.html'">
+    <div class="card bors-card" onclick="location.href='v2/bors.html'">
       <img src="bilder/børs-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Spillerbørs</div>
       <div class="card-text">
-        Stem etter kamp og se hvem forumet kåret til banens beste.
+        Stem etter kamp og se hvem Lyngjengen kåret til banens beste.
       </div>
     </div>
 
-    <div class="card" onclick="location.href='tippetips.html'">
+    <div class="card tips-card" onclick="location.href='v2/tips.html'">
       <img src="bilder/tippetips-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Tippetips</div>
       <div class="card-text">
-        Tipp resultater gjennom sesongen og konkurrer mot resten av forumet.
+        Tipp resultater gjennom sesongen og konkurrer mot resten av Lyngjengen.
       </div>
     </div>
 
-    <div class="card fantasy-feature-card" onclick="location.href='fantasy.html'">
+    <div class="card fantasy-card feature" onclick="location.href='v2/fantasy.html'">
       <img src="bilder/fantasy-Photoroom.png" class="card-player fantasy-player" alt="">
       <div class="card-title">Lyn Fantasy</div>
       <div class="card-text">
@@ -1000,25 +988,32 @@ h1 {
       </div>
     </div>
 
-    <div class="card" onclick="location.href='lynligaen.html'">
+    <div class="card liga-card" onclick="location.href='v2/lynligaen.html'">
       <img src="bilder/lynlaget-Photoroom.png" class="card-player" alt="">
       <div class="card-title">Lynligaen</div>
       <div class="card-text">
-        Sammenlagttabellen som kombinerer børs, tipping og fantasy.
+        Prestisjetabellen for Tippetips, Fantasy, Games, awards og Årets Lynspiller.
       </div>
     </div>
 
+    <div class="card games-card feature" onclick="location.href='games.html'">
+      <img src="bilder/games1.jpg" class="card-player games-player" alt="">
+      <div class="card-title">Lyn Games</div>
+      <div class="card-text">
+        Wordle, Tenable, Daily XI, Karrieregåten, Hvem er dette, Herd og Rebel.
+      </div>
+    </div>
 
   </div>
 
-  <div id="throneCard" class="throne-card" onclick="location.href='lynligaen.html'">
+  <div id="throneCard" class="throne-card" onclick="location.href='v2/lynligaen.html'">
     <div class="throne-crown">👑</div>
 
     <div class="throne-content">
       <div class="throne-label">Nåværende konge av Lynligaen</div>
 
       <div id="throneName" class="throne-name">
-        <a href="lynligaen.html">Laster leder...</a>
+        <a href="v2/lynligaen.html">Laster leder...</a>
       </div>
 
       <div id="thronePoints" class="throne-points">
@@ -1049,31 +1044,31 @@ h1 {
         <div class="player-of-year-title">🏆 Årets Lynspiller så langt</div>
         <div class="player-year-sub">En litt morsommere total enn bare børs.</div>
       </div>
-     <div class="player-of-year-formula">
-  Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
-</div>
-</div>
 
-<div id="playerOfYear">
+      <div class="player-of-year-formula">
+        Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
+      </div>
+    </div>
+
+    <div id="playerOfYear">
       <div class="player-year-loading">Laster topp 3...</div>
     </div>
   </div>
 
- <div class="footer">
-  <div class="footer-heart">
-  <img src="bilder/hjerte.jpg" alt="Hjerte">
+  <div class="footer">
+    <div class="footer-heart">
+      <img src="bilder/hjerte.jpg" alt="Hjerte">
+    </div>
+
+    <div class="footer-text">
+      Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.<br>
+      Send meg mail på
+      <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>
+      om du ønsker kontakt.
+    </div>
   </div>
 
-  <div class="footer-text">
-    Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.<br>
-    Send meg mail på
-    <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a>
-    om du ønsker kontakt.
-  </div>
 </div>
-
-</div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1108,7 +1103,7 @@ const players = [
   { name:"Andreas Hellum", short:"Hellum", position:"ANG" },
   { name:"Ibrahim Sawaneh", short:"Sawaneh", position:"ANG" },
   { name:"Fallou Sock", short:"Sock", position:"ANG" },
-  { name:"Ousmane Gueye", short:"Gueye", img:"gueye.png" },
+  { name:"Ousmane Gueye", short:"Gueye", position:"ANG" },
   { name:"Isak Vik", short:"Vik", position:"KEEPER" },
   { name:"Marcus Andersen", short:"Andersen", position:"MID" },
   { name:"Mats Trige", short:"Trige", position:"KEEPER" },
@@ -1116,9 +1111,17 @@ const players = [
 ];
 
 let currentUpcomingMatch = null;
+let globalMatches = [];
 
 function cleanVoterName(name) {
-  return (name || "").trim().toLowerCase();
+  return String(name || "").trim().toLowerCase();
+}
+
+function normalizeMatchId(id) {
+  return String(id || "")
+    .trim()
+    .replace(/\s*-\s*/g, " - ")
+    .replace(/\s+/g, " ");
 }
 
 function getStoredForumName() {
@@ -1133,7 +1136,8 @@ function getStoredForumName() {
 }
 
 function setStoredForumName(name) {
-  const trimmed = (name || "").trim();
+  const trimmed = String(name || "").trim();
+
   localStorage.setItem("lynbors_voter", trimmed);
   localStorage.setItem("lynBorsUsername", trimmed);
   localStorage.setItem("username", trimmed);
@@ -1169,11 +1173,16 @@ function isRealMatch(v) {
 }
 
 function isPredictionVote(v) {
-  return isRealMatch(v) && (v.player === TIP_HOME_PLAYER || v.player === TIP_AWAY_PLAYER);
+  return isRealMatch(v) && (
+    v.player === TIP_HOME_PLAYER ||
+    v.player === TIP_AWAY_PLAYER
+  );
 }
 
 function isPlayerVote(v) {
-  return isRealMatch(v) && v.player !== AWAY_FANS_PLAYER && !isPredictionVote(v);
+  return isRealMatch(v) &&
+    v.player !== AWAY_FANS_PLAYER &&
+    !isPredictionVote(v);
 }
 
 function decodeGoals(value) {
@@ -1181,6 +1190,9 @@ function decodeGoals(value) {
 }
 
 function getOutcome(home, away) {
+  home = Number(home);
+  away = Number(away);
+
   if (home > away) return "H";
   if (home < away) return "B";
   return "U";
@@ -1210,22 +1222,48 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   return 0;
 }
 
-let globalMatches = [];
+function scorePredictionFlexible(prediction, actualHome, actualAway) {
+  const decodedScore = scorePrediction(
+    prediction.home,
+    prediction.away,
+    actualHome,
+    actualAway
+  );
+
+  const rawScore = scorePrediction(
+    prediction.rawHome,
+    prediction.rawAway,
+    actualHome,
+    actualAway
+  );
+
+  return Math.max(decodedScore, rawScore);
+}
 
 function getMatchData(matchId) {
-  return globalMatches.find(m => m.id === matchId) || null;
+  const wanted = normalizeMatchId(matchId);
+
+  return globalMatches.find(m =>
+    normalizeMatchId(m.id) === wanted
+  ) || null;
 }
+
 function fantasyPosition(playerName) {
-  const p = players.find(x => x.short === playerName || x.name === playerName);
+  const p = players.find(x =>
+    x.short === playerName ||
+    x.name === playerName
+  );
+
   return p ? p.position : "";
 }
 
 function calculateFantasyPoints(player, isCaptain, statsMap) {
   const stat = statsMap[player];
   const position = fantasyPosition(player);
+
   if (!stat) return 0;
 
-  let points = 0;
+  let points = 1;
 
   if (stat.goals > 0) {
     if (position === "ANG") points += stat.goals * 4;
@@ -1234,7 +1272,7 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
     if (position === "KEEPER") points += stat.goals * 10;
   }
 
-  points += (stat.assists || 0) * 3;
+  points += Number(stat.assists || 0) * 3;
 
   if (stat.clean_sheet) {
     if (position === "MID") points += 1;
@@ -1244,58 +1282,85 @@ function calculateFantasyPoints(player, isCaptain, statsMap) {
 
   if (stat.penalty_save && position === "KEEPER") points += 5;
   if (stat.red_card) points -= 3;
-  if (stat.rating >= 7.0) points += 1;
-  if (stat.rating > 0 && stat.rating <= 4.0) points -= 1;
+  if (stat.rating >= 7.5) points += 1;
+  if (stat.rating > 0 && stat.rating <= 4.5) points -= 1;
+
   if (isCaptain) points = Math.round(points * 1.5);
 
   return points;
 }
 
-async function fetchVotes(query = "") {
+async function fetchVotes() {
+  const { data, error } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .order("created_at", { ascending:false })
+    .limit(50000);
 
-  const joiner = query ? "&" : "?";
-
-  const response = await fetch(
-    SUPABASE_URL +
-      "/rest/v1/votes" +
-      query +
-      joiner +
-      "order=created_at.desc&limit=10000",
-    {
-      headers:{
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
-      }
-    }
-  );
-
-  if (!response.ok) {
-    console.error(await response.text());
+  if (error) {
+    console.error(error);
     return [];
   }
 
-  return await response.json();
+  return data || [];
 }
+
+async function fetchPredictionVotes() {
+  const { data, error } = await supabaseClient
+    .from("votes")
+    .select("*")
+    .in("player", [TIP_HOME_PLAYER, TIP_AWAY_PLAYER])
+    .order("created_at", { ascending:false })
+    .limit(50000);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data || [];
+}
+
 function buildPredictions(votes) {
-  let map = {};
+  const map = {};
 
   votes.filter(isPredictionVote).forEach(v => {
     const voter = cleanVoterName(v.voter);
-    const key = `${v.match_id}|||${voter}`;
+    const key = `${normalizeMatchId(v.match_id)}|||${voter}`;
 
-    if (!map[key]) map[key] = { match_id:v.match_id, voter, home:null, away:null };
+    if (!map[key]) {
+      map[key] = {
+        match_id:v.match_id,
+        voter,
+        home:null,
+        away:null,
+        rawHome:null,
+        rawAway:null
+      };
+    }
 
-    if (v.player === TIP_HOME_PLAYER) map[key].home = decodeGoals(v.rating);
-    if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
+    if (v.player === TIP_HOME_PLAYER) {
+      map[key].home = decodeGoals(v.rating);
+      map[key].rawHome = Number(v.rating);
+    }
+
+    if (v.player === TIP_AWAY_PLAYER) {
+      map[key].away = decodeGoals(v.rating);
+      map[key].rawAway = Number(v.rating);
+    }
   });
 
-  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+  return Object.values(map).filter(p =>
+    p.home !== null &&
+    p.away !== null
+  );
 }
 
 function awardFantasyTierPoints(rows) {
   const sorted = [...rows].sort((a,b) => b.raw - a.raw);
   const n = sorted.length;
-  if (n === 0) return [];
+
+  if (!n) return [];
 
   const q1 = Math.ceil(n / 4);
   const q2 = Math.ceil(n / 2);
@@ -1352,20 +1417,20 @@ function ensureUser(users, voter) {
   return users[voter];
 }
 
-function buildTipRounds(allVotes) {
-  const predictions = buildPredictions(allVotes);
+function buildTipRounds(predictionVotes) {
+  const predictions = buildPredictions(predictionVotes);
   const byMatch = {};
 
   predictions.forEach(p => {
     const match = getMatchData(p.match_id);
-  if (!match) return;
+    if (!match) return;
 
-const actualHome = Number(match.actual_home ?? match.actual?.home);
-const actualAway = Number(match.actual_away ?? match.actual?.away);
+    const actualHome = Number(match.actual_home);
+    const actualAway = Number(match.actual_away);
 
-if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
+    if (Number.isNaN(actualHome) || Number.isNaN(actualAway)) return;
 
-const raw = scorePrediction(p.home, p.away, actualHome, actualAway);
+    const raw = scorePredictionFlexible(p, actualHome, actualAway);
 
     if (!byMatch[p.match_id]) byMatch[p.match_id] = [];
 
@@ -1394,7 +1459,12 @@ function buildRatingMaps(allVotes) {
 
   allVotes.filter(isPlayerVote).forEach(v => {
     if (!ratingMaps[v.match_id]) ratingMaps[v.match_id] = {};
-    if (!ratingMaps[v.match_id][v.player]) ratingMaps[v.match_id][v.player] = { total:0, count:0 };
+    if (!ratingMaps[v.match_id][v.player]) {
+      ratingMaps[v.match_id][v.player] = {
+        total:0,
+        count:0
+      };
+    }
 
     ratingMaps[v.match_id][v.player].total += Number(v.rating);
     ratingMaps[v.match_id][v.player].count += 1;
@@ -1408,10 +1478,16 @@ function buildFantasyRounds(picks, stats, allVotes) {
   const statsByMatch = {};
 
   (stats || []).forEach(row => {
+    if (!row.match_id || row.match_id === "TEST") return;
     if (!statsByMatch[row.match_id]) statsByMatch[row.match_id] = {};
 
-    const ratingData = ratingMaps[row.match_id] && ratingMaps[row.match_id][row.player];
-    const rating = ratingData ? ratingData.total / ratingData.count : 0;
+    const ratingData =
+      ratingMaps[row.match_id] &&
+      ratingMaps[row.match_id][row.player];
+
+    const rating = ratingData
+      ? ratingData.total / ratingData.count
+      : 0;
 
     statsByMatch[row.match_id][row.player] = {
       ...row,
@@ -1424,6 +1500,9 @@ function buildFantasyRounds(picks, stats, allVotes) {
   (picks || []).forEach(pick => {
     const matchId = pick.match_id;
     const statsMap = statsByMatch[matchId] || {};
+    const hasStats = Object.keys(statsMap).length > 0;
+
+    if (!hasStats) return;
 
     const raw =
       calculateFantasyPoints(pick.player1, false, statsMap) +
@@ -1440,26 +1519,17 @@ function buildFantasyRounds(picks, stats, allVotes) {
     });
   });
 
-  return Object.keys(byMatch)
-    .filter(matchId => byMatch[matchId].some(row => row.raw !== 0))
-    .map(matchId => ({
-      match_id:matchId,
-      type:"fantasy",
-      rows:awardFantasyTierPoints(byMatch[matchId])
-    }));
+  return Object.keys(byMatch).map(matchId => ({
+    match_id:matchId,
+    type:"fantasy",
+    rows:awardFantasyTierPoints(byMatch[matchId])
+  }));
 }
 
 function combineLeague(fantasyRounds, tipRounds) {
   const users = {};
-  const roundMap = {};
 
   fantasyRounds.forEach(round => {
-    if (!roundMap[round.match_id]) {
-      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
-    }
-
-    roundMap[round.match_id].fantasy = round.rows;
-
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
 
@@ -1474,12 +1544,6 @@ function combineLeague(fantasyRounds, tipRounds) {
   });
 
   tipRounds.forEach(round => {
-    if (!roundMap[round.match_id]) {
-      roundMap[round.match_id] = { match_id:round.match_id, fantasy:[], tips:[] };
-    }
-
-    roundMap[round.match_id].tips = round.rows;
-
     round.rows.forEach(row => {
       const user = ensureUser(users, row.voter);
 
@@ -1507,34 +1571,35 @@ function combineLeague(fantasyRounds, tipRounds) {
   return { league };
 }
 
-async function loadThroneLeader(){
+async function loadThroneLeader() {
   try {
-    const allVotes = await fetchVotes();
+    const [allVotes, predictionVotes, picksResponse, statsResponse] =
+      await Promise.all([
+        fetchVotes(),
+        fetchPredictionVotes(),
+        supabaseClient.from("fantasy_picks").select("*"),
+        supabaseClient.from("fantasy_stats").select("*")
+      ]);
 
-    const { data:picks } = await supabaseClient
-      .from("fantasy_picks")
-      .select("*");
+    const picks = picksResponse.data || [];
+    const stats = statsResponse.data || [];
 
-    const { data:stats } = await supabaseClient
-      .from("fantasy_stats")
-      .select("*");
-
-    const fantasyRounds = buildFantasyRounds(picks || [], stats || [], allVotes);
-    const tipRounds = buildTipRounds(allVotes);
+    const fantasyRounds = buildFantasyRounds(picks, stats, allVotes);
+    const tipRounds = buildTipRounds(predictionVotes);
 
     const { league } = combineLeague(fantasyRounds, tipRounds);
     const leader = league[0];
 
     if (!leader) {
       document.getElementById("throneName").innerHTML =
-        `<a href="lynligaen.html">Ingen leder ennå</a>`;
+        `<a href="v2/lynligaen.html">Ingen leder ennå</a>`;
       document.getElementById("thronePoints").innerHTML =
         `Sammenlagt for fantasy og tipping`;
       return;
     }
 
     document.getElementById("throneName").innerHTML = `
-      <a href="profil.html?user=${encodeURIComponent(leader.voter)}">
+      <a href="v2/profil.html?user=${encodeURIComponent(leader.voter)}">
         ${leader.voter}
       </a>
     `;
@@ -1545,18 +1610,20 @@ async function loadThroneLeader(){
   } catch (err) {
     console.error(err);
     document.getElementById("throneName").innerHTML =
-      `<a href="lynligaen.html">Klarte ikke å laste leder</a>`;
+      `<a href="v2/lynligaen.html">Klarte ikke å laste leder</a>`;
   }
 }
 
-async function loadSeasonStats(){
+async function loadSeasonStats() {
   const { data, error } = await supabaseClient
     .from("fantasy_stats")
     .select("*");
 
   if (error || !data) {
-    document.getElementById("topScorers").innerHTML = `<div class="season-row">Klarte ikke å laste</div>`;
-    document.getElementById("topAssists").innerHTML = `<div class="season-row">Klarte ikke å laste</div>`;
+    document.getElementById("topScorers").innerHTML =
+      `<div class="season-row">Klarte ikke å laste</div>`;
+    document.getElementById("topAssists").innerHTML =
+      `<div class="season-row">Klarte ikke å laste</div>`;
     return;
   }
 
@@ -1564,10 +1631,10 @@ async function loadSeasonStats(){
   const assists = {};
 
   data.forEach(row => {
-    if(!row.player || row.match_id === "TEST") return;
+    if (!row.player || row.match_id === "TEST") return;
 
-    goals[row.player] = (goals[row.player] || 0) + (row.goals || 0);
-    assists[row.player] = (assists[row.player] || 0) + (row.assists || 0);
+    goals[row.player] = (goals[row.player] || 0) + Number(row.goals || 0);
+    assists[row.player] = (assists[row.player] || 0) + Number(row.assists || 0);
   });
 
   const topGoals = Object.entries(goals)
@@ -1584,8 +1651,8 @@ async function loadSeasonStats(){
     topGoals.length
       ? topGoals.map((p,i) => `
           <div class="season-row">
-            <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
-              ${i+1}. ${p[0]}
+            <a class="season-link" href="v2/spiller.html?player=${encodeURIComponent(p[0])}">
+              ${i + 1}. ${p[0]}
             </a>
             <strong>${p[1]} mål</strong>
           </div>
@@ -1596,8 +1663,8 @@ async function loadSeasonStats(){
     topAssist.length
       ? topAssist.map((p,i) => `
           <div class="season-row">
-            <a class="season-link" href="spiller.html?player=${encodeURIComponent(p[0])}">
-              ${i+1}. ${p[0]}
+            <a class="season-link" href="v2/spiller.html?player=${encodeURIComponent(p[0])}">
+              ${i + 1}. ${p[0]}
             </a>
             <strong>${p[1]} assist</strong>
           </div>
@@ -1615,7 +1682,7 @@ function parseLocalDateTime(value) {
 
   return new Date(clean);
 }
-  
+
 function formatNiceDateTime(value) {
   if (!value) return "Ikke satt";
 
@@ -1641,7 +1708,7 @@ function getCountdownText(value) {
   const now = new Date();
   const diff = target - now;
 
-  if (Number.isNaN(target.getTime())) return "Frist ikke satt";
+  if (!target || Number.isNaN(target.getTime())) return "Frist ikke satt";
   if (diff <= 0) return "Frist utløpt";
 
   const totalMinutes = Math.floor(diff / (1000 * 60));
@@ -1665,7 +1732,7 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
 
   const storedName = getStoredForumName();
 
-  if (!storedName) {
+  if (!storedName || !match) {
     box.innerHTML = `
       <div class="my-deliveries-title">Mine leveringer</div>
       <div class="delivery-empty">Skriv forumnavnet ditt over, så vises tips og fantasy-lag for neste kamp her.</div>
@@ -1683,7 +1750,7 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
           <div class="delivery-main">${match.home} ${myPrediction.home}–${myPrediction.away} ${match.away}</div>
           <div class="delivery-sub">Tippetips levert</div>
         </div>
-        <a class="delivery-action" href="tippetips.html">Endre</a>
+        <a class="delivery-action" href="v2/tips.html">Endre</a>
       </div>
     `);
   } else {
@@ -1694,7 +1761,7 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
           <div class="delivery-main">Ikke levert tips ennå</div>
           <div class="delivery-sub">Fristen er åpen</div>
         </div>
-        <a class="delivery-action" href="tippetips.html">Lever</a>
+        <a class="delivery-action" href="v2/tips.html">Lever</a>
       </div>
     `);
   }
@@ -1707,7 +1774,7 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
           <div class="delivery-main">${myFantasyPick.player1} · ${myFantasyPick.player2} · ⭐ ${myFantasyPick.captain}</div>
           <div class="delivery-sub">Fantasy-lag levert</div>
         </div>
-        <a class="delivery-action" href="fantasy.html">Endre</a>
+        <a class="delivery-action" href="v2/fantasy.html">Endre</a>
       </div>
     `);
   }
@@ -1718,24 +1785,24 @@ function renderMyDeliveries(match, myPrediction, myFantasyPick) {
   `;
 }
 
-async function loadNextMatchWidget(){
+async function loadNextMatchWidget() {
   const box = document.getElementById("nextMatchWidget");
   if (!box) return;
 
   try {
-   const { data:matches, error } = await supabaseClient
-  .from("matches")
-  .select("*")
-  .eq("active", true)
-  .order("deadline", { ascending:true });
-
-globalMatches = matches || [];
+    const { data:matches, error } = await supabaseClient
+      .from("matches")
+      .select("*")
+      .order("date", { ascending:true });
 
     if (error) throw error;
+
+    globalMatches = matches || [];
 
     const now = new Date();
 
     const upcoming = (matches || [])
+      .filter(m => m.active !== false)
       .filter(m => parseLocalDateTime(m.deadline || m.date) > now)
       .sort((a,b) =>
         parseLocalDateTime(a.deadline || a.date) -
@@ -1750,16 +1817,17 @@ globalMatches = matches || [];
       return;
     }
 
-    const allVotes = await fetchVotes();
+    const predictionVotes = await fetchPredictionVotes();
 
-    const predictions = buildPredictions(allVotes)
-      .filter(p => p.match_id === upcoming.id);
+    const predictions = buildPredictions(predictionVotes)
+      .filter(p => normalizeMatchId(p.match_id) === normalizeMatchId(upcoming.id));
 
     const uniqueTipsters = new Set(
       predictions.map(p => cleanVoterName(p.voter))
     );
 
     const storedName = cleanVoterName(getStoredForumName());
+
     const myPrediction = storedName
       ? predictions.find(p => cleanVoterName(p.voter) === storedName)
       : null;
@@ -1806,17 +1874,18 @@ globalMatches = matches || [];
       </div>
 
       <div class="next-buttons">
-        <button class="next-btn primary" onclick="location.href='tippetips.html'">⚽ Lever tips</button>
-        ${fantasyEnabled ? `<button class="next-btn secondary" onclick="location.href='fantasy.html'">⭐ Fantasy</button>` : ``}
+        <button class="next-btn primary" onclick="location.href='v2/tips.html'">⚽ Lever tips</button>
+        ${fantasyEnabled ? `<button class="next-btn secondary" onclick="location.href='v2/fantasy.html'">⭐ Fantasy</button>` : ``}
       </div>
     `;
+
   } catch (err) {
     console.error(err);
     box.innerHTML = `<div class="next-loading">Klarte ikke å laste neste kamp.</div>`;
   }
 }
 
-async function loadPlayerOfYear(){
+async function loadPlayerOfYear() {
   const box = document.getElementById("playerOfYear");
   if (!box) return;
 
@@ -1833,7 +1902,10 @@ async function loadPlayerOfYear(){
     allVotes.filter(isPlayerVote).forEach(vote => {
       if (!ratingMap[vote.match_id]) ratingMap[vote.match_id] = {};
       if (!ratingMap[vote.match_id][vote.player]) {
-        ratingMap[vote.match_id][vote.player] = { total:0, count:0 };
+        ratingMap[vote.match_id][vote.player] = {
+          total:0,
+          count:0
+        };
       }
 
       ratingMap[vote.match_id][vote.player].total += Number(vote.rating || 0);
@@ -1845,44 +1917,52 @@ async function loadPlayerOfYear(){
     (statsRows || []).forEach(row => {
       if (!row.player || row.match_id === "TEST") return;
 
-      const ratingData = ratingMap[row.match_id] && ratingMap[row.match_id][row.player];
-      const avgRating = ratingData && ratingData.count
-        ? ratingData.total / ratingData.count
+      const ratingData =
+        ratingMap[row.match_id] &&
+        ratingMap[row.match_id][row.player];
+
+      const avgRating =
+        ratingData && ratingData.count
+          ? ratingData.total / ratingData.count
+          : 0;
+
+      if (!totals[row.player]) {
+        totals[row.player] = {
+          player:row.player,
+          ratingTotal:0,
+          ratingCount:0,
+          total:0,
+          bors:0,
+          goals:0,
+          assists:0,
+          cleanSheets:0
+        };
+      }
+
+      if (avgRating > 0) {
+        totals[row.player].ratingTotal += avgRating;
+        totals[row.player].ratingCount += 1;
+      }
+
+      totals[row.player].goals += Number(row.goals || 0);
+      totals[row.player].assists += Number(row.assists || 0);
+      totals[row.player].cleanSheets += row.clean_sheet ? 1 : 0;
+    });
+
+    Object.values(totals).forEach(p => {
+      const avg = p.ratingCount
+        ? p.ratingTotal / p.ratingCount
         : 0;
 
-if (!totals[row.player]) {
-  totals[row.player] = {
-    player: row.player,
-    ratingTotal: 0,
-    ratingCount: 0,
-    total: 0,
-    bors: 0,
-    goals: 0,
-    assists: 0,
-    cleanSheets: 0
-  };
-}
+      p.bors = avg.toFixed(1);
 
-if (avgRating > 0) {
-  totals[row.player].ratingTotal += avgRating;
-  totals[row.player].ratingCount += 1;
-}
-
-totals[row.player].goals += row.goals || 0;
-totals[row.player].assists += row.assists || 0;
-totals[row.player].cleanSheets += row.clean_sheet ? 1 : 0
+      p.total =
+        (avg * 10) +
+        (p.goals * 2) +
+        (p.assists * 1.5) +
+        p.cleanSheets;
     });
-Object.values(totals).forEach(p => {
-  const avg = p.ratingCount ? p.ratingTotal / p.ratingCount : 0;
 
-  p.bors = avg.toFixed(1);
-
-  p.total =
-    (avg * 10) +
-    (p.goals * 2) +
-    (p.assists * 1.5) +
-    p.cleanSheets;
-});
     const top = Object.values(totals)
       .filter(row => row.total > 0)
       .sort((a,b) =>
@@ -1904,7 +1984,7 @@ Object.values(totals).forEach(p => {
       <div class="player-year-row">
         <div class="player-year-medal">${medals[index]}</div>
         <div>
-          <a class="season-link player-year-name" href="spiller.html?player=${encodeURIComponent(row.player)}">
+          <a class="season-link player-year-name" href="v2/spiller.html?player=${encodeURIComponent(row.player)}">
             ${row.player}
           </a>
           <div class="player-year-sub">
@@ -1914,6 +1994,7 @@ Object.values(totals).forEach(p => {
         <div class="player-year-score">${Math.round(row.total)}</div>
       </div>
     `).join("");
+
   } catch (err) {
     console.error(err);
     box.innerHTML = `<div class="player-year-loading">Klarte ikke å laste årets spiller.</div>`;
@@ -1973,7 +2054,6 @@ init();
     })
   });
 })();
- 
 </script>
 
 </body>
