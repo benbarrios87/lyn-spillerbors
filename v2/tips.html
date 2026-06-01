@@ -1626,6 +1626,15 @@ function buildPredictionLeaderboardRows(allVotes, teamFilter = "all") {
   actualHome,
   actualAway
 );
+    if (p.voter === "idietrix") {
+  console.log("IDIETRIX DEBUG", {
+    match_id: p.match_id,
+    decodedTip: `${p.home}-${p.away}`,
+    rawTip: `${p.rawHome}-${p.rawAway}`,
+    actual: `${actualHome}-${actualAway}`,
+    points
+  });
+}
 
     if (!users[p.voter]) {
       users[p.voter] = { points:0, correct:0, diffs:0, outcomes:0, tips:0 };
