@@ -16,7 +16,21 @@ window.tenableChallenges = [
       { label: "Nottingham Forest", value: 1, aliases: ["nottingham forest", "forest"] }
     ]
   },
-
+{
+  id: "lyn-premier-league",
+  title: "Tidligere Lyn-spillere som har spilt i Premier League",
+  subtitle: "Fra Lyn til verdens største liga.",
+  answers: [
+    "John Obi Mikel",
+    "Adama Diomande",
+    "Jo Inge Berget",
+    "Ronny Johnsen",
+    "Jonathan Parr",
+    "Odion Ighalo",
+    "Øyvind Leonhardsen",
+    "Mats Møller Dæhli"
+  ]
+},
   {
     id: "ballon-dor-last-unique-winners-001",
     title: "Siste 10 ulike Ballon d'Or-vinnere",
