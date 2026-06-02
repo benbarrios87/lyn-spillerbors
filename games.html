@@ -653,13 +653,6 @@ const games = [
   href:"hvem.html",
   text:"Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
   badge:"Ørneblikk"
-},
-    id:"hvem",
-    title:"Hvem er dette?",
-    icon:"📸",
-    href:"hvem.html",
-    text:"Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
-    badge:"Ørneblikk"
   },
   {
     id:"tenable",
@@ -1040,7 +1033,10 @@ function renderGamesGrid() {
       <div class="mini-game ${open ? "today" : "locked"}">
         <div class="mini-icon">${game.icon}</div>
         <div class="mini-title">${game.title}</div>
-        <div class="mini-text">${game.text}</div>
+        <div class="mini-text">
+  ${game.text}
+  ${renderRulesList(game)}
+</div>
 
         <div class="mini-status">
           ${open ? "Dagens spill" : "Kommer senere i uka"}
