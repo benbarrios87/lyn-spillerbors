@@ -629,16 +629,23 @@ const games = [
     text:"Gjett startelleveren fra en klassisk Lyn-kamp. Du har 3 liv.",
     badge:"Daily XI-sjef"
   },
-  {
-    id:"herd",
-    title:"Herd Mentality",
-    icon:"🐑",
-    href:"herd.html",
-    text:"Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
-    badge:"Flokkleder",
-    excludedFromTotal:false
-  },
-  {
+ {
+  id:"herd",
+  title:"Herd Mentality",
+  icon:"🐑",
+  href:"herd.html",
+  text:"Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
+  badge:"Flokkleder",
+  excludedFromTotal:false,
+
+  rules:[
+    "5 spørsmål hver dag",
+    "Svar det du tror flest andre svarer",
+    "Mest populære svar gir flest poeng",
+    "Maks 100 poeng",
+    "Poeng regnes etter kl. 22"
+  ]
+},
     id:"hvem",
     title:"Hvem er dette?",
     icon:"📸",
@@ -662,15 +669,23 @@ const games = [
     text:"Gjett etternavnet til dagens- OG tidligere Lyn-spillere.",
     badge:"Wordlemester"
   },
-  {
-    id:"rebel",
-    title:"Rebel Mentality",
-    icon:"🦊",
-    href:"rebel.html",
-    text:"Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
-    badge:"Opprører",
-    excludedFromTotal:false
-  }
+ {
+  id:"rebel",
+  title:"Rebel Mentality",
+  icon:"🦊",
+  href:"rebel.html",
+  text:"Svar det du tror færrest Lyn-supportere svarer. Åpent til kl. 22.",
+  badge:"Opprører",
+  excludedFromTotal:false,
+
+  rules:[
+    "5 spørsmål hver dag",
+    "Svar det du tror færrest andre svarer",
+    "Sjeldne svar gir flest poeng",
+    "Maks 100 poeng",
+    "Resultater og poeng blir klare etter kl. 22"
+  ]
+},
 ];
 
 const weeklySchedule = {
