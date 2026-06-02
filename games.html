@@ -637,14 +637,22 @@ const games = [
   text:"Svar det du tror flest Lyn-supportere svarer. Åpent til kl. 22.",
   badge:"Flokkleder",
   excludedFromTotal:false,
-
   rules:[
     "5 spørsmål hver dag",
     "Svar det du tror flest andre svarer",
     "Mest populære svar gir flest poeng",
     "Maks 100 poeng",
-    "Poeng regnes etter kl. 22"
+    "Resultater og poeng blir klare etter kl. 22"
   ]
+},
+
+{
+  id:"hvem",
+  title:"Hvem er dette?",
+  icon:"📸",
+  href:"hvem.html",
+  text:"Gjett dagens Lyn-spiller fra bildet. Hint gir færre poeng.",
+  badge:"Ørneblikk"
 },
     id:"hvem",
     title:"Hvem er dette?",
@@ -838,7 +846,18 @@ function buildTotalLeaderboard(rows) {
       new Date(a.latest) - new Date(b.latest)
     );
 }
+function renderRulesList(game) {
+  if (!game.rules?.length) return "";
 
+  return `
+    <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45;">
+      ${game.rules.map(rule => `
+        <div>• ${rule}</div>
+      `).join("")}
+    </div>
+  `;
+}
+  
 function renderIdentity(user, allRows) {
   const box = document.getElementById("identityBox");
 
@@ -881,7 +900,10 @@ function renderTodayGame(rows, user) {
 
   box.innerHTML = `
     <div class="game-title">${todaysGame.icon} ${todaysGame.title}</div>
-    <div class="game-text">${todaysGame.text}</div>
+    <div class="game-text">
+  ${todaysGame.text}
+  ${renderRulesList(todaysGame)}
+</div>
 
     <div class="score-grid">
       <div class="score-box">
