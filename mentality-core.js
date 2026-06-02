@@ -4,8 +4,11 @@ import {
   hasPlayedToday
 } from "./v2/js/games-core.js";
 
+import { supabaseClient } from "./v2/js/supabase.js";
+
 const QUESTION_COUNT = 5;
 const DEADLINE_HOUR = 22;
+const QUESTION_POINTS = 20;
 
 export function setupMentalityGame({
   mode,
@@ -39,6 +42,19 @@ export function setupMentalityGame({
     document.querySelectorAll("input").forEach(input => {
       input.disabled = true;
     });
+  }
+
+  function normalizeAnswer(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/æ/g, "ae")
+      .replace(/ø/g, "o")
+      .replace(/å/g, "a")
+      .replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, " ");
   }
 
   function seededRandom(seed) {
@@ -120,10 +136,149 @@ export function setupMentalityGame({
     });
   }
 
+  function getAnswersFromRow(row) {
+    return Array.isArray(row.details?.answers)
+      ? row.details.answers
+      : [];
+  }
+
+  function buildQuestionStats(rows) {
+    const questions = {};
+
+    rows.forEach(row => {
+      getAnswersFromRow(row).forEach(answerObj => {
+        const qid = answerObj.question_id;
+        const answer = normalizeAnswer(answerObj.answer);
+
+        if (!qid || !answer) return;
+
+        if (!questions[qid]) {
+          questions[qid] = {
+            question: answerObj.question,
+            answers: {}
+          };
+        }
+
+        if (!questions[qid].answers[answer]) {
+          questions[qid].answers[answer] = {
+            display: answerObj.answer,
+            count: 0
+          };
+        }
+
+        questions[qid].answers[answer].count++;
+      });
+    });
+
+    return questions;
+  }
+
+  function scoreAnswer(answerKey, questionStats) {
+    const counts = Object.values(questionStats.answers).map(a => a.count);
+    const myCount = questionStats.answers[answerKey]?.count || 0;
+
+    if (!counts.length || !myCount) return 0;
+
+    const maxCount = Math.max(...counts);
+    const minCount = Math.min(...counts);
+
+    if (mode === "herd") {
+      return Math.round((myCount / maxCount) * QUESTION_POINTS);
+    }
+
+    if (mode === "rebel") {
+      return Math.round((minCount / myCount) * QUESTION_POINTS);
+    }
+
+    return 0;
+  }
+
+  function calculateRowScore(row, questionStats) {
+    let total = 0;
+    const breakdown = [];
+
+    getAnswersFromRow(row).forEach(answerObj => {
+      const qid = answerObj.question_id;
+      const answerKey = normalizeAnswer(answerObj.answer);
+      const stats = questionStats[qid];
+
+      if (!stats || !answerKey) return;
+
+      const points = scoreAnswer(answerKey, stats);
+      const count = stats.answers[answerKey]?.count || 0;
+
+      total += points;
+
+      breakdown.push({
+        question_id: qid,
+        question: answerObj.question,
+        answer: answerObj.answer,
+        count,
+        points
+      });
+    });
+
+    return {
+      score: Math.min(100, total),
+      breakdown
+    };
+  }
+
+  async function autoScoreIfClosed() {
+    if (!isClosed()) return;
+
+    const { data: rows, error } = await supabaseClient
+      .from("game_scores")
+      .select("*")
+      .eq("game", mode)
+      .eq("challenge_id", challengeId);
+
+    if (error || !rows || !rows.length) return;
+
+    const alreadyScored = rows.every(row => row.details?.scored === true);
+    if (alreadyScored) return;
+
+    const questionStats = buildQuestionStats(rows);
+
+    for (const row of rows) {
+      const result = calculateRowScore(row, questionStats);
+
+      await supabaseClient
+        .from("game_scores")
+        .update({
+          score: result.score,
+          max_score: 100,
+          details: {
+            ...(row.details || {}),
+            scored: true,
+            scored_at: new Date().toISOString(),
+            mentality_score_breakdown: result.breakdown
+          }
+        })
+        .eq("id", row.id);
+    }
+  }
+
+  async function getMyScore() {
+    const user = getGameUser();
+    if (!user) return null;
+
+    const { data } = await supabaseClient
+      .from("game_scores")
+      .select("*")
+      .eq("game", mode)
+      .eq("challenge_id", challengeId)
+      .ilike("voter", user)
+      .maybeSingle();
+
+    return data || null;
+  }
+
   async function submitAnswers() {
     if (alreadyPlayed) return;
 
     if (isClosed()) {
+      await autoScoreIfClosed();
       lockInputs();
       message.innerHTML = closedText;
       return;
@@ -144,7 +299,8 @@ export function setupMentalityGame({
       attempts: 1,
       details: {
         mode,
-        answers
+        answers,
+        pending_score: true
       }
     });
 
@@ -159,11 +315,25 @@ export function setupMentalityGame({
   }
 
   async function initPlayedCheck() {
+    if (isClosed()) {
+      await autoScoreIfClosed();
+    }
+
     alreadyPlayed = await hasPlayedToday(mode, challengeId);
 
     if (alreadyPlayed) {
       lockInputs();
-      message.innerHTML = `${emoji} Du har allerede spilt dagens ${mode === "herd" ? "Herd" : "Rebel"} Mentality.`;
+
+      const myScore = await getMyScore();
+
+      if (isClosed() && myScore?.details?.scored) {
+        message.innerHTML =
+          `${emoji} Du fikk ${myScore.score} poeng i dagens ${mode === "herd" ? "Herd" : "Rebel"} Mentality.`;
+      } else {
+        message.innerHTML =
+          `${emoji} Du har allerede levert. Poeng regnes etter kl. 22.`;
+      }
+
       return;
     }
 
