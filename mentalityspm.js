@@ -6,7 +6,7 @@ window.mentalityQuestions = [
     mode: ["herd", "rebel"],
     type: "choice",
     category: "stadion",
-    question: "Hva er den beste og mest realistiske langsiktige stadionløsningen for Lyn?",
+    question: "Hva er den mest realistiske langsiktige stadionløsningen for Lyn?",
     options: ["Bislett", "Ullevaal", "Nytt stadion", "Kringsjå"]
   },
   {
@@ -31,7 +31,7 @@ window.mentalityQuestions = [
     type: "choice",
     category: "klubb",
     question: "Hva er Lyns største utfordring?",
-    options: ["Stadion", "Økonomi", "Sportslig nivå", "Få folk på kamp/verve supportere"]
+    options: ["Stadion", "Økonomi", "Sportslig nivå", "Få folk på kamp"]
   },
   {
     id: "q005",
@@ -54,8 +54,8 @@ window.mentalityQuestions = [
     mode: ["herd", "rebel"],
     type: "choice",
     category: "supporter",
-    question: "Hvilken rival forbinder du sterkest med Lyn?",
-    options: ["Vålerenga", "Skeid", "Stabæk", "LSK"]
+    question: "Utenom Søpla, hva er årets morsomste kamp?",
+    options: ["Strømsgodset", "Noen andre", "Stabæk", "LSK"]
   },
   {
     id: "q008",
@@ -72,70 +72,56 @@ window.mentalityQuestions = [
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt som kaptein?"
+    question: "Hvem ville flest valgt som kaptein hvis dagens kaptein blir solgt?"
   },
   {
     id: "q010",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt til å ta straffe i det 95. minutt?"
+    question: "Hvilken spiller fra dagens stall ville flest valgt til å ta straffe i det 95. minutt?"
   },
   {
     id: "q011",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt først på femmerlag?"
+    question: "Hvem ville flest valgt først på femmerlag dra dagens stall?"
   },
   {
     id: "q012",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt som trener om karrieren sluttet i morgen?"
+    question: "Hvilken spiller fra dagens stall blir definitivt en trener?"
   },
   {
     id: "q013",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt som talsperson for klubben?"
-  },
-  {
-    id: "q014",
-    mode: ["herd"],
-    type: "text",
-    category: "stall",
-    question: "Hvem ville flest valgt som lagleder?"
+    question: "Hvem ville flest valgt som talsperson for klubben blant dagens spillere?"
   },
   {
     id: "q015",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt som pubquiz-partner?"
+    question: "Hvem ville flest valgt som pubquiz-partner fra dagens stall?"
   },
   {
     id: "q016",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt som barnevakt?"
+    question: "Hvem ville flest valgt som barnevakt fra dagens stall?"
   },
   {
     id: "q017",
     mode: ["herd"],
     type: "text",
     category: "stall",
-    question: "Hvem ville flest valgt til å representere Lyn i media?"
-  },
-  {
-    id: "q018",
-    mode: ["herd"],
-    type: "text",
-    category: "stall",
-    question: "Hvem ville flest valgt som klubbpresident?"
+    question: "Hvem ville flest valgt til å representere Lyn i media fra dagens stall?"
   },
 
   // REBEL DAGENS STALL
@@ -638,20 +624,12 @@ window.mentalityQuestions = [
     options: ["Tak over tribunene", "Kollektivtilgang", "Kiosker", "Akustikk"]
   },
   {
-    id: "q089",
-    mode: ["herd", "rebel"],
-    type: "choice",
-    category: "dilemma",
-    question: "Hvis Lyn måtte flytte permanent, hvor ville du helst landet?",
-    options: ["Bislett", "Ullevaal", "Kringsjå", "Eget nytt område"]
-  },
-  {
     id: "q090",
     mode: ["herd", "rebel"],
     type: "choice",
     category: "dilemma",
     question: "Hvis du kunne spole tilbake én ting i Lyn-historien, hva ville du gjort?",
-    options: ["Endret et resultat", "Beholdt en spiller", "Beholdt en trener", "Endret en styrebeslutning"]
+    options: ["Endret et resultat", "Beholdt en spiller og gitt dem tvungen 10 årskontrakt", "Beholdt en trener", "Endret en styrebeslutning"]
   },
   {
     id: "q091",
@@ -659,7 +637,7 @@ window.mentalityQuestions = [
     type: "choice",
     category: "dilemma",
     question: "Hvis Lyn kunne signert én type spiller, hva ville du valgt?",
-    options: ["Lokal unggutt", "Etablert OBOS-profil", "Tidligere Lyn-helt", "Internasjonalt talent"]
+    options: ["Lokal unggutt med høy potential", "Etablert OBOS-profil", "Tidligere Lyn-helt", "Sør Amerikaner"]
   },
   {
     id: "q092",
