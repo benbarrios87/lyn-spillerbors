@@ -511,9 +511,25 @@ function normalize(text) {
 
 function isCorrect(value) {
   const guess = normalize(value);
-  const accepted = player.aliases.map(normalize);
+  if (!guess) return false;
 
-  return accepted.includes(guess);
+  const accepted = [
+    player.name,
+    ...(player.aliases || [])
+  ].map(normalize);
+
+  return accepted.some(answer => {
+    const parts = answer.split(" ").filter(Boolean);
+    const lastName = parts[parts.length - 1] || "";
+
+    return (
+      guess === answer ||
+      guess === lastName ||
+      answer.includes(guess) && guess.length >= 4 ||
+      guess.includes(answer) && answer.length >= 4 ||
+      guess.endsWith(lastName) && lastName.length >= 4
+    );
+  });
 }
 
 function lockGame() {
