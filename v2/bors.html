@@ -94,6 +94,7 @@ async function init() {
   selectEl.addEventListener("change", () => renderMatch(selectEl.value));
 
   if (completed[0]) {
+    selectEl.value = completed[0].id;
     renderMatch(completed[0].id);
   }
 }
