@@ -122,15 +122,15 @@ export const players = [
       order: 8,
     aliases: ["Monglo", "Isaac Monglo"]
   },
-    {
-    id: "Nøis",
-    name: Johan solstad-Nøis",
-    short: "Nøis",
-    image: "../bilder/nois.png",
-    position: "MID",
-      order: 12,
-    aliases: ["nois", "Nøis"]
-  },
+   {
+  id: "nøis",
+  name: "Johan Solstad-Nøis",
+  short: "Nøis",
+  image: "../bilder/nois.png",
+  position: "MID",
+  order: 12,
+  aliases: ["nois", "Nøis", "Johan Solstad-Nøis", "Solstad-Nøis", "Solstad Nois"]
+},
   {
     id: "waehler",
     name: "William Wæhler",
