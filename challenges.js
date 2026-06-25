@@ -601,7 +601,206 @@ const challenges = [
     "Diego Guastavino",
     "Erling Knudtzon"
       ]
-}
+},
+  {
+  id:"haugesund-2026-2-4",
+  title:"Lyn vs Haugesund",
+  competition:"OBOS-ligaen 2026",
+  date:"06.04.2026",
+  result:"2-4",
+  formation:"3-4-3",
+  attendance:1768,
+  manager:"Magnus Aadland",
+  lineup:[
+    { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
+
+    { name:"Ådne Midtskogen", pos:"RCB", x:78, y:72 },
+    { name:"William Sell", pos:"CB", x:50, y:75 },
+    { name:"Isaac Emmanuel Barnett", pos:"LCB", x:22, y:72 },
+
+    { name:"Sander Amble Haugen", pos:"RM", x:82, y:48 },
+    { name:"Julius Skaug", pos:"CM", x:60, y:52 },
+    { name:"Didrik Fredriksen", pos:"CM", x:40, y:52 },
+    { name:"William Kurtovic", pos:"LM", x:18, y:48 },
+
+    { name:"Anders Bjørntvedt Olsen", pos:"RW", x:78, y:22 },
+    { name:"Mathias Johansen", pos:"ST", x:50, y:16 },
+    { name:"Andreas Hellum", pos:"LW", x:22, y:22 }
+  ],
+  bonusGoalscorers:[
+    "Selvmål",
+    "Andreas Hellum"
+  ]
+},
+
+{
+  id:"hodd-2023-1-2",
+  title:"Hødd vs Lyn",
+  competition:"2. divisjon avdeling 1 2023",
+  date:"02.12.2023",
+  result:"1-2",
+  formation:"4-3-3",
+  attendance:650,
+  manager:"Jan Halvor Halvorsen",
+  lineup:[
+    { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
+
+    { name:"Håvard Meinseth", pos:"RB", x:82, y:72 },
+    { name:"Daniel Schneider", pos:"CB", x:62, y:75 },
+    { name:"William Sell", pos:"CB", x:38, y:75 },
+    { name:"Herman Solberg Nilsen", pos:"LB", x:18, y:72 },
+
+    { name:"Julius Skaug", pos:"CM", x:30, y:52 },
+    { name:"Even Bydal", pos:"CM", x:50, y:49 },
+    { name:"Henrik Loholt Kristiansen", pos:"CM", x:70, y:52 },
+
+    { name:"Anders Bjørntvedt Olsen", pos:"RW", x:78, y:25 },
+    { name:"Andreas Hellum", pos:"ST", x:50, y:18 },
+    { name:"Ole Breistøl", pos:"LW", x:22, y:25 }
+  ],
+  bonusGoalscorers:[
+    "Ole Breistøl",
+    "Henrik Elvevold"
+  ]
+},
+
+{
+  id:"ullern-2019-6-3",
+  title:"Ullern vs Lyn",
+  competition:"3. divisjon avdeling 2 2019",
+  date:"14.07.2019",
+  result:"6-3",
+  formation:"4-3-3",
+  attendance:200,
+  manager:"Bent Inge Johnsen",
+  lineup:[
+    { name:"Joar Hedkvist Dale", pos:"GK", x:50, y:91 },
+
+    { name:"August Tuastad Randers", pos:"RB", x:82, y:72 },
+    { name:"Trygve Løberg", pos:"CB", x:62, y:75 },
+    { name:"Joakim Pedersen Strand", pos:"CB", x:38, y:75 },
+    { name:"Mikkel Tveiten", pos:"LB", x:18, y:72 },
+
+    { name:"Eirik Laabak", pos:"CM", x:30, y:52 },
+    { name:"Henrik Lehne Olsen", pos:"CM", x:50, y:49 },
+    { name:"Emil Borkø", pos:"CM", x:70, y:52 },
+
+    { name:"Emanuel Longe Grønner", pos:"RW", x:78, y:25 },
+    { name:"Jonas-Aleksander Bakken", pos:"ST", x:50, y:18 },
+    { name:"Mathias Pedersen Aasand", pos:"LW", x:22, y:25 }
+  ],
+  bonusGoalscorers:[
+    "Trygve Løberg",
+    "Emanuel Longe Grønner",
+    "Eirik Laabak"
+  ]
+},
+{
+  id:"sogndal2-2021-0-7",
+  title:"Sogndal 2 vs Lyn",
+  competition:"3. divisjon avdeling 4 2021",
+  date:"11.09.2021",
+  result:"0-7",
+  formation:"4-3-3",
+  attendance:0,
+  manager:"Bent Inge Johnsen",
+  lineup:[
+    { name:"Fredrik Pedersen", pos:"GK", x:50, y:91 },
+
+    { name:"Håkon Sjåtil", pos:"RB", x:82, y:72 },
+    { name:"August Tuastad Randers", pos:"CB", x:62, y:75 },
+    { name:"Eirik Haugstad", pos:"CB", x:38, y:75 },
+    { name:"Dan-Roger Roland", pos:"LB", x:18, y:72 },
+
+    { name:"Eirik Aalstad Bækkelund", pos:"CM", x:30, y:52 },
+    { name:"Henrik Elvevold", pos:"CM", x:50, y:49 },
+    { name:"Nyemah Brownell", pos:"CM", x:70, y:52 },
+
+    { name:"Tobias Hepsøe", pos:"RW", x:78, y:25 },
+    { name:"Matias Bjanes", pos:"ST", x:50, y:18 },
+    { name:"Anwar Makelio D´vaz Pellegrino", pos:"LW", x:22, y:25 }
+  ],
+  bonusGoalscorers:[
+    "Matias Bjanes",
+    "Nyemah Brownell",
+    "Henrik Elvevold",
+    "Eirik Haugstad",
+    "Peder Nomell",
+    "Kristian Berg Tveter"
+  ]
+},
+
+{
+  id:"heggedal-2011-8-1",
+  title:"Lyn vs Heggedal",
+  competition:"4. divisjon avdeling 1 2011",
+  date:"31.05.2011",
+  result:"8-1",
+  formation:"4-2-3-1",
+  attendance:1114,
+  manager:"Finn Bredo Olsen",
+  lineup:[
+    { name:"Thomas Sandsør", pos:"GK", x:50, y:91 },
+
+    { name:"Rene Winnem Reyes", pos:"RB", x:82, y:72 },
+    { name:"Mads Dahm", pos:"CB", x:62, y:75 },
+    { name:"Tresor Egholm", pos:"CB", x:38, y:75 },
+    { name:"Øyvind Jakobsen", pos:"LB", x:18, y:72 },
+
+    { name:"Kim-David Hunstok", pos:"CDM", x:40, y:55 },
+    { name:"Sami Sakka", pos:"CDM", x:60, y:55 },
+
+    { name:"Vegard Vinje", pos:"RW", x:78, y:35 },
+    { name:"Torbjørn Melhuus", pos:"CAM", x:50, y:38 },
+    { name:"Andreas Nielsen", pos:"LW", x:22, y:35 },
+
+    { name:"Lasse Brandal", pos:"ST", x:50, y:18 }
+  ],
+  bonusGoalscorers:[
+    "Lasse Brandal",
+    "Torbjørn Melhuus",
+    "Vegard Vinje",
+    "Kim-David Hunstok",
+    "Mads Dahm",
+    "Julian Hagemann"
+  ]
+},
+
+{
+  id:"oppsal-2022-7-0",
+  title:"Lyn vs Oppsal",
+  competition:"3. divisjon avdeling 1 2022",
+  date:"23.10.2022",
+  result:"7-0",
+  formation:"4-3-3",
+  attendance:1676,
+  manager:"Jan Halvor Halvorsen",
+  lineup:[
+    { name:"Alexander Pedersen", pos:"GK", x:50, y:91 },
+
+    { name:"August Tuastad Randers", pos:"RB", x:82, y:72 },
+    { name:"William Sell", pos:"CB", x:62, y:75 },
+    { name:"Christopher Lindquist", pos:"CB", x:38, y:75 },
+    { name:"Eirik Haugstad", pos:"LB", x:18, y:72 },
+
+    { name:"Even Bydal", pos:"CM", x:30, y:52 },
+    { name:"Henrik Elvevold", pos:"CM", x:50, y:49 },
+    { name:"Herman Solberg Nilsen", pos:"CM", x:70, y:52 },
+
+    { name:"Anders Bjørntvedt Olsen", pos:"RW", x:78, y:25 },
+    { name:"David Tavakoli", pos:"ST", x:50, y:18 },
+    { name:"Ole Breistøl", pos:"LW", x:22, y:25 }
+  ],
+  bonusGoalscorers:[
+    "Ole Breistøl",
+    "Henrik Elvevold",
+    "David Tavakoli",
+    "August Tuastad Randers",
+    "Anders Bjørntvedt Olsen",
+    "Ibba Laajab",
+    "Martin Bakken"
+  ]
+},
 
 ];
 
