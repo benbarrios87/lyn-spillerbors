@@ -276,6 +276,41 @@ window.tenableChallenges = [
     { label: "Ruud van Nistelrooy", value: 12, aliases: ["van nistelrooy", "nistelrooy", "ruud van nistelrooy"] }
   ]
 },
+{
+  id: "lyn-most-substituted-001",
+  title: "Lyn-spillere som har blitt byttet ut flest ganger",
+  intro: "Tallene viser hvor mange ganger spilleren har blitt byttet ut (pr. juni 2026).",
+  answers: [
+    { label: "Julius Skaug", value: 63, aliases: ["julius skaug", "skaug"] },
+    { label: "Ole Breistøl", value: 48, aliases: ["ole breistol", "ole breistøl", "breistol", "breistøl"] },
+    { label: "Tomasz Sokolowski", value: 45, aliases: ["tomasz sokolowski", "sokolowski"] },
+    { label: "Anders Bjørntvedt Olsen", value: 43, aliases: ["anders bjørntvedt olsen", "anders olsen", "bjørntvedt olsen"] },
+    { label: "Andreas Hellum", value: 43, aliases: ["andreas hellum", "hellum"] },
+    { label: "Emil Borkø", value: 42, aliases: ["emil borko", "emil borkø", "borko", "borkø"] },
+    { label: "Ole Bjørn Sundgot", value: 42, aliases: ["ole bjorn sundgot", "ole bjørn sundgot", "sundgot"] },
+    { label: "Mathias Johansen", value: 41, aliases: ["mathias johansen", "johansen"] },
+    { label: "Anwar Makelio D´vaz Pellegrino", value: 40, aliases: ["anwar pellegrino", "pellegrino", "anwar"] },
+    { label: "Kim Holmen", value: 39, aliases: ["kim holmen", "holmen"] }
+  ]
+},
+
+{
+  id: "fa-cup-titles-001",
+  title: "Klubber med flest FA Cup-titler",
+  intro: "Tallene viser antall FA Cup-titler.",
+  answers: [
+    { label: "Arsenal", value: 14, aliases: ["arsenal"] },
+    { label: "Manchester United", value: 13, aliases: ["manchester united", "man united", "man utd", "united"] },
+    { label: "Chelsea", value: 8, aliases: ["chelsea"] },
+    { label: "Liverpool", value: 8, aliases: ["liverpool"] },
+    { label: "Tottenham", value: 8, aliases: ["tottenham", "spurs"] },
+    { label: "Manchester City", value: 7, aliases: ["manchester city", "city", "man city"] },
+    { label: "Aston Villa", value: 7, aliases: ["aston villa", "villa"] },
+    { label: "Newcastle United", value: 6, aliases: ["newcastle", "newcastle united"] },
+    { label: "Blackburn Rovers", value: 6, aliases: ["blackburn", "blackburn rovers"] },
+    { label: "West Bromwich Albion", value: 5, aliases: ["west bromwich", "west brom", "wba"] }
+  ]
+},
   
   {
   id: "worldcup-appearances-001",
@@ -286,7 +321,7 @@ window.tenableChallenges = [
     { label: "Tyskland", value: 21, aliases: ["tyskland", "germany"] },
     { label: "Argentina", value: 19, aliases: ["argentina"] },
     { label: "Italia", value: 18, aliases: ["italia", "italy"] },
-    { label: "Mexico", value: 18, aliases: ["mexico", "mexico"] },
+    { label: "Mexico", value: 18, aliases: ["mexico", "meksiko"] },
     { label: "Spania", value: 16, aliases: ["spania", "spain"] },
     { label: "Frankrike", value: 16, aliases: ["frankrike", "france"] },
     { label: "England", value: 16, aliases: ["england"] },
