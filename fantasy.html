@@ -1276,6 +1276,76 @@ function isMensMatchId(matchId) {
 function getMensMatches() {
   return allMatches.filter(m => !m.team || m.team === "men");
 }
+  function getMatchMoment(matchId) {
+  const match = allMatches.find(item => item.id === matchId);
+
+  if (!match) return null;
+
+  if (match.deadline) {
+    const deadline = parseLocalDeadline(match.deadline);
+
+    if (deadline && !Number.isNaN(deadline.getTime())) {
+      return deadline.getTime();
+    }
+  }
+
+  const date = new Date(`${match.date}T00:00:00`);
+
+  return Number.isNaN(date.getTime())
+    ? null
+    : date.getTime();
+}
+
+/*
+  Finner laget som gjaldt for hver bruker i en bestemt kamp.
+
+  Prioritet:
+  1. Lag lagret direkte til denne kampen.
+  2. Ellers siste lag brukeren lagret før kampen.
+*/
+function getEffectivePicksForMatch(allPicks, targetMatchId) {
+  const targetMoment = getMatchMoment(targetMatchId);
+
+  if (targetMoment === null) return [];
+
+  const latestByUser = {};
+
+  (allPicks || []).forEach(pick => {
+    if (!pick || !pick.voter || !pick.match_id) return;
+    if (!isMensMatchId(pick.match_id)) return;
+
+    const pickMoment = getMatchMoment(pick.match_id);
+
+    if (pickMoment === null || pickMoment > targetMoment) {
+      return;
+    }
+
+    const voterKey = cleanVoterName(pick.voter);
+
+    if (!voterKey) return;
+
+    const current = latestByUser[voterKey];
+
+    const shouldReplace =
+      !current ||
+      pickMoment > current.pickMoment ||
+      (
+        pickMoment === current.pickMoment &&
+        pick.match_id === targetMatchId
+      );
+
+    if (shouldReplace) {
+      latestByUser[voterKey] = {
+        ...pick,
+        pickMoment,
+        inherited: pick.match_id !== targetMatchId,
+        source_match_id: pick.match_id
+      };
+    }
+  });
+
+  return Object.values(latestByUser);
+}
   
 function getPickMatch() {
   const now = new Date();
@@ -1935,25 +2005,91 @@ const total = p1.total + p2.total + cap.total;
   `;
 }
 
-function loadSavedTeam() {
+async function loadSavedTeam() {
   const savedUsername = getSavedUsername();
-  if (savedUsername) document.getElementById("username").value = savedUsername;
 
-  const saved = localStorage.getItem("lynFantasyTeam");
-  if (!saved) return;
+  if (!savedUsername || !nextMatch) return;
 
-  const team = JSON.parse(saved);
+  document.getElementById("username").value = savedUsername;
 
-  if (!nextMatch || team.match_id !== nextMatch.id) return;
+  const { data, error } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*");
 
-  document.getElementById("username").value = team.username;
-  document.getElementById("player1").value = team.player1;
-  document.getElementById("player2").value = team.player2;
-  document.getElementById("captain").value = team.captain;
+  if (error) {
+    console.error("Kunne ikke hente tidligere fantasy-lag:", error);
+    return;
+  }
 
+  const myEffectivePick = getEffectivePicksForMatch(
+    data || [],
+    nextMatch.id
+  ).find(pick =>
+    cleanVoterName(pick.voter) === cleanVoterName(savedUsername)
+  );
+
+  if (!myEffectivePick) return;
+
+  const availablePlayers = new Set(
+    players.map(player => player.short)
+  );
+
+  const player1 = availablePlayers.has(myEffectivePick.player1)
+    ? myEffectivePick.player1
+    : "";
+
+  const player2 = availablePlayers.has(myEffectivePick.player2)
+    ? myEffectivePick.player2
+    : "";
+
+  const captain = availablePlayers.has(myEffectivePick.captain)
+    ? myEffectivePick.captain
+    : "";
+
+  document.getElementById("player1").value = player1;
+  document.getElementById("player2").value = player2;
+  document.getElementById("captain").value = captain;
+
+  updatePlayerImages();
   updateTeamBuilder();
   renderPlayerCards();
-  showTeam(team);
+
+  if (!player1 || !player2 || !captain) {
+    return;
+  }
+
+  showTeam({
+    match_id: nextMatch.id,
+    username: myEffectivePick.voter,
+    player1,
+    player2,
+    captain
+  });
+
+  const output = document.getElementById("output");
+
+  if (myEffectivePick.inherited) {
+    output.insertAdjacentHTML(
+      "afterbegin",
+      `
+        <div class="locked" style="margin-bottom:14px;">
+          ♻️ Forrige fantasy-lag står automatisk videre mot
+          <strong>${nextMatch.home} – ${nextMatch.away}</strong>.<br>
+          Du trenger bare å lagre dersom du vil endre laget.
+        </div>
+      `
+    );
+  } else {
+    output.insertAdjacentHTML(
+      "afterbegin",
+      `
+        <div class="locked" style="margin-bottom:14px;">
+          ✅ Dette laget er lagret til
+          <strong>${nextMatch.home} – ${nextMatch.away}</strong>.
+        </div>
+      `
+    );
+  }
 }
 
 function renderPodium(leaderboard) {
@@ -2027,10 +2163,14 @@ async function loadFantasyStats() {
     return;
   }
 
-  const { data:picks, error:picksError } = await supabaseClient
-    .from("fantasy_picks")
-    .select("*")
-    .eq("match_id", statsMatch.id);
+const { data:allPicks, error:picksError } = await supabaseClient
+  .from("fantasy_picks")
+  .select("*");
+
+const picks = getEffectivePicksForMatch(
+  allPicks || [],
+  statsMatch.id
+);
 
   if (picksError) {
     console.error(picksError);
@@ -2271,7 +2411,32 @@ async function loadSeasonFantasyStats() {
   const captainPointGames = {};
   const matchLeaderboards = {};
 
- const mensPicks = picks.filter(pick => isMensMatchId(pick.match_id));
+const completedMensMatches = getMensMatches()
+  .filter(match =>
+    match.actual_home !== null &&
+    match.actual_away !== null
+  )
+  .sort((a, b) =>
+    getMatchMoment(a.id) - getMatchMoment(b.id)
+  );
+
+const mensPicks = completedMensMatches.flatMap(match => {
+  const effectivePicks = getEffectivePicksForMatch(
+    picks || [],
+    match.id
+  );
+
+  return effectivePicks.map(pick => ({
+    ...pick,
+
+    // Poengene skal regnes mot kampen laget gjelder i,
+    // ikke kampen der laget opprinnelig ble lagret.
+    match_id: match.id,
+
+    inherited_from_match_id:
+      pick.source_match_id || pick.match_id
+  }));
+});
 
 if (mensPicks.length === 0) {
   box.innerHTML = "Ingen fantasydata for herrekamper ennå.";
@@ -2542,7 +2707,7 @@ async function init() {
   await loadMatchStats();
   await loadBorsRatings();
 
-  loadSavedTeam();
+  await loadSavedTeam();
   updatePlayerImages();
   updateTeamBuilder();
   renderPlayerCards();
