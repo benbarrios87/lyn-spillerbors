@@ -78,6 +78,14 @@ export const players = [
     position: "FORS",
     aliases: ["Gueye", "Ousmane Gueye"]
   },
+  {
+    id: "race",
+    name: "Edvard Race",
+    short: "Race",
+    image: "../bilder/race.png",
+    position: "FORS",
+    aliases: ["Edvard Race", "Race"]
+  },
 
   {
     id: "fredriksen",
@@ -95,6 +103,22 @@ export const players = [
     image: "../bilder/isufi.png",
     position: "MID",
     aliases: ["Isufi", "Eron Isufi"]
+  },
+  {
+    id: "gueye",
+    name: "Ousmane Gueye",
+    short: "Gueye",
+    image: "../bilder/gueye.png",
+    position: "FORS",
+    aliases: ["Gueye", "Ousmane Gueye"]
+  },
+  {
+    id: "kallevåg",
+    name: "Ole Kallevåg",
+    short: "Kallevåg",
+    image: "../bilder/kallevåg.png",
+    position: "MID",
+    aliases: ["kallevåd", "Ole Kallevåg"]
   },
   {
     id: "skaug",
