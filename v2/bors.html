@@ -70,17 +70,13 @@ async function init() {
   allVotes = await fetchVotes();
 
   const completed = allMatches
-  .filter(match => {
-    if (match.actual_home === null || match.actual_away === null) {
-      return false;
-    }
-
-    const ranking = getMatchRanking(allVotes, match.id, {
-      minVotes: 1
-    });
-
-    return ranking.length > 0;
-  })
+  .filter(match =>
+    match.actual_home !== null &&
+    match.actual_away !== null
+  )
+  .sort((a, b) =>
+    new Date(b.date) - new Date(a.date)
+  );
   .sort((a,b) =>
     new Date(b.date) - new Date(a.date)
   );
