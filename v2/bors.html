@@ -74,9 +74,6 @@ async function init() {
     match.actual_home !== null &&
     match.actual_away !== null
   )
-  .sort((a, b) =>
-    new Date(b.date) - new Date(a.date)
-  );
   .sort((a,b) =>
     new Date(b.date) - new Date(a.date)
   );
