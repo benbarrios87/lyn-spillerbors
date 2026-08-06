@@ -224,7 +224,15 @@ export const players = [
     image: "../bilder/sock.png",
     position: "ANG",
     aliases: ["Sock", "Fallou Sock"]
-  }
+  },
+  {
+    id: "Memedov",
+    name: "Artan Memedov",
+    short: "Sock",
+    image: "../bilder/sock.png",
+    position: "ANG",
+    aliases: ["Sock", "Fallou Sock"]
+}
 ];
 
 function normalize(value) {
