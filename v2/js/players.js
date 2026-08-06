@@ -228,10 +228,10 @@ export const players = [
   {
     id: "Memedov",
     name: "Artan Memedov",
-    short: "Sock",
-    image: "../bilder/sock.png",
+    short: "Memedov",
+    image: "../bilder/.png",
     position: "ANG",
-    aliases: ["Sock", "Fallou Sock"]
+    aliases: ["Artan", "Artan Memedov"]
 }
 ];
 
