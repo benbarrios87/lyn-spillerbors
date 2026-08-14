@@ -8,15 +8,6 @@ export const players = [
     order: 1,
     aliases: ["Pedersen", "Alexander Pedersen"]
   },
-  {
-    id: "trige",
-    name: "Mats Trige",
-    short: "Trige",
-    image: "../bilder/trige.png",
-    position: "KEEPER",
-    order: 9999,
-    aliases: ["Trige", "Mats Trige"]
-  },
 
   {
     id: "sah",
