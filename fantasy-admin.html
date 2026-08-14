@@ -486,6 +486,40 @@ hr {
 
 <body>
 
+<!-- Enkel stopgap-beskyttelse. Dette er IKKE ekte sikkerhet (koden og passordet
+     kan leses av alle i "Vis kildekode"). Ekte beskyttelse må settes opp som
+     Row Level Security-regler i Supabase-prosjektet. Bytt passordet under før bruk. -->
+<div id="admin-lock" style="position:fixed;inset:0;background:#0b0f1a;color:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:Arial,sans-serif;">
+  <div style="text-align:center;padding:24px;">
+    <p style="font-weight:800;margin-bottom:12px;">🔒 Admin-adgang</p>
+    <input id="admin-pw" type="password" placeholder="Passord" style="padding:10px;border-radius:8px;border:1px solid #444;">
+    <button onclick="checkAdminPassword()" style="padding:10px 16px;border-radius:8px;border:none;background:#d71920;color:#fff;font-weight:800;cursor:pointer;margin-left:8px;">Lås opp</button>
+    <p id="admin-pw-error" style="color:#ff6b6b;margin-top:10px;display:none;">Feil passord.</p>
+  </div>
+</div>
+<script>
+(function () {
+  var ADMIN_PASSWORD = "BYTT_MEG_2026"; // ⚠️ Bytt dette til ditt eget passord
+  var lock = document.getElementById("admin-lock");
+  var input = document.getElementById("admin-pw");
+  var error = document.getElementById("admin-pw-error");
+  if (sessionStorage.getItem("lyn_admin_ok") === "1") {
+    lock.style.display = "none";
+  }
+  window.checkAdminPassword = function () {
+    if (input.value === ADMIN_PASSWORD) {
+      sessionStorage.setItem("lyn_admin_ok", "1");
+      lock.style.display = "none";
+    } else {
+      error.style.display = "block";
+    }
+  };
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") checkAdminPassword();
+  });
+})();
+</script>
+
 <button class="menu-btn" onclick="location.href='/'">← Meny</button>
 
 <div class="container">

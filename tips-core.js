@@ -2,7 +2,9 @@ const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
 const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";
 
 function cleanVoterName(name) {
-  return String(name || "").trim().toLowerCase();
+  return String(name || "")
+    .trim()
+    .toLowerCase();
 }
 
 function decodeGoals(value) {
@@ -40,8 +42,7 @@ function scorePrediction(tipHome, tipAway, actualHome, actualAway) {
   const sameOutcome =
     getOutcome(tipHome, tipAway) === getOutcome(actualHome, actualAway);
 
-  const sameGoalDiff =
-    (tipHome - tipAway) === (actualHome - actualAway);
+  const sameGoalDiff = tipHome - tipAway === actualHome - actualAway;
 
   if (sameOutcome && sameGoalDiff) return 2;
   if (sameOutcome) return 1;
@@ -60,7 +61,7 @@ function isPredictionVote(v) {
 function buildPredictions(votes) {
   const map = {};
 
-  (votes || []).filter(isPredictionVote).forEach(v => {
+  (votes || []).filter(isPredictionVote).forEach((v) => {
     const voter = cleanVoterName(v.voter);
     const key = `${v.match_id}|||${voter}`;
 
@@ -69,7 +70,7 @@ function buildPredictions(votes) {
         match_id: v.match_id,
         voter,
         home: null,
-        away: null
+        away: null,
       };
     }
 
@@ -77,18 +78,18 @@ function buildPredictions(votes) {
     if (v.player === TIP_AWAY_PLAYER) map[key].away = decodeGoals(v.rating);
   });
 
-  return Object.values(map).filter(p => p.home !== null && p.away !== null);
+  return Object.values(map).filter((p) => p.home !== null && p.away !== null);
 }
 
 function buildTipRows(votes, matches) {
   const matchesById = {};
 
-  (matches || []).forEach(match => {
+  (matches || []).forEach((match) => {
     matchesById[match.id] = match;
   });
 
   return buildPredictions(votes)
-    .map(prediction => {
+    .map((prediction) => {
       const match = matchesById[prediction.match_id];
       const actual = getActual(match);
 
@@ -98,14 +99,14 @@ function buildTipRows(votes, matches) {
         prediction.home,
         prediction.away,
         actual.home,
-        actual.away
+        actual.away,
       );
 
       return {
         ...prediction,
         match,
         actual,
-        points
+        points,
       };
     })
     .filter(Boolean);

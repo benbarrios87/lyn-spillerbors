@@ -3,7 +3,7 @@ let lives = 5;
 import {
   saveGameScore,
   getGameUser,
-  hasPlayedToday
+  hasPlayedToday,
 } from "./v2/js/games-core.js";
 
 import { supabaseClient } from "./v2/js/supabase.js";
@@ -11,21 +11,14 @@ import { supabaseClient } from "./v2/js/supabase.js";
 const startDate = new Date("2026-01-01");
 const today = new Date();
 
-const diffDays = Math.floor(
-  (today - startDate) /
-  (1000 * 60 * 60 * 24)
-);
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
 
 const challenge =
-  window.tenableChallenges[
-    diffDays % window.tenableChallenges.length
-  ];
+  window.tenableChallenges[diffDays % window.tenableChallenges.length];
 
-  const livesBox =
-  document.getElementById("livesBox");
- 
-const challengeId =
-  `tenable-${diffDays}-${challenge.id}`;
+const livesBox = document.getElementById("livesBox");
+
+const challengeId = `tenable-${diffDays}-${challenge.id}`;
 
 let found = [];
 let finished = false;
@@ -69,18 +62,20 @@ function renderSlots() {
   statSlots.className = "stat-slots";
 
   statSlots.innerHTML = challenge.answers
-    .map(answer => `
+    .map(
+      (answer) => `
       <div class="slot ${isFound(answer) ? "found" : ""}">
         ${answer.value}
         <small>${isFound(answer) ? answer.label : "?"}</small>
       </div>
-    `)
+    `,
+    )
     .join("");
 }
 
 function renderFound() {
   foundBox.innerHTML = found
-    .map(name => `<div class="found-row">✅ ${name}</div>`)
+    .map((name) => `<div class="found-row">✅ ${name}</div>`)
     .join("");
 }
 
@@ -89,10 +84,8 @@ function findAnswer(value) {
 
   if (!guess) return null;
 
-  return challenge.answers.find(answer =>
-    answer.aliases.some(alias =>
-      normalize(alias) === guess
-    )
+  return challenge.answers.find((answer) =>
+    answer.aliases.some((alias) => normalize(alias) === guess),
   );
 }
 
@@ -108,19 +101,18 @@ function addGuess() {
   if (!value.trim()) return;
 
   if (!answer) {
-  lives--;
+    lives--;
 
-  renderLives();
+    renderLives();
 
-  message.innerHTML =
-    `❌ Ikke på lista. ${lives} liv igjen.`;
+    message.innerHTML = `❌ Ikke på lista. ${lives} liv igjen.`;
 
-  if (lives <= 0) {
-    finishGame();
+    if (lives <= 0) {
+      finishGame();
+    }
+
+    return;
   }
-
-  return;
-}
 
   if (isFound(answer)) {
     message.innerHTML = "Du har allerede tatt den.";
@@ -129,8 +121,7 @@ function addGuess() {
 
   found.push(answer.label);
 
-  message.innerHTML =
-    `✅ ${answer.label} (${answer.value})`;
+  message.innerHTML = `✅ ${answer.label} (${answer.value})`;
 
   renderSlots();
   renderFound();
@@ -141,21 +132,15 @@ function addGuess() {
 }
 
 function renderLives() {
-  livesBox.innerHTML =
-    `❤️`.repeat(lives) +
-    `🖤`.repeat(5 - lives);
+  livesBox.innerHTML = `❤️`.repeat(lives) + `🖤`.repeat(5 - lives);
 }
 
 function calculateScore() {
-  const findScore =
-    (found.length / challenge.answers.length) * 80;
+  const findScore = (found.length / challenge.answers.length) * 80;
 
-  const lifeScore =
-    (lives / 5) * 20;
+  const lifeScore = (lives / 5) * 20;
 
-  return Math.round(
-    findScore + lifeScore
-  );
+  return Math.round(findScore + lifeScore);
 }
 
 function lockGame() {
@@ -181,12 +166,12 @@ function saveTenableScore(score) {
       found,
       total: challenge.answers.length,
       missing: challenge.answers
-        .filter(answer => !isFound(answer))
-        .map(answer => answer.label),
-      user: getGameUser()
-    }
-  }).then(result => {
-    console.log("Tenable score lagret:", result, score);
+        .filter((answer) => !isFound(answer))
+        .map((answer) => answer.label),
+      user: getGameUser(),
+    },
+  }).catch((err) => {
+    console.error("Kunne ikke lagre score:", err);
   });
 }
 
@@ -197,8 +182,7 @@ function finishGame() {
 
   saveTenableScore(score);
 
-  const missing = challenge.answers
-    .filter(answer => !isFound(answer));
+  const missing = challenge.answers.filter((answer) => !isFound(answer));
 
   resultBox.innerHTML = `
     <div class="result-title">
@@ -213,11 +197,15 @@ function finishGame() {
       missing.length
         ? `
           <div class="result-title">Du manglet:</div>
-          ${missing.map(answer => `
+          ${missing
+            .map(
+              (answer) => `
             <div class="missing-row">
               ❌ ${answer.label} (${answer.value})
             </div>
-          `).join("")}
+          `,
+            )
+            .join("")}
         `
         : `
           <div class="result-title">
@@ -246,34 +234,24 @@ async function getMyPreviousResult() {
 }
 
 async function initPlayedCheck() {
-
-  const alreadyPlayed =
-    await hasPlayedToday(
-      "tenable",
-      challengeId
-    );
+  const alreadyPlayed = await hasPlayedToday("tenable", challengeId);
 
   if (!alreadyPlayed) return;
 
-  const result =
-    await getMyPreviousResult();
+  const result = await getMyPreviousResult();
 
   lockGame();
 
   if (!result) {
-    message.innerHTML =
-      "🏆 Du har allerede spilt dagens Lyn Tenable.";
+    message.innerHTML = "🏆 Du har allerede spilt dagens Lyn Tenable.";
     return;
   }
 
-  const foundCount =
-    result.details?.found?.length || 0;
+  const foundCount = result.details?.found?.length || 0;
 
-  const totalCount =
-    result.details?.total || 0;
+  const totalCount = result.details?.total || 0;
 
-  const foundList =
-    result.details?.found || [];
+  const foundList = result.details?.found || [];
 
   resultBox.innerHTML = `
     <div class="result-title">
@@ -296,23 +274,27 @@ async function initPlayedCheck() {
             Dine funn
           </div>
 
-          ${foundList.map(name => `
+          ${foundList
+            .map(
+              (name) => `
             <div class="found-row">
               ✅ ${name}
             </div>
-          `).join("")}
+          `,
+            )
+            .join("")}
         `
         : ""
     }
   `;
 
-   message.innerHTML = "";
+  message.innerHTML = "";
 }
 
 guessBtn.addEventListener("click", addGuess);
 finishBtn.addEventListener("click", finishGame);
 
-guessInput.addEventListener("keydown", e => {
+guessInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     addGuess();
   }

@@ -1,55 +1,37 @@
 import {
   saveGameScore,
   getGameUser,
-  hasPlayedToday
+  hasPlayedToday,
 } from "./v2/js/games-core.js";
 
-const startDate =
-  new Date("2026-01-01");
+const startDate = new Date("2026-01-01");
 
-const today =
-  new Date();
+const today = new Date();
 
-const diffDays =
-  Math.floor(
-    (today - startDate) /
-    (1000 * 60 * 60 * 24)
-  );
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
 
-const careerIndex =
-  diffDays % careers.length;
+const careerIndex = diffDays % careers.length;
 
 const career = careers[careerIndex];
-const challengeId =
-  `career-${diffDays}-${career.answer}`;
+const challengeId = `career-${diffDays}-${career.answer}`;
 
 let revealed = 1;
 let score = 100;
 let finished = false;
 
-const careerList =
-  document.getElementById("careerList");
+const careerList = document.getElementById("careerList");
 
-const progressText =
-  document.getElementById("progressText");
+const progressText = document.getElementById("progressText");
 
-const scoreText =
-  document.getElementById("scoreText");
+const scoreText = document.getElementById("scoreText");
 
-const message =
-  document.getElementById("message");
+const message = document.getElementById("message");
 
-const guessInput =
-  document.getElementById("guessInput");
+const guessInput = document.getElementById("guessInput");
 initPlayedCheck();
 
 async function initPlayedCheck() {
-
- const alreadyPlayed =
-  await hasPlayedToday(
-    "career",
-    challengeId
-  );
+  const alreadyPlayed = await hasPlayedToday("career", challengeId);
 
   if (!alreadyPlayed) return;
 
@@ -57,37 +39,28 @@ async function initPlayedCheck() {
 
   guessInput.disabled = true;
 
-  const btn =
-    document.getElementById("revealBtn");
+  const btn = document.getElementById("revealBtn");
 
   if (btn) {
     btn.disabled = true;
   }
 
-  message.innerHTML =
-    "🏆 Du har allerede spilt dagens Karrieregåte";
+  message.innerHTML = "🏆 Du har allerede spilt dagens Karrieregåte";
 }
 
 function renderCareer() {
-
   careerList.innerHTML = "";
 
-  progressText.innerHTML =
-    `Reveal ${revealed} / ${career.clubs.length}`;
+  progressText.innerHTML = `Reveal ${revealed} / ${career.clubs.length}`;
 
-  scoreText.innerHTML =
-    `⭐ ${score} poeng`;
+  scoreText.innerHTML = `⭐ ${score} poeng`;
 
-  career.clubs
-    .slice(0, revealed)
-    .forEach(club => {
+  career.clubs.slice(0, revealed).forEach((club) => {
+    const row = document.createElement("div");
 
-      const row =
-        document.createElement("div");
+    row.className = "career-row";
 
-      row.className = "career-row";
-
-      row.innerHTML = `
+    row.innerHTML = `
         <div class="career-years">
           ${club.years}
         </div>
@@ -97,44 +70,31 @@ function renderCareer() {
         </div>
 
         <div class="career-apps">
-          ${
-            club.apps !== null
-              ? `${club.apps} kamper`
-              : "?"
-          }
+          ${club.apps !== null ? `${club.apps} kamper` : "?"}
         </div>
       `;
 
-      careerList.appendChild(row);
-
-    });
-
+    careerList.appendChild(row);
+  });
 }
 
 function revealNextClub() {
-
   if (finished) return;
 
   if (revealed < career.clubs.length) {
+    revealed++;
+    score = Math.max(0, score - 10);
 
-  revealed++;
-  score = Math.max(0, score - 10);
+    renderCareer();
+  } else {
+    finished = true;
 
-  renderCareer();
+    revealed = career.clubs.length;
 
-} else {
+    renderCareer();
 
-  finished = true;
-
-  revealed = career.clubs.length;
-
-  renderCareer();
-
-  message.innerHTML =
-    `💀 Ingen flere klubber! Det var ${career.answer}`;
-
-}
-
+    message.innerHTML = `💀 Ingen flere klubber! Det var ${career.answer}`;
+  }
 }
 function normalize(str) {
   return String(str || "")
@@ -157,7 +117,7 @@ function levenshtein(a, b) {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
       );
     }
   }
@@ -175,89 +135,73 @@ function isCareerMatch(guessValue, answerValue) {
   return (
     guess === answer ||
     guess === last ||
-    answer.includes(guess) && guess.length >= 5 ||
-    last.includes(guess) && guess.length >= 4 ||
-    levenshtein(guess, last) <= 1 && guess.length >= 5 ||
-    levenshtein(guess, answer) <= 2 && guess.length >= 7
+    (answer.includes(guess) && guess.length >= 5) ||
+    (last.includes(guess) && guess.length >= 4) ||
+    (levenshtein(guess, last) <= 1 && guess.length >= 5) ||
+    (levenshtein(guess, answer) <= 2 && guess.length >= 7)
   );
 }
 
 function submitCareerGuess() {
-
   if (finished) return;
 
   if (isCareerMatch(guessInput.value, career.answer)) {
-
     finished = true;
     revealed = career.clubs.length;
 
     renderCareer();
 
-    message.innerHTML =
-  `🏆 Riktig! ${career.answer} · ${score} poeng`;
+    message.innerHTML = `🏆 Riktig! ${career.answer} · ${score} poeng`;
 
-console.log("Prøver å lagre score:", {
-  game: "career",
-  challengeId,
-  score,
-  user: getGameUser()
-});
-
-saveGameScore({
-  game: "career",
-  challengeId,
-  score,
-  maxScore: 100,
-  attempts: 1,
-  details: {
-    answer: career.answer,
-    revealed,
-    totalClubs: career.clubs.length,
-    user: getGameUser()
-  }
-}).then(result => {
-  console.log("saveGameScore ferdig:", result);
-});
+    saveGameScore({
+      game: "career",
+      challengeId,
+      score,
+      maxScore: 100,
+      attempts: 1,
+      details: {
+        answer: career.answer,
+        revealed,
+        totalClubs: career.clubs.length,
+        user: getGameUser(),
+      },
+    }).catch((err) => {
+      console.error("Kunne ikke lagre score:", err);
+    });
 
     return;
   }
 
-  message.innerHTML =
-    "❌ Feil spiller. Ny klubb avslørt.";
+  message.innerHTML = "❌ Feil spiller. Ny klubb avslørt.";
 
   if (revealed < career.clubs.length) {
+    revealed++;
+    score = Math.max(0, score - 10);
+    renderCareer();
+  } else {
+    finished = true;
+    revealed = career.clubs.length;
+    renderCareer();
 
-  revealed++;
-  score = Math.max(0, score - 10);
-  renderCareer();
-
-} else {
-
-  finished = true;
-  revealed = career.clubs.length;
-  renderCareer();
-
-  message.innerHTML =
-    `💀 Ingen flere klubber! Det var ${career.answer}`;
+    message.innerHTML = `💀 Ingen flere klubber! Det var ${career.answer}`;
 
     saveGameScore({
-  game: "career",
-  challengeId,
-  score: 0,
-  maxScore: 100,
-  attempts: career.clubs.length,
-  details: {
-    answer: career.answer,
-    revealed,
-    totalClubs: career.clubs.length,
-    lost: true,
-    user: getGameUser()
+      game: "career",
+      challengeId,
+      score: 0,
+      maxScore: 100,
+      attempts: career.clubs.length,
+      details: {
+        answer: career.answer,
+        revealed,
+        totalClubs: career.clubs.length,
+        lost: true,
+        user: getGameUser(),
+      },
+    });
   }
-});
 }
-
-}
-guessInput.addEventListener("keydown", e => {
+guessInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     submitCareerGuess();
   }
@@ -267,5 +211,3 @@ window.revealNextClub = revealNextClub;
 window.submitCareerGuess = submitCareerGuess;
 
 renderCareer();
-
-

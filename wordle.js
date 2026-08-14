@@ -1,7 +1,7 @@
 import {
   saveGameScore,
   getGameUser,
-  hasPlayedToday
+  hasPlayedToday,
 } from "./v2/js/games-core.js";
 
 function normalize(str) {
@@ -15,64 +15,48 @@ function normalize(str) {
     .replace(/[^A-Z]/g, "");
 }
 
-const startDate =
-  new Date("2026-01-01");
+const startDate = new Date("2026-01-01");
 
-const today =
-  new Date();
+const today = new Date();
 
-const diffDays =
-  Math.floor(
-    (today - startDate) /
-    (1000 * 60 * 60 * 24)
-  );
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
 
-const rawAnswer =
-  players[diffDays % players.length];
+const rawAnswer = players[diffDays % players.length];
 
-const answer =
-  normalize(rawAnswer);
+const answer = normalize(rawAnswer);
 
-const challengeId =
-  `wordle-${diffDays}-${answer}`;
+const challengeId = `wordle-${diffDays}-${answer}`;
 const maxGuesses = 6;
 let guesses = [];
 let finished = false;
 let scoreSaved = false;
 
-const board =
-  document.getElementById("board");
+const board = document.getElementById("board");
 
-const statusBox =
-  document.getElementById("status");
+const statusBox = document.getElementById("status");
 
-const message =
-  document.getElementById("message");
+const message = document.getElementById("message");
 
-const guessInput =
-  document.getElementById("guessInput");
+const guessInput = document.getElementById("guessInput");
 
 async function initPlayedCheck() {
-  const alreadyPlayed =
-    await hasPlayedToday("wordle", challengeId);
+  const alreadyPlayed = await hasPlayedToday("wordle", challengeId);
 
   if (!alreadyPlayed) return;
 
   finished = true;
-guessInput.disabled = true;
+  guessInput.disabled = true;
 
-const btn = document.querySelector(".guess-box button");
-if (btn) btn.disabled = true;
+  const btn = document.querySelector(".guess-box button");
+  if (btn) btn.disabled = true;
 
-message.innerHTML =
-  "🏆 Du har allerede spilt dagens Lyn Wordle";
+  message.innerHTML = "🏆 Du har allerede spilt dagens Lyn Wordle";
 }
 
 function calculateWordleScore(won = false) {
   if (!won) return 0;
 
-  const attempts =
-    guesses.length;
+  const attempts = guesses.length;
 
   const scores = {
     1: 100,
@@ -80,7 +64,7 @@ function calculateWordleScore(won = false) {
     3: 70,
     4: 55,
     5: 40,
-    6: 25
+    6: 25,
   };
 
   return scores[attempts] || 0;
@@ -91,8 +75,7 @@ function saveWordleScore(won = false) {
 
   scoreSaved = true;
 
-  const finalScore =
-    calculateWordleScore(won);
+  const finalScore = calculateWordleScore(won);
 
   saveGameScore({
     game: "wordle",
@@ -104,36 +87,31 @@ function saveWordleScore(won = false) {
       answer,
       guesses,
       won,
-      user: getGameUser()
-    }
-  }).then(result => {
-    console.log("Wordle score lagret:", result, finalScore);
+      user: getGameUser(),
+    },
+  }).catch((err) => {
+    console.error("Kunne ikke lagre score:", err);
   });
 }
 
 function renderBoard() {
   board.innerHTML = "";
 
-  statusBox.innerHTML =
-    `Dagens navn har ${answer.length} bokstaver`;
+  statusBox.innerHTML = `Dagens navn har ${answer.length} bokstaver`;
 
   for (let r = 0; r < maxGuesses; r++) {
-    const row =
-      document.createElement("div");
+    const row = document.createElement("div");
 
     row.className = "word-row";
 
-    const guess =
-      guesses[r] || "";
+    const guess = guesses[r] || "";
 
     for (let i = 0; i < answer.length; i++) {
-      const tile =
-        document.createElement("div");
+      const tile = document.createElement("div");
 
       tile.className = "tile";
 
-      const letter =
-        guess[i] || "";
+      const letter = guess[i] || "";
 
       tile.textContent = letter;
 
@@ -157,8 +135,7 @@ function renderBoard() {
 function submitGuess() {
   if (finished) return;
 
-  const guess =
-    normalize(guessInput.value);
+  const guess = normalize(guessInput.value);
 
   guessInput.value = "";
   guessInput.focus();
@@ -166,8 +143,7 @@ function submitGuess() {
   if (!guess) return;
 
   if (guess.length !== answer.length) {
-    message.innerHTML =
-      `Navnet må ha ${answer.length} bokstaver`;
+    message.innerHTML = `Navnet må ha ${answer.length} bokstaver`;
     return;
   }
 
@@ -178,32 +154,27 @@ function submitGuess() {
 
     saveWordleScore(true);
 
-    message.innerHTML =
-      `🏆 Riktig! ${rawAnswer} · ${calculateWordleScore(true)} poeng`;
+    message.innerHTML = `🏆 Riktig! ${rawAnswer} · ${calculateWordleScore(true)} poeng`;
 
     guessInput.disabled = true;
     const btn = document.querySelector(".guess-box button");
-if (btn) btn.disabled = true;
-
+    if (btn) btn.disabled = true;
   } else if (guesses.length >= maxGuesses) {
     finished = true;
 
     saveWordleScore(false);
 
-    message.innerHTML =
-      `💀 Ferdig! Svaret var ${rawAnswer}`;
+    message.innerHTML = `💀 Ferdig! Svaret var ${rawAnswer}`;
 
     guessInput.disabled = true;
-
   } else {
-    message.innerHTML =
-      "Ikke riktig";
+    message.innerHTML = "Ikke riktig";
   }
 
   renderBoard();
 }
 
-guessInput.addEventListener("keydown", e => {
+guessInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     submitGuess();
   }

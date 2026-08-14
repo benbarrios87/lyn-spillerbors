@@ -1,21 +1,18 @@
 import {
   saveGameScore,
   getGameUser,
-  hasPlayedToday
+  hasPlayedToday,
 } from "./v2/js/games-core.js";
 
 const startDate = new Date("2026-01-01");
 const today = new Date();
 
-const diffDays = Math.floor(
-  (today - startDate) / (1000 * 60 * 60 * 24)
-);
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
 
 const dailyIndex = diffDays % challenges.length;
 const challenge = challenges[dailyIndex];
 
-const challengeId =
-  `dailyxi-${diffDays}-${challenge.title}`;
+const challengeId = `dailyxi-${diffDays}-${challenge.title}`;
 
 let guessed = [];
 let guessedScorers = [];
@@ -24,12 +21,10 @@ let gameOver = false;
 let username = getGameUser() || "Lyn-supporter";
 let scoreSaved = false;
 
-const stats = JSON.parse(
-  localStorage.getItem("dailyXiStats")
-) || {
+const stats = JSON.parse(localStorage.getItem("dailyXiStats")) || {
   played: 0,
   wins: 0,
-  goals: 0
+  goals: 0,
 };
 
 const guessInput = document.getElementById("guessInput");
@@ -50,10 +45,7 @@ document.getElementById("info").innerHTML = `
 `;
 
 async function initPlayedCheck() {
-  const alreadyPlayed = await hasPlayedToday(
-    "dailyxi",
-    challengeId
-  );
+  const alreadyPlayed = await hasPlayedToday("dailyxi", challengeId);
 
   if (!alreadyPlayed) {
     guessInput.focus();
@@ -81,7 +73,9 @@ function normalize(str) {
 }
 
 function lastName(fullName) {
-  return String(fullName || "").split(" ").slice(-1)[0];
+  return String(fullName || "")
+    .split(" ")
+    .slice(-1)[0];
 }
 
 function levenshtein(a, b) {
@@ -95,7 +89,7 @@ function levenshtein(a, b) {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        matrix[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
       );
     }
   }
@@ -158,7 +152,7 @@ function renderPitch() {
     <div class="box-bottom"></div>
   `;
 
-  challenge.lineup.forEach(player => {
+  challenge.lineup.forEach((player) => {
     const div = document.createElement("div");
     const isGuessed = guessed.includes(player.name);
 
@@ -186,7 +180,7 @@ function renderGuessedList() {
     <div class="guessed-grid">
       ${
         guessed.length
-          ? guessed.map(p => `<div>${p}</div>`).join("")
+          ? guessed.map((p) => `<div>${p}</div>`).join("")
           : "<div>Ingen ennå</div>"
       }
     </div>
@@ -228,15 +222,17 @@ function renderBonusBox() {
     </div>
 
     <div class="bonus-grid">
-      ${uniqueScorers.map(name => {
-        const found = guessedScorers.includes(normalize(name));
+      ${uniqueScorers
+        .map((name) => {
+          const found = guessedScorers.includes(normalize(name));
 
-        return `
+          return `
           <div class="bonus-chip ${found ? "found" : ""}">
             ${found ? "⚽ " + name : "⚽ ?"}
           </div>
         `;
-      }).join("")}
+        })
+        .join("")}
     </div>
   `;
 }
@@ -246,9 +242,10 @@ function setMessage(text) {
 }
 
 function calculateDailyXiScore(won = false) {
-  const lineupPoints = guessed.filter(name =>
-    challenge.lineup.some(player => player.name === name)
-  ).length * 7;
+  const lineupPoints =
+    guessed.filter((name) =>
+      challenge.lineup.some((player) => player.name === name),
+    ).length * 7;
 
   const bonusPoints = guessedScorers.length * 5;
   const lifeBonus = won ? lives * 5 : 0;
@@ -277,10 +274,10 @@ function saveDailyXiScore(won = false) {
       guessedScorers,
       livesLeft: lives,
       won,
-      user: getGameUser()
-    }
-  }).then(result => {
-    console.log("Daily XI score lagret:", result, finalScore);
+      user: getGameUser(),
+    },
+  }).catch((err) => {
+    console.error("Kunne ikke lagre score:", err);
   });
 }
 
@@ -298,9 +295,7 @@ function checkBonusScorer(rawGuess) {
   const scorers = challenge.bonusGoalscorers || [];
   if (!scorers.length) return false;
 
-  const foundScorer = scorers.find(scorer =>
-    isNameMatch(rawGuess, scorer)
-  );
+  const foundScorer = scorers.find((scorer) => isNameMatch(rawGuess, scorer));
 
   if (!foundScorer) return false;
 
@@ -331,8 +326,8 @@ function submitGuess() {
 
   if (!rawGuess) return;
 
-  const foundPlayer = challenge.lineup.find(player =>
-    isNameMatch(rawGuess, player.name)
+  const foundPlayer = challenge.lineup.find((player) =>
+    isNameMatch(rawGuess, player.name),
   );
 
   if (foundPlayer) {
@@ -350,7 +345,7 @@ function submitGuess() {
     setMessage(
       bonusHit
         ? `✅ Riktig! ${foundPlayer.name} ⭐ Bonusmålscorer!`
-        : `✅ Riktig! ${foundPlayer.name}`
+        : `✅ Riktig! ${foundPlayer.name}`,
     );
 
     if (guessed.length === challenge.lineup.length) {
@@ -361,7 +356,9 @@ function submitGuess() {
       renderProfile();
 
       saveDailyXiScore(true);
-      endGame(`🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`);
+      endGame(
+        `🏆 DU KLARTE DAGENS LYN XI · ${calculateDailyXiScore(true)} poeng`,
+      );
     }
 
     return;
@@ -392,7 +389,7 @@ function submitGuess() {
 }
 
 function revealAnswers() {
-  challenge.lineup.forEach(player => {
+  challenge.lineup.forEach((player) => {
     if (!guessed.includes(player.name)) {
       guessed.push(player.name);
     }
@@ -401,7 +398,7 @@ function revealAnswers() {
   renderPitch();
 }
 
-guessInput.addEventListener("keydown", e => {
+guessInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     submitGuess();
   }

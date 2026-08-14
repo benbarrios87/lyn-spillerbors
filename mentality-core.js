@@ -1,7 +1,7 @@
 import {
   saveGameScore,
   getGameUser,
-  hasPlayedToday
+  hasPlayedToday,
 } from "./v2/js/games-core.js";
 
 import { supabaseClient } from "./v2/js/supabase.js";
@@ -10,18 +10,11 @@ const QUESTION_COUNT = 5;
 const DEADLINE_HOUR = 22;
 const QUESTION_POINTS = 20;
 
-export function setupMentalityGame({
-  mode,
-  emoji,
-  deliveredText,
-  closedText
-}) {
+export function setupMentalityGame({ mode, emoji, deliveredText, closedText }) {
   const startDate = new Date("2026-01-01");
   const today = new Date();
 
-  const diffDays = Math.floor(
-    (today - startDate) / (1000 * 60 * 60 * 24)
-  );
+  const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
 
   const challengeId = `${mode}-${diffDays}`;
 
@@ -39,7 +32,7 @@ export function setupMentalityGame({
 
   function lockInputs() {
     submitBtn.disabled = true;
-    document.querySelectorAll("input").forEach(input => {
+    document.querySelectorAll("input").forEach((input) => {
       input.disabled = true;
     });
   }
@@ -64,10 +57,12 @@ export function setupMentalityGame({
 
   function pickQuestions() {
     const pool = window.mentalityQuestions
-      .filter(q => q.mode.includes(mode))
+      .filter((q) => q.mode.includes(mode))
       .map((q, index) => ({
         ...q,
-        sortValue: seededRandom(diffDays * 1000 + index * 17 + mode.length * 31)
+        sortValue: seededRandom(
+          diffDays * 1000 + index * 17 + mode.length * 31,
+        ),
       }))
       .sort((a, b) => a.sortValue - b.sortValue);
 
@@ -85,37 +80,43 @@ export function setupMentalityGame({
   function renderQuestions() {
     selectedQuestions = pickQuestions();
 
-    questionsBox.innerHTML = selectedQuestions.map((q, index) => {
-      if (q.type === "choice") {
-        return `
+    questionsBox.innerHTML = selectedQuestions
+      .map((q, index) => {
+        if (q.type === "choice") {
+          return `
           <div class="question-card">
             <div class="question-number">Spørsmål ${index + 1}</div>
             <h2>${q.question}</h2>
 
             <div class="options">
-              ${q.options.map(option => `
+              ${q.options
+                .map(
+                  (option) => `
                 <label class="option">
                   <input type="radio" name="${q.id}" value="${option}">
                   <span>${option}</span>
                 </label>
-              `).join("")}
+              `,
+                )
+                .join("")}
             </div>
           </div>
         `;
-      }
+        }
 
-      return `
+        return `
         <div class="question-card">
           <div class="question-number">Spørsmål ${index + 1}</div>
           <h2>${q.question}</h2>
           <input class="text-answer" id="answer-${q.id}" type="text" placeholder="Skriv svar...">
         </div>
       `;
-    }).join("");
+      })
+      .join("");
   }
 
   function getAnswers() {
-    return selectedQuestions.map(q => {
+    return selectedQuestions.map((q) => {
       let answer = "";
 
       if (q.type === "choice") {
@@ -131,22 +132,20 @@ export function setupMentalityGame({
         question: q.question,
         type: q.type,
         category: q.category,
-        answer
+        answer,
       };
     });
   }
 
   function getAnswersFromRow(row) {
-    return Array.isArray(row.details?.answers)
-      ? row.details.answers
-      : [];
+    return Array.isArray(row.details?.answers) ? row.details.answers : [];
   }
 
   function buildQuestionStats(rows) {
     const questions = {};
 
-    rows.forEach(row => {
-      getAnswersFromRow(row).forEach(answerObj => {
+    rows.forEach((row) => {
+      getAnswersFromRow(row).forEach((answerObj) => {
         const qid = answerObj.question_id;
         const answer = normalizeAnswer(answerObj.answer);
 
@@ -155,14 +154,14 @@ export function setupMentalityGame({
         if (!questions[qid]) {
           questions[qid] = {
             question: answerObj.question,
-            answers: {}
+            answers: {},
           };
         }
 
         if (!questions[qid].answers[answer]) {
           questions[qid].answers[answer] = {
             display: answerObj.answer,
-            count: 0
+            count: 0,
           };
         }
 
@@ -174,7 +173,7 @@ export function setupMentalityGame({
   }
 
   function scoreAnswer(answerKey, questionStats) {
-    const counts = Object.values(questionStats.answers).map(a => a.count);
+    const counts = Object.values(questionStats.answers).map((a) => a.count);
     const myCount = questionStats.answers[answerKey]?.count || 0;
 
     if (!counts.length || !myCount) return 0;
@@ -197,7 +196,7 @@ export function setupMentalityGame({
     let total = 0;
     const breakdown = [];
 
-    getAnswersFromRow(row).forEach(answerObj => {
+    getAnswersFromRow(row).forEach((answerObj) => {
       const qid = answerObj.question_id;
       const answerKey = normalizeAnswer(answerObj.answer);
       const stats = questionStats[qid];
@@ -214,13 +213,13 @@ export function setupMentalityGame({
         question: answerObj.question,
         answer: answerObj.answer,
         count,
-        points
+        points,
       });
     });
 
     return {
       score: Math.min(100, total),
-      breakdown
+      breakdown,
     };
   }
 
@@ -235,7 +234,7 @@ export function setupMentalityGame({
 
     if (error || !rows || !rows.length) return;
 
-    const alreadyScored = rows.every(row => row.details?.scored === true);
+    const alreadyScored = rows.every((row) => row.details?.scored === true);
     if (alreadyScored) return;
 
     const questionStats = buildQuestionStats(rows);
@@ -252,8 +251,8 @@ export function setupMentalityGame({
             ...(row.details || {}),
             scored: true,
             scored_at: new Date().toISOString(),
-            mentality_score_breakdown: result.breakdown
-          }
+            mentality_score_breakdown: result.breakdown,
+          },
         })
         .eq("id", row.id);
     }
@@ -286,7 +285,7 @@ export function setupMentalityGame({
 
     const answers = getAnswers();
 
-    if (answers.some(a => !a.answer)) {
+    if (answers.some((a) => !a.answer)) {
       message.innerHTML = "Svar på alle spørsmål først.";
       return;
     }
@@ -300,8 +299,8 @@ export function setupMentalityGame({
       details: {
         mode,
         answers,
-        pending_score: true
-      }
+        pending_score: true,
+      },
     });
 
     if (!result) {
@@ -327,11 +326,9 @@ export function setupMentalityGame({
       const myScore = await getMyScore();
 
       if (isClosed() && myScore?.details?.scored) {
-        message.innerHTML =
-          `${emoji} Du fikk ${myScore.score} poeng i dagens ${mode === "herd" ? "Herd" : "Rebel"} Mentality.`;
+        message.innerHTML = `${emoji} Du fikk ${myScore.score} poeng i dagens ${mode === "herd" ? "Herd" : "Rebel"} Mentality.`;
       } else {
-        message.innerHTML =
-          `${emoji} Du har allerede levert. Poeng regnes etter kl. 22.`;
+        message.innerHTML = `${emoji} Du har allerede levert. Poeng regnes etter kl. 22.`;
       }
 
       return;
