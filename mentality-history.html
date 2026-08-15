@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fasit — Herd &amp; Rebel Mentality</title>
+  <link rel="icon" href="lblogoen.png">
+  <link rel="stylesheet" href="mentality.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    .mode-toggle {
+      display:flex;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .mode-btn {
+      flex:1;
+      padding:13px;
+      border-radius:16px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      color:white;
+      font-family:Arial, sans-serif;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .mode-btn.active.herd {
+      background:linear-gradient(135deg, rgba(11,99,229,.95), rgba(19,41,75,.95));
+      border-color:rgba(11,99,229,.6);
+    }
+
+    .mode-btn.active.rebel {
+      background:linear-gradient(135deg, rgba(215,25,32,.95), rgba(60,10,12,.95));
+      border-color:rgba(215,25,32,.6);
+    }
+
+    .day-picker {
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding:4px 2px 16px;
+      margin-bottom:4px;
+    }
+
+    .day-pill {
+      flex:0 0 auto;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      color:white;
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .day-pill.active {
+      background:#ffd166;
+      color:#111827;
+      border-color:#ffd166;
+    }
+
+    .answer-bar-row {
+      margin:10px 0;
+    }
+
+    .answer-bar-label {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:14px;
+      margin-bottom:5px;
+    }
+
+    .answer-bar-label span {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .answer-bar-track {
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+
+    .answer-bar-fill {
+      height:100%;
+      border-radius:999px;
+      background:rgba(255,255,255,.35);
+    }
+
+    .answer-bar-row.top .answer-bar-fill {
+      background:linear-gradient(90deg,#ffd166,#ff7a1a);
+    }
+
+    .answer-bar-row.top .answer-bar-label strong {
+      color:#ffd166;
+    }
+
+    .empty-note {
+      color:rgba(255,255,255,.65);
+      text-align:center;
+      padding:26px 10px;
+    }
+  </style>
+</head>
+<body>
+
+<a href="index.html" style="position:fixed;top:14px;left:14px;z-index:100;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.22);color:white;text-decoration:none;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;backdrop-filter:blur(6px);">← Forsiden</a>
+
+<main class="mentality-wrap">
+  <section class="hero">
+    <div class="game-kicker">Lyn Games · Fasit</div>
+    <h1>📊 Hva svarte flokken?</h1>
+    <p>Se hvordan andre svarte i tidligere Herd og Rebel Mentality. Ikke rekk klokken 22? Sjekk innom her når det passer deg.</p>
+  </section>
+
+  <section class="game-card">
+    <div class="mode-toggle">
+      <button class="mode-btn herd" id="modeHerdBtn" type="button">🐑 Herd</button>
+      <button class="mode-btn rebel" id="modeRebelBtn" type="button">🦊 Rebel</button>
+    </div>
+
+    <div class="day-picker" id="dayPicker"></div>
+
+    <div id="historyResults"></div>
+  </section>
+</main>
+
+<script src="mentalityspm.js"></script>
+<script type="module">
+  import { supabaseClient } from "./v2/js/supabase.js";
+
+  const DEADLINE_HOUR = 22;
+  const QUESTION_COUNT = 5;
+  const DAYS_BACK = 14;
+  const startDate = new Date("2026-01-01");
+
+  const dayPicker = document.getElementById("dayPicker");
+  const resultsBox = document.getElementById("historyResults");
+  const modeHerdBtn = document.getElementById("modeHerdBtn");
+  const modeRebelBtn = document.getElementById("modeRebelBtn");
+
+  const params = new URLSearchParams(location.search);
+  let mode = params.get("mode") === "rebel" ? "rebel" : "herd";
+  let selectedDiffDays = null;
+
+  function seededRandom(seed) {
+    let x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  // Samme utvalgslogikk som i mentality-core.js, slik at vi vet nøyaktig
+  // hvilke 5 spørsmål som faktisk ble vist en gitt dag.
+  function pickQuestionsForDay(diffDays) {
+    const pool = (window.mentalityQuestions || [])
+      .filter(q => q.mode.includes(mode))
+      .map((q, index) => ({
+        ...q,
+        sortValue: seededRandom(diffDays * 1000 + index * 17 + mode.length * 31)
+      }))
+      .sort((a, b) => a.sortValue - b.sortValue);
+
+    return pool.slice(0, QUESTION_COUNT);
+  }
+
+  function normalizeAnswer(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/æ/g, "ae")
+      .replace(/ø/g, "o")
+      .replace(/å/g, "a")
+      .replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function todayDiffDays() {
+    return Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+  }
+
+  function isTodayClosed() {
+    return new Date().getHours() >= DEADLINE_HOUR;
+  }
+
+  function formatDayLabel(diffDays) {
+    const today = todayDiffDays();
+
+    if (diffDays === today) return "I dag";
+    if (diffDays === today - 1) return "I går";
+
+    const d = new Date(startDate.getTime() + diffDays * 86400000);
+    return d.toLocaleDateString("no-NO", { day: "2-digit", month: "2-digit" });
+  }
+
+  function buildDayList() {
+    const today = todayDiffDays();
+    const days = [];
+
+    for (let i = 0; i < DAYS_BACK; i++) {
+      days.push(today - i);
+    }
+
+    dayPicker.innerHTML = days.map(d => `
+      <div class="day-pill ${d === selectedDiffDays ? "active" : ""}" data-day="${d}">
+        ${formatDayLabel(d)}
+      </div>
+    `).join("");
+
+    dayPicker.querySelectorAll(".day-pill").forEach(el => {
+      el.addEventListener("click", () => {
+        selectedDiffDays = Number(el.dataset.day);
+        buildDayList();
+        loadDay(selectedDiffDays);
+      });
+    });
+  }
+
+  async function loadDay(diffDays) {
+    const today = todayDiffDays();
+
+    if (diffDays === today && !isTodayClosed()) {
+      resultsBox.innerHTML = `<div class="empty-note">Dagens svar vises her først etter kl. 22, så ingen kan snoke før avstemningen er stengt.</div>`;
+      return;
+    }
+
+    resultsBox.innerHTML = `<div class="empty-note">Laster fasit...</div>`;
+
+    const challengeId = `${mode}-${diffDays}`;
+
+    const { data: rows, error } = await supabaseClient
+      .from("game_scores")
+      .select("*")
+      .eq("game", mode)
+      .eq("challenge_id", challengeId);
+
+    if (error) {
+      resultsBox.innerHTML = `<div class="empty-note">Klarte ikke å hente fasit akkurat nå. Prøv igjen senere.</div>`;
+      return;
+    }
+
+    if (!rows || !rows.length) {
+      resultsBox.innerHTML = `<div class="empty-note">Ingen svarte denne dagen.</div>`;
+      return;
+    }
+
+    const questions = pickQuestionsForDay(diffDays);
+
+    resultsBox.innerHTML = questions.map((q, index) => {
+      const tally = {};
+      let total = 0;
+
+      rows.forEach(row => {
+        const answers = Array.isArray(row.details?.answers) ? row.details.answers : [];
+        const found = answers.find(a => a.question_id === q.id);
+        if (!found || !found.answer) return;
+
+        const key = normalizeAnswer(found.answer);
+        if (!key) return;
+
+        if (!tally[key]) tally[key] = { display: found.answer, count: 0 };
+        tally[key].count++;
+        total++;
+      });
+
+      const sorted = Object.values(tally).sort((a, b) => b.count - a.count);
+
+      if (!total) {
+        return `
+          <div class="question-card">
+            <div class="question-number">Spørsmål ${index + 1}</div>
+            <h2>${escapeHTML(q.question)}</h2>
+            <div class="empty-note">Ingen svarte på dette spørsmålet.</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="question-card">
+          <div class="question-number">Spørsmål ${index + 1}</div>
+          <h2>${escapeHTML(q.question)}</h2>
+          ${sorted.map((a, i) => {
+            const pct = Math.round((a.count / total) * 100);
+            return `
+              <div class="answer-bar-row ${i === 0 ? "top" : ""}">
+                <div class="answer-bar-label">
+                  <span>${i === 0 ? "🐑 " : ""}${escapeHTML(a.display)}</span>
+                  <strong>${a.count} (${pct}%)</strong>
+                </div>
+                <div class="answer-bar-track">
+                  <div class="answer-bar-fill" style="width:${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+          <div class="results-box"><p>${total} svar totalt denne dagen.</p></div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function setMode(newMode) {
+    mode = newMode;
+    modeHerdBtn.classList.toggle("active", mode === "herd");
+    modeRebelBtn.classList.toggle("active", mode === "rebel");
+    buildDayList();
+    loadDay(selectedDiffDays);
+  }
+
+  modeHerdBtn.addEventListener("click", () => setMode("herd"));
+  modeRebelBtn.addEventListener("click", () => setMode("rebel"));
+
+  modeHerdBtn.classList.toggle("active", mode === "herd");
+  modeRebelBtn.classList.toggle("active", mode === "rebel");
+
+  const today = todayDiffDays();
+  selectedDiffDays = isTodayClosed() ? today : today - 1;
+
+  buildDayList();
+  loadDay(selectedDiffDays);
+</script>
+
+</body>
+</html>
