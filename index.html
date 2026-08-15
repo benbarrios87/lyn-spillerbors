@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lynbørs</title>
 <link rel="icon" href="lblogoen.png">
+<link rel="stylesheet" href="nav.css">
 
 <style>
 :root {
@@ -28,67 +29,11 @@ body {
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
-  padding:92px 20px 20px;
+  padding:0 20px 20px;
 }
 
-.topnav {
-  position:fixed;
-  top:12px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:50;
-  width:min(980px, calc(100% - 24px));
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:10px 12px;
-  border-radius:20px;
-  background:rgba(8,12,24,0.88);
-  border:1px solid rgba(255,255,255,0.14);
-  box-shadow:0 12px 30px rgba(0,0,0,0.36);
-  backdrop-filter:blur(10px);
-}
-
-.nav-brand {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:white;
-  text-decoration:none;
-  font-weight:900;
-  white-space:nowrap;
-}
-
-.nav-brand img {
-  width:30px;
-  height:30px;
-  object-fit:contain;
-}
-
-.nav-links {
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
-.nav-links a {
-  color:white;
-  text-decoration:none;
-  font-size:13px;
-  font-weight:900;
-  padding:8px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.10);
-  border:1px solid rgba(255,255,255,0.12);
-}
-
-.nav-links a.active,
-.nav-links a:hover {
-  background:var(--gold);
-  color:#17110a;
-}
+/* Navbaren (.topbar/.brand/.nav) er nå felles for hele siden og ligger i
+   nav.css, for å unngå at forsiden og resten av siden får ulik meny igjen. */
 
 .wrapper {
   width:100%;
@@ -764,25 +709,7 @@ h1 {
 
 @media (max-width:700px) {
   body {
-    padding:86px 14px 14px;
-  }
-
-  .topnav {
-    top:8px;
-    width:calc(100% - 16px);
-    border-radius:18px;
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .nav-links {
-    width:100%;
-    justify-content:flex-start;
-  }
-
-  .nav-links a {
-    font-size:12px;
-    padding:7px 9px;
+    padding:0 14px 14px;
   }
 
   .wrapper {
@@ -910,21 +837,11 @@ h1 {
 
 <body>
 
-<header class="topnav">
-  <a class="nav-brand" href="index.html">
-    <img src="lblogoen.png" alt="">
-    <span>Lynbørs</span>
-  </a>
-
-  <nav class="nav-links">
-    <a class="active" href="index.html">Forside</a>
-    <a href="v2/bors.html">Børs</a>
-    <a href="v2/tips.html">Tips</a>
-    <a href="v2/fantasy.html">Fantasy</a>
-    <a href="v2/lynligaen.html">Ligaen</a>
-    <a href="games.html">Games</a>
-  </nav>
-</header>
+<div id="navbar"></div>
+<script type="module">
+  import { renderNavbar } from "./nav.js";
+  document.getElementById("navbar").innerHTML = renderNavbar("home", "");
+</script>
 
 <div class="wrapper">
 

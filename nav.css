@@ -1,0 +1,114 @@
+/* Delt navbar/footer-stil for hele Lynbørs-prosjektet.
+   Brukes av alle sider (rot, v2/ og minispill) sammen med nav.js,
+   slik at det kun finnes ett sted å endre utseendet på menyen. */
+
+/* Samme grunn som kommentaren i .topbar under: sikrer full bredde på
+   #navbar-wrapperen selv om den ligger i en sentrerende flex-body. */
+#navbar {
+  width: 100%;
+  align-self: stretch;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  /* width:100%/align-self:stretch sikrer full bredde selv når #navbar er
+     barn av en flex-container med align-items:center (som forsiden bruker
+     for å sentrere resten av innholdet). Uskadelig utenfor en flex-parent. */
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  padding: 14px 22px;
+
+  background: rgba(5, 8, 20, 0.88);
+  backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  font-family: Arial, sans-serif;
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.topbar .brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.topbar .nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.topbar .nav a {
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition: 0.2s;
+}
+
+.topbar .nav a:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.topbar .nav a.active {
+  background: #d71920;
+  border-color: #d71920;
+}
+
+.topbar .nav a.disabled {
+  opacity: 0.45;
+}
+
+.site-footer {
+  margin-top: 40px;
+  padding: 30px 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: Arial, sans-serif;
+}
+
+.site-footer a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 700px) {
+  .topbar {
+    justify-content: center;
+  }
+
+  .topbar .nav {
+    justify-content: center;
+  }
+
+  .topbar .nav a {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

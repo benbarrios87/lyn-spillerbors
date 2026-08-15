@@ -179,11 +179,12 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="nav.css">
 </head>
 
 <body>
 
-<a href="index.html" style="position:fixed;top:14px;left:14px;z-index:100;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.22);color:white;text-decoration:none;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;backdrop-filter:blur(6px);">← Forsiden</a>
+<div id="navbar"></div>
 
 <main class="wrap">
 
@@ -663,6 +664,13 @@ input.addEventListener("keydown", e => {
 });
 
 init();
+</script>
+
+<div id="footer"></div>
+<script type="module">
+  import { renderNavbar, renderFooter } from "./nav.js";
+  document.getElementById("navbar").innerHTML = renderNavbar("games", "");
+  document.getElementById("footer").innerHTML = renderFooter();
 </script>
 
 </body>

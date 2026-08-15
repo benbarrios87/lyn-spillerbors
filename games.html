@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lyn Games</title>
   <link rel="icon" href="lblogoen.png">
+  <link rel="stylesheet" href="nav.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -37,46 +38,7 @@
       padding:26px 14px 70px;
     }
 
-    .topbar {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:20px;
-    }
-
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:white;
-      text-decoration:none;
-      font-weight:900;
-    }
-
-    .brand img {
-      width:42px;
-      height:42px;
-      object-fit:contain;
-    }
-
-    .toplinks {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .toplinks a {
-      color:white;
-      text-decoration:none;
-      padding:9px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid var(--line);
-      font-size:14px;
-      font-weight:800;
-    }
+    /* .topbar/.brand/.nav er nå felles for hele siden og ligger i nav.css. */
 
     .hero {
       text-align:center;
@@ -500,11 +462,6 @@
     }
 
     @media(max-width:650px) {
-      .topbar {
-        align-items:flex-start;
-        flex-direction:column;
-      }
-
       h1 {
         font-size:42px;
       }
@@ -531,23 +488,13 @@
 
 <body>
 
+<div id="navbar"></div>
+<script type="module">
+  import { renderNavbar } from "./nav.js";
+  document.getElementById("navbar").innerHTML = renderNavbar("games", "");
+</script>
+
 <div class="wrap">
-
-  <header class="topbar">
-    <a class="brand" href="v2/index.html">
-      <img src="lblogoen.png" alt="">
-      <span>Lynbørs</span>
-    </a>
-
-    <nav class="toplinks">
-      <a href="v2/index.html">Forside</a>
-      <a href="v2/lynligaen.html">Lynligaen</a>
-      <a href="v2/fantasy.html">Fantasy</a>
-      <a href="v2/tips.html">Tippetips</a>
-      <a href="v2/bors.html">Børs</a>
-      <a href="games.html">Games</a>
-    </nav>
-  </header>
 
   <section class="hero">
     <div class="kicker">Lyn Games</div>
@@ -868,7 +815,7 @@ function renderIdentity(user, allRows) {
         <strong>Ingen bruker valgt</strong><br>
         <span style="color:var(--muted)">Sett forumnavn på Lynbørs-forsiden først.</span>
       </div>
-      <a href="v2/index.html">Sett navn</a>
+      <a href="index.html">Sett navn</a>
     `;
     return;
   }
