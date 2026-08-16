@@ -965,7 +965,7 @@ h1 {
       </div>
 
       <div class="player-of-year-formula">
-        Formelen: <strong>snittbørs × 10</strong>. Mål gir <strong>+2</strong>, assist gir <strong>+1.5</strong>, og clean sheet gir <strong>+1</strong>.
+        Formelen: <strong>snittbørs × 10</strong>, pluss mål/assist/clean sheet vektet etter posisjon (samme system som Fantasy). Krever minst <strong>5 vurderte kamper</strong> for å kvalifisere.
       </div>
     </div>
 
@@ -1804,6 +1804,23 @@ async function loadNextMatchWidget() {
   }
 }
 
+const MIN_MATCHES_FOR_AWARD = 5;
+
+function awardGoalPoints(position, goals) {
+  if (position === "ANG") return goals * 4;
+  if (position === "MID") return goals * 5;
+  if (position === "FORS") return goals * 6;
+  if (position === "KEEPER") return goals * 10;
+  return goals * 4;
+}
+
+function awardCleanSheetPoints(position, cleanSheets) {
+  if (position === "MID") return cleanSheets * 1;
+  if (position === "FORS") return cleanSheets * 4;
+  if (position === "KEEPER") return cleanSheets * 5;
+  return 0;
+}
+
 async function loadPlayerOfYear() {
   const box = document.getElementById("playerOfYear");
   if (!box) return;
@@ -1875,15 +1892,17 @@ async function loadPlayerOfYear() {
 
       p.bors = avg.toFixed(1);
 
+      const position = fantasyPosition(p.player);
+
       p.total =
         (avg * 10) +
-        (p.goals * 2) +
-        (p.assists * 1.5) +
-        p.cleanSheets;
+        awardGoalPoints(position, p.goals) +
+        (p.assists * 3) +
+        awardCleanSheetPoints(position, p.cleanSheets);
     });
 
     const top = Object.values(totals)
-      .filter(row => row.total > 0)
+      .filter(row => row.total > 0 && row.ratingCount >= MIN_MATCHES_FOR_AWARD)
       .sort((a,b) =>
         b.total - a.total ||
         b.bors - a.bors ||
@@ -1893,7 +1912,7 @@ async function loadPlayerOfYear() {
       .slice(0,3);
 
     if (!top.length) {
-      box.innerHTML = `<div class="player-year-loading">Ingen data nok ennå.</div>`;
+      box.innerHTML = `<div class="player-year-loading">Ingen spillere har rukket ${MIN_MATCHES_FOR_AWARD} vurderte kamper ennå.</div>`;
       return;
     }
 
