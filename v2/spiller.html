@@ -8,6 +8,7 @@
   <link rel="icon" href="../lblogoen.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="../nav.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -30,6 +31,11 @@
       <h2>Høydepunkter</h2>
       <div id="highlights">Laster...</div>
     </div>
+  </section>
+
+  <section class="data-card">
+    <h2>Børsutvikling</h2>
+    <div id="trendChart">Laster...</div>
   </section>
 
   <section class="data-card">
@@ -64,6 +70,7 @@ const heroEl = document.getElementById("playerHero");
 const statsEl = document.getElementById("seasonStats");
 const highlightsEl = document.getElementById("highlights");
 const matchListEl = document.getElementById("matchList");
+const trendChartEl = document.getElementById("trendChart");
 
 function round(value, decimals = 2) {
   return Number(Number(value || 0).toFixed(decimals));
@@ -102,6 +109,185 @@ function resolvePlayer() {
   return null;
 }
 
+const TREND_WIDTH = 640;
+const TREND_HEIGHT = 220;
+const TREND_PAD_LEFT = 32;
+const TREND_PAD_RIGHT = 14;
+const TREND_PAD_TOP = 20;
+const TREND_PAD_BOTTOM = 28;
+const TREND_Y_MAX = 10;
+const TREND_Y_TICKS = [2, 4, 6, 8, 10];
+
+function trendTierColor(value) {
+  const rating = Number(value || 0);
+  if (rating >= 7.5) return "#3ee98a";
+  if (rating >= 6) return "#ffd166";
+  return "#ff6b6b";
+}
+
+function buildTrendSeries(matchRows, matches) {
+  return matchRows
+    .map(row => {
+      const match = matches.find(m => String(m.id) === String(row.match_id));
+      const date = match?.date ? new Date(match.date) : null;
+      if (!date || Number.isNaN(date.getTime())) return null;
+
+      return {
+        matchId: row.match_id,
+        date,
+        average: Number(row.average) || 0,
+        votes: row.votes,
+        title: getMatchTitle(row.match_id, matches),
+        dateLabel: getMatchDate(row.match_id, matches)
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.date - b.date);
+}
+
+function trendX(index, count) {
+  const plotW = TREND_WIDTH - TREND_PAD_LEFT - TREND_PAD_RIGHT;
+  if (count <= 1) return TREND_PAD_LEFT + plotW / 2;
+  return TREND_PAD_LEFT + (index / (count - 1)) * plotW;
+}
+
+function trendY(value) {
+  const plotH = TREND_HEIGHT - TREND_PAD_TOP - TREND_PAD_BOTTOM;
+  const clamped = Math.max(0, Math.min(TREND_Y_MAX, Number(value) || 0));
+  return TREND_PAD_TOP + plotH - (clamped / TREND_Y_MAX) * plotH;
+}
+
+function renderTrendChart(series) {
+  if (series.length < 2) {
+    return `<div class="trend-empty">Trenger minst to vurderte kamper for å vise en utvikling.</div>`;
+  }
+
+  const gridLines = TREND_Y_TICKS.map(tick => {
+    const y = trendY(tick);
+    return `
+      <line x1="${TREND_PAD_LEFT}" y1="${y}" x2="${TREND_WIDTH - TREND_PAD_RIGHT}" y2="${y}" class="trend-grid" />
+      <text x="${TREND_PAD_LEFT - 8}" y="${y + 4}" class="trend-axis-label" text-anchor="end">${tick}</text>
+    `;
+  }).join("");
+
+  const linePoints = series
+    .map((point, i) => `${trendX(i, series.length)},${trendY(point.average)}`)
+    .join(" ");
+
+  const dots = series.map((point, i) => `
+    <circle
+      cx="${trendX(i, series.length)}"
+      cy="${trendY(point.average)}"
+      r="5"
+      fill="${trendTierColor(point.average)}"
+      stroke="var(--panel)"
+      stroke-width="2"
+      class="trend-dot"
+    />
+  `).join("");
+
+  const lastIndex = series.length - 1;
+  const lastPoint = series[lastIndex];
+
+  const labelIdxs = [...new Set([
+    0,
+    Math.floor((series.length - 1) / 2),
+    lastIndex
+  ])];
+
+  const xLabels = labelIdxs.map(i => `
+    <text x="${trendX(i, series.length)}" y="${TREND_HEIGHT - 8}" class="trend-axis-label" text-anchor="middle">
+      ${series[i].dateLabel}
+    </text>
+  `).join("");
+
+  return `
+    <div class="trend-chart-wrap">
+      <svg viewBox="0 0 ${TREND_WIDTH} ${TREND_HEIGHT}" class="trend-chart" role="img" aria-label="Børsutvikling over sesongen, kamp for kamp">
+        ${gridLines}
+        <polyline points="${linePoints}" class="trend-line" />
+        ${dots}
+        <text
+          x="${trendX(lastIndex, series.length)}"
+          y="${trendY(lastPoint.average) - 12}"
+          class="trend-end-label"
+          text-anchor="${series.length > 3 ? "end" : "middle"}"
+        >${lastPoint.average.toFixed(1)}</text>
+        ${xLabels}
+        <line x1="0" y1="${TREND_PAD_TOP}" x2="0" y2="${TREND_HEIGHT - TREND_PAD_BOTTOM}" class="trend-crosshair" />
+      </svg>
+      <div class="trend-tooltip"></div>
+      <div class="trend-caption">🟢 7.5+ · 🟡 6.0–7.4 · 🔴 under 6.0 &nbsp;·&nbsp; hold over et punkt for kampdetaljer</div>
+    </div>
+  `;
+}
+
+function attachTrendInteraction(container, series) {
+  const svg = container.querySelector(".trend-chart");
+  const tooltip = container.querySelector(".trend-tooltip");
+  const crosshair = container.querySelector(".trend-crosshair");
+  if (!svg || !tooltip || !crosshair || series.length < 2) return;
+
+  function showAt(index) {
+    const point = series[index];
+    if (!point) return;
+
+    const x = trendX(index, series.length);
+    crosshair.setAttribute("x1", x);
+    crosshair.setAttribute("x2", x);
+    crosshair.style.opacity = "1";
+
+    tooltip.innerHTML = "";
+
+    const value = document.createElement("div");
+    value.className = "trend-tooltip-value";
+    value.textContent = point.average.toFixed(1);
+
+    const sub = document.createElement("div");
+    sub.className = "trend-tooltip-sub";
+    sub.textContent = `${point.title} · ${point.dateLabel}`;
+
+    tooltip.appendChild(value);
+    tooltip.appendChild(sub);
+
+    const rect = svg.getBoundingClientRect();
+    const pxRatio = rect.width / TREND_WIDTH;
+    const left = Math.max(4, Math.min(rect.width - 4, x * pxRatio));
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.opacity = "1";
+  }
+
+  function hide() {
+    crosshair.style.opacity = "0";
+    tooltip.style.opacity = "0";
+  }
+
+  function nearestIndex(clientX) {
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width) return 0;
+
+    const relX = ((clientX - rect.left) / rect.width) * TREND_WIDTH;
+
+    let best = 0;
+    let bestDist = Infinity;
+
+    series.forEach((_, i) => {
+      const dist = Math.abs(trendX(i, series.length) - relX);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
+      }
+    });
+
+    return best;
+  }
+
+  svg.addEventListener("pointermove", (e) => showAt(nearestIndex(e.clientX)));
+  svg.addEventListener("pointerdown", (e) => showAt(nearestIndex(e.clientX)));
+  svg.addEventListener("pointerleave", hide);
+}
+
 async function init() {
   const playerInfo = resolvePlayer();
 
@@ -110,6 +296,7 @@ async function init() {
     statsEl.innerHTML = "";
     highlightsEl.innerHTML = "";
     matchListEl.innerHTML = "";
+    trendChartEl.innerHTML = "";
     return;
   }
 
@@ -136,6 +323,7 @@ async function init() {
     statsEl.innerHTML = "";
     highlightsEl.innerHTML = "";
     matchListEl.innerHTML = "";
+    trendChartEl.innerHTML = "";
     return;
   }
 
@@ -253,6 +441,10 @@ async function init() {
       </div>
     </a>
   `).join("");
+
+  const trendSeries = buildTrendSeries(matchRows, matches);
+  trendChartEl.innerHTML = renderTrendChart(trendSeries);
+  attachTrendInteraction(trendChartEl, trendSeries);
 }
 
 init();
@@ -392,6 +584,96 @@ init();
   .highlight-row {
     align-items:flex-start;
   }
+}
+
+.trend-chart-wrap {
+  position:relative;
+}
+
+.trend-chart {
+  width:100%;
+  height:auto;
+  display:block;
+  overflow:visible;
+}
+
+.trend-grid {
+  stroke:rgba(255,255,255,0.12);
+  stroke-width:1;
+}
+
+.trend-axis-label {
+  fill:var(--muted);
+  font-size:11px;
+  font-family:Arial, sans-serif;
+}
+
+.trend-line {
+  fill:none;
+  stroke:var(--gold);
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.trend-dot {
+  cursor:pointer;
+}
+
+.trend-end-label {
+  fill:var(--gold);
+  font-size:13px;
+  font-weight:900;
+  font-family:Arial, sans-serif;
+}
+
+.trend-crosshair {
+  stroke:rgba(255,255,255,0.35);
+  stroke-width:1;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.1s ease;
+}
+
+.trend-tooltip {
+  position:absolute;
+  top:6px;
+  transform:translateX(-50%);
+  min-width:150px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(4,7,16,0.96);
+  border:1px solid var(--line);
+  box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.1s ease;
+  text-align:center;
+}
+
+.trend-tooltip-value {
+  font-size:20px;
+  font-weight:900;
+  color:white;
+}
+
+.trend-tooltip-sub {
+  margin-top:2px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.trend-caption {
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.trend-empty {
+  padding:20px 0;
+  color:var(--muted);
+  text-align:center;
 }
 </style>
 
