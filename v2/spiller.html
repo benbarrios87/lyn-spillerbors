@@ -50,7 +50,7 @@
 <script type="module">
 import { renderNavbar, renderFooter } from "./js/layout.js";
 import { fetchMatches } from "./js/matches.js";
-import { fetchVotes, buildPlayerRatingStats } from "./js/ratings.js";
+import { fetchVotes, buildPlayerRatingStats, getBestPlayersByMatch } from "./js/ratings.js";
 import {
   players,
   findPlayer,
@@ -78,8 +78,8 @@ function round(value, decimals = 2) {
 
 function getRatingClass(value) {
   const rating = Number(value || 0);
-  if (rating >= 7.5) return "rating-good";
-  if (rating >= 6) return "rating-ok";
+  if (rating >= 6) return "rating-good";
+  if (rating >= 4) return "rating-ok";
   return "rating-bad";
 }
 
@@ -95,6 +95,28 @@ function getMatchDate(matchId, matches) {
   const d = new Date(match.date);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("no-NO", { day:"2-digit", month:"2-digit" });
+}
+
+const FORM_SAMPLE_SIZE = 5;
+const FORM_MIN_MATCHES = 3;
+const FORM_THRESHOLD = 0.4;
+
+function buildFormInfo(chronologicalRows, seasonAverage) {
+  if (chronologicalRows.length < FORM_MIN_MATCHES) return null;
+
+  const recent = chronologicalRows.slice(0, FORM_SAMPLE_SIZE);
+  const recentAvg = recent.reduce((sum, m) => sum + Number(m.average || 0), 0) / recent.length;
+  const diff = recentAvg - Number(seasonAverage || 0);
+
+  if (diff >= FORM_THRESHOLD) {
+    return { className: "form-hot", label: `🔥 I form (${round(recentAvg, 1)} siste ${recent.length})` };
+  }
+
+  if (diff <= -FORM_THRESHOLD) {
+    return { className: "form-cold", label: `❄️ Svak periode (${round(recentAvg, 1)} siste ${recent.length})` };
+  }
+
+  return { className: "form-steady", label: `➖ Stabil form (${round(recentAvg, 1)} siste ${recent.length})` };
 }
 
 function resolvePlayer() {
@@ -120,8 +142,8 @@ const TREND_Y_TICKS = [2, 4, 6, 8, 10];
 
 function trendTierColor(value) {
   const rating = Number(value || 0);
-  if (rating >= 7.5) return "#3ee98a";
-  if (rating >= 6) return "#ffd166";
+  if (rating >= 6) return "#3ee98a";
+  if (rating >= 4) return "#ffd166";
   return "#ff6b6b";
 }
 
@@ -217,7 +239,7 @@ function renderTrendChart(series) {
         <line x1="0" y1="${TREND_PAD_TOP}" x2="0" y2="${TREND_HEIGHT - TREND_PAD_BOTTOM}" class="trend-crosshair" />
       </svg>
       <div class="trend-tooltip"></div>
-      <div class="trend-caption">🟢 7.5+ · 🟡 6.0–7.4 · 🔴 under 6.0 &nbsp;·&nbsp; hold over et punkt for kampdetaljer</div>
+      <div class="trend-caption">🟢 6.0+ · 🟡 4.0–5.9 · 🔴 under 4.0 &nbsp;·&nbsp; hold over et punkt for kampdetaljer</div>
     </div>
   `;
 }
@@ -313,7 +335,7 @@ async function init() {
       <div class="player-hero-card">
         <img src="${getPlayerImage(playerInfo.short)}" class="hero-avatar" onerror="this.src='../lblogoen.png'">
         <div>
-          <div class="badge">SPILLERPROFIL</div>
+          <div class="player-kicker">SPILLERPROFIL</div>
           <h1>${playerInfo.name}</h1>
           <div class="match-meta">${getPlayerPosition(playerInfo.short) || "Spiller"}</div>
           <p>Ingen børsdata funnet ennå.</p>
@@ -339,12 +361,20 @@ async function init() {
   const over7 = matchRows.filter(m => Number(m.average) >= 7).length;
   const over8 = matchRows.filter(m => Number(m.average) >= 8).length;
 
+  const motmCount = getBestPlayersByMatch(votes, { minVotes: 1 })
+    .filter(row =>
+      row.bestPlayer &&
+      (row.bestPlayer.player === playerInfo.short || row.bestPlayer.player === playerInfo.name)
+    ).length;
+
+  const formInfo = buildFormInfo(chronologicalRows, playerStats.average);
+
   heroEl.innerHTML = `
     <div class="player-hero-card">
       <img src="${getPlayerImage(playerInfo.short)}" class="hero-avatar" onerror="this.src='../lblogoen.png'">
 
       <div class="hero-info">
-        <div class="badge">SPILLERPROFIL</div>
+        <div class="player-kicker">SPILLERPROFIL</div>
         <h1>${getPlayerDisplayName(playerInfo.short)}</h1>
 
         <div class="player-subline">
@@ -358,6 +388,11 @@ async function init() {
         <div class="match-meta">
           ${playerStats.votes} stemmer · ${matchRows.length} kamper vurdert
         </div>
+
+        <div class="hero-badges">
+          ${motmCount > 0 ? `<div class="hero-badge motm-badge">🏅 Banens beste ${motmCount} ${motmCount === 1 ? "gang" : "ganger"}</div>` : ""}
+          ${formInfo ? `<div class="hero-badge form-badge ${formInfo.className}">${formInfo.label}</div>` : ""}
+        </div>
       </div>
     </div>
   `;
@@ -365,33 +400,38 @@ async function init() {
   statsEl.innerHTML = `
     <div class="stat-grid">
       <div class="mini-stat">
-        <span>Snitt</span>
+        <span>📊 Snitt</span>
         <strong>${playerStats.average}</strong>
       </div>
 
       <div class="mini-stat">
-        <span>Stemmer</span>
+        <span>🗳️ Stemmer</span>
         <strong>${playerStats.votes}</strong>
       </div>
 
       <div class="mini-stat">
-        <span>Kamper</span>
+        <span>⚽ Kamper</span>
         <strong>${matchRows.length}</strong>
       </div>
 
       <div class="mini-stat">
-        <span>Over 7</span>
+        <span>✅ Over 7</span>
         <strong>${over7}</strong>
       </div>
 
       <div class="mini-stat">
-        <span>Over 8</span>
+        <span>🌟 Over 8</span>
         <strong>${over8}</strong>
       </div>
 
       <div class="mini-stat">
-        <span>Beste</span>
+        <span>🏆 Beste</span>
         <strong>${playerStats.bestMatch?.average || "-"}</strong>
+      </div>
+
+      <div class="mini-stat">
+        <span>🏅 Banens beste</span>
+        <strong>${motmCount}</strong>
       </div>
     </div>
   `;
@@ -456,24 +496,54 @@ init();
 }
 
 .player-hero-card {
+  position:relative;
+  overflow:hidden;
   display:flex;
   align-items:center;
   gap:24px;
-  padding:26px;
-  background:var(--panel);
+  padding:28px 26px 26px;
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.16), transparent 45%),
+    var(--panel);
   border:1px solid var(--line);
   border-radius:28px;
   box-shadow:0 12px 35px rgba(0,0,0,0.32);
+  animation:player-fade-in 0.35s ease;
+}
+
+.player-hero-card::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:4px;
+  background:linear-gradient(90deg, var(--red), var(--gold));
 }
 
 .hero-avatar {
+  flex-shrink:0;
   width:132px;
   height:132px;
   border-radius:26px;
   object-fit:cover;
   object-position:center top;
   background:white;
-  border:3px solid rgba(255,255,255,0.18);
+  border:3px solid rgba(255,209,102,0.55);
+  box-shadow:0 0 26px rgba(255,209,102,0.22);
+}
+
+.player-kicker {
+  display:inline-block;
+  margin-top:0;
+  padding:7px 13px;
+  border-radius:999px;
+  background:var(--gold);
+  color:#101827;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:0.4px;
+  text-transform:uppercase;
 }
 
 .hero-info h1 {
@@ -492,6 +562,50 @@ init();
   line-height:1;
 }
 
+.hero-badges {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.hero-badge {
+  display:inline-block;
+  padding:7px 13px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:bold;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.14);
+}
+
+.motm-badge {
+  background:rgba(255,209,102,0.16);
+  border-color:rgba(255,209,102,0.4);
+  color:var(--gold);
+}
+
+.form-badge.form-hot {
+  background:rgba(34,197,94,0.16);
+  border-color:rgba(34,197,94,0.4);
+  color:#3ee98a;
+}
+
+.form-badge.form-cold {
+  background:rgba(255,107,107,0.14);
+  border-color:rgba(255,107,107,0.36);
+  color:#ff6b6b;
+}
+
+.form-badge.form-steady {
+  color:var(--muted);
+}
+
+@keyframes player-fade-in {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
 .rating-good {
   color:#3ee98a;
 }
@@ -506,7 +620,7 @@ init();
 
 .stat-grid {
   display:grid;
-  grid-template-columns:repeat(3, 1fr);
+  grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));
   gap:14px;
 }
 
@@ -514,6 +628,12 @@ init();
   padding:18px;
   border-radius:18px;
   background:rgba(255,255,255,0.06);
+  transition:0.15s ease;
+}
+
+.mini-stat:hover {
+  transform:translateY(-2px);
+  background:rgba(255,255,255,0.09);
 }
 
 .mini-stat span {
@@ -539,6 +659,12 @@ init();
   padding:14px;
   border-radius:18px;
   background:rgba(255,255,255,0.06);
+  transition:0.15s ease;
+}
+
+.highlight-row:hover {
+  transform:translateY(-2px);
+  background:rgba(255,255,255,0.09);
 }
 
 .rating-pill {
@@ -575,6 +701,10 @@ init();
 
   .hero-rating {
     font-size:46px;
+  }
+
+  .hero-badges {
+    justify-content:center;
   }
 
   .stat-grid {

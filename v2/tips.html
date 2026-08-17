@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tippetips</title>
   <link rel="icon" href="../lblogoen.png">
+  <link rel="stylesheet" href="../nav.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -978,7 +979,7 @@ padding-right:120px;
 
 <body>
 
-<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+<div id="navbar"></div>
 
 <header>
   <div class="coupon-hero">
@@ -1090,7 +1091,7 @@ padding-right:120px;
 
 <div id="successOverlay" class="success-overlay">
   <div class="success-box">
-    <img src="../bilder/jess.jpg" alt="Kupong levert" onerror="this.src='../../../../../lblogoen.png'">
+    <img src="../bilder/jess.jpg" alt="Kupong levert" onerror="this.src='../lblogoen.png'">
     <div class="success-title">Kupong levert!</div>
     <div id="successText" class="success-text"></div>
     <div class="success-actions">
@@ -1100,14 +1101,15 @@ padding-right:120px;
   </div>
 </div>
 
-<footer class="site-footer">
-  Har du glede av prosjektet? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
-  Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
-</footer>
+<div id="footer"></div>
 
     <script type="module">
 import { supabaseClient } from "./js/supabase.js";
 import { fetchMatches } from "./js/matches.js";
+import { renderNavbar, renderFooter } from "../nav.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("tips", "../");
+document.getElementById("footer").innerHTML = renderFooter();
 
 const TIP_HOME_PLAYER = "TIP_HOME_GOALS";
 const TIP_AWAY_PLAYER = "TIP_AWAY_GOALS";

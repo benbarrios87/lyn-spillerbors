@@ -8,6 +8,7 @@
 <link rel="icon" href="../lblogoen.png">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="../nav.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -862,7 +863,7 @@ function renderMVP(votes, fantasyStats){
   return `
     <h2>🏅 Årets Lynspiller</h2>
     <p class="mvp-formula">
-      Formel: <strong>børssnitt × 10</strong> + <strong>mål × 2</strong> + <strong>assist × 1.5</strong> + <strong>clean sheet × 1</strong>.
+      Formel: <strong>børssnitt × 10</strong>, pluss mål/assist/clean sheet vektet etter posisjon (samme system som Fantasy). Krever minst 5 vurderte kamper.
     </p>
 
     <div class="table-wrap">

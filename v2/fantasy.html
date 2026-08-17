@@ -6,7 +6,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lyn Fantasy</title>
-<link rel="icon" href="lblogoen.png">
+<link rel="icon" href="../lblogoen.png">
+<link rel="stylesheet" href="../nav.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -25,7 +26,7 @@
 body {
   margin:0;
   font-family:Arial, sans-serif;
-  background:url("bakgrunn.jpg.webp") center/cover no-repeat fixed;
+  background:url("../bakgrunn.jpg.webp") center/cover no-repeat fixed;
   color:white;
 }
 
@@ -1031,7 +1032,7 @@ label {
 
 <body>
 
-<button class="menu-btn" onclick="location.href='/'">← Meny</button>
+<div id="navbar"></div>
 
 <div class="container">
 
@@ -1042,8 +1043,13 @@ label {
     <div class="quick-actions">
       <a class="quick-action" href="#velg-lag">⚡ Sett laget<span>Bygg laget med spillerkort, bilder og kapteinvalg.</span></a>
       <a class="quick-action" href="#rundestats">🏆 Se runden<span>Rundeleder, MVP og fantasyspillere.</span></a>
-      <a class="quick-action" href="#sesongstats">📈 Sesongstats<span>Tabell, favoritter og differensialer.</span></a>
+      <a class="quick-action" href="#sesongstats" onclick="const d=document.getElementById('sesongstats'); if(d) d.open=true;">📈 Sesongstats<span>Tabell, favoritter og differensialer.</span></a>
     </div>
+  </div>
+
+  <div class="card" id="myResultCard" style="display:none;">
+    <h2 style="margin-top:0;">📊 Sånn gikk det med laget ditt</h2>
+    <div id="myResultContent"></div>
   </div>
 
   <h2 class="section-title">1. Neste runde</h2>
@@ -1145,14 +1151,14 @@ label {
     </div>
   </div>
 
-  <h2 class="section-title" id="sesongstats">5. Fantasy Central</h2>
-
-  <div class="card">
-    <h2>Sesongstats</h2>
-    <div id="seasonFantasyStats">
-      <div class="small">Laster sesongstats...</div>
+  <details class="rules-dropdown" id="sesongstats">
+    <summary>5. Fantasy Central – sesongstats</summary>
+    <div class="card">
+      <div id="seasonFantasyStats">
+        <div class="small">Laster sesongstats...</div>
+      </div>
     </div>
-  </div>
+  </details>
 
 </div>
 
@@ -1167,15 +1173,16 @@ label {
   </div>
 </div>
 
-<footer class="site-footer">
- Har du glede av Lynbørs?? Vipps gjerne en kaffekapsel til <strong>40001410</strong>.
-  Send meg mail på <a href="mailto:benbarrios87@gmail.com">benbarrios87@gmail.com</a> om du ønsker kontakt.
-</footer>
+<div id="footer"></div>
 
 <script type="module">
 import { players } from "./js/players.js";
 import { fetchMatches } from "./js/matches.js";
 import { supabaseClient } from "./js/supabase.js";
+import { renderNavbar, renderFooter } from "../nav.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("fantasy", "../");
+document.getElementById("footer").innerHTML = renderFooter();
 
 async function trackEvent(eventType, data = {}) {
   if (localStorage.getItem("lyncentral_ignore_tracking") === "true") {
@@ -1902,6 +1909,63 @@ const total = p1.total + p2.total + cap.total;
   `;
 }
 
+async function renderMyResultSummary() {
+  const card = document.getElementById("myResultCard");
+  const content = document.getElementById("myResultContent");
+  if (!card || !content) return;
+
+  const finished = statsMatch && statsMatch.actual_home !== null && statsMatch.actual_away !== null;
+  if (!finished) return;
+
+  const savedUsername = getSavedUsername();
+  if (!savedUsername) return;
+
+  const { data: picks, error } = await supabaseClient
+    .from("fantasy_picks")
+    .select("*")
+    .eq("match_id", statsMatch.id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const myKey = cleanVoterName(savedUsername);
+  const myPick = (picks || []).find(p => cleanVoterName(p.voter) === myKey);
+
+  const scoreLine = `${statsMatch.home} ${statsMatch.actual_home} - ${statsMatch.actual_away} ${statsMatch.away}`;
+
+  card.style.display = "block";
+
+  if (!myPick) {
+    content.innerHTML = `
+      <p class="small">Du leverte ikke fantasy-lag til forrige runde (${scoreLine}).</p>
+      <a class="quick-action" href="#velg-lag" style="display:inline-block;">⚡ Sett laget til neste runde<span>Rekk fristen for neste kamp.</span></a>
+    `;
+    return;
+  }
+
+  const p1 = calculatePoints(myPick.player1, false);
+  const p2 = calculatePoints(myPick.player2, false);
+  const cap = calculatePoints(myPick.captain, true);
+  const total = p1.total + p2.total + cap.total;
+
+  content.innerHTML = `
+    <div class="team-total-card">
+      <div>${myPick.voter}</div>
+      <div class="small">Kamp: ${scoreLine}</div>
+      <div class="total-points">${total}</div>
+      <div class="small">fantasypoeng forrige runde</div>
+    </div>
+
+    <div class="team-grid">
+      ${playerPointsCard(myPick.player1, p1, false)}
+      ${playerPointsCard(myPick.player2, p2, false)}
+      ${playerPointsCard(myPick.captain, cap, true)}
+    </div>
+  `;
+}
+
 function loadSavedTeam() {
   const savedUsername = getSavedUsername();
   if (savedUsername) document.getElementById("username").value = savedUsername;
@@ -2516,6 +2580,7 @@ async function init() {
   applyDeadlineLock();
   loadFantasyStats();
   loadSeasonFantasyStats();
+  renderMyResultSummary();
 }
 window.chooseRegularPlayer = chooseRegularPlayer;
 window.chooseCaptain = chooseCaptain;
