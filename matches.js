@@ -167,7 +167,7 @@ const matchesData = [
     date: "2026-08-26",
     home: "Åsane",
     away: "Lyn",
-    deadline: "2026-08-26T18:00:00",
+    deadline: "2026-08-26T19:00:00",
     actual: null,
   },
   {
