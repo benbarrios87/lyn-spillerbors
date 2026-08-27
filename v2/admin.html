@@ -195,6 +195,49 @@ button.danger{background:#7f1d1d}
   <div id="issues" class="issue-list">Laster kontroll...</div>
 </section>
 
+<section class="admin-card">
+  <h2>Opprett ny kamp</h2>
+  <p class="small-help">Brukes for cupkamp, treningskamp eller nye serie-/OBOS-liga-kamper.</p>
+
+  <div class="form-grid">
+    <div>
+      <label>Lag</label>
+      <select id="newTeam">
+        <option value="men">Herrene</option>
+        <option value="women">Kvinnene</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Turnering</label>
+      <input id="newCompetition" placeholder="OBOS-ligaen, NM, Toppserien">
+    </div>
+
+    <div>
+      <label>Hjemmelag</label>
+      <input id="newHome" placeholder="Lyn">
+    </div>
+
+    <div>
+      <label>Bortelag</label>
+      <input id="newAway" placeholder="Motstander">
+    </div>
+
+    <div>
+      <label>Kampstart</label>
+      <input id="newDateTime" type="datetime-local">
+    </div>
+
+    <div>
+      <label>Deadline</label>
+      <input id="newDeadline" type="datetime-local">
+    </div>
+  </div>
+
+  <button onclick="createMatch()">Opprett kamp</button>
+  <div id="createMatchStatus" class="status"></div>
+</section>
+
 <section class="admin-grid">
 
   <div class="admin-card">
@@ -333,6 +376,61 @@ function numberOrNull(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
+
+function makeMatchId(date, home, away) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month} ${home} - ${away}`;
+}
+
+window.createMatch = async function() {
+  const team = byId("newTeam").value;
+  const competition = byId("newCompetition").value.trim();
+  const home = byId("newHome").value.trim();
+  const away = byId("newAway").value.trim();
+  const dateTimeValue = byId("newDateTime").value;
+  const deadlineValue = byId("newDeadline").value;
+
+  if (!home || !away || !dateTimeValue || !deadlineValue) {
+    showStatus("createMatchStatus", "Fyll inn hjemmelag, bortelag, kampstart og deadline.", "error");
+    return;
+  }
+
+  const id = makeMatchId(dateTimeValue, home, away);
+
+  const { error } = await supabaseClient
+    .from("matches")
+    .insert({
+      id,
+      team,
+      competition: competition || null,
+      home,
+      away,
+      date: fromInputDateTime(dateTimeValue),
+      deadline: fromInputDateTime(deadlineValue),
+      actual_home: null,
+      actual_away: null,
+      active: true
+    });
+
+  if (error) {
+    console.error(error);
+    showStatus("createMatchStatus", "Klarte ikke å opprette kamp. Kanskje finnes den allerede?", "error");
+    return;
+  }
+
+  showStatus("createMatchStatus", `Kamp opprettet: <strong>${id}</strong>.`);
+
+  byId("newCompetition").value = "";
+  byId("newHome").value = "";
+  byId("newAway").value = "";
+  byId("newDateTime").value = "";
+  byId("newDeadline").value = "";
+
+  selectedMatchId = id;
+  await loadAll();
+};
 
 function formatMatchDate(value) {
   if (!value) return "Dato mangler";
