@@ -6,7 +6,7 @@ export const players = [
     image: "../bilder/pedersen.png",
     position: "KEEPER",
     order: 1,
-    aliases: ["Pedersen", "Alexander Pedersen"]
+    aliases: ["Pedersen", "Alexander Pedersen"],
   },
 
   {
@@ -16,7 +16,7 @@ export const players = [
     image: "../bilder/sah.png",
     position: "FORS",
     order: 2,
-    aliases: ["SAH", "Sander Amble Haugen"]
+    aliases: ["SAH", "Sander Amble Haugen"],
   },
   {
     id: "sell",
@@ -24,8 +24,8 @@ export const players = [
     short: "Sell",
     image: "../bilder/sell.png",
     position: "FORS",
-      order: 3,
-    aliases: ["Sell", "William Sell"]
+    order: 3,
+    aliases: ["Sell", "William Sell"],
   },
   {
     id: "midtskogen",
@@ -33,8 +33,8 @@ export const players = [
     short: "Midtskogen",
     image: "../bilder/midtskogen.png",
     position: "FORS",
-      order: 4,
-    aliases: ["Midtskogen", "Ådne Midtskogen"]
+    order: 4,
+    aliases: ["Midtskogen", "Ådne Midtskogen"],
   },
   {
     id: "hsn",
@@ -42,8 +42,8 @@ export const players = [
     short: "HSN",
     image: "../bilder/hsn.png",
     position: "FORS",
-      order: 5,
-    aliases: ["HSN", "Herman Solberg Nilsen"]
+    order: 5,
+    aliases: ["HSN", "Herman Solberg Nilsen"],
   },
   {
     id: "barnett",
@@ -51,7 +51,7 @@ export const players = [
     short: "Barnett",
     image: "../bilder/barnett.png",
     position: "FORS",
-    aliases: ["Barnett", "Isaac Barnett"]
+    aliases: ["Barnett", "Isaac Barnett"],
   },
   {
     id: "vik",
@@ -59,7 +59,7 @@ export const players = [
     short: "Vik",
     image: "../bilder/vik.png",
     position: "FORS",
-    aliases: ["Vik", "Isak Vik"]
+    aliases: ["Vik", "Isak Vik"],
   },
   {
     id: "gueye",
@@ -67,7 +67,7 @@ export const players = [
     short: "Gueye",
     image: "../bilder/gueye.png",
     position: "FORS",
-    aliases: ["Gueye", "Ousmane Gueye"]
+    aliases: ["Gueye", "Ousmane Gueye"],
   },
   {
     id: "race",
@@ -75,7 +75,7 @@ export const players = [
     short: "Race",
     image: "../bilder/race.png",
     position: "FORS",
-    aliases: ["Edvard Race", "Race"]
+    aliases: ["Edvard Race", "Race"],
   },
 
   {
@@ -84,8 +84,8 @@ export const players = [
     short: "Fredriksen",
     image: "../bilder/fredriksen.png",
     position: "MID",
-      order: 6,
-    aliases: ["Fredriksen", "Didrik Fredriksen"]
+    order: 6,
+    aliases: ["Fredriksen", "Didrik Fredriksen"],
   },
   {
     id: "isufi",
@@ -93,15 +93,7 @@ export const players = [
     short: "Isufi",
     image: "../bilder/isufi.png",
     position: "MID",
-    aliases: ["Isufi", "Eron Isufi"]
-  },
-  {
-    id: "gueye",
-    name: "Ousmane Gueye",
-    short: "Gueye",
-    image: "../bilder/gueye.png",
-    position: "FORS",
-    aliases: ["Gueye", "Ousmane Gueye"]
+    aliases: ["Isufi", "Eron Isufi"],
   },
   {
     id: "kallevåg",
@@ -109,7 +101,7 @@ export const players = [
     short: "Kallevåg",
     image: "../bilder/kallevåg.png",
     position: "MID",
-    aliases: ["kallevåd", "Ole Kallevåg"]
+    aliases: ["kallevåd", "Ole Kallevåg"],
   },
   {
     id: "skaug",
@@ -117,7 +109,7 @@ export const players = [
     short: "Skaug",
     image: "../bilder/skaug.png",
     position: "MID",
-    aliases: ["Skaug", "Julius Skaug"]
+    aliases: ["Skaug", "Julius Skaug"],
   },
   {
     id: "kurtovic",
@@ -125,8 +117,8 @@ export const players = [
     short: "Kurtovic",
     image: "../bilder/kurtovic.png",
     position: "MID",
-      order: 7,
-    aliases: ["Kurtovic", "William Kurtovic"]
+    order: 7,
+    aliases: ["Kurtovic", "William Kurtovic"],
   },
   {
     id: "monglo",
@@ -134,25 +126,37 @@ export const players = [
     short: "Monglo",
     image: "../bilder/monglo.png",
     position: "MID",
-      order: 8,
-    aliases: ["Monglo", "Isaac Monglo"]
+    order: 8,
+    aliases: ["Monglo", "Isaac Monglo"],
   },
-   {
-  id: "nøis",
-  name: "Johan Solstad-Nøis",
-  short: "Nøis",
-  image: "../bilder/nois.png",
-  position: "MID",
-  order: 12,
-  aliases: ["nois", "Nøis", "Johan Solstad-Nøis", "Solstad-Nøis", "Solstad Nois"]
-},
+  {
+    id: "nøis",
+    name: "Johan Solstad-Nøis",
+    short: "Nøis",
+    image: "../bilder/nois.png",
+    position: "MID",
+    order: 12,
+    aliases: [
+      "nois",
+      "Nøis",
+      "Johan Solstad-Nøis",
+      "Solstad-Nøis",
+      "Solstad Nois",
+    ],
+  },
   {
     id: "waehler",
     name: "William Wæhler",
     short: "Wæhler",
     image: "../bilder/wæhler.png",
     position: "MID",
-    aliases: ["Wæhler", "Wæhler", "William Wæhler", "Waehler", "William Waehler"]
+    aliases: [
+      "Wæhler",
+      "Wæhler",
+      "William Wæhler",
+      "Waehler",
+      "William Waehler",
+    ],
   },
   {
     id: "andersen",
@@ -161,7 +165,7 @@ export const players = [
     image: "../bilder/andersen.png",
     position: "KEEPER",
     order: 9999,
-    aliases: ["Andersen", "Marcus Andersen"]
+    aliases: ["Andersen", "Marcus Andersen"],
   },
   {
     id: "aadland",
@@ -170,7 +174,7 @@ export const players = [
     image: "../bilder/aadland.png",
     position: "MID",
     order: 9998,
-    aliases: ["Aadland", "Magnus Aadland", "Ådland", "Magnus Ådland"]
+    aliases: ["Aadland", "Magnus Aadland", "Ådland", "Magnus Ådland"],
   },
 
   {
@@ -179,8 +183,8 @@ export const players = [
     short: "ABO",
     image: "../bilder/abo.png",
     position: "ANG",
-      order: 9,
-    aliases: ["ABO", "Anders Bjørntvedt Olsen"]
+    order: 9,
+    aliases: ["ABO", "Anders Bjørntvedt Olsen"],
   },
   {
     id: "mj",
@@ -188,8 +192,8 @@ export const players = [
     short: "MJ",
     image: "../bilder/mj.png",
     position: "ANG",
-      order: 10,
-    aliases: ["MJ", "Matias Johansen"]
+    order: 10,
+    aliases: ["MJ", "Matias Johansen"],
   },
   {
     id: "hellum",
@@ -197,8 +201,8 @@ export const players = [
     short: "Hellum",
     image: "../bilder/hellum.png",
     position: "ANG",
-      order: 11,
-    aliases: ["Hellum", "Andreas Hellum"]
+    order: 11,
+    aliases: ["Hellum", "Andreas Hellum"],
   },
   {
     id: "sawaneh",
@@ -206,7 +210,7 @@ export const players = [
     short: "Sawaneh",
     image: "../bilder/sawaneh.png",
     position: "ANG",
-    aliases: ["Sawaneh", "Ibrahim Sawaneh"]
+    aliases: ["Sawaneh", "Ibrahim Sawaneh"],
   },
   {
     id: "sock",
@@ -214,16 +218,16 @@ export const players = [
     short: "Sock",
     image: "../bilder/sock.png",
     position: "ANG",
-    aliases: ["Sock", "Fallou Sock"]
+    aliases: ["Sock", "Fallou Sock"],
   },
   {
     id: "Memedov",
     name: "Artan Memedov",
     short: "Memedov",
-    image: "../bilder/.png",
+    image: "../lblogoen.png",
     position: "ANG",
-    aliases: ["Artan", "Artan Memedov"]
-}
+    aliases: ["Artan", "Artan Memedov"],
+  },
 ];
 
 function normalize(value) {
@@ -240,15 +244,15 @@ function normalize(value) {
 export function findPlayer(value) {
   const wanted = normalize(value);
 
-  return players.find(player => {
-    if (normalize(player.id) === wanted) return true;
-    if (normalize(player.short) === wanted) return true;
-    if (normalize(player.name) === wanted) return true;
+  return (
+    players.find((player) => {
+      if (normalize(player.id) === wanted) return true;
+      if (normalize(player.short) === wanted) return true;
+      if (normalize(player.name) === wanted) return true;
 
-    return player.aliases.some(alias =>
-      normalize(alias) === wanted
-    );
-  }) || null;
+      return player.aliases.some((alias) => normalize(alias) === wanted);
+    }) || null
+  );
 }
 
 export function getPlayer(value) {
@@ -280,5 +284,5 @@ export function getAllPlayers() {
 }
 
 export function getPlayersByPosition(position) {
-  return players.filter(player => player.position === position);
+  return players.filter((player) => player.position === position);
 }
