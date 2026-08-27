@@ -486,10 +486,12 @@ function safeId(value) {
 }
 
 function orderedPlayers() {
-  return [...players].sort((a,b) =>
-    (a.order ?? 9999) - (b.order ?? 9999) ||
-    a.short.localeCompare(b.short)
-  );
+  return [...players]
+    .filter(player => player.active !== false)
+    .sort((a,b) =>
+      (a.order ?? 9999) - (b.order ?? 9999) ||
+      a.short.localeCompare(b.short)
+    );
 }
 
 function renderPlayers() {
@@ -503,8 +505,8 @@ function renderPlayers() {
         <div class="player-head">
           <img src="${getPlayerImage(player.short)}" onerror="this.src='../lblogoen.png'" alt="">
           <div>
-            <strong>${player.short}</strong><br>
-            <span class="small-help">${player.name} · ${player.position}</span>
+            <strong>${player.name}</strong><br>
+            <span class="small-help">${player.short} · ${player.position}</span>
           </div>
         </div>
 

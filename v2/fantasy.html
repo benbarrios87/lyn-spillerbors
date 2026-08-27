@@ -1281,7 +1281,12 @@ function getPlayerImage(playerName) {
   const player = getPlayer(playerName);
   return player ? player.image : "../lblogoen.png";
 }
-  
+
+function getPlayerDisplayName(playerName) {
+  const player = getPlayer(playerName);
+  return player ? player.name : playerName;
+}
+
 
 function getSelectedTeamFromInputs() {
   return {
@@ -1391,6 +1396,7 @@ function renderPlayerCards() {
   const selectedRegulars = [team.player1, team.player2].filter(Boolean);
 
   const visiblePlayers = [...players]
+  .filter(player => player.active !== false)
   .filter(player => {
     return activePositionFilter === "ALLE" || player.position === activePositionFilter;
   })
@@ -1407,9 +1413,9 @@ function renderPlayerCards() {
     return `
       <div class="pick-card ${isSelected ? "selected" : ""} ${isCaptain ? "captain" : ""}">
         <div class="pick-card-top">
-          <img class="pick-card-img" src="${getPlayerImage(player.short)}" alt="${player.short}" onerror="this.src='../lblogoen.png'">
+          <img class="pick-card-img" src="${getPlayerImage(player.short)}" alt="${player.name}" onerror="this.src='../lblogoen.png'">
           <div>
-            <div class="pick-card-name">${isCaptain ? "⭐ " : ""}${player.short}</div>
+            <div class="pick-card-name">${isCaptain ? "⭐ " : ""}${player.name}</div>
             <div class="position-tag">${player.position}</div>
           </div>
         </div>
@@ -1450,7 +1456,7 @@ function updateTeamBuilder() {
         <img src="${value ? getPlayerImage(value) : "../lblogoen.png"}" alt="" onerror="this.src='../lblogoen.png'">
         <div>
           <div class="slot-label">${slot.label}</div>
-          <div class="slot-name ${value ? "" : "slot-empty"}">${value || "Ikke valgt"}</div>
+          <div class="slot-name ${value ? "" : "slot-empty"}">${value ? getPlayerDisplayName(value) : "Ikke valgt"}</div>
         </div>
         <button type="button" class="clear-slot" onclick="clearPickSlot('${slot.id}')">×</button>
       </div>
@@ -1544,14 +1550,14 @@ function setupTabs() {
 function playerLink(playerName) {
   return `
     <a href="spiller.html?id=${encodeURIComponent(playerName)}" class="player-link">
-      ${playerName}
+      ${getPlayerDisplayName(playerName)}
     </a>
   `;
 }
 function playerChip(playerName) {
   return `
     <div class="player-chip">
-      <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='../lblogoen.png'">
+      <img src="${getPlayerImage(playerName)}" alt="${getPlayerDisplayName(playerName)}" onerror="this.src='../lblogoen.png'">
       <div>
        <strong>${playerLink(playerName)}</strong><br>
         <span class="small">${getPlayerPosition(playerName)}</span>
@@ -1857,9 +1863,9 @@ function playerPointsCard(playerName, pointsData, isCaptain) {
   return `
     <div class="player-points-card ${isCaptain ? "captain" : ""}">
       <div class="player-card-top">
-        <img src="${getPlayerImage(playerName)}" alt="${playerName}" onerror="this.src='../lblogoen.png'">
+        <img src="${getPlayerImage(playerName)}" alt="${getPlayerDisplayName(playerName)}" onerror="this.src='../lblogoen.png'">
         <div>
-          <div class="player-card-name">${isCaptain ? "⭐ " : ""}${playerName}</div>
+          <div class="player-card-name">${isCaptain ? "⭐ " : ""}${getPlayerDisplayName(playerName)}</div>
           <div class="position-tag">${getPlayerPosition(playerName)}</div>
         </div>
       </div>

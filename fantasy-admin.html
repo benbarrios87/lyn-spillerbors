@@ -792,29 +792,27 @@ const supabaseClient = window.supabase.createClient(
 
 const players = [
   { name:"Pedersen", position:"KEEPER", image:"bilder/pedersen.png" },
-  { name:"SAH", position:"FORS", image:"bilder/sah.png" },
-  { name:"Sell", position:"FORS", image:"bilder/sell.png" },
+  { name:"SAH", label:"Sander Amble Haugen", position:"FORS", image:"bilder/sah.png" },
+  { name:"Race", position:"FORS", image:"bilder/race.png" },
   { name:"Midtskogen", position:"FORS", image:"bilder/midtskogen.png" },
-  { name:"HSN", position:"FORS", image:"bilder/hsn.png" },
+  { name:"HSN", label:"Herman Solberg Nilsen", position:"FORS", image:"bilder/hsn.png" },
+  { name:"Fredriksen", position:"MID", image:"bilder/fredriksen.png" },
+  { name:"Kallevåg", position:"MID", image:"bilder/kallevåg.png" },
+  { name:"Johan Solstad-Nøis", position:"MID", image:"bilder/nois.png" },
+  { name:"ABO", label:"Anders Bjørntvedt Olsen", position:"ANG", image:"bilder/abo.png" },
+  { name:"Hellum", position:"ANG", image:"bilder/hellum.png" },
+  { name:"MJ", label:"Matias Johansen", position:"ANG", image:"bilder/mj.png" },
+
+  { name:"Sell", position:"FORS", image:"bilder/sell.png" },
   { name:"Barnett", position:"FORS", image:"bilder/barnett.png" },
   { name:"Gueye", position:"FORS", image:"bilder/gueye.png" },
-  { name:"Fredriksen", position:"MID", image:"bilder/fredriksen.png" },
   { name:"Isufi", position:"MID", image:"bilder/isufi.png" },
-  { name:"Kallevåg", position:"MID", image:"bilder/kallevåg.png" },
   { name:"Skaug", position:"MID", image:"bilder/skaug.png" },
   { name:"Kurtovic", position:"MID", image:"bilder/kurtovic.png" },
   { name:"Monglo", position:"MID", image:"bilder/monglo.png" },
-  { name:"Johan Solstad-Nøis", position:"MID", image:"bilder/nois.png" },
   { name:"Wæhler", position:"MID", image:"bilder/wæhler.png" },
-  { name:"Race", position:"FORS", image:"bilder/race.png" },
-  { name:"ABO", position:"ANG", image:"bilder/abo.png" },
-  { name:"MJ", position:"ANG", image:"bilder/mj.png" },
-  { name:"Hellum", position:"ANG", image:"bilder/hellum.png" },
-  { name:"Sawaneh", position:"ANG", image:"bilder/sawaneh.png" },
   { name:"Sock", position:"ANG", image:"bilder/sock.png" },
-  { name:"Vik", position:"KEEPER", image:"bilder/vik.png" },
-  { name:"Andersen", position:"KEEPER", image:"bilder/andersen.png" },
-  { name:"Trige", position:"KEEPER", image:"bilder/trige.png" }
+  { name:"Andersen", position:"KEEPER", image:"bilder/andersen.png" }
 ];
 
 let allMatches = [];
@@ -1054,9 +1052,9 @@ function renderPlayers() {
 
     card.innerHTML = `
       <div class="player-header">
-        <img src="${player.image}" alt="${player.name}" onerror="this.src='lblogoen.png'">
+        <img src="${player.image}" alt="${player.label || player.name}" onerror="this.src='lblogoen.png'">
         <div>
-          <div class="player-name">${player.name}</div>
+          <div class="player-name">${player.label || player.name}</div>
           <div class="position">${player.position}</div>
         </div>
       </div>

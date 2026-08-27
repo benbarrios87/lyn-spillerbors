@@ -197,6 +197,7 @@ function renderMatchInfo() {
 
 function renderVoteGrid() {
   const sortedPlayers = [...players]
+    .filter(player => player.active !== false)
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   voteGridEl.innerHTML = sortedPlayers.map(player => `
@@ -211,7 +212,7 @@ function renderVoteGrid() {
 
         <div class="vote-player-text">
           <strong>${getPlayerDisplayName(player.name)}</strong>
-          <span>${player.position} • ${player.short}</span>
+          <span>${player.position}</span>
         </div>
       </a>
 
