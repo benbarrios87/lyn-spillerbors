@@ -103,24 +103,20 @@ async function init() {
   const matches = await fetchMatches();
 
   relevantMatches = matches
-    .filter(match => match.active === true || match.actual_home !== null)
-    .reverse();
+    .filter(match => match.actual_home !== null && match.actual_away !== null)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   if (!relevantMatches.length) {
-    matchSelectEl.innerHTML = `<option>Ingen kamper funnet</option>`;
-    voteGridEl.innerHTML = `<div class="match-meta">Ingen kamper tilgjengelig.</div>`;
+    matchSelectEl.innerHTML = `<option>Ingen spilte kamper funnet</option>`;
+    voteGridEl.innerHTML = `<div class="match-meta">Ingen spilte kamper tilgjengelig ennå.</div>`;
     return;
   }
 
-  matchSelectEl.innerHTML = relevantMatches.map(match => {
-  const label = match.active ? " • åpen" : "";
-
-  return `
+  matchSelectEl.innerHTML = relevantMatches.map(match => `
     <option value="${match.id}">
-      ${match.home} - ${match.away}${label}
+      ${match.home} - ${match.away}
     </option>
-  `;
-}).join("");
+  `).join("");
 
   activeMatch = relevantMatches[0];
 
