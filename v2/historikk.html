@@ -21,18 +21,23 @@
   <section class="page-header">
     <div class="badge">HISTORIKK</div>
     <h1>Lynbørs Historikk</h1>
-    <p>Alt av sesongstatistikk samlet: årets spiller, beste elleve siden starten, spillerstats og de beste brukerne i tips, fantasy og børs. Tall fra og med 2026, da Lynbørs.no startet. Oppdateres automatisk etter hvert som sesongen rulles ut — også gamle spillere som er tatt ut av aktive lister lever videre her.</p>
+    <p>Alt av sesongstatistikk samlet: årets spiller, beste elleve siden starten, spillerstats og de beste brukerne i tips, fantasy og børs. Tall fra og med 2026, da Lynbørs.no startet. Oppdateres automatisk etter hvert som sesongen rulles ut — også gamle spillere som er tatt ut av aktive lister lever videre her. Du kan se både år for år og totalt oppsummert.</p>
   </section>
 
   <section class="data-card" id="loadingNotice">
     Laster historikk...
   </section>
 
+  <section class="data-card season-select-card" id="seasonCard" hidden>
+    <div class="small-help" style="margin-bottom:10px;">Velg sesong</div>
+    <div class="season-tabs" id="seasonTabs"></div>
+  </section>
+
   <section class="data-card spotlight-card" id="mvpCard" hidden></section>
 
   <section class="data-card" id="xiCard" hidden>
-    <h2>Beste elleve siden starten (2026–)</h2>
-    <p class="small-help">Basert på snittkarakter på børsen gjennom hele sesongen, blant spillere med minst 5 kamper. Satt opp som et ekte lag: 1 keeper, 3–5 forsvarere, 3–5 midtbanespillere, 1–3 spisser — resten av plassene innenfor disse rammene går til de med høyest snitt.</p>
+    <h2 id="xiHeading">Beste elleve</h2>
+    <p class="small-help" id="xiDesc"></p>
     <div id="pitch" class="pitch"></div>
   </section>
 
@@ -60,7 +65,7 @@
 
   <section class="data-card" id="statsCard" hidden>
     <h2>Spillerstats <span class="small-help" id="statsCount"></span></h2>
-    <p class="small-help">Alle spillere som har fått børsstemmer er med her, også de som ikke lenger står i aktive lister (merket «Historisk»). Årets Lynspiller og Beste elleve krever minst 5 kamper, men her vises alle uansett antall.</p>
+    <p class="small-help" id="statsDesc"></p>
     <div class="table-wrap">
       <table class="stats-table">
         <thead>
@@ -74,6 +79,7 @@
             <th>Mål</th>
             <th>Assist</th>
             <th>Clean sheet</th>
+            <th>Sesong</th>
           </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -432,6 +438,41 @@ function buildBestXI(seasonRanking) {
   return { keeper: gk, fors, mid, ang, complete: total === 11 };
 }
 
+function getMatchYear(matchId) {
+  const match = findMatch(matchId);
+  if (!match || !match.date) return null;
+  return new Date(match.date).getFullYear();
+}
+
+function getAvailableYears(matches) {
+  const years = new Set();
+  (matches || []).forEach(m => {
+    if (m.date) years.add(new Date(m.date).getFullYear());
+  });
+  return Array.from(years).sort((a, b) => b - a);
+}
+
+function filterByYear(rows, year, matchIdKey = "match_id") {
+  if (year === "total") return rows;
+  return rows.filter(row => getMatchYear(row[matchIdKey]) === year);
+}
+
+function statLineText(totals) {
+  const parts = [];
+  if (totals.goals > 0) parts.push(`${totals.goals} mål`);
+  if (totals.assists > 0) parts.push(`${totals.assists} assist`);
+  if (totals.cleanSheets > 0) parts.push(`${totals.cleanSheets} clean sheet${totals.cleanSheets === 1 ? "" : "s"}`);
+  return parts.join(" · ");
+}
+
+function pitchStatLine(totals) {
+  const bits = [];
+  if (totals.goals > 0) bits.push(`${totals.goals}m`);
+  if (totals.assists > 0) bits.push(`${totals.assists}a`);
+  if (totals.cleanSheets > 0) bits.push(`${totals.cleanSheets}cs`);
+  return bits.join(" · ");
+}
+
 function renderMiniRanking(rows, mapper, limit = 5) {
   if (!rows || rows.length === 0) {
     return `<div class="small-help">Ingen data ennå.</div>`;
@@ -452,18 +493,6 @@ function renderMiniRanking(rows, mapper, limit = 5) {
   }).join("");
 }
 
-function pitchCard(playerStats, isTop) {
-  const info = playerStatusInfo(playerStats.player);
-
-  return `
-    <a href="spiller.html?player=${encodeURIComponent(playerStats.player)}" class="pitch-player${isTop ? " top" : ""}">
-      <img src="${info.image}" onerror="this.src='../lblogoen.png'" alt="${info.name}">
-      <div class="pitch-name">${info.name}</div>
-      <div class="pitch-rating">${playerStats.average.toFixed(2)}</div>
-    </a>
-  `;
-}
-
 async function init() {
   const [matches, votes, statsResult, picksResult] = await Promise.all([
     fetchMatches(),
@@ -475,66 +504,37 @@ async function init() {
   const statsRows = statsResult.data || [];
   const picks = picksResult.data || [];
 
-  const fullRanking = getSeasonRanking(votes, { minVotes: 1 });
-  const qualifiedRanking = fullRanking.filter(p => appearances(p) >= MIN_APPEARANCES);
-  const playerTotals = buildPlayerSeasonStats(statsRows);
-  const statsByMatch = buildStatsByMatch(statsRows, votes);
+  document.getElementById("loadingNotice").hidden = true;
 
+  const availableYears = getAvailableYears(matches);
+
+  // Per-sesong rangering (brukes til å finne hvilket år hver spiller hadde sin beste sesong)
+  const perYearRanking = {};
+  availableYears.forEach(year => {
+    perYearRanking[year] = getSeasonRanking(filterByYear(votes, year), { minVotes: 1 });
+  });
+
+  function bestSeasonFor(playerKey) {
+    let bestYear = null;
+    let bestAvg = -Infinity;
+
+    availableYears.forEach(year => {
+      const entry = perYearRanking[year].find(p => p.player === playerKey);
+      if (entry && appearances(entry) >= 3 && entry.average > bestAvg) {
+        bestAvg = entry.average;
+        bestYear = year;
+      }
+    });
+
+    return bestYear;
+  }
+
+  // --- Beste brukere (alltid totalt, uavhengig av sesongvalg) ---
+  const statsByMatch = buildStatsByMatch(statsRows, votes);
   const tipsTable = buildTipsSeasonTable(votes);
   const fantasyTable = buildFantasySeasonTable(picks, statsByMatch);
   const borsTable = buildBorsActivityTable(votes);
 
-  document.getElementById("loadingNotice").hidden = true;
-
-  // --- Årets Lynspiller ---
-  const mvpCard = document.getElementById("mvpCard");
-
-  if (qualifiedRanking.length > 0) {
-    const mvp = qualifiedRanking[0];
-    const info = playerStatusInfo(mvp.player);
-
-    mvpCard.hidden = false;
-    mvpCard.innerHTML = `
-      <div class="badge">ÅRETS LYNSPILLER</div>
-      <div class="mvp-layout">
-        <img src="${info.image}" onerror="this.src='../lblogoen.png'" alt="${info.name}" class="mvp-image">
-        <div>
-          <h2>${info.name}</h2>
-          <p class="small-help">${info.position || ""} · høyest snittkarakter på børsen denne sesongen (blant spillere med minst ${MIN_APPEARANCES} kamper)</p>
-          <div class="mvp-rating">${mvp.average.toFixed(2)}</div>
-          <div class="small-help">${appearances(mvp)} kamper · ${mvp.votes} børsstemmer</div>
-        </div>
-      </div>
-    `;
-  } else {
-    mvpCard.hidden = false;
-    mvpCard.innerHTML = `
-      <div class="badge">ÅRETS LYNSPILLER</div>
-      <p class="small-help">Ingen spillere har rukket ${MIN_APPEARANCES} kamper med børsstemmer ennå.</p>
-    `;
-  }
-
-  // --- Beste elleve ---
-  const xiCard = document.getElementById("xiCard");
-  const pitch = document.getElementById("pitch");
-  const xi = buildBestXI(qualifiedRanking);
-
-  if (xi.complete) {
-    xiCard.hidden = false;
-    const topPlayer = qualifiedRanking[0]?.player;
-
-    pitch.innerHTML = `
-      <div class="pitch-row">${xi.ang.map(p => pitchCard(p, p.player === topPlayer)).join("")}</div>
-      <div class="pitch-row">${xi.mid.map(p => pitchCard(p, p.player === topPlayer)).join("")}</div>
-      <div class="pitch-row">${xi.fors.map(p => pitchCard(p, p.player === topPlayer)).join("")}</div>
-      <div class="pitch-row">${xi.keeper.map(p => pitchCard(p, p.player === topPlayer)).join("")}</div>
-    `;
-  } else {
-    xiCard.hidden = false;
-    pitch.innerHTML = `<div class="small-help">Ikke nok spillere med minst ${MIN_APPEARANCES} kamper ennå til å sette opp en fullstendig elleve.</div>`;
-  }
-
-  // --- Beste brukere ---
   const usersCard = document.getElementById("usersCard");
   usersCard.hidden = false;
 
@@ -553,45 +553,208 @@ async function init() {
     value: `${row.votes} stemmer`
   }));
 
-  // --- Full spillerstats ---
-  const statsCard = document.getElementById("statsCard");
-  statsCard.hidden = false;
-  document.getElementById("statsCount").textContent = `(${fullRanking.length} spillere)`;
+  // --- Sesongvalg: år for år, eller totalt ---
+  const seasonCard = document.getElementById("seasonCard");
+  const seasonTabs = document.getElementById("seasonTabs");
 
-  document.getElementById("statsBody").innerHTML = fullRanking.map((p, index) => {
-    const info = playerStatusInfo(p.player);
-    const totals = playerTotals[p.player] || { goals: 0, assists: 0, cleanSheets: 0 };
-    const statusBadge = info.active
-      ? ""
-      : `<span class="badge-small">Historisk</span>`;
+  const tabOptions = [
+    ...availableYears.map(y => ({ key: y, label: String(y) })),
+    { key: "total", label: "Totalt" }
+  ];
 
-    return `
-      <tr>
-        <td>${index + 1}</td>
-        <td>
-          <a href="spiller.html?player=${encodeURIComponent(p.player)}" class="user-link">
-            <strong>${info.name}</strong>
-          </a>
-          ${statusBadge}
-        </td>
-        <td>${info.position || "–"}</td>
-        <td><strong>${p.average.toFixed(2)}</strong></td>
-        <td>${appearances(p)}</td>
-        <td>${p.votes}</td>
-        <td>${totals.goals}</td>
-        <td>${totals.assists}</td>
-        <td>${totals.cleanSheets}</td>
-      </tr>
-    `;
-  }).join("");
+  function renderTabs(activeKey) {
+    seasonTabs.innerHTML = tabOptions.map(opt => `
+      <button type="button" class="season-tab${opt.key === activeKey ? " active" : ""}" data-year="${opt.key}">${opt.label}</button>
+    `).join("");
+
+    seasonTabs.querySelectorAll(".season-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.year === "total" ? "total" : Number(btn.dataset.year);
+        renderYear(key);
+      });
+    });
+  }
+
+  function renderYear(year) {
+    renderTabs(year);
+
+    const yearVotes = filterByYear(votes, year);
+    const yearStatsRows = filterByYear(statsRows, year);
+
+    const fullRanking = getSeasonRanking(yearVotes, { minVotes: 1 });
+    const qualifiedRanking = fullRanking.filter(p => appearances(p) >= MIN_APPEARANCES);
+    const playerTotals = buildPlayerSeasonStats(yearStatsRows);
+
+    const isTotal = year === "total";
+    const yearLabel = isTotal ? "totalt (alle sesonger)" : `sesongen ${year}`;
+
+    // --- Årets Lynspiller / beste spiller totalt ---
+    const mvpCard = document.getElementById("mvpCard");
+
+    if (qualifiedRanking.length > 0) {
+      const mvp = qualifiedRanking[0];
+      const info = playerStatusInfo(mvp.player);
+      const totals = playerTotals[mvp.player] || { goals: 0, assists: 0, cleanSheets: 0 };
+      const statLine = statLineText(totals);
+      const bestSeason = isTotal ? bestSeasonFor(mvp.player) : null;
+
+      mvpCard.hidden = false;
+      mvpCard.innerHTML = `
+        <div class="badge">${isTotal ? "BESTE SPILLER TOTALT" : `ÅRETS LYNSPILLER ${year}`}</div>
+        <div class="mvp-layout">
+          <img src="${info.image}" onerror="this.src='../lblogoen.png'" alt="${info.name}" class="mvp-image">
+          <div>
+            <h2>${info.name}</h2>
+            <p class="small-help">${info.position || ""} · høyest snittkarakter på børsen ${yearLabel} (blant spillere med minst ${MIN_APPEARANCES} kamper${isTotal ? " totalt" : ""})</p>
+            <div class="mvp-rating">${mvp.average.toFixed(2)}</div>
+            <div class="small-help">${appearances(mvp)} kamper · ${mvp.votes} børsstemmer</div>
+            ${statLine ? `<div class="mvp-statline">${statLine}${bestSeason ? ` · beste sesong: ${bestSeason}` : ""}</div>` : ""}
+          </div>
+        </div>
+      `;
+    } else {
+      mvpCard.hidden = false;
+      mvpCard.innerHTML = `
+        <div class="badge">${isTotal ? "BESTE SPILLER TOTALT" : `ÅRETS LYNSPILLER ${year}`}</div>
+        <p class="small-help">Ingen spillere har rukket ${MIN_APPEARANCES} kamper med børsstemmer ${isTotal ? "totalt" : `i ${year}`} ennå.</p>
+      `;
+    }
+
+    // --- Beste elleve ---
+    const xiCard = document.getElementById("xiCard");
+    const pitch = document.getElementById("pitch");
+    const xiHeading = document.getElementById("xiHeading");
+    const xiDesc = document.getElementById("xiDesc");
+    const xi = buildBestXI(qualifiedRanking);
+
+    xiHeading.textContent = isTotal ? "Beste elleve totalt (2026–)" : `Beste elleve ${year}`;
+    xiDesc.textContent = `Basert på snittkarakter på børsen ${isTotal ? "gjennom hele tiden siden Lynbørs.no startet i 2026" : `i ${year}-sesongen`}, blant spillere med minst ${MIN_APPEARANCES} kamper. Satt opp som et ekte lag: 1 keeper, 3–5 forsvarere, 3–5 midtbanespillere, 1–3 spisser — resten av plassene innenfor disse rammene går til de med høyest snitt.`;
+
+    function pitchCardWithStats(playerStats, isTop) {
+      const info = playerStatusInfo(playerStats.player);
+      const totals = playerTotals[playerStats.player] || { goals: 0, assists: 0, cleanSheets: 0 };
+      const line = pitchStatLine(totals);
+
+      return `
+        <a href="spiller.html?player=${encodeURIComponent(playerStats.player)}" class="pitch-player${isTop ? " top" : ""}">
+          <img src="${info.image}" onerror="this.src='../lblogoen.png'" alt="${info.name}">
+          <div class="pitch-name">${info.name}</div>
+          <div class="pitch-rating">${playerStats.average.toFixed(2)}</div>
+          ${line ? `<div class="pitch-statline">${line}</div>` : ""}
+        </a>
+      `;
+    }
+
+    if (xi.complete) {
+      xiCard.hidden = false;
+      const topPlayer = qualifiedRanking[0]?.player;
+
+      pitch.innerHTML = `
+        <div class="pitch-row">${xi.ang.map(p => pitchCardWithStats(p, p.player === topPlayer)).join("")}</div>
+        <div class="pitch-row">${xi.mid.map(p => pitchCardWithStats(p, p.player === topPlayer)).join("")}</div>
+        <div class="pitch-row">${xi.fors.map(p => pitchCardWithStats(p, p.player === topPlayer)).join("")}</div>
+        <div class="pitch-row">${xi.keeper.map(p => pitchCardWithStats(p, p.player === topPlayer)).join("")}</div>
+      `;
+    } else {
+      xiCard.hidden = false;
+      pitch.innerHTML = `<div class="small-help">Ikke nok spillere med minst ${MIN_APPEARANCES} kamper ${isTotal ? "totalt" : `i ${year}`} ennå til å sette opp en fullstendig elleve.</div>`;
+    }
+
+    // --- Full spillerstats ---
+    const statsCard = document.getElementById("statsCard");
+    const statsDesc = document.getElementById("statsDesc");
+    statsCard.hidden = false;
+    document.getElementById("statsCount").textContent = `(${fullRanking.length} spillere)`;
+    statsDesc.textContent = `Alle spillere som har fått børsstemmer ${isTotal ? "totalt" : `i ${year}`} er med her, også de som ikke lenger står i aktive lister (merket «Historisk»). Årets Lynspiller og Beste elleve krever minst ${MIN_APPEARANCES} kamper, men her vises alle uansett antall.`;
+
+    document.getElementById("statsBody").innerHTML = fullRanking.map((p, index) => {
+      const info = playerStatusInfo(p.player);
+      const totals = playerTotals[p.player] || { goals: 0, assists: 0, cleanSheets: 0 };
+      const statusBadge = info.active
+        ? ""
+        : `<span class="badge-small">Historisk</span>`;
+      const bestSeason = isTotal ? bestSeasonFor(p.player) : null;
+      const seasonCell = isTotal
+        ? (bestSeason ? `'${String(bestSeason).slice(-2)}` : "–")
+        : String(year);
+
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>
+            <a href="spiller.html?player=${encodeURIComponent(p.player)}" class="user-link">
+              <strong>${info.name}</strong>
+            </a>
+            ${statusBadge}
+          </td>
+          <td>${info.position || "–"}</td>
+          <td><strong>${p.average.toFixed(2)}</strong></td>
+          <td>${appearances(p)}</td>
+          <td>${p.votes}</td>
+          <td>${totals.goals}</td>
+          <td>${totals.assists}</td>
+          <td>${totals.cleanSheets}</td>
+          <td>${seasonCell}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  seasonCard.hidden = false;
+
+  const defaultYear = availableYears.length > 0 ? availableYears[0] : "total";
+  renderYear(defaultYear);
 }
 
 init();
 </script>
 
 <style>
+.season-select-card {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.season-tabs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.season-tab {
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--line);
+  color:var(--muted);
+  padding:8px 18px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.season-tab:hover {
+  color:white;
+  border-color:rgba(255,209,102,0.4);
+}
+
+.season-tab.active {
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#16100a;
+}
+
 .spotlight-card {
   text-align:center;
+}
+
+.mvp-statline {
+  margin-top:8px;
+  font-size:13px;
+  color:var(--gold);
+  font-weight:600;
 }
 
 .mvp-layout {
@@ -653,9 +816,16 @@ init();
   display:flex;
   flex-direction:column;
   align-items:center;
-  width:84px;
+  width:92px;
   text-decoration:none;
   color:white;
+}
+
+.pitch-statline {
+  margin-top:2px;
+  font-size:10px;
+  color:var(--muted);
+  text-align:center;
 }
 
 .pitch-player img {
