@@ -139,6 +139,7 @@ export const players = [
     image: "../bilder/isufi.png",
     position: "MID",
     order: 15,
+    active: false,
     aliases: ["Isufi", "Eron Isufi"],
   },
   {
@@ -203,12 +204,12 @@ export const players = [
   },
   {
     id: "Memedov",
-    name: "Artan Memedov",
+    name: "Artem Memedov",
     short: "Memedov",
-    image: "../lblogoen.png",
+    image: "../bilder/memedov.png",
     position: "ANG",
     order: 22,
-    aliases: ["Artan", "Artan Memedov"],
+    aliases: ["Artem", "Artem Memedov", "Artan Memedov"],
   },
   {
     id: "andersen",

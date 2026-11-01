@@ -14,6 +14,7 @@ export function renderNavbar(active = "") {
         <a href="fantasy.html" class="${active === "fantasy" ? "active" : ""}">Fantasy</a>
         <a href="tips.html" class="${active === "tips" ? "active" : ""}">Tips</a>
         <a href="lynligaen.html" class="${active === "lynligaen" ? "active" : ""}">Lynligaen</a>
+        <a href="historikk.html" class="${active === "historikk" ? "active" : ""}">Historikk</a>
         <a href="../games.html">Games</a>
       </nav>
     </header>
