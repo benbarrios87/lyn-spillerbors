@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lynbørs</title>
+<meta name="description" content="Spillerbørs, tips, fantasy og lynligaen for Lyn. Stem på banens beste, tipp resultater og bygg fantasylaget ditt.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lynbørs">
+<meta property="og:description" content="Spillerbørs, tips, fantasy og lynligaen for Lyn. Stem på banens beste, tipp resultater og bygg fantasylaget ditt.">
+<meta property="og:image" content="https://lynbors.no/lblogoen.png">
+<meta property="og:url" content="https://lynbors.no/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lynbørs">
+<meta name="twitter:description" content="Spillerbørs, tips, fantasy og lynligaen for Lyn.">
+<meta name="twitter:image" content="https://lynbors.no/lblogoen.png">
+
 <link rel="icon" href="lblogoen.png">
 <link rel="stylesheet" href="nav.css">
 
@@ -388,6 +400,13 @@ h1 {
     linear-gradient(135deg,#25125e,#0b63e5 48%,#d71920);
 }
 
+.card.historikk-card {
+  border-color:rgba(255,209,102,0.65);
+  background:
+    radial-gradient(circle at top right, rgba(255,209,102,0.20), transparent 34%),
+    linear-gradient(135deg,#3a2a06,#8b6b12 48%,#ffd166);
+}
+
 .card.feature::before {
   position:absolute;
   top:14px;
@@ -408,6 +427,10 @@ h1 {
 
 .card.games-card.feature::before {
   content:"NYTT";
+}
+
+.card.historikk-card.feature::before {
+  content:"SESONGSLUTT";
 }
 
 .card-player {
@@ -436,6 +459,23 @@ h1 {
   object-fit:cover;
   object-position:center;
   border-radius:0 0 0 22px;
+}
+
+.historikk-player {
+  height:128px;
+  width:150px;
+  max-width:150px;
+  object-fit:cover;
+  object-position:top center;
+  border-radius:6px;
+  border:3px solid rgba(255,209,102,0.85);
+  filter:sepia(0.15) contrast(1.02);
+  box-shadow:0 10px 18px rgba(0,0,0,0.45);
+  transform:rotate(-2deg);
+}
+
+.card:hover .historikk-player {
+  transform:rotate(-2deg) scale(1.04);
 }
 
 .card:hover .card-player {
@@ -912,6 +952,14 @@ h1 {
       <div class="card-title">Lynligaen</div>
       <div class="card-text">
         Prestisjetabellen for Tippetips, Fantasy, Games, awards og Årets Lynspiller.
+      </div>
+    </div>
+
+    <div class="card historikk-card feature" onclick="location.href='v2/historikk.html'">
+      <img src="bilder/historikk-retro.jpg" class="card-player historikk-player" alt="Lyn historisk lagbilde">
+      <div class="card-title">Historikk</div>
+      <div class="card-text">
+        Årets Lynspiller, beste elleve og full spillerstats samlet fra 2026-sesongen.
       </div>
     </div>
 

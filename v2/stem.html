@@ -91,6 +91,22 @@ let relevantMatches = [];
 let activeMatch = null;
 let votingClosed = false;
 
+async function trackEvent(eventType, data = {}) {
+  try {
+    const { error } = await supabaseClient.from("site_events").insert({
+      event_type: eventType,
+      page: location.pathname,
+      voter: data.voter || null,
+      match_id: data.match_id || null,
+      details: data
+    });
+
+    if (error) console.log("trackEvent feil", error);
+  } catch (err) {
+    console.log("trackEvent feil", err);
+  }
+}
+
 const TIP_PLAYERS = [
   "TIP_HOME_GOALS",
   "TIP_AWAY_GOALS"
@@ -369,6 +385,12 @@ async function submitVotes() {
 
   localStorage.setItem("lynbors-voter-name", voter);
   clearDraft();
+
+  trackEvent("bors_submitted", {
+    voter,
+    match_id: activeMatch.id,
+    ratings: ratings.length
+  });
 
   submitBtn.disabled = false;
   submitBtn.textContent = "Lagret!";
