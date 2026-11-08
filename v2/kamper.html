@@ -30,6 +30,10 @@
     </p>
   </section>
 
+  <section class="data-card team-filter-card">
+    <div class="team-tabs" id="teamTabs"></div>
+  </section>
+
   <section class="data-grid">
 
     <div class="data-card">
@@ -56,8 +60,15 @@ import { formatShortDate, getActualScore } from "./js/utils.js";
 document.getElementById("navbar").innerHTML = renderNavbar("kamper");
 document.getElementById("footer").innerHTML = renderFooter();
 
+const teamTabsEl = document.getElementById("teamTabs");
 const upcomingEl = document.getElementById("upcomingMatches");
 const completedEl = document.getElementById("completedMatches");
+
+const TEAM_LABELS = { men: "Herrer", women: "Kvinner" };
+
+let allUpcoming = [];
+let allCompleted = [];
+let activeTeam = "all";
 
 function formatDeadline(value) {
   if (!value) return "Ikke satt";
@@ -69,10 +80,47 @@ function formatDeadline(value) {
   }
 }
 
+function teamBadge(match) {
+  const team = match.team || "men";
+  return `<span class="badge-small team-badge ${team}">${TEAM_LABELS[team] || team}</span>`;
+}
+
+function filterByTeam(matches) {
+  if (activeTeam === "all") return matches;
+  return matches.filter(match => (match.team || "men") === activeTeam);
+}
+
+function renderTeamTabs() {
+  const teamsPresent = new Set(
+    [...allUpcoming, ...allCompleted].map(match => match.team || "men")
+  );
+
+  const tabs = [
+    { key: "all", label: "Alle" },
+    ...["men", "women"].filter(team => teamsPresent.has(team)).map(team => ({ key: team, label: TEAM_LABELS[team] }))
+  ];
+
+  teamTabsEl.innerHTML = tabs.map(tab => `
+    <button type="button" class="team-tab${tab.key === activeTeam ? " active" : ""}" data-team="${tab.key}">
+      ${tab.label}
+    </button>
+  `).join("");
+
+  teamTabsEl.querySelectorAll(".team-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.team === activeTeam) return;
+      activeTeam = btn.dataset.team;
+      renderTeamTabs();
+      renderUpcoming(filterByTeam(allUpcoming));
+      renderCompleted(filterByTeam(allCompleted));
+    });
+  });
+}
+
 async function init() {
   const matches = await fetchMatches();
 
-  const upcoming = matches
+  allUpcoming = matches
     .filter(match =>
       match.active === true &&
       match.actual_home === null &&
@@ -80,7 +128,7 @@ async function init() {
     )
     .sort((a, b) => new Date(a.date || a.deadline) - new Date(b.date || b.deadline));
 
-  const completed = matches
+  allCompleted = matches
     .filter(match =>
       match.actual_home !== null &&
       match.actual_home !== undefined &&
@@ -89,8 +137,9 @@ async function init() {
     )
     .sort((a, b) => new Date(b.date || b.deadline) - new Date(a.date || a.deadline));
 
-  renderUpcoming(upcoming);
-  renderCompleted(completed);
+  renderTeamTabs();
+  renderUpcoming(filterByTeam(allUpcoming));
+  renderCompleted(filterByTeam(allCompleted));
 }
 
 function renderUpcoming(matches) {
@@ -105,8 +154,11 @@ function renderUpcoming(matches) {
             ${formatShortDate(match.date)}
           </div>
 
-          <div class="badge-small live">
-            Aktiv kamp
+          <div class="badge-row">
+            <div class="badge-small live">
+              Aktiv kamp
+            </div>
+            ${teamBadge(match)}
           </div>
         </div>
 
@@ -135,8 +187,11 @@ function renderCompleted(matches) {
               ${formatShortDate(match.date)}
             </div>
 
-            <div class="badge-small done">
-              Ferdigspilt
+            <div class="badge-row">
+              <div class="badge-small done">
+                Ferdigspilt
+              </div>
+              ${teamBadge(match)}
             </div>
           </div>
 
@@ -152,6 +207,62 @@ function renderCompleted(matches) {
 
 init();
 </script>
+
+<style>
+.team-filter-card {
+  padding:14px 20px;
+}
+
+.team-tabs {
+  display:flex;
+  gap:8px;
+}
+
+.team-tab {
+  flex:1;
+  padding:11px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.team-tab:hover {
+  color:white;
+  border-color:rgba(255,209,102,0.4);
+}
+
+.team-tab.active {
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#16100a;
+}
+
+.badge-row {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+
+.badge-row .badge-small {
+  margin-top:0;
+}
+
+.team-badge.men {
+  background:rgba(11,99,229,0.22);
+  color:#bcd6ff;
+}
+
+.team-badge.women {
+  background:rgba(215,25,32,0.22);
+  color:#ffc1c4;
+}
+</style>
 
 </body>
 </html>

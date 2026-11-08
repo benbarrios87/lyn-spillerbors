@@ -1,13 +1,13 @@
 export function renderNavbar(active = "") {
   return `
     <header class="topbar">
-      <a href="index.html" class="brand">
+      <a href="../index.html" class="brand">
         <img src="../lblogoen.png" alt="Lynbørs">
         <span>Lynbørs</span>
       </a>
 
       <nav class="nav">
-        <a href="index.html" class="${active === "home" ? "active" : ""}">Hjem</a>
+        <a href="../index.html" class="${active === "home" ? "active" : ""}">Hjem</a>
         <a href="kamper.html" class="${active === "kamper" ? "active" : ""}">Kamper</a>
         <a href="stem.html" class="${active === "stem" ? "active" : ""}">Stem</a>
         <a href="bors.html" class="${active === "bors" ? "active" : ""}">Børs</a>

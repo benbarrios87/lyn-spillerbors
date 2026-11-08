@@ -26,6 +26,9 @@
   </section>
 
   <section class="data-card setup-card">
+    <label class="field-label">Lag</label>
+    <div class="team-tabs" id="teamTabs"></div>
+
     <label class="field-label" for="matchSelect">Kamp</label>
     <select id="matchSelect" class="match-select"></select>
     <div id="matchInfo"></div>
@@ -74,10 +77,12 @@ import { renderNavbar, renderFooter } from "./js/layout.js";
 import { fetchMatches } from "./js/matches.js";
 import { players, getPlayerDisplayName } from "./js/players.js";
 import { supabaseClient } from "./js/supabase.js";
+import { formatShortDate } from "./js/utils.js";
 
 document.getElementById("navbar").innerHTML = renderNavbar("stem");
 document.getElementById("footer").innerHTML = renderFooter();
 
+const teamTabsEl = document.getElementById("teamTabs");
 const matchSelectEl = document.getElementById("matchSelect");
 const matchInfoEl = document.getElementById("matchInfo");
 const voteGridEl = document.getElementById("voteGrid");
@@ -87,9 +92,51 @@ const usernameEl = document.getElementById("username");
 const submitBtn = document.getElementById("submitBtn");
 const clearBtn = document.getElementById("clearBtn");
 
+const TEAM_LABELS = { men: "Herrer", women: "Kvinner" };
+
 let relevantMatches = [];
 let activeMatch = null;
+let activeTeam = "men";
 let votingClosed = false;
+
+function matchesForTeam(team) {
+  return relevantMatches.filter(match => (match.team || "men") === team);
+}
+
+function renderTeamTabs() {
+  const teamsWithMatches = ["men", "women"].filter(team => matchesForTeam(team).length > 0);
+
+  teamTabsEl.innerHTML = teamsWithMatches.map(team => `
+    <button type="button" class="team-tab${team === activeTeam ? " active" : ""}" data-team="${team}">
+      ${TEAM_LABELS[team]}
+    </button>
+  `).join("");
+
+  teamTabsEl.querySelectorAll(".team-tab").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (btn.dataset.team === activeTeam) return;
+      activeTeam = btn.dataset.team;
+      renderTeamTabs();
+      populateMatchSelect();
+      renderMatchInfo();
+      renderVoteGrid();
+      restoreDraft();
+      await loadExistingVotes(usernameEl.value.trim());
+    });
+  });
+}
+
+function populateMatchSelect() {
+  const list = matchesForTeam(activeTeam);
+
+  matchSelectEl.innerHTML = list.map(match => `
+    <option value="${match.id}">
+      ${formatShortDate(match.date)} · ${match.home} - ${match.away}
+    </option>
+  `).join("");
+
+  activeMatch = list[0] || null;
+}
 
 async function trackEvent(eventType, data = {}) {
   try {
@@ -123,26 +170,23 @@ async function init() {
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   if (!relevantMatches.length) {
+    teamTabsEl.innerHTML = "";
     matchSelectEl.innerHTML = `<option>Ingen spilte kamper funnet</option>`;
     voteGridEl.innerHTML = `<div class="match-meta">Ingen spilte kamper tilgjengelig ennå.</div>`;
     return;
   }
 
-  matchSelectEl.innerHTML = relevantMatches.map(match => `
-    <option value="${match.id}">
-      ${match.home} - ${match.away}
-    </option>
-  `).join("");
+  activeTeam = relevantMatches[0].team || "men";
 
-  activeMatch = relevantMatches[0];
-
+  renderTeamTabs();
+  populateMatchSelect();
   renderMatchInfo();
   renderVoteGrid();
   restoreDraft();
   await loadExistingVotes(usernameEl.value.trim());
 
   matchSelectEl.addEventListener("change", async () => {
-    activeMatch = relevantMatches.find(match => match.id === matchSelectEl.value);
+    activeMatch = matchesForTeam(activeTeam).find(match => match.id === matchSelectEl.value);
     renderMatchInfo();
     renderVoteGrid();
     restoreDraft();
@@ -545,6 +589,36 @@ init();
   font-weight:bold;
   text-transform:uppercase;
   letter-spacing:0.06em;
+}
+
+.team-tabs {
+  display:flex;
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.team-tab {
+  flex:1;
+  padding:11px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.team-tab:hover {
+  color:white;
+  border-color:rgba(255,209,102,0.4);
+}
+
+.team-tab.active {
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#16100a;
 }
 
 .match-select {
