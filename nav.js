@@ -4,7 +4,7 @@
 // det bare finnes ett sted å oppdatere lenker/utseende. `basePath` sier hvor
 // mye vi må gå "opp" for å nå rotmappen fra siden som kaller funksjonen:
 //   - Sider i rotmappen (index.html, games.html, wordle.html osv.): basePath = ""
-//   - Sider i v2/-mappen (v2/bors.html osv.):                       basePath = "../"
+//   - Sider i v2/-mappen (v2/stem.html osv.):                       basePath = "../"
 //
 // v2/js/layout.js re-eksporterer denne med basePath="../" ferdig satt, slik
 // at v2-sidene ikke trenger å bry seg om det selv.
@@ -20,8 +20,7 @@ export function renderNavbar(active = "", basePath = "") {
       <nav class="nav">
         <a href="${basePath}index.html" class="${active === "home" ? "active" : ""}">Forside</a>
         <a href="${basePath}v2/kamper.html" class="${active === "kamper" ? "active" : ""}">Kamper</a>
-        <a href="${basePath}v2/stem.html" class="${active === "stem" ? "active" : ""}">Stem</a>
-        <a href="${basePath}v2/bors.html" class="${active === "bors" ? "active" : ""}">Børs</a>
+        <a href="${basePath}v2/stem.html" class="${active === "stem" ? "active" : ""}">Børs</a>
         <a href="${basePath}v2/fantasy.html" class="${active === "fantasy" ? "active" : ""}">Fantasy</a>
         <a href="${basePath}v2/tips.html" class="${active === "tips" ? "active" : ""}">Tips</a>
         <a href="${basePath}v2/lynligaen.html" class="${active === "lynligaen" ? "active" : ""}">Lynligaen</a>

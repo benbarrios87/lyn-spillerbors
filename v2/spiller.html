@@ -468,7 +468,7 @@ async function init() {
   `;
 
   matchListEl.innerHTML = chronologicalRows.map(match => `
-    <a class="match-row profile-match-row" href="bors.html?match=${encodeURIComponent(match.match_id)}">
+    <a class="match-row profile-match-row" href="stem.html?match=${encodeURIComponent(match.match_id)}">
       <div>
         <strong>${getMatchTitle(match.match_id, matches)}</strong>
         <div class="match-meta">

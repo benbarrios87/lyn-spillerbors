@@ -189,6 +189,7 @@
 
 <section id="mvp" class="tab-panel">
   <div id="mvpPanel" class="data-card">Laster årets spiller...</div>
+  <div id="playerAwardsPanel" class="data-card" style="margin-top:16px;">Laster spiller-awards...</div>
 </section>
 
 <section id="games" class="tab-panel">
@@ -211,7 +212,8 @@ import {
   fetchVotes,
   isPredictionVote,
   getPlayerVotes,
-  buildMVPRanking
+  getSeasonRanking,
+  buildPlayerAwards
 } from "./js/ratings.js";
 import { getPlayerPosition } from "./js/players.js";
 
@@ -841,7 +843,7 @@ function renderAwards(league){
 }
 
 function renderMVP(votes, fantasyStats){
-  const ranking = buildMVPRanking(votes, fantasyStats);
+  const ranking = getSeasonRanking(votes, { minVotes: 5 });
 
   if (!ranking.length) return `<div class="warning">Ingen MVP-data ennå.</div>`;
 
@@ -863,7 +865,7 @@ function renderMVP(votes, fantasyStats){
   return `
     <h2>🏅 Årets Lynspiller</h2>
     <p class="mvp-formula">
-      Formel: <strong>børssnitt × 10</strong>, pluss mål/assist/clean sheet vektet etter posisjon (samme system som Fantasy). Krever minst 5 vurderte kamper.
+      Rangert etter <strong>høyest børssnitt</strong>. Krever minst 5 vurderte kamper.
     </p>
 
     <div class="table-wrap">
@@ -876,7 +878,6 @@ function renderMVP(votes, fantasyStats){
             <th>Mål</th>
             <th>Assist</th>
             <th>CS</th>
-            <th>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -888,16 +889,54 @@ function renderMVP(votes, fantasyStats){
               <tr>
                 <td>${medal}</td>
                 <td>${playerLink(player.player)}</td>
-                <td>${player.average}</td>
+                <td><strong>${player.average}</strong></td>
                 <td>${fantasy.goals}</td>
                 <td>${fantasy.assists}</td>
                 <td>${fantasy.cs}</td>
-                <td>${player.mvpScore}</td>
               </tr>
             `;
           }).join("")}
         </tbody>
       </table>
+    </div>
+  `;
+}
+
+function renderPlayerAwards(votes, fantasyStats){
+  const awards = buildPlayerAwards(votes, fantasyStats, { minMatches: 5 });
+
+  const cards = [];
+
+  if (awards.topGoals) {
+    cards.push({ icon:"🎯", title:"Målkonge", player:awards.topGoals.player, value:`${awards.topGoals.value} mål` });
+  }
+  if (awards.topAssists) {
+    cards.push({ icon:"🅰️", title:"Målgiveren", player:awards.topAssists.player, value:`${awards.topAssists.value} assist` });
+  }
+  if (awards.topCleanSheets) {
+    cards.push({ icon:"🧤", title:"Muren", player:awards.topCleanSheets.player, value:`${awards.topCleanSheets.value} clean sheet${awards.topCleanSheets.value === 1 ? "" : "s"}` });
+  }
+  if (awards.ironMan) {
+    cards.push({ icon:"🦾", title:"Jernmannen", player:awards.ironMan.player, value:`${awards.ironMan.value} kamper vurdert` });
+  }
+  if (awards.mostStable) {
+    cards.push({ icon:"📊", title:"Mest stabil", player:awards.mostStable.player, value:`± ${awards.mostStable.value.toFixed(2)}` });
+  }
+
+  if (!cards.length) return `<div class="warning">Ikke nok data til spiller-awards ennå.</div>`;
+
+  return `
+    <h2>⚽ Spiller-awards</h2>
+    <p class="mvp-formula">Noen ekstra kategorier utenom børssnittet.</p>
+
+    <div class="stats-grid">
+      ${cards.map(c => `
+        <div class="award-card">
+          <h3>${c.icon} ${c.title}</h3>
+          ${playerLink(c.player)}
+          <div class="result-score" style="margin-top:6px;">${c.value}</div>
+        </div>
+      `).join("")}
     </div>
   `;
 }
@@ -1090,6 +1129,7 @@ async function init(){
   document.getElementById("leagueTable").innerHTML = renderLeagueTable(league);
   document.getElementById("awardsPanel").innerHTML = renderAwards(league);
   document.getElementById("mvpPanel").innerHTML = renderMVP(votes, stats);
+  document.getElementById("playerAwardsPanel").innerHTML = renderPlayerAwards(votes, stats);
   document.getElementById("gamesPanel").innerHTML = renderGames(gameRows);
   document.getElementById("rulesPanel").innerHTML = renderRules();
 }

@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Lynbørs 2.0 • Stats</title>
+  <link rel="canonical" href="historikk.html">
+  <script>
+    // Stats-siden er slått sammen med Historikk (sesongoversikt + awards).
+    location.replace("historikk.html");
+  </script>
 
   <link rel="icon" href="../lblogoen.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="../nav.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -19,221 +21,19 @@
 <div id="navbar"></div>
 
 <main class="page-wrap">
-
-  <section class="page-header">
-    <div class="badge">STATSCENTER</div>
-
-    <h1>Lynbørs Stats</h1>
-
-    <p>
-      Sesongranking, børs, målpoeng og MVP-formelen samlet på ett sted.
-    </p>
+  <section class="data-card" style="text-align:center;">
+    <p>MVP-statistikken er nå en del av Historikk.</p>
+    <p><a href="historikk.html" style="color:var(--gold); font-weight:bold;">Klikk her hvis du ikke sendes videre automatisk</a></p>
   </section>
-
-  <section class="data-card">
-    <h2>🏆 MVP-ranking</h2>
-
-    <p class="match-meta">
-      Formel: <strong>børssnitt × 10</strong>, pluss mål/assist/clean sheet vektet etter posisjon (samme system som Fantasy). Krever minst 5 vurderte kamper.
-    </p>
-
-    <div class="table-wrap">
-      <table class="stats-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Spiller</th>
-            <th>Børs</th>
-            <th>Mål</th>
-            <th>Assist</th>
-            <th>CS</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody id="mvpTable">
-          <tr>
-            <td colspan="7">Laster...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
 </main>
 
 <div id="footer"></div>
 
 <script type="module">
 import { renderNavbar, renderFooter } from "./js/layout.js";
-import { supabaseClient } from "./js/supabase.js";
-
-import {
-  fetchVotes,
-  buildMVPRanking
-} from "./js/ratings.js";
-
-document.getElementById("navbar").innerHTML = renderNavbar("stats");
+document.getElementById("navbar").innerHTML = renderNavbar("historikk");
 document.getElementById("footer").innerHTML = renderFooter();
-
-const tableEl = document.getElementById("mvpTable");
-
-function playerUrl(player) {
-  return `spiller.html?player=${encodeURIComponent(player)}`;
-}
-
-async function init() {
-  const [votes, fantasyResponse] = await Promise.all([
-    fetchVotes(),
-    supabaseClient
-      .from("fantasy_stats")
-      .select("*")
-  ]);
-
-  const fantasyStats = fantasyResponse.data || [];
-
-  if (fantasyResponse.error) {
-    console.error(fantasyResponse.error);
-    tableEl.innerHTML = `
-      <tr>
-        <td colspan="7">Klarte ikke å laste fantasy stats.</td>
-      </tr>
-    `;
-    return;
-  }
-
-  const ranking = buildMVPRanking(votes, fantasyStats);
-
-  if (!ranking.length) {
-    tableEl.innerHTML = `
-      <tr>
-        <td colspan="7">Ingen stats registrert ennå.</td>
-      </tr>
-    `;
-    return;
-  }
-
-  const fantasyTotals = {};
-
-  fantasyStats.forEach(row => {
-    const player = String(row.player || "").trim();
-    if (!player || row.match_id === "TEST") return;
-
-    if (!fantasyTotals[player]) {
-      fantasyTotals[player] = {
-        goals:0,
-        assists:0,
-        cs:0
-      };
-    }
-
-    fantasyTotals[player].goals += Number(row.goals || 0);
-    fantasyTotals[player].assists += Number(row.assists || 0);
-
-    if (row.clean_sheet) {
-      fantasyTotals[player].cs += 1;
-    }
-  });
-
-  tableEl.innerHTML = ranking.slice(0, 30).map((player, index) => {
-    const fantasy = fantasyTotals[player.player] || {
-      goals:0,
-      assists:0,
-      cs:0
-    };
-
-    const medal =
-      index === 0 ? "🥇" :
-      index === 1 ? "🥈" :
-      index === 2 ? "🥉" :
-      index + 1;
-
-    return `
-      <tr class="${index < 3 ? "top-row" : ""}">
-        <td>${medal}</td>
-
-        <td>
-          <a class="player-link" href="${playerUrl(player.player)}">
-            <strong>${player.player}</strong>
-          </a>
-        </td>
-
-        <td>${player.average}</td>
-        <td>${fantasy.goals}</td>
-        <td>${fantasy.assists}</td>
-        <td>${fantasy.cs}</td>
-
-        <td>
-          <strong>${player.mvpScore}</strong>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-init();
 </script>
-
-<style>
-.table-wrap {
-  overflow-x:auto;
-}
-
-.stats-table {
-  width:100%;
-  border-collapse:collapse;
-  min-width:700px;
-}
-
-.stats-table th,
-.stats-table td {
-  padding:13px 10px;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  text-align:left;
-}
-
-.stats-table th {
-  color:var(--muted);
-  font-size:13px;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-}
-
-.stats-table td:last-child,
-.stats-table th:last-child {
-  text-align:right;
-}
-
-.stats-table tr:hover {
-  background:rgba(255,255,255,0.04);
-}
-
-.stats-table .top-row {
-  background:rgba(255,209,102,0.06);
-}
-
-.player-link {
-  color:white;
-  text-decoration:none;
-}
-
-.player-link:hover {
-  color:var(--gold);
-  text-decoration:underline;
-}
-
-@media(max-width:700px) {
-  .stats-table {
-    min-width:620px;
-  }
-
-  .stats-table th,
-  .stats-table td {
-    padding:11px 8px;
-    font-size:14px;
-  }
-}
-</style>
 
 </body>
 </html>

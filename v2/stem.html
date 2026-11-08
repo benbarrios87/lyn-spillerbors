@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lynbørs 2.0 • Stem</title>
+  <title>Lynbørs 2.0 • Børs</title>
 
   <link rel="icon" href="../lblogoen.png">
   <link rel="stylesheet" href="css/base.css">
@@ -22,7 +22,7 @@
   <section class="page-header compact-header">
     <div class="badge">SPILLERBØRS</div>
     <h1>Sett børsen</h1>
-    <p>Velg kamp, skriv navn og gi spillerne karakter. Gamle stemmer lastes automatisk.</p>
+    <p>Velg kamp, skriv navn og gi spillerne karakter. Gamle stemmer lastes automatisk, og resultatene vises så snart du har stemt.</p>
   </section>
 
   <section class="data-card setup-card">
@@ -68,6 +68,12 @@
     </div>
   </section>
 
+  <section class="data-card results-card" id="resultsCard" hidden>
+    <h2>Resultater</h2>
+    <div class="match-meta" id="resultsMeta"></div>
+    <div id="resultsRanking" class="ranking-list"></div>
+  </section>
+
 </main>
 
 <div id="footer"></div>
@@ -75,9 +81,10 @@
 <script type="module">
 import { renderNavbar, renderFooter } from "./js/layout.js";
 import { fetchMatches } from "./js/matches.js";
-import { players, getPlayerDisplayName } from "./js/players.js";
+import { players, getPlayerDisplayName, getPlayerImage } from "./js/players.js";
 import { supabaseClient } from "./js/supabase.js";
 import { formatShortDate } from "./js/utils.js";
+import { fetchVotes, getMatchRanking } from "./js/ratings.js";
 
 document.getElementById("navbar").innerHTML = renderNavbar("stem");
 document.getElementById("footer").innerHTML = renderFooter();
@@ -91,6 +98,9 @@ const loadStatusEl = document.getElementById("loadStatus");
 const usernameEl = document.getElementById("username");
 const submitBtn = document.getElementById("submitBtn");
 const clearBtn = document.getElementById("clearBtn");
+const resultsCardEl = document.getElementById("resultsCard");
+const resultsMetaEl = document.getElementById("resultsMeta");
+const resultsRankingEl = document.getElementById("resultsRanking");
 
 const TEAM_LABELS = { men: "Herrer", women: "Kvinner" };
 
@@ -176,10 +186,22 @@ async function init() {
     return;
   }
 
-  activeTeam = relevantMatches[0].team || "men";
+  // Lenke fra spillerprofilen (f.eks. ?match=08.11%20Str%C3%B8mmen%20-%20Lyn) peker på én bestemt kamp.
+  const requestedMatchId = new URLSearchParams(location.search).get("match");
+  const requestedMatch = requestedMatchId
+    ? relevantMatches.find(match => match.id === requestedMatchId)
+    : null;
+
+  activeTeam = (requestedMatch || relevantMatches[0]).team || "men";
 
   renderTeamTabs();
   populateMatchSelect();
+
+  if (requestedMatch) {
+    activeMatch = requestedMatch;
+    matchSelectEl.value = requestedMatch.id;
+  }
+
   renderMatchInfo();
   renderVoteGrid();
   restoreDraft();
@@ -320,7 +342,57 @@ function setupRatingButtons() {
   });
 }
 
+function hideResults() {
+  resultsCardEl.hidden = true;
+  resultsRankingEl.innerHTML = "";
+}
+
+async function renderResults() {
+  if (!activeMatch) {
+    hideResults();
+    return;
+  }
+
+  const votes = await fetchVotes();
+  const ranking = getMatchRanking(votes, activeMatch.id, { minVotes: 1 });
+
+  resultsCardEl.hidden = false;
+  resultsMetaEl.textContent = `${ranking.length} spillere med børs på denne kampen`;
+
+  resultsRankingEl.innerHTML = ranking.length
+    ? ranking.map((player, index) => {
+      const image = getPlayerImage(player.player);
+      const displayName = getPlayerDisplayName(player.player);
+
+      return `
+        <a href="spiller.html?player=${encodeURIComponent(player.player)}" class="player-card-link">
+          <div class="rating-row ${index === 0 ? "winner" : ""}">
+            <div class="player-info">
+              <img
+                src="${image}"
+                class="player-avatar"
+                onerror="this.src='../lblogoen.png'"
+              >
+
+              <div class="player-text">
+                <strong>${index + 1}. ${displayName}</strong>
+                <div class="match-meta">
+                  ${player.votes} stemmer
+                </div>
+              </div>
+            </div>
+
+            <div class="rating-score">${player.average}</div>
+          </div>
+        </a>
+      `;
+    }).join("")
+    : `<div class="match-meta">Ingen stemmer registrert ennå.</div>`;
+}
+
 async function loadExistingVotes(voter) {
+  hideResults();
+
   if (!voter || !activeMatch) {
     setStatus("Skriv inn navn for å hente gamle stemmer.", "neutral");
     return;
@@ -365,6 +437,9 @@ async function loadExistingVotes(voter) {
   setStatus(`Fant ${playerVotes.length} gamle stemmer.`, "good");
   updateProgress();
   saveDraft();
+
+  // Du har allerede stemt på denne kampen før, så vis resultatene med en gang.
+  await renderResults();
 }
 
 async function submitVotes() {
@@ -439,6 +514,9 @@ async function submitVotes() {
   submitBtn.disabled = false;
   submitBtn.textContent = "Lagret!";
   setStatus(`Børs lagret med ${ratings.length} spillere.`, "good");
+
+  await renderResults();
+  resultsCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
 
   setTimeout(() => {
     submitBtn.textContent = "Send børs";
@@ -863,6 +941,71 @@ init();
 .clear-btn {
   background:rgba(255,255,255,0.10);
   color:white;
+}
+
+.results-card {
+  margin-top:18px;
+}
+
+.ranking-list {
+  margin-top:10px;
+}
+
+.rating-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+}
+
+.rating-row:last-child {
+  border-bottom:none;
+}
+
+.rating-row.winner {
+  padding:14px;
+  margin-bottom:10px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(255,209,102,0.18), rgba(215,25,32,0.12));
+  border:1px solid rgba(255,209,102,0.35);
+}
+
+.rating-score {
+  font-size:26px;
+  font-weight:bold;
+  color:var(--gold);
+}
+
+.player-card-link {
+  text-decoration:none;
+  color:white;
+}
+
+.player-info {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+
+.player-avatar {
+  width:42px !important;
+  height:42px !important;
+  min-width:42px;
+  max-width:42px;
+  max-height:42px;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:10px;
+  display:block;
+  background:white;
+  border:2px solid rgba(255,255,255,0.18);
+}
+
+.player-text {
+  min-width:0;
 }
 
 @media(max-width:900px) {

@@ -2,7 +2,6 @@ import { supabaseClient } from "./supabase.js";
 import { TABLES, SPECIAL_PLAYERS } from "./config.js";
 import { cleanName, normalizeMatchId } from "./utils.js";
 import { findMatch } from "./matches.js";
-import { getPlayerPosition } from "./players.js";
 
 export async function fetchVotes() {
   const { data, error } = await supabaseClient
@@ -217,59 +216,96 @@ export function round(number, decimals = 2) {
 function sum(numbers) {
   return numbers.reduce((total, number) => total + Number(number || 0), 0);
 }
-export function calculateMVPScore(playerStats, fantasyStats = {}) {
-  const fantasy = fantasyStats[playerStats.player] || {};
 
-  const goals = Number(fantasy.goals || 0);
-  const assists = Number(fantasy.assists || 0);
-  const cleanSheets = Number(fantasy.clean_sheets || 0);
+// Sesongens "awards": en håndfull morsomme kategorier utenom selve børssnittet
+// (som er den ene offisielle "Årets Lynspiller"-rangeringen, via getSeasonRanking).
+// Delt mellom historikk.html og lynligaen.html slik at begge viser samme tall.
+export function buildPlayerAwards(votes, fantasyStatsRows = [], {
+  minMatches = 5,
+  previousVotes = null,
+  previousMinMatches = 3
+} = {}) {
+  function matchesCount(playerStats) {
+    return Object.keys(playerStats.matches).length;
+  }
 
-  const position = getPlayerPosition(playerStats.player);
-  const cleanSheetBonus = ["KEEPER", "FORS"].includes(position)
-    ? cleanSheets * 1
-    : 0;
-
-  return round(
-    (playerStats.average * 10) +
-    (goals * 2) +
-    (assists * 1.5) +
-    cleanSheetBonus
-  , 2);
-}
-
-export function buildMVPRanking(votes, fantasyStatsRows = []) {
-
-  const ranking = getSeasonRanking(votes, {
-    minVotes: 5
-  });
+  const fullRanking = getSeasonRanking(votes, { minVotes: 1 });
+  const ranking = fullRanking.filter(player => matchesCount(player) >= minMatches);
 
   const fantasyTotals = {};
 
-  fantasyStatsRows.forEach(row => {
-
+  (fantasyStatsRows || []).forEach(row => {
     const player = String(row.player || "").trim();
-
-    if (!player) return;
+    if (!player || row.match_id === "TEST") return;
 
     if (!fantasyTotals[player]) {
-      fantasyTotals[player] = {
-        goals: 0,
-        assists: 0,
-        clean_sheets: 0
-      };
+      fantasyTotals[player] = { goals: 0, assists: 0, cleanSheets: 0 };
     }
 
     fantasyTotals[player].goals += Number(row.goals || 0);
     fantasyTotals[player].assists += Number(row.assists || 0);
 
     if (row.clean_sheet) {
-      fantasyTotals[player].clean_sheets += 1;
+      fantasyTotals[player].cleanSheets += 1;
     }
   });
 
-  return ranking.map(playerStats => ({
-    ...playerStats,
-    mvpScore: calculateMVPScore(playerStats, fantasyTotals)
-  }))
-  .sort((a, b) => b.mvpScore - a.mvpScore);
+  function topFantasyStat(key) {
+    const rows = Object.entries(fantasyTotals)
+      .map(([player, totals]) => ({ player, value: totals[key] }))
+      .filter(row => row.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    return rows[0] || null;
+  }
+
+  const topGoals = topFantasyStat("goals");
+  const topAssists = topFantasyStat("assists");
+  const topCleanSheets = topFantasyStat("cleanSheets");
+
+  const ironManCandidates = fullRanking
+    .map(player => ({ player: player.player, value: matchesCount(player) }))
+    .sort((a, b) => b.value - a.value);
+
+  const ironMan = ironManCandidates[0] || null;
+
+  function stdDev(playerStats) {
+    const matchAverages = Object.values(playerStats.matches).map(m => m.average);
+    if (matchAverages.length < 2) return null;
+
+    const mean = matchAverages.reduce((a, b) => a + b, 0) / matchAverages.length;
+    const variance = matchAverages.reduce((a, b) => a + (b - mean) ** 2, 0) / matchAverages.length;
+
+    return Math.sqrt(variance);
+  }
+
+  const mostStableCandidates = ranking
+    .map(player => ({ player: player.player, value: stdDev(player) }))
+    .filter(row => row.value !== null)
+    .sort((a, b) => a.value - b.value);
+
+  const mostStable = mostStableCandidates[0]
+    ? { player: mostStableCandidates[0].player, value: round(mostStableCandidates[0].value, 2) }
+    : null;
+
+  let mostImproved = null;
+
+  if (previousVotes && previousVotes.length) {
+    const previousFullRanking = getSeasonRanking(previousVotes, { minVotes: 1 });
+    const previousMap = {};
+
+    previousFullRanking
+      .filter(player => matchesCount(player) >= previousMinMatches)
+      .forEach(player => { previousMap[player.player] = player.average; });
+
+    const improved = ranking
+      .filter(player => previousMap[player.player] !== undefined)
+      .map(player => ({ player: player.player, value: round(player.average - previousMap[player.player], 2) }))
+      .filter(row => row.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    mostImproved = improved[0] || null;
+  }
+
+  return { topGoals, topAssists, topCleanSheets, ironMan, mostStable, mostImproved };
 }

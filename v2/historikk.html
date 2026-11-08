@@ -35,6 +35,12 @@
 
   <section class="data-card spotlight-card" id="mvpCard" hidden></section>
 
+  <section class="data-card" id="playerAwardsCard" hidden>
+    <h2>⚽ Sesongens awards</h2>
+    <p class="small-help" id="playerAwardsDesc"></p>
+    <div class="stats-grid" id="playerAwardsGrid"></div>
+  </section>
+
   <section class="data-card" id="xiCard" hidden>
     <h2 id="xiHeading">Beste elleve</h2>
     <p class="small-help" id="xiDesc"></p>
@@ -105,6 +111,7 @@ import {
   fetchVotes,
   isPlayerRatingVote,
   getSeasonRanking,
+  buildPlayerAwards,
   round
 } from "./js/ratings.js";
 import { supabaseClient } from "./js/supabase.js";
@@ -473,6 +480,41 @@ function pitchStatLine(totals) {
   return bits.join(" · ");
 }
 
+function renderPlayerAwards(awards) {
+  const cards = [];
+
+  if (awards.topGoals) {
+    cards.push({ icon: "🎯", title: "Målkonge", player: awards.topGoals.player, value: `${awards.topGoals.value} mål` });
+  }
+  if (awards.topAssists) {
+    cards.push({ icon: "🅰️", title: "Målgiveren", player: awards.topAssists.player, value: `${awards.topAssists.value} assist` });
+  }
+  if (awards.topCleanSheets) {
+    cards.push({ icon: "🧤", title: "Muren", player: awards.topCleanSheets.player, value: `${awards.topCleanSheets.value} clean sheet${awards.topCleanSheets.value === 1 ? "" : "s"}` });
+  }
+  if (awards.ironMan) {
+    cards.push({ icon: "🦾", title: "Jernmannen", player: awards.ironMan.player, value: `${awards.ironMan.value} kamper vurdert` });
+  }
+  if (awards.mostStable) {
+    cards.push({ icon: "📊", title: "Mest stabil", player: awards.mostStable.player, value: `± ${awards.mostStable.value.toFixed(2)}` });
+  }
+  if (awards.mostImproved) {
+    cards.push({ icon: "🚀", title: "Størst forbedring", player: awards.mostImproved.player, value: `+${awards.mostImproved.value.toFixed(2)}` });
+  }
+
+  if (!cards.length) {
+    return `<div class="small-help">Ikke nok data til awards ennå.</div>`;
+  }
+
+  return cards.map(c => `
+    <div class="award-card">
+      <h3>${c.icon} ${c.title}</h3>
+      <a href="spiller.html?player=${encodeURIComponent(c.player)}" class="award-player">${getPlayerDisplayName(c.player)}</a>
+      <div class="award-value">${c.value}</div>
+    </div>
+  `).join("");
+}
+
 function renderMiniRanking(rows, mapper, limit = 5) {
   if (!rows || rows.length === 0) {
     return `<div class="small-help">Ingen data ennå.</div>`;
@@ -619,6 +661,22 @@ async function init() {
         <p class="small-help">Ingen spillere har rukket ${MIN_APPEARANCES} kamper med børsstemmer ${isTotal ? "totalt" : `i ${year}`} ennå.</p>
       `;
     }
+
+    // --- Sesongens awards (morsomme kategorier utenom børssnittet) ---
+    const previousVotes = isTotal ? null : filterByYear(votes, year - 1);
+
+    const awards = buildPlayerAwards(yearVotes, yearStatsRows, {
+      minMatches: MIN_APPEARANCES,
+      previousVotes: previousVotes && previousVotes.length ? previousVotes : null,
+      previousMinMatches: 3
+    });
+
+    const awardsCard = document.getElementById("playerAwardsCard");
+    awardsCard.hidden = false;
+    document.getElementById("playerAwardsDesc").textContent = isTotal
+      ? "Noen ekstra kategorier utenom børssnittet, samlet totalt."
+      : `Noen ekstra kategorier utenom børssnittet, for ${year}-sesongen.`;
+    document.getElementById("playerAwardsGrid").innerHTML = renderPlayerAwards(awards);
 
     // --- Beste elleve ---
     const xiCard = document.getElementById("xiCard");
@@ -855,6 +913,52 @@ init();
   font-size:12px;
   font-weight:bold;
   color:var(--gold);
+}
+
+.stats-grid {
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (min-width:850px) {
+  .stats-grid {
+    grid-template-columns:repeat(3, 1fr);
+  }
+}
+
+.award-card {
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+}
+
+.award-card h3 {
+  margin:0 0 10px;
+  font-size:15px;
+}
+
+.award-player {
+  display:block;
+  color:white;
+  text-decoration:none;
+  font-weight:700;
+  font-size:16px;
+}
+
+.award-player:hover {
+  color:var(--gold);
+  text-decoration:underline;
+}
+
+.award-value {
+  margin-top:6px;
+  font-weight:900;
+  color:var(--gold);
+  font-size:18px;
 }
 
 .users-grid {
