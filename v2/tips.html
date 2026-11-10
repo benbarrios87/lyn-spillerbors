@@ -583,6 +583,70 @@ padding-right:120px;
   margin-bottom:12px;
 }
 
+.season-over {
+  background:var(--paper2);
+  border:3px dashed var(--blue);
+  border-radius:22px;
+  padding:30px 20px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 10px 26px rgba(19,41,75,0.14);
+}
+
+.season-over::after {
+  content:"SESONGEN OVER";
+  position:absolute;
+  right:-34px;
+  top:24px;
+  color:rgba(215,25,32,0.13);
+  font-weight:bold;
+  font-size:34px;
+  letter-spacing:1px;
+  transform:rotate(12deg);
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.season-over img {
+  width:72px;
+  height:72px;
+  object-fit:contain;
+  margin-bottom:10px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+}
+
+.season-over h3 {
+  color:var(--blue);
+  font-size:23px;
+  margin:4px 0 8px;
+  position:relative;
+  z-index:1;
+}
+
+.season-over p {
+  font-family:Arial, sans-serif;
+  color:#374151;
+  max-width:420px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+
+.season-over .season-over-tag {
+  display:inline-block;
+  margin-top:16px;
+  border:2px solid var(--stamp);
+  color:var(--stamp);
+  padding:7px 16px;
+  border-radius:999px;
+  font-weight:bold;
+  transform:rotate(-2deg);
+  background:rgba(255,255,255,0.55);
+  position:relative;
+  z-index:1;
+}
+
 .profile-link {
   color:var(--blue);
   text-decoration:none;
@@ -1381,7 +1445,14 @@ function renderCoupons() {
   const box = document.getElementById("couponList");
 
   if (openCouponMatches.length === 0) {
-    box.innerHTML = `<div class="warning">Sesongen er over for denne gang – ingen flere kamper å tippe på. Sees i 2027! ⚽</div>`;
+    box.innerHTML = `
+      <div class="season-over">
+        <img src="../lblogoen.png" alt="Lynbørs-logo">
+        <h3>Kupongen er tom – for denne sesongen</h3>
+        <p>Ingen flere kamper å tippe på i 2026. Nye kuponger deles ut når 2027-sesongen sparkes i gang.</p>
+        <div class="season-over-tag">Sees i 2027! 🔴⚪</div>
+      </div>
+    `;
     updateCouponProgress();
     return;
   }
