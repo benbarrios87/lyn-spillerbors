@@ -1283,7 +1283,10 @@ function getOpenMatchesByTeam(team, limit = 3) {
 
   const open = matches.filter(m => !isTipLocked(m));
 
-  return (open.length ? open : matches).slice(0, limit);
+  // Ikke fall tilbake til ALLE kamper når ingen er åpne - det viste bare
+  // sesongens første kamper (fra våren) som om de var "neste kamper".
+  // Når ingen kamper er åpne er sesongen rett og slett over.
+  return open.slice(0, limit);
 }
 
 function getNextTipMatches(limit = 3) {
@@ -1378,7 +1381,7 @@ function renderCoupons() {
   const box = document.getElementById("couponList");
 
   if (openCouponMatches.length === 0) {
-    box.innerHTML = `<div class="warning">Ingen åpne kamper å tippe på akkurat nå.</div>`;
+    box.innerHTML = `<div class="warning">Sesongen er over for denne gang – ingen flere kamper å tippe på. Sees i 2027! ⚽</div>`;
     updateCouponProgress();
     return;
   }
