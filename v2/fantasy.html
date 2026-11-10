@@ -1055,7 +1055,7 @@ label {
   <h2 class="section-title">1. Neste runde</h2>
 
   <div class="card match-box">
-    <div>Åpen fantasy-kamp</div>
+    <div id="matchKicker">Åpen fantasy-kamp</div>
     <div class="match-title" id="matchTitle"></div>
     <div class="match-date" id="matchDate"></div>
   </div>
@@ -1572,8 +1572,10 @@ function isDeadlinePassed() {
 
 function fillMatchInfo() {
   if (!nextMatch) {
-    document.getElementById("matchTitle").textContent = "Ingen kommende kamp";
-    document.getElementById("matchDate").textContent = "";
+    const kicker = document.getElementById("matchKicker");
+    if (kicker) kicker.textContent = "Sesongen er over";
+    document.getElementById("matchTitle").textContent = "Sees i 2027";
+    document.getElementById("matchDate").textContent = "Fantasy-lag åpner igjen når 2027-sesongen starter.";
     return;
   }
 
@@ -1592,7 +1594,7 @@ function applyDeadlineLock() {
 
   if (!nextMatch) {
     document.getElementById("saveBtn").disabled = true;
-    lockMessage.innerHTML = `<div class="locked">Ingen kommende kamp å velge lag til.</div>`;
+    lockMessage.innerHTML = `<div class="locked">⭐ Sesongen er over – ingen kamp å velge fantasy-lag til. Sees i 2027!</div>`;
     return;
   }
 

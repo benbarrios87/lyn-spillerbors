@@ -1780,7 +1780,20 @@ async function loadNextMatchWidget() {
     currentUpcomingMatch = upcoming || null;
 
     if (!upcoming) {
-      box.innerHTML = `<div class="next-loading">Ingen kommende kamper funnet.</div>`;
+      box.innerHTML = `
+        <div class="next-kicker">Sesongen er over</div>
+
+        <div class="next-title">Sees i 2027</div>
+
+        <div class="next-meta">
+          Siste kamp er spilt, og børsen tar vinterferie. Alt som skjedde i 2026 ligger klart på Historikk, og sluttstillingen i Lynligaen finner du der den hører hjemme.
+        </div>
+
+        <div class="next-buttons">
+          <button class="next-btn primary" onclick="location.href='v2/historikk.html'">📖 Historikk 2026</button>
+          <button class="next-btn secondary" onclick="location.href='v2/lynligaen.html'">🏅 Lynligaen</button>
+        </div>
+      `;
       renderMyDeliveries(null, null, null);
       return;
     }
