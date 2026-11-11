@@ -1673,6 +1673,11 @@ async function loadMatchStats() {
       cleanSheet: row.clean_sheet || false,
       penaltySave: row.penalty_save || false,
       redCard: row.red_card || false,
+      penaltyGoals: row.penalty_goals || 0,
+      penaltyMisses: row.penalty_misses || 0,
+      penaltyWon: row.penalty_won || 0,
+      ownGoals: row.own_goals || 0,
+      winningGoal: row.winning_goal || false,
       rating: 0
     };
   });
@@ -1759,6 +1764,33 @@ function calculatePointsFromStat(playerName, stat, isCaptain) {
   if (stat.redCard) {
     points -= 3;
     lines.push("Rødt kort: −3");
+  }
+
+  if (stat.penaltyGoals > 0) {
+    lines.push(`(hvorav ${stat.penaltyGoals} straffemål, inkludert i mål-poengene)`);
+  }
+
+  if (stat.penaltyMisses > 0) {
+    const missPoints = stat.penaltyMisses * -2;
+    points += missPoints;
+    lines.push(`Straffebom: ${missPoints}`);
+  }
+
+  if (stat.penaltyWon > 0) {
+    const wonPoints = stat.penaltyWon * 2;
+    points += wonPoints;
+    lines.push(`Vunnet straffe: +${wonPoints}`);
+  }
+
+  if (stat.ownGoals > 0) {
+    const ownGoalPoints = stat.ownGoals * -3;
+    points += ownGoalPoints;
+    lines.push(`Selvmål: ${ownGoalPoints}`);
+  }
+
+  if (stat.winningGoal) {
+    points += 2;
+    lines.push("Vinnermål: +2");
   }
 
   if (stat.rating >= 7.0) {
@@ -2215,6 +2247,11 @@ function buildStatsByMatch(statsRows, voteRows) {
       cleanSheet: row.clean_sheet || false,
       penaltySave: row.penalty_save || false,
       redCard: row.red_card || false,
+      penaltyGoals: row.penalty_goals || 0,
+      penaltyMisses: row.penalty_misses || 0,
+      penaltyWon: row.penalty_won || 0,
+      ownGoals: row.own_goals || 0,
+      winningGoal: row.winning_goal || false,
       rating: 0
     };
   });

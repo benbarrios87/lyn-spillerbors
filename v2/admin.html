@@ -132,7 +132,7 @@ button.danger{background:#7f1d1d}
   width:52px;height:52px;border-radius:14px;object-fit:cover;object-position:center top;background:white;
 }
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(min-width:850px){.stat-grid{grid-template-columns:repeat(5,1fr)}}
+@media(min-width:850px){.stat-grid{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}}
 .check-row{
   display:flex;align-items:center;gap:8px;
   padding:10px;border-radius:12px;background:rgba(0,0,0,.22);
@@ -326,6 +326,15 @@ button.danger{background:#7f1d1d}
     <div class="summary-box">Assist<strong id="sumAssists">0</strong></div>
     <div class="summary-box">Clean sheet<strong id="sumCleanSheets">0</strong></div>
     <div class="summary-box">Røde kort<strong id="sumRedCards">0</strong></div>
+    <div class="summary-box">Straffemål<strong id="sumPenaltyGoals">0</strong></div>
+    <div class="summary-box">Straffebom<strong id="sumPenaltyMisses">0</strong></div>
+    <div class="summary-box">Vunnet straffe<strong id="sumPenaltyWon">0</strong></div>
+    <div class="summary-box">Selvmål<strong id="sumOwnGoals">0</strong></div>
+  </div>
+
+  <div>
+    <label>Vinnermål (hvem scoret det avgjørende målet?)</label>
+    <select id="winningGoalPlayer"><option value="">Ingen / uavgjort</option></select>
   </div>
 
   <div id="fantasyStatus" class="status"></div>
@@ -624,6 +633,26 @@ function renderPlayers() {
             <input id="penalty_${id}" type="number" min="0" value="0" data-stat-input>
           </div>
 
+          <div>
+            <label>Straffemål</label>
+            <input id="pg_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div>
+            <label>Straffebom</label>
+            <input id="pm_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div>
+            <label>Vunnet straffe</label>
+            <input id="pw_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
+          <div>
+            <label>Selvmål</label>
+            <input id="og_${id}" type="number" min="0" value="0" data-stat-input>
+          </div>
+
           <div class="check-row">
             <input id="cs_${id}" type="checkbox" data-stat-input>
             <label for="cs_${id}">CS</label>
@@ -643,7 +672,21 @@ function renderPlayers() {
     input.addEventListener("change", updateSummary);
   });
 
+  renderWinningGoalSelect();
   updateSummary();
+}
+
+function renderWinningGoalSelect() {
+  const select = byId("winningGoalPlayer");
+  if (!select) return;
+
+  const current = select.value;
+
+  select.innerHTML = `<option value="">Ingen / uavgjort</option>` +
+    orderedPlayers().map(player => `<option value="${player.short}">${player.short}</option>`).join("");
+
+  select.value = current;
+  select.addEventListener("change", updateSummary);
 }
 
 function clearFantasyInputs() {
@@ -652,9 +695,15 @@ function clearFantasyInputs() {
     byId(`goals_${id}`).value = 0;
     byId(`assists_${id}`).value = 0;
     byId(`penalty_${id}`).value = 0;
+    byId(`pg_${id}`).value = 0;
+    byId(`pm_${id}`).value = 0;
+    byId(`pw_${id}`).value = 0;
+    byId(`og_${id}`).value = 0;
     byId(`cs_${id}`).checked = false;
     byId(`red_${id}`).checked = false;
   });
+
+  if (byId("winningGoalPlayer")) byId("winningGoalPlayer").value = "";
 
   updateSummary();
 }
@@ -684,8 +733,16 @@ window.loadFantasyStats = async function() {
     byId(`goals_${id}`).value = row.goals || 0;
     byId(`assists_${id}`).value = row.assists || 0;
     byId(`penalty_${id}`).value = row.penalty_save || 0;
+    byId(`pg_${id}`).value = row.penalty_goals || 0;
+    byId(`pm_${id}`).value = row.penalty_misses || 0;
+    byId(`pw_${id}`).value = row.penalty_won || 0;
+    byId(`og_${id}`).value = row.own_goals || 0;
     byId(`cs_${id}`).checked = !!row.clean_sheet;
     byId(`red_${id}`).checked = !!row.red_card;
+
+    if (row.winning_goal && byId("winningGoalPlayer")) {
+      byId("winningGoalPlayer").value = row.player;
+    }
   });
 
   updateSummary();
@@ -699,6 +756,7 @@ function getInputNumber(id) {
 
 function collectFantasyRows() {
   const match = selectedMatch();
+  const winningGoalPlayer = byId("winningGoalPlayer") ? byId("winningGoalPlayer").value : "";
 
   return orderedPlayers().map(player => {
     const id = safeId(player.short);
@@ -709,8 +767,13 @@ function collectFantasyRows() {
       goals: getInputNumber(`goals_${id}`),
       assists: getInputNumber(`assists_${id}`),
       penalty_save: getInputNumber(`penalty_${id}`),
+      penalty_goals: getInputNumber(`pg_${id}`),
+      penalty_misses: getInputNumber(`pm_${id}`),
+      penalty_won: getInputNumber(`pw_${id}`),
+      own_goals: getInputNumber(`og_${id}`),
       clean_sheet: byId(`cs_${id}`).checked,
-      red_card: byId(`red_${id}`).checked
+      red_card: byId(`red_${id}`).checked,
+      winning_goal: player.short === winningGoalPlayer
     };
   });
 }
@@ -744,6 +807,10 @@ function updateSummary() {
   byId("sumAssists").textContent = rows.reduce((sum,row) => sum + row.assists, 0);
   byId("sumCleanSheets").textContent = rows.filter(row => row.clean_sheet).length;
   byId("sumRedCards").textContent = rows.filter(row => row.red_card).length;
+  if (byId("sumPenaltyGoals")) byId("sumPenaltyGoals").textContent = rows.reduce((sum,row) => sum + row.penaltyGoals, 0);
+  if (byId("sumPenaltyMisses")) byId("sumPenaltyMisses").textContent = rows.reduce((sum,row) => sum + row.penaltyMisses, 0);
+  if (byId("sumPenaltyWon")) byId("sumPenaltyWon").textContent = rows.reduce((sum,row) => sum + row.penaltyWon, 0);
+  if (byId("sumOwnGoals")) byId("sumOwnGoals").textContent = rows.reduce((sum,row) => sum + row.ownGoals, 0);
 }
 
 function collectFantasyRowsSafe() {
@@ -753,13 +820,17 @@ function collectFantasyRowsSafe() {
   return orderedPlayers().map(player => {
     const id = safeId(player.short);
     if (!byId(`goals_${id}`)) {
-      return { goals:0, assists:0, clean_sheet:false, red_card:false };
+      return { goals:0, assists:0, clean_sheet:false, red_card:false, penaltyGoals:0, penaltyMisses:0, penaltyWon:0, ownGoals:0 };
     }
 
     return {
       goals: getInputNumber(`goals_${id}`),
       assists: getInputNumber(`assists_${id}`),
       penalty_save: getInputNumber(`penalty_${id}`),
+      penaltyGoals: getInputNumber(`pg_${id}`),
+      penaltyMisses: getInputNumber(`pm_${id}`),
+      penaltyWon: getInputNumber(`pw_${id}`),
+      ownGoals: getInputNumber(`og_${id}`),
       clean_sheet: byId(`cs_${id}`).checked,
       red_card: byId(`red_${id}`).checked
     };
