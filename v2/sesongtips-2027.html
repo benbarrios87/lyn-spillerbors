@@ -14,89 +14,130 @@
 
 <style>
 .dev-banner{
-  background:rgba(255,209,102,.14);
-  border:1px dashed rgba(255,209,102,.55);
+  background:rgba(255,209,102,.12);
+  border:1px dashed rgba(255,209,102,.5);
   border-radius:18px;
   padding:14px 16px;
-  margin-bottom:18px;
-  font-size:14px;
-  line-height:1.5;
+  margin-bottom:20px;
+  font-size:13.5px;
+  line-height:1.55;
+  color:var(--muted);
 }
 .dev-banner strong{color:var(--gold)}
+.dev-banner code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:6px;font-size:12px}
 
 .section-card{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:24px;
-  padding:20px;
-  box-shadow:0 12px 35px rgba(0,0,0,.28);
-  margin-bottom:18px;
+  padding:22px;
+  box-shadow:0 14px 38px rgba(0,0,0,.3);
+  margin-bottom:20px;
 }
-.section-card h2{margin-top:0}
-.section-card .small-help{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:14px}
+.section-card h2{margin:0 0 4px;font-size:21px;display:flex;align-items:center;gap:8px}
+.section-card .small-help{color:var(--muted);font-size:13.5px;line-height:1.55;margin:4px 0 16px}
 
-.voter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.voter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .voter-row input{
   flex:1;min-width:180px;
-  padding:12px;border-radius:12px;border:1px solid var(--line);
-  background:rgba(255,255,255,.94);color:#111;font-size:16px;
+  padding:13px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.95);color:#111;font-size:16px;
 }
 
 button.primary-btn{
-  border:none;border-radius:14px;padding:13px 18px;
+  border:none;border-radius:14px;padding:13px 20px;
   background:var(--red);color:white;font-weight:900;cursor:pointer;font-size:15px;
+  transition:transform .1s, opacity .15s;
 }
-button.primary-btn:disabled{opacity:.5;cursor:not-allowed}
+button.primary-btn:hover{transform:translateY(-1px)}
+button.primary-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.ghost-btn{
+  border:1px solid var(--line);border-radius:12px;padding:10px 14px;
+  background:rgba(255,255,255,.06);color:white;font-weight:700;font-size:13px;cursor:pointer;
+}
+button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 
-.team-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+/* ---- Tabelltipping ---- */
+.table-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.table-legend span{display:flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.legend-dot.promo{background:#22c55e}
+.legend-dot.releg{background:#ef4444}
+
+.team-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 .team-row{
-  display:flex;align-items:center;gap:12px;
+  display:flex;align-items:center;gap:14px;
   background:rgba(255,255,255,.07);
   border:1px solid var(--line);
-  border-radius:14px;
-  padding:10px 12px;
+  border-left:4px solid transparent;
+  border-radius:16px;
+  padding:12px 14px;
   user-select:none;
+  cursor:grab;
+  transition:background .12s, border-color .12s;
 }
-.team-row.dragging{opacity:.55;border-color:var(--gold)}
+.team-row:hover{background:rgba(255,255,255,.11)}
+.team-row.dragging{opacity:.5;border-color:var(--gold);cursor:grabbing}
+.team-row.zone-promo{border-left-color:#22c55e}
+.team-row.zone-releg{border-left-color:#ef4444}
+.team-row.is-lyn{background:rgba(215,25,32,.16)}
+
 .team-pos{
-  width:30px;text-align:center;font-weight:900;color:var(--gold);font-size:15px;flex-shrink:0;
+  width:28px;text-align:center;font-weight:900;color:var(--gold);font-size:15px;flex-shrink:0;
 }
 .team-crest{
-  width:34px;height:34px;border-radius:50%;
+  position:relative;
+  width:38px;height:38px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   font-weight:900;font-size:12px;color:white;flex-shrink:0;
-  box-shadow:0 3px 8px rgba(0,0,0,.35);
+  box-shadow:0 3px 10px rgba(0,0,0,.4);
+  overflow:hidden;
 }
-.team-name{flex:1;font-weight:700}
+.team-crest img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.team-crest .crest-fallback{position:relative;z-index:0}
+
+.team-name{flex:1;font-weight:700;font-size:15px}
 .team-nudge{display:flex;gap:4px}
 .team-nudge button{
-  width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
-  background:rgba(255,255,255,.08);color:white;font-weight:900;cursor:pointer;
+  width:28px;height:28px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(255,255,255,.06);color:var(--muted);font-weight:900;cursor:pointer;font-size:11px;
 }
-.drag-handle{
-  cursor:grab;color:var(--muted);font-size:18px;padding:0 4px;touch-action:none;flex-shrink:0;
-}
-.drag-handle:active{cursor:grabbing}
+.team-nudge button:hover{background:rgba(255,255,255,.14);color:white}
+.drag-dots{color:var(--muted);font-size:16px;flex-shrink:0;letter-spacing:-1px}
 
-.fixture-grid{display:grid;gap:10px}
-.fixture-row{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+/* ---- Kamptipping ---- */
+.fixture-quickrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.fixture-progress{font-size:13px;color:var(--muted);margin-bottom:14px}
+.fixture-progress strong{color:var(--gold)}
+
+.fixture-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:720px){.fixture-grid{grid-template-columns:1fr 1fr}}
+
+.fixture-card{
   background:rgba(255,255,255,.06);
   border:1px solid var(--line);
-  border-radius:14px;
-  padding:10px 12px;
+  border-radius:16px;
+  padding:12px 14px;
 }
-.fixture-label{flex:1;min-width:160px;font-weight:700}
-.fixture-venue{font-size:12px;color:var(--muted);font-weight:700}
-.pick-group{display:flex;gap:6px}
+.fixture-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fixture-card-head .team-crest{width:28px;height:28px;font-size:10px}
+.fixture-card-head strong{font-size:14.5px}
+
+.fixture-leg{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.fixture-leg:first-of-type{margin-top:0}
+.leg-label{font-size:11.5px;color:var(--muted);font-weight:800;text-transform:uppercase;width:52px;flex-shrink:0}
+.pick-group{display:flex;gap:5px;flex:1;justify-content:flex-end}
 .pick-btn{
-  border:1px solid var(--line);border-radius:10px;
-  padding:8px 12px;background:rgba(255,255,255,.07);
-  color:white;font-weight:800;font-size:13px;cursor:pointer;
+  border:1px solid var(--line);border-radius:9px;
+  padding:7px 0;width:58px;
+  background:rgba(255,255,255,.07);
+  color:white;font-weight:800;font-size:12px;cursor:pointer;
+  transition:background .12s;
 }
-.pick-btn.active{background:var(--gold);color:#16100a;border-color:var(--gold)}
+.pick-btn:hover{background:rgba(255,255,255,.15)}
+.pick-btn.active[data-pick="seier"]{background:#22c55e;color:#06220f;border-color:#22c55e}
+.pick-btn.active[data-pick="uavgjort"]{background:var(--gold);color:#16100a;border-color:var(--gold)}
 .pick-btn.active[data-pick="tap"]{background:var(--red);color:white;border-color:var(--red)}
-.pick-btn.active[data-pick="uavgjort"]{background:var(--blue);color:white;border-color:var(--blue)}
 
 .status{
   display:none;margin-top:14px;padding:13px;border-radius:14px;line-height:1.45;
@@ -106,7 +147,7 @@ button.primary-btn:disabled{opacity:.5;cursor:not-allowed}
 
 .locked-note{
   background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.5);
-  border-radius:14px;padding:13px;margin-bottom:14px;font-size:14px;
+  border-radius:14px;padding:13px;margin-bottom:18px;font-size:14px;
 }
 </style>
 </head>
@@ -124,34 +165,47 @@ button.primary-btn:disabled{opacity:.5;cursor:not-allowed}
 </section>
 
 <div class="dev-banner">
-  <strong>Under utvikling.</strong> Denne siden er ikke lansert og ligger ikke i menyen – kun tilgjengelig via denne lenken.
-  Laglisten er en plassholder basert på 2026-sesongen (riktig 2027-liste er ikke klar før opprykk/nedrykk er avgjort),
-  og lagene har genererte farge-badges i stedet for ekte klubblogoer. Oppdater <code>v2/js/season2027-data.js</code>
-  når ting er klart.
+  <strong>Under utvikling.</strong> Ikke lansert, ikke i menyen – kun via denne lenken. Laglisten er en plassholder
+  fra 2026-sesongen (riktig 2027-liste er ikke klar før opprykk/nedrykk er avgjort). Legg ekte klubblogoer i
+  <code>bilder/klubber/{lagid}.png</code> (f.eks. <code>bilder/klubber/lyn.png</code>) for at de skal vises automatisk –
+  helt til da vises en generert farge-badge med initialer.
 </div>
 
 <div id="lockedNote" class="locked-note" style="display:none;">
-  🔒 Tippingen er låst (sesongen har startet eller låsetidspunktet er passert). Du kan fortsatt se hva du tippet.
+  🔒 Tippingen er låst. Du kan fortsatt se hva du tippet.
 </div>
 
 <section class="section-card">
-  <h2>Hvem tipper?</h2>
+  <h2>👤 Hvem tipper?</h2>
+  <p class="small-help">Bruk samme navn som på børsen/fantasy/tips, så er alt samlet på deg.</p>
   <div class="voter-row">
-    <input id="voterName" placeholder="Navnet ditt (samme som på børsen)">
-    <button class="primary-btn" id="loadBtn" onclick="loadMyPredictions()">Hent min tipping</button>
+    <input id="voterName" placeholder="Navnet ditt">
+    <button class="ghost-btn" onclick="loadMyPredictions()">Hent min tipping</button>
   </div>
-  <p class="small-help">Bruk samme navn som du bruker på børsen/fantasy/tips, så er alt samlet på deg.</p>
 </section>
 
 <section class="section-card">
   <h2>🏆 Tabelltipping</h2>
-  <p class="small-help">Dra lagene opp eller ned (eller bruk pilene) til tabellen ser ut som du tror den gjør når sesongen er ferdig. Øverst = 1. plass.</p>
+  <p class="small-help">Dra hele boksen opp eller ned (eller bruk pilene) til tabellen ser ut som du tror den gjør når sesongen er ferdig. Øverst = 1. plass.</p>
+  <div class="table-legend">
+    <span><span class="legend-dot promo"></span> Opprykkssone</span>
+    <span><span class="legend-dot releg"></span> Nedrykkssone</span>
+  </div>
   <ol id="teamList" class="team-list"></ol>
 </section>
 
 <section class="section-card">
   <h2>⚽ Lyns kamper</h2>
-  <p class="small-help">Tipp utfall (sett fra Lyn sin side) for alle kampene Lyn spiller mot de andre lagene, hjemme og borte.</p>
+  <p class="small-help">Tipp utfall (sett fra Lyn sin side) mot alle lagene, hjemme og borte.</p>
+
+  <div class="fixture-quickrow">
+    <button class="ghost-btn" onclick="quickFill('seier')">✅ Sett alt til Lyn-seier</button>
+    <button class="ghost-btn" onclick="quickFillHomeAway()">🏠 Hjemme = seier, borte = tap</button>
+    <button class="ghost-btn" onclick="quickFill(null)">🧹 Nullstill</button>
+  </div>
+
+  <div class="fixture-progress"><strong id="fixtureProgressCount">0</strong> av <span id="fixtureProgressTotal">0</span> kamper tippet</div>
+
   <div id="fixtureGrid" class="fixture-grid"></div>
 </section>
 
@@ -169,9 +223,11 @@ import { renderNavbar, renderFooter } from "./js/layout.js";
 import { supabaseClient } from "./js/supabase.js";
 import {
   TEAMS_2027,
-  teamInitials,
+  teamCrestHtml,
   isLocked,
-  getLynFixtures
+  getLynFixtures,
+  PROMOTION_ZONE_SIZE,
+  RELEGATION_ZONE_SIZE
 } from "./js/season2027-data.js";
 
 document.getElementById("navbar").innerHTML = renderNavbar("");
@@ -225,10 +281,10 @@ function renderTeamList(order) {
     if (!team) return "";
 
     return `
-      <li class="team-row" data-id="${team.id}">
-        <span class="drag-handle">⠿</span>
+      <li class="team-row ${team.id === "lyn" ? "is-lyn" : ""}" data-id="${team.id}">
+        <span class="drag-dots">⠿</span>
         <span class="team-pos"></span>
-        <span class="team-crest" style="background:${team.color}">${teamInitials(team.name)}</span>
+        ${teamCrestHtml(team, 38)}
         <span class="team-name">${team.name}</span>
         <span class="team-nudge">
           <button type="button" data-dir="-1" aria-label="Flytt opp">▲</button>
@@ -244,13 +300,19 @@ function renderTeamList(order) {
 }
 
 function updatePositions() {
-  [...byId("teamList").querySelectorAll(".team-row")].forEach((row, i) => {
+  const rows = [...byId("teamList").querySelectorAll(".team-row")];
+  const n = rows.length;
+
+  rows.forEach((row, i) => {
     row.querySelector(".team-pos").textContent = `${i + 1}.`;
+    row.classList.toggle("zone-promo", i < PROMOTION_ZONE_SIZE);
+    row.classList.toggle("zone-releg", i >= n - RELEGATION_ZONE_SIZE);
   });
 }
 
 function wireNudgeButtons() {
   byId("teamList").querySelectorAll(".team-nudge button").forEach(btn => {
+    btn.addEventListener("pointerdown", e => e.stopPropagation());
     btn.onclick = () => {
       if (locked) return;
       const row = btn.closest(".team-row");
@@ -270,11 +332,11 @@ function wireNudgeButtons() {
 }
 
 function wireDrag() {
-  byId("teamList").querySelectorAll(".drag-handle").forEach(handle => {
-    handle.addEventListener("pointerdown", (e) => {
+  byId("teamList").querySelectorAll(".team-row").forEach(row => {
+    row.addEventListener("pointerdown", (e) => {
       if (locked) return;
+      if (e.target.closest(".team-nudge")) return;
 
-      const row = handle.closest(".team-row");
       const list = byId("teamList");
 
       row.classList.add("dragging");
@@ -321,45 +383,87 @@ renderTeamList(null);
 const fixtures = getLynFixtures();
 let picks = {};
 
-function renderFixtures() {
-  byId("fixtureGrid").innerHTML = fixtures.map(fx => `
-    <div class="fixture-row" data-id="${fx.id}">
-      <div class="fixture-label">
-        ${fx.label}
-        <div class="fixture-venue">${fx.venue === "hjemme" ? "Hjemme" : "Borte"}</div>
-      </div>
+function opponentGroups() {
+  const groups = {};
+  fixtures.forEach(fx => {
+    if (!groups[fx.opponent.id]) groups[fx.opponent.id] = { opponent: fx.opponent, home: null, away: null };
+    if (fx.venue === "hjemme") groups[fx.opponent.id].home = fx;
+    else groups[fx.opponent.id].away = fx;
+  });
+  return Object.values(groups);
+}
+
+function pickGroupHtml(fx) {
+  return `
+    <div class="fixture-leg" data-fixture-id="${fx.id}">
+      <span class="leg-label">${fx.venue === "hjemme" ? "Hjemme" : "Borte"}</span>
       <div class="pick-group">
         <button type="button" class="pick-btn" data-pick="seier">Seier</button>
-        <button type="button" class="pick-btn" data-pick="uavgjort">Uavgjort</button>
+        <button type="button" class="pick-btn" data-pick="uavgjort">Uav.</button>
         <button type="button" class="pick-btn" data-pick="tap">Tap</button>
       </div>
+    </div>
+  `;
+}
+
+function renderFixtures() {
+  byId("fixtureProgressTotal").textContent = fixtures.length;
+
+  byId("fixtureGrid").innerHTML = opponentGroups().map(group => `
+    <div class="fixture-card">
+      <div class="fixture-card-head">
+        ${teamCrestHtml(group.opponent, 28)}
+        <strong>${group.opponent.name}</strong>
+      </div>
+      ${pickGroupHtml(group.home)}
+      ${pickGroupHtml(group.away)}
     </div>
   `).join("");
 
   byId("fixtureGrid").querySelectorAll(".pick-btn").forEach(btn => {
     btn.onclick = () => {
       if (locked) return;
-      const row = btn.closest(".fixture-row");
-      const id = row.dataset.id;
+      const leg = btn.closest(".fixture-leg");
+      const id = leg.dataset.fixtureId;
       picks[id] = btn.dataset.pick;
 
-      row.querySelectorAll(".pick-btn").forEach(b => b.classList.toggle("active", b === btn));
+      leg.querySelectorAll(".pick-btn").forEach(b => b.classList.toggle("active", b === btn));
+      updateProgress();
     };
   });
 
   applyPicksToUI();
+  updateProgress();
 }
 
 function applyPicksToUI() {
-  byId("fixtureGrid").querySelectorAll(".fixture-row").forEach(row => {
-    const id = row.dataset.id;
+  byId("fixtureGrid").querySelectorAll(".fixture-leg").forEach(leg => {
+    const id = leg.dataset.fixtureId;
     const pick = picks[id];
 
-    row.querySelectorAll(".pick-btn").forEach(b => {
+    leg.querySelectorAll(".pick-btn").forEach(b => {
       b.classList.toggle("active", pick && b.dataset.pick === pick);
     });
   });
 }
+
+function updateProgress() {
+  byId("fixtureProgressCount").textContent = Object.keys(picks).filter(id => picks[id]).length;
+}
+
+window.quickFill = function(pick) {
+  if (locked) return;
+  fixtures.forEach(fx => { picks[fx.id] = pick; });
+  applyPicksToUI();
+  updateProgress();
+};
+
+window.quickFillHomeAway = function() {
+  if (locked) return;
+  fixtures.forEach(fx => { picks[fx.id] = fx.venue === "hjemme" ? "seier" : "tap"; });
+  applyPicksToUI();
+  updateProgress();
+};
 
 renderFixtures();
 
@@ -398,6 +502,7 @@ window.loadMyPredictions = async function() {
     picks[`${row.opponent_id}_${venueKey}`] = row.pick;
   });
   applyPicksToUI();
+  updateProgress();
 
   showStatus("saveStatus", `Hentet tidligere tipping for <strong>${voter}</strong> (hvis noe fantes).`);
 };

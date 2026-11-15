@@ -48,6 +48,20 @@ export function teamInitials(name) {
   return cleaned.slice(0, 2).toUpperCase();
 }
 
+// Prøver en ekte klubblogo fra bilder/klubber/{id}.png først. Finnes ikke
+// filen (vanlig akkurat nå – ingen er lagt inn), forsvinner <img> via
+// onerror og den genererte farge-badgen med initialer vises i stedet.
+// Ingen ekte klubblogoer hentes inn automatisk her (opphavsrett) – legg dem
+// inn selv i bilder/klubber/ hvis du vil ha ekte logoer.
+export function teamCrestHtml(team, size = 34) {
+  return `
+    <span class="team-crest" style="width:${size}px;height:${size}px;background:${team.color}">
+      <img src="../bilder/klubber/${team.id}.png" alt="" loading="lazy" onerror="this.remove()">
+      <span class="crest-fallback">${teamInitials(team.name)}</span>
+    </span>
+  `;
+}
+
 export function isLocked() {
   return new Date() >= new Date(LOCK_AT);
 }
