@@ -1,9 +1,18 @@
 // ⚠️ PROTOTYPE-DATA for "Sesongtips 2027".
 //
-// 2026-sesongen er ikke avgjort ennå, så opprykk/nedrykk til/fra 2027-utgaven
-// av OBOS-ligaen er ikke klart. Listen under er derfor en PLASSHOLDER basert
-// på 2026-lagene. Oppdater TEAMS_2027 (og gjerne LOCK_AT) når det er klart,
-// trolig i november/desember når 2026-sesongen er ferdigspilt.
+// Status pr. nå (ifølge Ben):
+//  - Raufoss og Åsane er rykket ned fra OBOS-ligaen – fjernet fra lista.
+//  - Strømsgodset og Haugesund er rykket opp til Eliteserien – fjernet fra lista.
+//  - Stabæk og Kongsvinger kjemper om opprykkskvalik-plassen (3. plass, som
+//    møter Eliteserien i kvalifisering) – begge står fortsatt i lista siden
+//    verste utfall for dem er å bli værende i OBOS-ligaen uansett.
+//  - Sogndal har nedrykkskvalik mot Bjarg (fra 2. divisjon) – Sogndal står
+//    fortsatt i lista inntil det er avgjort. Taper Sogndal, bytt Sogndal ut
+//    med Bjarg.
+//  - MANGLER: lag opprykket fra 2. divisjon som erstatning for
+//    Strømsgodset/Haugesund er ikke kjent ennå – legg dem til når det er klart.
+//
+// Oppdater denne lista etter hvert som resten blir avgjort.
 
 export const SEASON_YEAR = 2027;
 
@@ -12,25 +21,23 @@ export const SEASON_YEAR = 2027;
 export const LOCK_AT = "2027-03-01T00:00:00+01:00";
 
 // id må være stabil (brukes til lagring). name er det som vises.
-// color brukes til den genererte lag-"logoen" (sirkel med initialer) –
-// ingen ekte klubblogoer er hentet inn her (opphavsrett + usikker 2027-liste).
+// color brukes til den genererte lag-"logoen" (sirkel med initialer) som
+// vises når det ikke finnes en ekte logofil i bilder/klubber/{id}.png.
 export const TEAMS_2027 = [
   { id: "bryne", name: "Bryne", color: "#1d4ed8" },
   { id: "egersund", name: "Egersund", color: "#0d9488" },
-  { id: "haugesund", name: "Haugesund", color: "#f59e0b" },
   { id: "hodd", name: "Hødd", color: "#2563eb" },
   { id: "kongsvinger", name: "Kongsvinger", color: "#1f2937" },
   { id: "lyn", name: "Lyn", color: "#d71920" },
   { id: "moss", name: "Moss", color: "#0ea5e9" },
   { id: "odd", name: "Odd", color: "#15803d" },
   { id: "ranheim", name: "Ranheim", color: "#7c3aed" },
-  { id: "raufoss", name: "Raufoss", color: "#f97316" },
   { id: "sandnesulf", name: "Sandnes Ulf", color: "#ca8a04" },
   { id: "sogndal", name: "Sogndal", color: "#dc2626" },
   { id: "stabaek", name: "Stabæk", color: "#3b82f6" },
-  { id: "strommen", name: "Strømmen", color: "#334155" },
-  { id: "stromsgodset", name: "Strømsgodset", color: "#1e3a8a" },
-  { id: "asane", name: "Åsane", color: "#ca8a04" }
+  { id: "strommen", name: "Strømmen", color: "#334155" }
+  // TODO: legg til lag opprykket fra 2. divisjon (og evt. Bjarg hvis Sogndal
+  // taper kvalik) når det er avgjort, slik at lista igjen blir 16 lag.
 ];
 
 export function getTeam(id) {
@@ -49,15 +56,15 @@ export function teamInitials(name) {
 }
 
 // Prøver en ekte klubblogo fra bilder/klubber/{id}.png først. Finnes ikke
-// filen (vanlig akkurat nå – ingen er lagt inn), forsvinner <img> via
-// onerror og den genererte farge-badgen med initialer vises i stedet.
-// Ingen ekte klubblogoer hentes inn automatisk her (opphavsrett) – legg dem
-// inn selv i bilder/klubber/ hvis du vil ha ekte logoer.
+// filen, forsvinner <img> via onerror og initial-bokstavene vises i stedet.
+// Initialene er skjult (display:none) så lenge en ekte logo vises, så de
+// ikke skinner gjennom gjennomsiktige hjørner på skjold-formede logoer.
 export function teamCrestHtml(team, size = 34) {
   return `
     <span class="team-crest" style="width:${size}px;height:${size}px;background:${team.color}">
-      <img src="../bilder/klubber/${team.id}.png" alt="" loading="lazy" onerror="this.remove()">
-      <span class="crest-fallback">${teamInitials(team.name)}</span>
+      <img src="../bilder/klubber/${team.id}.png" alt="" loading="lazy"
+           onerror="var p=this.parentElement; this.remove(); p.querySelector('.crest-fallback').style.display='inline';">
+      <span class="crest-fallback" style="display:none;">${teamInitials(team.name)}</span>
     </span>
   `;
 }
