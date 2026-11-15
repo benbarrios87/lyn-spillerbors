@@ -3,14 +3,13 @@
 // Status pr. nå (ifølge Ben):
 //  - Raufoss og Åsane er rykket ned fra OBOS-ligaen – fjernet fra lista.
 //  - Strømsgodset og Haugesund er rykket opp til Eliteserien – fjernet fra lista.
+//  - Jerv og Eidsvold Turn er rykket opp til OBOS-ligaen – lagt til i lista.
 //  - Stabæk og Kongsvinger kjemper om opprykkskvalik-plassen (3. plass, som
 //    møter Eliteserien i kvalifisering) – begge står fortsatt i lista siden
 //    verste utfall for dem er å bli værende i OBOS-ligaen uansett.
 //  - Sogndal har nedrykkskvalik mot Bjarg (fra 2. divisjon) – Sogndal står
 //    fortsatt i lista inntil det er avgjort. Taper Sogndal, bytt Sogndal ut
 //    med Bjarg.
-//  - MANGLER: lag opprykket fra 2. divisjon som erstatning for
-//    Strømsgodset/Haugesund er ikke kjent ennå – legg dem til når det er klart.
 //
 // Oppdater denne lista etter hvert som resten blir avgjort.
 
@@ -26,7 +25,9 @@ export const LOCK_AT = "2027-03-01T00:00:00+01:00";
 export const TEAMS_2027 = [
   { id: "bryne", name: "Bryne", color: "#1d4ed8" },
   { id: "egersund", name: "Egersund", color: "#0d9488" },
+  { id: "eidsvoldturn", name: "Eidsvold Turn", color: "#1d4ed8" },
   { id: "hodd", name: "Hødd", color: "#2563eb" },
+  { id: "jerv", name: "Jerv", color: "#facc15" },
   { id: "kongsvinger", name: "Kongsvinger", color: "#1f2937" },
   { id: "lyn", name: "Lyn", color: "#d71920" },
   { id: "moss", name: "Moss", color: "#0ea5e9" },
@@ -36,8 +37,8 @@ export const TEAMS_2027 = [
   { id: "sogndal", name: "Sogndal", color: "#dc2626" },
   { id: "stabaek", name: "Stabæk", color: "#3b82f6" },
   { id: "strommen", name: "Strømmen", color: "#334155" }
-  // TODO: legg til lag opprykket fra 2. divisjon (og evt. Bjarg hvis Sogndal
-  // taper kvalik) når det er avgjort, slik at lista igjen blir 16 lag.
+  // TODO: legg til ev. Bjarg hvis Sogndal taper nedrykkskvalik, slik at
+  // lista blir 16 lag.
 ];
 
 export function getTeam(id) {
@@ -99,14 +100,17 @@ export function getLynFixtures() {
 //    nedrykkssonen, selv om rekkefølgen internt i sonen ikke stemmer. Å vite
 //    HVEM som rykker opp/ned er ofte viktigere enn eksakt rekkefølge der.
 //
-// PROMOTION_ZONE_SIZE/RELEGATION_ZONE_SIZE er satt til vanlige størrelser for
-// OBOS-ligaen, men formatet (antall kvalik-/nedrykksplasser) kan variere fra
-// sesong til sesong – juster disse to tallene når 2027-formatet er bekreftet.
+// Format bekreftet av Ben: plass 1-2 rykker direkte opp, plass 3-6 går til
+// opprykkskvalik, plass 7-11 er trygg midtsone (ingen bonus), og plass 12-16
+// er nedrykkssone. Zone-bonusen gjelder både direkte opprykk og kvalik-sonen
+// (11 av 16 lag er altså i en sone - bare midtsonen gir ingen sonebonus).
 
 export const LYN_EXACT_BONUS = 10;
 export const ZONE_BONUS_PER_TEAM = 5;
-export const PROMOTION_ZONE_SIZE = 3; // f.eks. plass 1-3 (direkte opprykk + kvalik)
-export const RELEGATION_ZONE_SIZE = 2; // f.eks. de 2 nederste plassene
+export const PROMOTION_DIRECT_SIZE = 2; // plass 1-2: direkte opprykk
+export const PROMOTION_PLAYOFF_SIZE = 4; // plass 3-6: opprykkskvalik
+export const PROMOTION_ZONE_SIZE = PROMOTION_DIRECT_SIZE + PROMOTION_PLAYOFF_SIZE; // plass 1-6 totalt
+export const RELEGATION_ZONE_SIZE = 5; // plass 12-16 (av 16 lag)
 
 export function scoreTablePrediction(predictedIds, actualIds) {
   const actualPos = {};

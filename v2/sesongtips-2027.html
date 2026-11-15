@@ -62,6 +62,7 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 .table-legend span{display:flex;align-items:center;gap:6px}
 .legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
 .legend-dot.promo{background:#22c55e}
+.legend-dot.playoff{background:#86efac}
 .legend-dot.releg{background:#ef4444}
 
 .team-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
@@ -86,7 +87,8 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
   position:relative;
   will-change:transform;
 }
-.team-row.zone-promo{border-left-color:#22c55e}
+.team-row.zone-promo-direct{border-left-color:#22c55e}
+.team-row.zone-promo-playoff{border-left-color:#86efac}
 .team-row.zone-releg{border-left-color:#ef4444}
 .team-row.is-lyn{background:rgba(215,25,32,.16)}
 
@@ -156,6 +158,31 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
   background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.5);
   border-radius:14px;padding:13px;margin-bottom:18px;font-size:14px;
 }
+
+.points-info{
+  margin-top:12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:13px;color:var(--muted);
+}
+.points-info summary{cursor:pointer;font-weight:800;color:var(--gold);list-style:none}
+.points-info summary::-webkit-details-marker{display:none}
+.points-info summary::before{content:"▸ "}
+.points-info[open] summary::before{content:"▾ "}
+.points-info ul{margin:10px 0 2px;padding-left:18px;line-height:1.6}
+
+.leaderboard-table{width:100%;border-collapse:collapse;font-size:14px}
+.leaderboard-table th{
+  text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;
+  padding:6px 8px;border-bottom:1px solid var(--line);
+}
+.leaderboard-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.07)}
+.leaderboard-table tr:last-child td{border-bottom:none}
+.leaderboard-rank{font-weight:900;color:var(--gold);width:28px}
+.leaderboard-table tr.is-me{background:rgba(255,209,102,.1)}
+.leaderboard-points{font-weight:900;text-align:right}
 </style>
 </head>
 
@@ -195,10 +222,16 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
   <h2>🏆 Tabelltipping</h2>
   <p class="small-help">Dra hele boksen opp eller ned (eller bruk pilene) til tabellen ser ut som du tror den gjør når sesongen er ferdig. Øverst = 1. plass.</p>
   <div class="table-legend">
-    <span><span class="legend-dot promo"></span> Opprykkssone</span>
+    <span><span class="legend-dot promo"></span> Direkte opprykk</span>
+    <span><span class="legend-dot playoff"></span> Opprykkskvalik</span>
     <span><span class="legend-dot releg"></span> Nedrykkssone</span>
   </div>
   <ol id="teamList" class="team-list"></ol>
+
+  <details class="points-info">
+    <summary>Hvordan telles poengene?</summary>
+    <ul id="tablePointsInfo"></ul>
+  </details>
 </section>
 
 <section class="section-card">
@@ -214,11 +247,25 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
   <div class="fixture-progress"><strong id="fixtureProgressCount">0</strong> av <span id="fixtureProgressTotal">0</span> kamper tippet</div>
 
   <div id="fixtureGrid" class="fixture-grid"></div>
+
+  <details class="points-info">
+    <summary>Hvordan telles poengene?</summary>
+    <ul id="matchPointsInfo"></ul>
+  </details>
 </section>
 
 <section class="section-card">
   <button class="primary-btn" id="saveBtn" onclick="saveMyPredictions()">Lagre tippingen min</button>
   <div id="saveStatus" class="status"></div>
+</section>
+
+<section class="section-card">
+  <h2>🏁 Ledertavle <span style="font-size:12px;color:var(--muted);font-weight:700;">(live)</span></h2>
+  <p class="small-help">
+    Oppdateres automatisk etter hvert som Lyns kamper får resultat i admin. Tabellpoeng (sone-bonus og avstandspoeng)
+    krever full sluttabell og telles først når 2027-sesongen er ferdigspilt – under vises derfor kun kamppoeng så langt.
+  </p>
+  <div id="leaderboard"><p class="small-help">Laster...</p></div>
 </section>
 
 </main>
@@ -233,8 +280,14 @@ import {
   teamCrestHtml,
   isLocked,
   getLynFixtures,
+  PROMOTION_DIRECT_SIZE,
   PROMOTION_ZONE_SIZE,
-  RELEGATION_ZONE_SIZE
+  RELEGATION_ZONE_SIZE,
+  LYN_EXACT_BONUS,
+  ZONE_BONUS_PER_TEAM,
+  POINTS_WIN_OR_LOSS,
+  POINTS_DRAW,
+  scoreMatchPrediction
 } from "./js/season2027-data.js";
 
 document.getElementById("navbar").innerHTML = renderNavbar("");
@@ -247,6 +300,19 @@ if (locked) {
   byId("lockedNote").style.display = "block";
   byId("saveBtn").disabled = true;
 }
+
+byId("tablePointsInfo").innerHTML = `
+  <li>Opptil ${TEAMS_2027.length} poeng per lag – jo nærmere du er riktig plass, jo flere poeng. Helt riktig plass gir full pott, og du får aldri under 1 poeng selv om du bommer stygt.</li>
+  <li>+${ZONE_BONUS_PER_TEAM} bonuspoeng per lag du plasserer i riktig sone (direkte opprykk, opprykkskvalik eller nedrykk) – selv om eksakt plass i sonen er feil.</li>
+  <li>+${LYN_EXACT_BONUS} bonuspoeng hvis du treffer Lyn sin eksakte sluttplassering.</li>
+  <li>Tabellpoeng krever full sluttabell, så disse telles først når 2027-sesongen er ferdigspilt.</li>
+`;
+
+byId("matchPointsInfo").innerHTML = `
+  <li>Riktig tippet seier eller tap: ${POINTS_WIN_OR_LOSS} poeng</li>
+  <li>Riktig tippet uavgjort: ${POINTS_DRAW} poeng (vanskeligere å gjette riktig enn seier/tap)</li>
+  <li>Disse poengene telles live, kamp for kamp, etter hvert som Lyns resultater legges inn i admin.</li>
+`;
 
 function showStatus(id, message, type = "ok") {
   const el = byId(id);
@@ -312,7 +378,8 @@ function updatePositions() {
 
   rows.forEach((row, i) => {
     row.querySelector(".team-pos").textContent = `${i + 1}.`;
-    row.classList.toggle("zone-promo", i < PROMOTION_ZONE_SIZE);
+    row.classList.toggle("zone-promo-direct", i < PROMOTION_DIRECT_SIZE);
+    row.classList.toggle("zone-promo-playoff", i >= PROMOTION_DIRECT_SIZE && i < PROMOTION_ZONE_SIZE);
     row.classList.toggle("zone-releg", i >= n - RELEGATION_ZONE_SIZE);
   });
 }
@@ -614,7 +681,133 @@ window.saveMyPredictions = async function() {
   if (missingPicks === 0) {
     showStatus("saveStatus", `Tippingen til <strong>${voter}</strong> er lagret!`);
   }
+
+  loadLeaderboard();
 };
+
+// ---------- Live ledertavle ----------
+//
+// Kamppoeng kan telles live: vi henter Lyns ferdigspilte kamper fra den
+// vanlige matches-tabellen (samme data som resten av siden bruker), finner
+// hvilken av våre 2027-motstandere hver kamp gjelder (matcher på lagnavn),
+// regner ut faktisk utfall (seier/uavgjort/tap sett fra Lyn), og sammenligner
+// med hver sin tipping. Tabellpoeng (sone-bonus m.m.) krever full sluttabell
+// og kan ikke telles live før sesongen er ferdig.
+
+function normalizeTeamName(name) {
+  return String(name || "").trim().toLowerCase();
+}
+
+const teamByName = new Map(TEAMS_2027.map(t => [normalizeTeamName(t.name), t]));
+
+async function getResolvedLynOutcomes() {
+  const { data, error } = await supabaseClient
+    .from("matches")
+    .select("*")
+    .eq("team", "men");
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  const outcomes = [];
+
+  (data || []).forEach(match => {
+    const hasResult = match.actual_home !== null && match.actual_home !== undefined &&
+                       match.actual_away !== null && match.actual_away !== undefined;
+    if (!hasResult) return;
+
+    const homeIsLyn = normalizeTeamName(match.home) === "lyn";
+    const awayIsLyn = normalizeTeamName(match.away) === "lyn";
+    if (!homeIsLyn && !awayIsLyn) return;
+
+    const opponentName = homeIsLyn ? match.away : match.home;
+    const opponent = teamByName.get(normalizeTeamName(opponentName));
+    if (!opponent) return; // ikke en av våre 2027-motstandere (f.eks. cupkamp)
+
+    const lynGoals = homeIsLyn ? match.actual_home : match.actual_away;
+    const otherGoals = homeIsLyn ? match.actual_away : match.actual_home;
+
+    let outcome = "uavgjort";
+    if (lynGoals > otherGoals) outcome = "seier";
+    if (lynGoals < otherGoals) outcome = "tap";
+
+    outcomes.push({
+      fixtureId: `${opponent.id}_${homeIsLyn ? "h" : "b"}`,
+      outcome
+    });
+  });
+
+  return outcomes;
+}
+
+async function loadLeaderboard() {
+  const box = byId("leaderboard");
+
+  const [outcomes, { data: predictionRows, error }] = await Promise.all([
+    getResolvedLynOutcomes(),
+    supabaseClient.from("season2027_match_predictions").select("*")
+  ]);
+
+  if (error) {
+    console.error(error);
+    box.innerHTML = `<p class="small-help">Klarte ikke å laste ledertavlen.</p>`;
+    return;
+  }
+
+  if (!outcomes.length) {
+    box.innerHTML = `<p class="small-help">Ingen av Lyns 2027-kamper har fått resultat ennå – ledertavlen fylles opp etter hvert som sesongen går.</p>`;
+    return;
+  }
+
+  const byVoter = new Map();
+
+  (predictionRows || []).forEach(row => {
+    const fixtureId = `${row.opponent_id}_${row.venue === "hjemme" ? "h" : "b"}`;
+    const resolved = outcomes.find(o => o.fixtureId === fixtureId);
+    if (!resolved) return;
+
+    if (!byVoter.has(row.voter)) byVoter.set(row.voter, { voter: row.voter, points: 0, resolved: 0 });
+    const entry = byVoter.get(row.voter);
+    entry.points += scoreMatchPrediction(row.pick, resolved.outcome);
+    entry.resolved += 1;
+  });
+
+  const rows = [...byVoter.values()].sort((a, b) => b.points - a.points);
+
+  if (!rows.length) {
+    box.innerHTML = `<p class="small-help">Ingen har tippet de avgjorte kampene ennå.</p>`;
+    return;
+  }
+
+  const me = normalizeTeamName(byId("voterName").value);
+
+  box.innerHTML = `
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Navn</th>
+          <th>Kamper avgjort</th>
+          <th style="text-align:right">Poeng</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((row, i) => `
+          <tr class="${normalizeTeamName(row.voter) === me ? "is-me" : ""}">
+            <td class="leaderboard-rank">${i + 1}.</td>
+            <td>${row.voter}</td>
+            <td>${row.resolved} av ${outcomes.length}</td>
+            <td class="leaderboard-points">${row.points}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+loadLeaderboard();
 </script>
 
 </body>
