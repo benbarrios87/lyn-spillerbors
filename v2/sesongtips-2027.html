@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynbørs 2.0 • Sesongtips 2027 (prototype)</title>
+
+<link rel="icon" href="../lblogoen.png">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="../nav.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+.dev-banner{
+  background:rgba(255,209,102,.14);
+  border:1px dashed rgba(255,209,102,.55);
+  border-radius:18px;
+  padding:14px 16px;
+  margin-bottom:18px;
+  font-size:14px;
+  line-height:1.5;
+}
+.dev-banner strong{color:var(--gold)}
+
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 12px 35px rgba(0,0,0,.28);
+  margin-bottom:18px;
+}
+.section-card h2{margin-top:0}
+.section-card .small-help{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:14px}
+
+.voter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.voter-row input{
+  flex:1;min-width:180px;
+  padding:12px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.94);color:#111;font-size:16px;
+}
+
+button.primary-btn{
+  border:none;border-radius:14px;padding:13px 18px;
+  background:var(--red);color:white;font-weight:900;cursor:pointer;font-size:15px;
+}
+button.primary-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.team-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.team-row{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 12px;
+  user-select:none;
+}
+.team-row.dragging{opacity:.55;border-color:var(--gold)}
+.team-pos{
+  width:30px;text-align:center;font-weight:900;color:var(--gold);font-size:15px;flex-shrink:0;
+}
+.team-crest{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:12px;color:white;flex-shrink:0;
+  box-shadow:0 3px 8px rgba(0,0,0,.35);
+}
+.team-name{flex:1;font-weight:700}
+.team-nudge{display:flex;gap:4px}
+.team-nudge button{
+  width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(255,255,255,.08);color:white;font-weight:900;cursor:pointer;
+}
+.drag-handle{
+  cursor:grab;color:var(--muted);font-size:18px;padding:0 4px;touch-action:none;flex-shrink:0;
+}
+.drag-handle:active{cursor:grabbing}
+
+.fixture-grid{display:grid;gap:10px}
+.fixture-row{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.fixture-label{flex:1;min-width:160px;font-weight:700}
+.fixture-venue{font-size:12px;color:var(--muted);font-weight:700}
+.pick-group{display:flex;gap:6px}
+.pick-btn{
+  border:1px solid var(--line);border-radius:10px;
+  padding:8px 12px;background:rgba(255,255,255,.07);
+  color:white;font-weight:800;font-size:13px;cursor:pointer;
+}
+.pick-btn.active{background:var(--gold);color:#16100a;border-color:var(--gold)}
+.pick-btn.active[data-pick="tap"]{background:var(--red);color:white;border-color:var(--red)}
+.pick-btn.active[data-pick="uavgjort"]{background:var(--blue);color:white;border-color:var(--blue)}
+
+.status{
+  display:none;margin-top:14px;padding:13px;border-radius:14px;line-height:1.45;
+}
+.status.ok{display:block;background:rgba(40,209,124,.16);border:1px solid rgba(40,209,124,.55)}
+.status.error{display:block;background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.65)}
+
+.locked-note{
+  background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.5);
+  border-radius:14px;padding:13px;margin-bottom:14px;font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="navbar"></div>
+
+<main class="page-wrap">
+
+<section class="page-header">
+  <div class="badge">PROTOTYPE</div>
+  <h1>Sesongtips 2027</h1>
+  <p>Tipp OBOS-liga-tabellen og alle Lyns kamper før sesongen starter.</p>
+</section>
+
+<div class="dev-banner">
+  <strong>Under utvikling.</strong> Denne siden er ikke lansert og ligger ikke i menyen – kun tilgjengelig via denne lenken.
+  Laglisten er en plassholder basert på 2026-sesongen (riktig 2027-liste er ikke klar før opprykk/nedrykk er avgjort),
+  og lagene har genererte farge-badges i stedet for ekte klubblogoer. Oppdater <code>v2/js/season2027-data.js</code>
+  når ting er klart.
+</div>
+
+<div id="lockedNote" class="locked-note" style="display:none;">
+  🔒 Tippingen er låst (sesongen har startet eller låsetidspunktet er passert). Du kan fortsatt se hva du tippet.
+</div>
+
+<section class="section-card">
+  <h2>Hvem tipper?</h2>
+  <div class="voter-row">
+    <input id="voterName" placeholder="Navnet ditt (samme som på børsen)">
+    <button class="primary-btn" id="loadBtn" onclick="loadMyPredictions()">Hent min tipping</button>
+  </div>
+  <p class="small-help">Bruk samme navn som du bruker på børsen/fantasy/tips, så er alt samlet på deg.</p>
+</section>
+
+<section class="section-card">
+  <h2>🏆 Tabelltipping</h2>
+  <p class="small-help">Dra lagene opp eller ned (eller bruk pilene) til tabellen ser ut som du tror den gjør når sesongen er ferdig. Øverst = 1. plass.</p>
+  <ol id="teamList" class="team-list"></ol>
+</section>
+
+<section class="section-card">
+  <h2>⚽ Lyns kamper</h2>
+  <p class="small-help">Tipp utfall (sett fra Lyn sin side) for alle kampene Lyn spiller mot de andre lagene, hjemme og borte.</p>
+  <div id="fixtureGrid" class="fixture-grid"></div>
+</section>
+
+<section class="section-card">
+  <button class="primary-btn" id="saveBtn" onclick="saveMyPredictions()">Lagre tippingen min</button>
+  <div id="saveStatus" class="status"></div>
+</section>
+
+</main>
+
+<div id="footer"></div>
+
+<script type="module">
+import { renderNavbar, renderFooter } from "./js/layout.js";
+import { supabaseClient } from "./js/supabase.js";
+import {
+  TEAMS_2027,
+  teamInitials,
+  isLocked,
+  getLynFixtures
+} from "./js/season2027-data.js";
+
+document.getElementById("navbar").innerHTML = renderNavbar("");
+document.getElementById("footer").innerHTML = renderFooter();
+
+const byId = id => document.getElementById(id);
+const locked = isLocked();
+
+if (locked) {
+  byId("lockedNote").style.display = "block";
+  byId("saveBtn").disabled = true;
+}
+
+function showStatus(id, message, type = "ok") {
+  const el = byId(id);
+  el.className = `status ${type}`;
+  el.innerHTML = message;
+}
+
+function getSavedUsername() {
+  return (
+    localStorage.getItem("lynbors_voter") ||
+    localStorage.getItem("lynBorsUsername") ||
+    localStorage.getItem("username") ||
+    localStorage.getItem("voter") ||
+    localStorage.getItem("forumName") ||
+    ""
+  );
+}
+
+function saveUsernameEverywhere(username) {
+  localStorage.setItem("lynbors_voter", username);
+  localStorage.setItem("lynBorsUsername", username);
+  localStorage.setItem("username", username);
+  localStorage.setItem("voter", username);
+  localStorage.setItem("forumName", username);
+}
+
+byId("voterName").value = getSavedUsername();
+
+// ---------- Tabelltipping ----------
+
+function renderTeamList(order) {
+  const list = byId("teamList");
+  const ids = order && order.length === TEAMS_2027.length
+    ? order
+    : TEAMS_2027.map(t => t.id);
+
+  list.innerHTML = ids.map(id => {
+    const team = TEAMS_2027.find(t => t.id === id);
+    if (!team) return "";
+
+    return `
+      <li class="team-row" data-id="${team.id}">
+        <span class="drag-handle">⠿</span>
+        <span class="team-pos"></span>
+        <span class="team-crest" style="background:${team.color}">${teamInitials(team.name)}</span>
+        <span class="team-name">${team.name}</span>
+        <span class="team-nudge">
+          <button type="button" data-dir="-1" aria-label="Flytt opp">▲</button>
+          <button type="button" data-dir="1" aria-label="Flytt ned">▼</button>
+        </span>
+      </li>
+    `;
+  }).join("");
+
+  updatePositions();
+  wireNudgeButtons();
+  wireDrag();
+}
+
+function updatePositions() {
+  [...byId("teamList").querySelectorAll(".team-row")].forEach((row, i) => {
+    row.querySelector(".team-pos").textContent = `${i + 1}.`;
+  });
+}
+
+function wireNudgeButtons() {
+  byId("teamList").querySelectorAll(".team-nudge button").forEach(btn => {
+    btn.onclick = () => {
+      if (locked) return;
+      const row = btn.closest(".team-row");
+      const dir = Number(btn.dataset.dir);
+      const sibling = dir < 0 ? row.previousElementSibling : row.nextElementSibling;
+      if (!sibling) return;
+
+      if (dir < 0) {
+        row.parentNode.insertBefore(row, sibling);
+      } else {
+        row.parentNode.insertBefore(sibling, row);
+      }
+
+      updatePositions();
+    };
+  });
+}
+
+function wireDrag() {
+  byId("teamList").querySelectorAll(".drag-handle").forEach(handle => {
+    handle.addEventListener("pointerdown", (e) => {
+      if (locked) return;
+
+      const row = handle.closest(".team-row");
+      const list = byId("teamList");
+
+      row.classList.add("dragging");
+      try { row.setPointerCapture(e.pointerId); } catch {}
+
+      const onMove = (ev) => {
+        const rows = [...list.querySelectorAll(".team-row")].filter(r => r !== row);
+
+        const after = rows.find(r => {
+          const rect = r.getBoundingClientRect();
+          return ev.clientY < rect.top + rect.height / 2;
+        });
+
+        if (after) {
+          list.insertBefore(row, after);
+        } else {
+          list.appendChild(row);
+        }
+
+        updatePositions();
+      };
+
+      const onUp = () => {
+        row.classList.remove("dragging");
+        try { row.releasePointerCapture(e.pointerId); } catch {}
+        document.removeEventListener("pointermove", onMove);
+        document.removeEventListener("pointerup", onUp);
+      };
+
+      document.addEventListener("pointermove", onMove);
+      document.addEventListener("pointerup", onUp);
+    });
+  });
+}
+
+function getTeamOrder() {
+  return [...byId("teamList").querySelectorAll(".team-row")].map(row => row.dataset.id);
+}
+
+renderTeamList(null);
+
+// ---------- Kamptipping ----------
+
+const fixtures = getLynFixtures();
+let picks = {};
+
+function renderFixtures() {
+  byId("fixtureGrid").innerHTML = fixtures.map(fx => `
+    <div class="fixture-row" data-id="${fx.id}">
+      <div class="fixture-label">
+        ${fx.label}
+        <div class="fixture-venue">${fx.venue === "hjemme" ? "Hjemme" : "Borte"}</div>
+      </div>
+      <div class="pick-group">
+        <button type="button" class="pick-btn" data-pick="seier">Seier</button>
+        <button type="button" class="pick-btn" data-pick="uavgjort">Uavgjort</button>
+        <button type="button" class="pick-btn" data-pick="tap">Tap</button>
+      </div>
+    </div>
+  `).join("");
+
+  byId("fixtureGrid").querySelectorAll(".pick-btn").forEach(btn => {
+    btn.onclick = () => {
+      if (locked) return;
+      const row = btn.closest(".fixture-row");
+      const id = row.dataset.id;
+      picks[id] = btn.dataset.pick;
+
+      row.querySelectorAll(".pick-btn").forEach(b => b.classList.toggle("active", b === btn));
+    };
+  });
+
+  applyPicksToUI();
+}
+
+function applyPicksToUI() {
+  byId("fixtureGrid").querySelectorAll(".fixture-row").forEach(row => {
+    const id = row.dataset.id;
+    const pick = picks[id];
+
+    row.querySelectorAll(".pick-btn").forEach(b => {
+      b.classList.toggle("active", pick && b.dataset.pick === pick);
+    });
+  });
+}
+
+renderFixtures();
+
+// ---------- Last / lagre ----------
+
+window.loadMyPredictions = async function() {
+  const voter = byId("voterName").value.trim();
+
+  if (!voter) {
+    showStatus("saveStatus", "Skriv inn navnet ditt først.", "error");
+    return;
+  }
+
+  saveUsernameEverywhere(voter);
+
+  const [{ data: tableRow, error: tableError }, { data: matchRows, error: matchError }] = await Promise.all([
+    supabaseClient.from("season2027_table_predictions").select("*").eq("voter", voter).maybeSingle(),
+    supabaseClient.from("season2027_match_predictions").select("*").eq("voter", voter)
+  ]);
+
+  if (tableError || matchError) {
+    console.error(tableError || matchError);
+    showStatus("saveStatus", "Klarte ikke å hente tidligere tipping.", "error");
+    return;
+  }
+
+  if (tableRow && Array.isArray(tableRow.teams)) {
+    renderTeamList(tableRow.teams);
+  } else {
+    renderTeamList(null);
+  }
+
+  picks = {};
+  (matchRows || []).forEach(row => {
+    const venueKey = row.venue === "hjemme" ? "h" : "b";
+    picks[`${row.opponent_id}_${venueKey}`] = row.pick;
+  });
+  applyPicksToUI();
+
+  showStatus("saveStatus", `Hentet tidligere tipping for <strong>${voter}</strong> (hvis noe fantes).`);
+};
+
+window.saveMyPredictions = async function() {
+  if (locked) return;
+
+  const voter = byId("voterName").value.trim();
+
+  if (!voter) {
+    showStatus("saveStatus", "Skriv inn navnet ditt først.", "error");
+    return;
+  }
+
+  saveUsernameEverywhere(voter);
+
+  const teamOrder = getTeamOrder();
+
+  const missingPicks = fixtures.filter(fx => !picks[fx.id]).length;
+  if (missingPicks > 0) {
+    showStatus("saveStatus", `Du har ${missingPicks} kamp(er) uten tips. Lagrer det du har valgt så langt.`, "error");
+  }
+
+  const { error: tableError } = await supabaseClient
+    .from("season2027_table_predictions")
+    .upsert({
+      voter,
+      teams: teamOrder,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "voter" });
+
+  const matchRows = fixtures
+    .filter(fx => picks[fx.id])
+    .map(fx => ({
+      voter,
+      opponent_id: fx.opponent.id,
+      venue: fx.venue,
+      pick: picks[fx.id],
+      updated_at: new Date().toISOString()
+    }));
+
+  const { error: matchError } = matchRows.length
+    ? await supabaseClient.from("season2027_match_predictions").upsert(matchRows, { onConflict: "voter,opponent_id,venue" })
+    : { error: null };
+
+  if (tableError || matchError) {
+    console.error(tableError || matchError);
+    showStatus("saveStatus", "Klarte ikke å lagre tippingen.", "error");
+    return;
+  }
+
+  if (missingPicks === 0) {
+    showStatus("saveStatus", `Tippingen til <strong>${voter}</strong> er lagret!`);
+  }
+};
+</script>
+
+</body>
+</html>
