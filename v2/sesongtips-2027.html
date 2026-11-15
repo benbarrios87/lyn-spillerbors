@@ -74,10 +74,18 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
   padding:12px 14px;
   user-select:none;
   cursor:grab;
-  transition:background .12s, border-color .12s;
+  touch-action:none;
+  transition:background .12s, border-color .12s, box-shadow .15s;
 }
 .team-row:hover{background:rgba(255,255,255,.11)}
-.team-row.dragging{opacity:.5;border-color:var(--gold);cursor:grabbing}
+.team-row.dragging{
+  border-color:var(--gold);
+  background:rgba(255,209,102,.14);
+  box-shadow:0 20px 34px rgba(0,0,0,.5);
+  cursor:grabbing;
+  position:relative;
+  will-change:transform;
+}
 .team-row.zone-promo{border-left-color:#22c55e}
 .team-row.zone-releg{border-left-color:#ef4444}
 .team-row.is-lyn{background:rgba(215,25,32,.16)}
@@ -330,6 +338,30 @@ function wireNudgeButtons() {
   });
 }
 
+// Animerer de andre radene (ikke den som dras) inn på sin nye plass med en
+// FLIP-teknikk: mål posisjon før endringen, gjør endringen, mål posisjon
+// etter, og la dem gli fra gammel til ny plass i stedet for å hoppe rett dit.
+function animateSiblingsReorder(list, draggedRow, mutate) {
+  const rows = [...list.querySelectorAll(".team-row")].filter(r => r !== draggedRow);
+  const before = new Map(rows.map(r => [r, r.getBoundingClientRect().top]));
+
+  mutate();
+
+  rows.forEach(r => {
+    const from = before.get(r);
+    const to = r.getBoundingClientRect().top;
+    const delta = from - to;
+    if (!delta) return;
+
+    r.style.transition = "none";
+    r.style.transform = `translateY(${delta}px)`;
+    requestAnimationFrame(() => {
+      r.style.transition = "transform 220ms cubic-bezier(.2,.8,.2,1)";
+      r.style.transform = "";
+    });
+  });
+}
+
 function wireDrag() {
   byId("teamList").querySelectorAll(".team-row").forEach(row => {
     row.addEventListener("pointerdown", (e) => {
@@ -337,11 +369,26 @@ function wireDrag() {
       if (e.target.closest(".team-nudge")) return;
 
       const list = byId("teamList");
+      const startY = e.clientY;
+      let lastY = startY;
+      let lastT = performance.now();
 
       row.classList.add("dragging");
+      row.style.transition = "none";
+      row.style.zIndex = "50";
       try { row.setPointerCapture(e.pointerId); } catch {}
 
       const onMove = (ev) => {
+        const now = performance.now();
+        const dt = Math.max(now - lastT, 1);
+        const velocity = (ev.clientY - lastY) / dt; // px per ms
+        lastY = ev.clientY;
+        lastT = now;
+
+        const deltaY = ev.clientY - startY;
+        const tilt = Math.max(-8, Math.min(8, velocity * 35));
+        row.style.transform = `translateY(${deltaY}px) scale(1.04) rotate(${tilt.toFixed(2)}deg)`;
+
         const rows = [...list.querySelectorAll(".team-row")].filter(r => r !== row);
 
         const after = rows.find(r => {
@@ -349,17 +396,28 @@ function wireDrag() {
           return ev.clientY < rect.top + rect.height / 2;
         });
 
-        if (after) {
-          list.insertBefore(row, after);
-        } else {
-          list.appendChild(row);
-        }
+        const wouldMoveToEnd = !after && row.nextElementSibling !== null;
+        const wouldMoveBefore = after && after !== row.nextElementSibling;
 
-        updatePositions();
+        if (wouldMoveToEnd || wouldMoveBefore) {
+          animateSiblingsReorder(list, row, () => {
+            if (after) list.insertBefore(row, after);
+            else list.appendChild(row);
+          });
+          updatePositions();
+        }
       };
 
       const onUp = () => {
         row.classList.remove("dragging");
+        row.style.transition = "transform 260ms cubic-bezier(.34,1.56,.64,1)";
+        row.style.transform = "";
+
+        setTimeout(() => {
+          row.style.transition = "";
+          row.style.zIndex = "";
+        }, 270);
+
         try { row.releasePointerCapture(e.pointerId); } catch {}
         document.removeEventListener("pointermove", onMove);
         document.removeEventListener("pointerup", onUp);
