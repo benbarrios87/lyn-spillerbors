@@ -114,6 +114,15 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 .team-nudge button:hover{background:rgba(255,255,255,.14);color:white}
 .drag-dots{color:var(--muted);font-size:16px;flex-shrink:0;letter-spacing:-1px}
 
+.pos-delta{
+  font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;
+  background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--muted);
+  flex-shrink:0;white-space:nowrap;
+}
+.pos-delta.is-exact{background:rgba(40,209,124,.2);border-color:rgba(40,209,124,.6);color:#9df7c4}
+.pos-delta.is-close{background:rgba(255,209,102,.18);border-color:rgba(255,209,102,.55);color:var(--gold)}
+.pos-delta.is-far{background:rgba(255,107,107,.18);border-color:rgba(255,107,107,.55);color:#ffb4b4}
+
 /* ---- Kamptipping ---- */
 .fixture-quickrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .fixture-progress{font-size:13px;color:var(--muted);margin-bottom:14px}
@@ -147,6 +156,10 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 .pick-btn.active[data-pick="seier"]{background:#22c55e;color:#06220f;border-color:#22c55e}
 .pick-btn.active[data-pick="uavgjort"]{background:var(--gold);color:#16100a;border-color:var(--gold)}
 .pick-btn.active[data-pick="tap"]{background:var(--red);color:white;border-color:var(--red)}
+.pick-btn.outcome-actual{box-shadow:0 0 0 2px rgba(255,209,102,.85) inset}
+
+.leg-result{font-size:12.5px;margin-left:6px}
+.fixture-leg.resolved .leg-label{color:var(--gold)}
 
 .status{
   display:none;margin-top:14px;padding:13px;border-radius:14px;line-height:1.45;
@@ -183,6 +196,14 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 .leaderboard-rank{font-weight:900;color:var(--gold);width:28px}
 .leaderboard-table tr.is-me{background:rgba(255,209,102,.1)}
 .leaderboard-points{font-weight:900;text-align:right}
+
+.points-bar-track{
+  margin-top:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;max-width:220px;
+}
+.points-bar-fill{
+  height:100%;border-radius:999px;background:linear-gradient(90deg, var(--gold), #ffb347);
+  transition:width .35s ease;
+}
 
 .live-source-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
 .live-source-badge{
@@ -236,6 +257,10 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
     <span><span class="legend-dot playoff"></span> Opprykkskvalik</span>
     <span><span class="legend-dot releg"></span> Nedrykkssone</span>
   </div>
+  <p class="small-help" style="margin-top:-4px">
+    Chippen til høyre for hvert lag viser hvordan du ligger an <em>akkurat nå</em> mot live-tabellen under –
+    ✓ = riktig plass akkurat nå, ▲/▼ = antall plasser unna. Rent moro underveis, selve poengene telles ved sesongslutt.
+  </p>
   <ol id="teamList" class="team-list"></ol>
 
   <details class="points-info">
@@ -377,6 +402,7 @@ function renderTeamList(order) {
         <span class="team-pos"></span>
         ${teamCrestHtml(team, 38)}
         <span class="team-name">${team.name}</span>
+        <span class="pos-delta"></span>
         <span class="team-nudge">
           <button type="button" data-dir="-1" aria-label="Flytt opp">▲</button>
           <button type="button" data-dir="1" aria-label="Flytt ned">▼</button>
@@ -399,6 +425,48 @@ function updatePositions() {
     row.classList.toggle("zone-promo-direct", i < PROMOTION_DIRECT_SIZE);
     row.classList.toggle("zone-promo-playoff", i >= PROMOTION_DIRECT_SIZE && i < PROMOTION_ZONE_SIZE);
     row.classList.toggle("zone-releg", i >= n - RELEGATION_ZONE_SIZE);
+  });
+
+  applyTableComparison();
+}
+
+// Viser, mens man drar lagene rundt, hvor langt unna man er live-tabellen
+// akkurat nå (se loadLiveStandings()). Rent visuelt/for moro skyld – de
+// faktiske tabellpoengene telles fortsatt først ved sesongslutt, siden
+// live-tabellen underveis ikke er den endelige sluttabellen.
+let liveStandingsPos = new Map(); // team.id -> 0-indeksert plass i live-tabellen
+
+function applyTableComparison() {
+  const rows = [...byId("teamList").querySelectorAll(".team-row")];
+
+  rows.forEach((row, i) => {
+    const id = row.dataset.id;
+    let badge = row.querySelector(".pos-delta");
+    if (!badge) return;
+
+    if (!liveStandingsPos.has(id)) {
+      badge.className = "pos-delta";
+      badge.textContent = "";
+      badge.title = "";
+      return;
+    }
+
+    const livePos = liveStandingsPos.get(id);
+    const diff = i - livePos;
+    const absDiff = Math.abs(diff);
+
+    let cls, label;
+    if (diff === 0) {
+      cls = "is-exact";
+      label = "✓";
+    } else {
+      cls = absDiff <= 2 ? "is-close" : "is-far";
+      label = diff > 0 ? `▼${absDiff}` : `▲${absDiff}`;
+    }
+
+    badge.className = `pos-delta ${cls}`;
+    badge.textContent = label;
+    badge.title = `Du har denne på plass ${i + 1}. Live-tabellen har dem på plass ${livePos + 1} akkurat nå.`;
   });
 }
 
@@ -538,7 +606,7 @@ function opponentGroups() {
 function pickGroupHtml(fx) {
   return `
     <div class="fixture-leg" data-fixture-id="${fx.id}">
-      <span class="leg-label">${fx.venue === "hjemme" ? "Hjemme" : "Borte"}</span>
+      <span class="leg-label">${fx.venue === "hjemme" ? "Hjemme" : "Borte"}<span class="leg-result"></span></span>
       <div class="pick-group">
         <button type="button" class="pick-btn" data-pick="seier">Seier</button>
         <button type="button" class="pick-btn" data-pick="uavgjort">Uav.</button>
@@ -569,7 +637,7 @@ function renderFixtures() {
       const id = leg.dataset.fixtureId;
       picks[id] = btn.dataset.pick;
 
-      leg.querySelectorAll(".pick-btn").forEach(b => b.classList.toggle("active", b === btn));
+      applyPicksToUI();
       updateProgress();
     };
   });
@@ -586,6 +654,42 @@ function applyPicksToUI() {
     leg.querySelectorAll(".pick-btn").forEach(b => {
       b.classList.toggle("active", pick && b.dataset.pick === pick);
     });
+  });
+
+  applyFixtureResolutions();
+}
+
+// Viser live, kamp for kamp, om tippingen din stemte med faktisk resultat
+// (hentet fra samme matches-tabell som ledertavlen bruker). Ring rundt
+// knappen = dette ble faktisk utfallet. ✅/❌ ved siden av Hjemme/Borte =
+// om din tipping for akkurat den kampen stemte.
+let resolvedOutcomes = [];
+
+function applyFixtureResolutions() {
+  byId("fixtureGrid").querySelectorAll(".fixture-leg").forEach(leg => {
+    const id = leg.dataset.fixtureId;
+    const resolved = resolvedOutcomes.find(o => o.fixtureId === id);
+
+    leg.classList.toggle("resolved", !!resolved);
+
+    leg.querySelectorAll(".pick-btn").forEach(b => {
+      b.classList.toggle("outcome-actual", !!resolved && b.dataset.pick === resolved.outcome);
+    });
+
+    const resultEl = leg.querySelector(".leg-result");
+    if (!resolved) {
+      resultEl.textContent = "";
+      return;
+    }
+
+    const pick = picks[id];
+    if (!pick) {
+      resultEl.textContent = "❔";
+    } else if (pick === resolved.outcome) {
+      resultEl.textContent = "✅";
+    } else {
+      resultEl.textContent = "❌";
+    }
   });
 }
 
@@ -788,6 +892,12 @@ async function loadLiveStandings() {
       return;
     }
 
+    liveStandingsPos = new Map();
+    rows.forEach((row, i) => {
+      if (row.team) liveStandingsPos.set(row.team.id, i);
+    });
+    applyTableComparison();
+
     const sourceBadge = {
       live: `<span class="live-source-badge is-live">🟢 Live</span>`,
       cache: `<span class="live-source-badge">🟡 Cachet (nylig)</span>`,
@@ -886,10 +996,9 @@ async function getResolvedLynOutcomes() {
 async function loadLeaderboard() {
   const box = byId("leaderboard");
 
-  const [outcomes, { data: predictionRows, error }] = await Promise.all([
-    getResolvedLynOutcomes(),
-    supabaseClient.from("season2027_match_predictions").select("*")
-  ]);
+  const { data: predictionRows, error } = await supabaseClient
+    .from("season2027_match_predictions")
+    .select("*");
 
   if (error) {
     console.error(error);
@@ -897,7 +1006,7 @@ async function loadLeaderboard() {
     return;
   }
 
-  if (!outcomes.length) {
+  if (!resolvedOutcomes.length) {
     box.innerHTML = `<p class="small-help">Ingen av Lyns 2027-kamper har fått resultat ennå – ledertavlen fylles opp etter hvert som sesongen går.</p>`;
     return;
   }
@@ -906,7 +1015,7 @@ async function loadLeaderboard() {
 
   (predictionRows || []).forEach(row => {
     const fixtureId = `${row.opponent_id}_${row.venue === "hjemme" ? "h" : "b"}`;
-    const resolved = outcomes.find(o => o.fixtureId === fixtureId);
+    const resolved = resolvedOutcomes.find(o => o.fixtureId === fixtureId);
     if (!resolved) return;
 
     if (!byVoter.has(row.voter)) byVoter.set(row.voter, { voter: row.voter, points: 0, resolved: 0 });
@@ -923,6 +1032,7 @@ async function loadLeaderboard() {
   }
 
   const me = normalizeTeamName(byId("voterName").value);
+  const maxPoints = Math.max(...rows.map(r => r.points), 1);
 
   box.innerHTML = `
     <table class="leaderboard-table">
@@ -938,8 +1048,11 @@ async function loadLeaderboard() {
         ${rows.map((row, i) => `
           <tr class="${normalizeTeamName(row.voter) === me ? "is-me" : ""}">
             <td class="leaderboard-rank">${i + 1}.</td>
-            <td>${row.voter}</td>
-            <td>${row.resolved} av ${outcomes.length}</td>
+            <td>
+              ${row.voter}
+              <div class="points-bar-track"><div class="points-bar-fill" style="width:${Math.max(4, (row.points / maxPoints) * 100)}%"></div></div>
+            </td>
+            <td>${row.resolved} av ${resolvedOutcomes.length}</td>
             <td class="leaderboard-points">${row.points}</td>
           </tr>
         `).join("")}
@@ -948,7 +1061,16 @@ async function loadLeaderboard() {
   `;
 }
 
-loadLeaderboard();
+// Henter faktiske kamputfall én gang og gjenbruker dem til både ✅/❌ per
+// kamp i "Lyns kamper"-seksjonen og til ledertavlen under, i stedet for å
+// hente samme data to ganger.
+async function refreshResolvedOutcomes() {
+  resolvedOutcomes = await getResolvedLynOutcomes();
+  applyFixtureResolutions();
+  await loadLeaderboard();
+}
+
+refreshResolvedOutcomes();
 </script>
 
 </body>
