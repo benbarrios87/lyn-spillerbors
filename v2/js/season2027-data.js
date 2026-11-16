@@ -10,6 +10,8 @@
 //  - Sogndal har nedrykkskvalik mot Bjarg (fra 2. divisjon) – Sogndal står
 //    fortsatt i lista inntil det er avgjort. Taper Sogndal, bytt Sogndal ut
 //    med Bjarg.
+//  - Start er (ifølge Bens tips) ventet å rykke ned fra Eliteserien – lagt
+//    til i lista. Dette er fortsatt en spådom, ikke offisielt avgjort ennå.
 //
 // Oppdater denne lista etter hvert som resten blir avgjort.
 
@@ -36,6 +38,7 @@ export const TEAMS_2027 = [
   { id: "sandnesulf", name: "Sandnes Ulf", color: "#ca8a04" },
   { id: "sogndal", name: "Sogndal", color: "#dc2626" },
   { id: "stabaek", name: "Stabæk", color: "#3b82f6" },
+  { id: "start", name: "Start", color: "#0369a1" },
   { id: "strommen", name: "Strømmen", color: "#334155" }
   // TODO: legg til ev. Bjarg hvis Sogndal taper nedrykkskvalik, slik at
   // lista blir 16 lag.

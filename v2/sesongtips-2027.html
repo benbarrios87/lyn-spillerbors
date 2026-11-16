@@ -183,6 +183,16 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 .leaderboard-rank{font-weight:900;color:var(--gold);width:28px}
 .leaderboard-table tr.is-me{background:rgba(255,209,102,.1)}
 .leaderboard-points{font-weight:900;text-align:right}
+
+.live-source-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.live-source-badge{
+  font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;
+  background:rgba(255,255,255,.08);border:1px solid var(--line);
+}
+.live-source-badge.is-live{background:rgba(40,209,124,.18);border-color:rgba(40,209,124,.55);color:#9df7c4}
+.live-source-badge.is-stale{background:rgba(255,209,102,.16);border-color:rgba(255,209,102,.5);color:var(--gold)}
+.standings-table td:nth-child(2){display:flex;align-items:center;gap:8px}
+.refresh-btn{margin-left:auto}
 </style>
 </head>
 
@@ -257,6 +267,14 @@ button.ghost-btn:hover{background:rgba(255,255,255,.12)}
 <section class="section-card">
   <button class="primary-btn" id="saveBtn" onclick="saveMyPredictions()">Lagre tippingen min</button>
   <div id="saveStatus" class="status"></div>
+</section>
+
+<section class="section-card">
+  <h2>📊 OBOS-ligaen – live tabell</h2>
+  <p class="small-help">
+    Hentet direkte fra fotball.no, så du alltid kan se hvordan det faktisk ligger an – uavhengig av hva du selv har tippet.
+  </p>
+  <div id="liveStandings"><p class="small-help">Laster...</p></div>
 </section>
 
 <section class="section-card">
@@ -699,6 +717,129 @@ function normalizeTeamName(name) {
 }
 
 const teamByName = new Map(TEAMS_2027.map(t => [normalizeTeamName(t.name), t]));
+
+// ---------- Live tabell fra fotball.no (via Supabase Edge Function) --------
+//
+// Ekstern kilde, så svaret kan i prinsippet se annerledes ut enn forventet –
+// koden her er derfor forsiktig/defensiv og viser heller en feilmelding enn
+// å krasje hvis feltnavnene ikke stemmer med det vi gjettet på.
+
+const LIVE_TABLE_FUNCTION_URL = "https://oqwlbdnthdbomnobxqot.supabase.co/functions/v1/season2027-table";
+
+function pickField(row, keys) {
+  for (const key of keys) {
+    if (row && row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
+  }
+  return undefined;
+}
+
+function matchTeamByName(name) {
+  const norm = normalizeTeamName(name);
+  if (!norm) return null;
+  if (teamByName.has(norm)) return teamByName.get(norm);
+
+  // Fallback: ekstern kilde skriver ofte fulle klubbnavn ("Sandnes Ulf IL",
+  // "IL Hødd") som ikke er et eksakt treff på vår korte liste-tekst.
+  return TEAMS_2027.find(t => {
+    const tn = normalizeTeamName(t.name);
+    return norm.includes(tn) || tn.includes(norm);
+  }) || null;
+}
+
+function zoneDotClass(i, n) {
+  if (i < PROMOTION_DIRECT_SIZE) return "promo";
+  if (i < PROMOTION_ZONE_SIZE) return "playoff";
+  if (i >= n - RELEGATION_ZONE_SIZE) return "releg";
+  return "";
+}
+
+async function loadLiveStandings() {
+  const box = byId("liveStandings");
+
+  try {
+    const res = await fetch(LIVE_TABLE_FUNCTION_URL);
+    const json = await res.json();
+
+    if (!res.ok || json.error) {
+      throw new Error(json.error || `HTTP ${res.status}`);
+    }
+
+    const rawRows = Array.isArray(json.standings) ? json.standings : [];
+
+    const rows = rawRows.map(row => {
+      const name = pickField(row, ["team", "name", "club", "lag", "holdName", "teamName"]);
+      const positionRaw = pickField(row, ["position", "rank", "plass", "pos"]);
+      return {
+        name: name || "?",
+        team: matchTeamByName(name),
+        position: positionRaw !== undefined ? Number(positionRaw) : null,
+        played: pickField(row, ["played", "matches", "matchesPlayed", "kamper", "mp", "GP"]),
+        points: pickField(row, ["points", "poeng", "pts", "P"])
+      };
+    });
+
+    rows.sort((a, b) => {
+      if (a.position !== null && b.position !== null) return a.position - b.position;
+      return (Number(b.points) || 0) - (Number(a.points) || 0);
+    });
+
+    if (!rows.length) {
+      box.innerHTML = `<p class="small-help">Ingen tabelldata tilgjengelig akkurat nå – sjekk igjen senere.</p>`;
+      return;
+    }
+
+    const sourceBadge = {
+      live: `<span class="live-source-badge is-live">🟢 Live</span>`,
+      cache: `<span class="live-source-badge">🟡 Cachet (nylig)</span>`,
+      "stale-cache": `<span class="live-source-badge is-stale">🟠 Gammel cache</span>`
+    }[json.source] || "";
+
+    const fetchedAt = json.fetched_at
+      ? new Date(json.fetched_at).toLocaleString("no-NO", { dateStyle: "short", timeStyle: "short" })
+      : "";
+
+    box.innerHTML = `
+      <div class="live-source-line">
+        ${sourceBadge}
+        <span class="small-help" style="margin:0">sist hentet ${fetchedAt}</span>
+        <button type="button" class="ghost-btn refresh-btn" id="refreshStandingsBtn">↻ Oppdater</button>
+      </div>
+      <table class="leaderboard-table standings-table">
+        <thead>
+          <tr><th>#</th><th>Lag</th><th>K</th><th style="text-align:right">P</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map((row, i) => {
+            const dot = zoneDotClass(i, rows.length);
+            return `
+              <tr>
+                <td class="leaderboard-rank">${row.position ?? i + 1}.</td>
+                <td>
+                  ${dot ? `<span class="legend-dot ${dot}"></span>` : ""}
+                  ${row.team ? teamCrestHtml(row.team, 22) : ""}
+                  ${row.team ? row.team.name : row.name}
+                </td>
+                <td>${row.played ?? "–"}</td>
+                <td class="leaderboard-points">${row.points ?? "–"}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    `;
+
+    const refreshBtn = byId("refreshStandingsBtn");
+    if (refreshBtn) refreshBtn.onclick = () => {
+      box.innerHTML = `<p class="small-help">Laster...</p>`;
+      loadLiveStandings();
+    };
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = `<p class="small-help">Klarte ikke å hente live-tabellen akkurat nå. Prøver igjen senere.</p>`;
+  }
+}
+
+loadLiveStandings();
 
 async function getResolvedLynOutcomes() {
   const { data, error } = await supabaseClient
