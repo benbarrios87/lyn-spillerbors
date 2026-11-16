@@ -23,23 +23,28 @@ export const LOCK_AT = "2027-03-01T00:00:00+01:00";
 
 // id må være stabil (brukes til lagring). name er det som vises.
 // color brukes til den genererte lag-"logoen" (sirkel med initialer) som
-// vises når det ikke finnes en ekte logofil i bilder/klubber/{id}.png.
+// vises når det ikke finnes en ekte logofil i bilder/klubber/{id}.png – og
+// som bakgrunnssirkel bak selve logoen ellers. Fargene under er satt ved å
+// faktisk måle dominerende farge i hver nedlastede klubblogo (ikke gjettet),
+// slik at bakgrunnen ikke "krasjer" visuelt med logoen slik blå-på-blå gjorde
+// for Start. lyn beholder sin røde merkevarefarge uansett (brukes i resten av
+// siden), og sogndal/stabæk er uendret siden de ennå ikke har en ekte logofil.
 export const TEAMS_2027 = [
-  { id: "bryne", name: "Bryne", color: "#1d4ed8" },
-  { id: "egersund", name: "Egersund", color: "#0d9488" },
-  { id: "eidsvoldturn", name: "Eidsvold Turn", color: "#1d4ed8" },
+  { id: "bryne", name: "Bryne", color: "#16a34a" },
+  { id: "egersund", name: "Egersund", color: "#ca8a04" },
+  { id: "eidsvoldturn", name: "Eidsvold Turn", color: "#1e3a8a" },
   { id: "hodd", name: "Hødd", color: "#2563eb" },
   { id: "jerv", name: "Jerv", color: "#facc15" },
-  { id: "kongsvinger", name: "Kongsvinger", color: "#1f2937" },
+  { id: "kongsvinger", name: "Kongsvinger", color: "#0369a1" },
   { id: "lyn", name: "Lyn", color: "#d71920" },
-  { id: "moss", name: "Moss", color: "#0ea5e9" },
-  { id: "odd", name: "Odd", color: "#15803d" },
-  { id: "ranheim", name: "Ranheim", color: "#7c3aed" },
-  { id: "sandnesulf", name: "Sandnes Ulf", color: "#ca8a04" },
+  { id: "moss", name: "Moss", color: "#eab308" },
+  { id: "odd", name: "Odd", color: "#111827" },
+  { id: "ranheim", name: "Ranheim", color: "#1e40af" },
+  { id: "sandnesulf", name: "Sandnes Ulf", color: "#0f766e" },
   { id: "sogndal", name: "Sogndal", color: "#dc2626" },
   { id: "stabaek", name: "Stabæk", color: "#3b82f6" },
-  { id: "start", name: "Start", color: "#0369a1" },
-  { id: "strommen", name: "Strømmen", color: "#334155" }
+  { id: "start", name: "Start", color: "#f59e0b" },
+  { id: "strommen", name: "Strømmen", color: "#b91c1c" }
   // TODO: legg til ev. Bjarg hvis Sogndal taper nedrykkskvalik, slik at
   // lista blir 16 lag.
 ];
